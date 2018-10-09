@@ -1,0 +1,39 @@
+
+\documentclass[11pt, pdftex]{article}
+\usepackage{epsf}
+\usepackage{epsfig}
+\usepackage{times}
+\usepackage{ifthen}
+\usepackage{comment}
+\usepackage{amsfonts}
+\usepackage{color,soul}
+\usepackage[dvipsnames]{xcolor}
+\usepackage{enumitem}
+\usepackage[margin=1in]{geometry}
+\usepackage{amssymb}
+
+\title{Cryptographic Notions for Data Structures}
+\author{David Clayton}
+
+
+\begin{document}
+\maketitle
+
+\section{Definitions}
+
+We start with a universe $\mathcal{D}$ of data objects, a key space $\mathcal{K}$, a set $\mathcal{Q}$ of queries, a set $\mathcal{R}$ of responses, and a set $\mathcal{U} = \{\mathsf{up}: \mathcal{D} \to \mathcal{D}\}$ of possible updates. A {\em mutable data structure} is a tuple $\Pi = (\textsc{Rep},\textsc{Qry},\textsc{Up})$, where:
+
+\begin{itemize}
+	\item $\textsc{Rep}: \mathcal{K} \times \mathcal{D} \to \{0,1\}^*$ is a randomized {\em representation algorithm}, taking as input a key $K \in \mathcal{K}$ and data object $D \in \mathcal{D}$, and outputting the public representation $\mathsf{pub} \in \{0,1\}^*$ of $D$. We write this as $\mathsf{pub} \gets^\$ \textsc{Rep}_K(D)$.
+	\item $\textsc{Qry}: \mathcal{K} \times \{0,1\}^* \times \mathcal{Q} \to \mathcal{R}$ is a deterministic {\em query-evaluation algorithm}, taking as input $K \in \mathcal{K}$, $\mathsf{pub} \in \{0,1\}^*$, and $\mathsf{qry} \in \mathcal{Q}$, and outputting an answer $a \in \mathcal{R}$. We write this as $a \gets \textsc{Qry}_K(\mathsf{pub},\mathsf{qry})$.
+	\item $\textsc{Up}: \mathcal{K} \times \{0,1\}^* \times \mathcal{U} \to \{0,1\}^*$ is a randomized {\em update algorithm}, taking as input $K \in \mathcal{K}$, $\mathsf{pub} \in \{0,1\}^*$, and $\mathsf{up} \in \mathcal{U}$, and outputting an updated representation $\mathsf{pub}'$. We write this as $\mathsf{pub}' \gets^\$ \textsc{Up}_K(\mathsf{pub},\mathsf{up})$.
+\end{itemize}
+
+Unkeyed data structures are a special case where $\mathcal{K} = \{\epsilon\}$, and immutable data structures are a special case where $\mathcal{U} = \varnothing$.
+
+\section{Correctness}
+
+An adversarial notion of correctness is given by the following experiment for a mutable data structure $\Pi$ and error capacity $r$. A key $K$ is sampled from a key space $\mathcal{K}$. An adversary $A$ is equipped with oracles $\mathbf{Rep}(D)$, $\mathbf{Qry}(i,\mathsf{qry})$, and $\mathbf{Up}(i,\mathsf{up})$. The adversary may use $\mathbf{Rep}$ arbitrarily many times to gain representations $\mathsf{pub}_i$ of data objects $D_i$, in each case initializing a corresponding $err_i$ to zero. The $\mathbf{Qry}$ oracle takes the index of the $\mathsf{pub}_i$ to query along with a query object, returning $\bot$ if the same query has been made previously and the result of $\textsc{Qry}_K(\mathsf{pub}_i,\mathsf{qry})$ otherwise. If this does not agree with $\mathsf{qry}(D_i)$, $err_i$ is incremented. Finally, the $\mathbf{Up}$ oracle updates $D_i$ to $\mathsf{up}(D_i)$ and $\mathsf{pub}_i$ to $\textsc{Up}_K(\mathsf{pub}_i,\mathsf{up})$, returning the latter result. If any of the $err_i$ exceeds $r$, the experiment is a success for the adversary.
+
+\section{Security}
+\end{document}
