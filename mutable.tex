@@ -11,7 +11,7 @@
 \usepackage{enumitem}
 \usepackage[margin=1in]{geometry}
 \usepackage{amssymb}
-
+\include{defs}
 \title{Cryptographic Notions for Data Structures}
 \author{David Clayton}
 
@@ -36,4 +36,7 @@ Unkeyed data structures are a special case where $\mathcal{K} = \{\epsilon\}$, a
 An adversarial notion of correctness is given by the following experiment for a mutable data structure $\Pi$ and error capacity $r$. A key $K$ is sampled from a key space $\mathcal{K}$. An adversary $A$ is equipped with oracles $\mathbf{Rep}(D)$, $\mathbf{Qry}(i,\mathsf{qry})$, and $\mathbf{Up}(i,\mathsf{up})$. The adversary may use $\mathbf{Rep}$ arbitrarily many times to gain representations $\mathsf{pub}_i$ of data objects $D_i$, in each case initializing a corresponding $err_i$ to zero. The $\mathbf{Qry}$ oracle takes the index of the $\mathsf{pub}_i$ to query along with a query object, returning $\bot$ if the same query has been made previously and the result of $\textsc{Qry}_K(\mathsf{pub}_i,\mathsf{qry})$ otherwise. If this does not agree with $\mathsf{qry}(D_i)$, $err_i$ is incremented. Finally, the $\mathbf{Up}$ oracle updates $D_i$ to $\mathsf{up}(D_i)$ and $\mathsf{pub}_i$ to $\textsc{Up}_K(\mathsf{pub}_i,\mathsf{up})$, returning the latter result. If any of the $err_i$ exceeds $r$, the experiment is a success for the adversary.
 
 \section{Security}
+
+
+\input{toms-mutable-filters}
 \end{document}

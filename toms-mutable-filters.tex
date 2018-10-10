@@ -1,0 +1,159 @@
+\section{Tom's old Mutuable Hash-Based Filters}
+Here we extend the basic Bloom filter syntax to allow for variations on the traditional Bloom filter, e.g. counting Bloom filters~\cite{xxx}, spectral Bloom filters~\cite{xxx}, count-min sketches~\cite{xxx}, stable Bloom filters~\cite{xxx}, etc.   Before giving it, let us briefly describe what is formalized.  Our syntax captures settings in which there is some (potentially empty) initial set~$S$, whose representation~$M$ may undergo updates over time.  Effectively, this allows for expansion of~$S$ to a larger set, or even a multiset, as new elements ``arrive''.    The update algorithm is responsible for altering the current representation.  We allow it to take in a string that encodes inputs needed to carry out the updating.  For example, counting Bloom filters may receive update strings that encode $(x,c)$ where $x \in U$ is the element whose representation should be incremented, and $c \in \mathbb{N}$ is the amount of the increment.  Network applications, such as looking for heavy-hitters across TCP/IP streams seen by a router, may have $x = (\mathrm{IP_{src}},\mathrm{IP_{dst}})$, the source and destintation address of a packet, and~$c$ the number of bytes in the packet payload.  When necessary we will specify what is encoded in the update string, but will assume some implicit and fixed encoding scheme.  Note that our syntax allows for randomized updating.  This accommodates stable Bloom filters, for example, which has a randomized ``forgetting'' feature as part of its update.
+
+\heading{Preliminaries.}
+When~$U$ is a set, we let $\multiset{U}{}$ denote the set of all finite multisets of~$U$.  We can denote any multiset~$S$ as $\{(x,\ell) \,|\, x \in U, \ell > 0\}$ where each~$x$ appears exactly once, and each~$\ell$ is an integer.  We define the multiplicity of~$x$ as $\mu_S(x) = \ell$.  We write $|S|= \sum_{(x,\ell)\in S}\mu_S(x)$, and let $\multiset{U}{n}$ denote the set of multisets~$S$ where $|S|=n$.   The notation $S \uplus \{x\}$ denotes multiset union.
+
+\heading{Syntax. }
+Fix nonempty sets $U,\Sigma$ and integers $k,m_1,m_2,n>0$ with $m_1 \leq m_2$.  Fix a symbol $\bot \not\in U$.  An $(n,k,[m_1,m_2])$-filter (over universe~$U$) is a tuple  $B=(\Hash,\Init,\Qry,\Update, \Test)$.   
+%
+The randomized \emph{hash-sampling} algorithm~$\Hash$ samples a size~$k$ family of functions~$\mathcal{H}=\{h_1,h_2,\ldots,h_k\}$ where each $h_i \in  \mathrm{Func}(U,\{0,1,\ldots,m_2-1\})$.  We write $\mathcal{H} \getsr \Hash$ for this operation. 
+%
+The randomized \emph{initial-representation} algorithm $\Init\colon \multiset{U}{n} \rightarrow \left(\bigcup_{m=m_1}^{m_2}\Sigma^m\right) \times \bits^*$ takes a multiset~$S$ of size~$n$ as input, and outputs representation~$M$ of length~$m_1 \leq m \leq m_2$, and side-information~$\tau$.
+%
+The determinisitc query algorithm $\Qry\colon \left(\bigcup_{m=m_1}^{m_2}\Sigma^m \right)\times \bits^* \times U \rightarrow \bits^*$ takes a representation $M$, side-information~$\tau$, and an element $x \in U$ as input, and returns a bitstring.  
+%
+The randomized \emph{update} algorithm $\Update\colon \left(\bigcup_{m=m_1}^{m_2}\Sigma^m \right)\times \bits^* \times \bits^*\rightarrow \left(\bigcup_{m=m_1}^{m_2}\Sigma^m \right) \cup \{\bot\}$ takes a representation~$M$, side-information~$\tau$, and an update string~$\sigma$ as input, and returns an updated representation or the distinguished symbol~$\bot$.  
+%
+The deterministic \emph{test} algorithm $\Test \colon \multiset{U}{} \times \left(\bigcup_{m=m_1}^{m_2}\Sigma^m \right)\cup\{\bot\} \times \bits^* \times U \rightarrow \bits$ takes a multiset~$S$, a representation~$M$, side-information~$\tau$, and an element~$x \in U$ as input, and returns a bit. \tsnote{The point of $\Test$ is to capture correctness, which is not guaranteed in this setting.  (It isn't something one would actually implement in practice.)  Intuitively, $\Test$ outputs 1 iff $x \in S$ but the representation~$M$ ``says'' it is not.}
+%
+%We assume that all $\Init,\Qry,\Update,\Test$ all have blackbox access to the functions $h_1,h_2,\ldots,h_k \in \mathcal{H}$, which we denote by writing~$\mathcal{H}$ as a superscript.   
+
+\heading{Correctness. } The kind of filters we capture, here, can have \emph{two-sided} error.  That is, they may result in false-negatives as well as false-positives.  We captures two versions of correctness in Figure~\ref{fig:correctness-mutable}, corresponding to whether or not the adversary is given access to the hash functions used to create and update the multiset representation. \tsnote{These are draft experiments!}
+
+\begin{figure}
+\centering
+\fpage{.75}{
+\hpagess{.6}{.35}
+{
+\experimentv{$\ExpCorrectSecHash{B}{\distr{U}{n}, A}$}\\
+$S \getsr \distr{U}{n}$\\
+$ \{h_1,h_2,\ldots,h_k\} \getsr \Hash$\\
+$(M,\tau) \getsr \Init^{\HashOracle}(S)$\\
+$x \getsr A^{\QryOracle,\UpdateOracle}(S)$\\
+if $\Test^{\HashOracle}(S,M,\tau,x) \neq 1$ then\\
+\nudge Ret 1\\
+Ret 0
+}
+%
+{
+\oracle{$\QryOracle(x)$}\\
+if $M = \bot$ then Ret $\bot$\\
+Ret $\Qry^{\HashOracle}(M,\tau,x)$\\
+
+\medskip
+\oracle{$\UpdateOracle(\sigma)$}\\
+if $M = \bot$ then Ret $\bot$ \\
+$\mathrm{op},\mathrm{val} \gets \sigma$\\
+$S \gets S \uplus \{\mathrm{val}\}$\\
+$M \getsr \Update^{\HashOracle}(M,\tau,\sigma)$\\
+
+\medskip
+\oracle{$\HashOracle(i,x)$}\\
+Ret $h_i(x)$\\
+}
+}
+%%%%%%%%%%
+\fpage{.75}{
+\hpagess{.6}{.35}
+{
+\experimentv{$\ExpCorrectPubHashBB{B}{\distr{U}{n} , A}$}\\
+$S \getsr \distr{U}{n}$\\
+$ \{h_1,h_2,\ldots,h_k\} \getsr \Hash$\\
+$(M,\tau) \getsr \Init^{\HashOracle}(S)$\\
+$x \getsr A^{\QryOracle,\UpdateOracle,\HashOracle}(S)$\\
+if $\Test^{\HashOracle}(S,M,\tau,x) \neq 1$ then Ret 1\\
+Ret 0
+}
+%
+{
+\oracle{$\QryOracle(x)$}\\
+if $M = \bot$ then Ret $\bot$\\
+Ret $\Qry^{\HashOracle}(M,\tau,x)$\\
+
+\medskip
+\oracle{$\UpdateOracle(\sigma)$}\\
+if $M = \bot$ then Ret $\bot$ \\
+$\mathrm{op},\mathrm{val} \gets \sigma$\\
+$S \gets S \uplus \{\mathrm{val}\}$\\
+$M \getsr \Update^{\HashOracle}(M,\tau,\sigma)$\\
+
+\medskip
+\oracle{$\HashOracle(i,x)$}\\
+Ret $h_i(x)$\\
+}
+}
+%%%%%%%%%%%
+\fpage{.75}{
+\hpagess{.6}{.35}
+{
+\experimentv{$\ExpCorrectPubHash{B}{\distr{U}{n} , A}$}\\
+$S \getsr \distr{U}{n}$\\
+$ \{h_1,h_2,\ldots,h_k\} \getsr \Hash$\\
+$(M,\tau) \getsr \Init^{\HashOracle}(S)$\\
+$x \getsr A^{\QryOracle,\UpdateOracle}(S,\{h_1,h_2,\ldots,h_k\})$\\
+if $\Test^{\HashOracle}(S,M,\tau,x) \neq 1$ then Ret 1\\
+Ret 0
+}
+%
+{
+\oracle{$\QryOracle(x)$}\\
+if $M = \bot$ then Ret $\bot$\\
+Ret $\Qry^{\HashOracle}(M,\tau,x)$\\
+
+\medskip
+\oracle{$\UpdateOracle(\sigma)$}\\
+if $M = \bot$ then Ret $\bot$ \\
+$\mathrm{op},\mathrm{val} \gets \sigma$\\
+$S \gets S \uplus \{\\mathrm{val}\}$\\
+$M \getsr \Update^{\HashOracle}(M,\tau,\sigma)$\\
+
+\medskip
+\oracle{$\HashOracle(i,x)$}\\
+Ret $h_i(x)$\\
+}
+}
+\caption{Trying to define correctness for an $(n,k,[m_1,m_2])$-filter~$B$.  \textcolor{cyan}{Revisit once picture for ``plain'' filters settles.  Also, not exactly right since $\distr{U}{n}$ currently defined to sample from $[U]^n$; here should be multisets.}}
+\label{fig:correctness-mutable}
+\end{figure}
+
+
+\heading{Soundness for mutable hash-based filters. } \tsnote{To do.  Same comments as for the simple case, only it's more complicated here because I have no idea what soundness even means in this setting.  Might generically specify two tests as part of the syntax, one for correctness and one for soundness?}
+
+
+\heading{Privacy of Mutable hash-based filters.} \tsnote{To-do.}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Security Results for Mutable Hash-Based Filters}
+\begin{itemize}
+\item Prove privacy of ``Stable'' Bloom Filters
+\item Ditto for count-min sketch (with and without conservative update)
+\item Ditto for scaling BF 
+\item Correctness and soundness bounds for these?  (Not sure this is possible without a lot of work; see what's already been done in the papers that propose them)
+\end{itemize}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\if{0}
+\heading{Multiset-oriented hash-based filters. }
+\tsnote{Commented out, but in the source: an alternative way to formalize mutable hash-based filters.  This way directly address the inputs as multisets, instead of starting with a set and then updating the represenation a step at a time.  Not sure which is cleaner and more easily applied to real problems, yet.}
+
+Let $\mathbb{M}_\mathcal{U}$ be the set of multisets over~$\mathcal{U}$.  We can denote any multiset as $\{(x,\ell) \,|\, x \in \mathcal{U}, \ell \in \mathbb{N}\}$, and for a particular multiset~$S$ we define the multiplicity of~$x$ as $\mu_S(x) = \ell$ where $(x,\ell)\in S$.
+
+An $(n,k,[m_1,m_2])$-filter with operations is a tuple  $B=(\Hash,\Rep,\Qry, \mathcal{F})$.  
+The set $\mathcal{F}$ is the finite collection of allowable operations.  All operations are of the form 
+$f: \mathbb{M}_{\mathcal{U}} \times \mathbb{M}_{\mathcal{U}} \rightarrow \mathbb{M}_{\mathcal{U}} \cup \{\bot\}$.  
+%
+The deterministic representation algorithm $\Rep\colon \mathbb{M}_\mathcal{U} \rightarrow \bigcup_{m=m_1}^{m_2}\Sigma^m$ takes a multiset~$S$, and outputs representation~$M$ of length~$m_1 \leq m \leq m_2$, or the distinguished symbol~$\bot$.  We assume that if the multiset~$S=\{(x_1,\ell_1),(x_2,\ell_2),\ldots,(x_t,\ell_t)\}$ is such that $n < \sum_{i=1}^t \ell_i$ then $\Rep(S)=\bot$.
+%
+The randomized hash-sampling algorithm~$\Hash$ is as before.
+%
+The determinisitic query algorithm $\Qry$... \tsnote{Not sure how to define this!  See my comment, below...}
+
+%Correctness is defined as follows.  Let $S,T$ be arbitrary multisets and let~$f$ be an arbitrary operation in $\mathcal{F}$.  If $f(S,T) = S'\neq \bot$, then for all $x \in S'$ we demand that $\Qry(\Rep(S'),x)=1$.  \tsnote{might need a stronger condition that this holds for any sequence of operations that do not result in $\bot$.}
+
+Let us see how this syntax captures various kinds of Bloom filters.  First, let $\Sigma = \mathbb{N}$ and define $f_{\mathrm{add}}(S,T)=\{(x,\mu_S(x)+\mu_T(x)) \,|\, x \in \mathcal{U}\}$ and $f_\mathrm{del}(S,T) = \{(x,\min\{0,\mu_S(x)-\mu_T(x)\}) \,|\, x \in \mathcal{U} \}$.  Define $\Rep(S')$ as follows: for each $(x,\ell)\in S'$ and $j\in\{1,2,\ldots,k\}$, set $M[h_j(x)]=\ell$.   Finally, define $\Qry(M,x) = 1 \Leftrightarrow \forall j \in \{1,2,\ldots,k\},\; M[h_j(x)] > 0$.  This allows us to capture counting Bloom filters. \tsnote{Does it?  Acutally, you might want $\Qry(M,x)$ to return a number, i.e., a counter value.  How do you define correctness then?}
+
+\tsnote{There are more direct ways to formalize counting Bloom filters, like the syntax above.  But this less direct way will allow us to capture other kinds ``advanced'' Bloom filters proposed in the literature or (more importantly) used in practice. For example, $f_{\mathrm{setify}}(S,T)=\{(x,1) \,|\, x \in \mathcal{U} \mbox{s.t. } \mu_S(x)>0, \mu_T(x)>0\}$.  On the other hand, we may end up deciding it is overkill... }
+\fi
