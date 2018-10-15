@@ -1,10 +1,10 @@
 
 \documentclass[11pt, pdftex]{article}
-\usepackage{epsf}
+%\usepackage{epsf}
 \usepackage{epsfig}
 \usepackage{times}
 \usepackage{ifthen}
-\usepackage{comment}
+%\usepackage{comment}
 \usepackage{amsfonts}
 \usepackage{color,soul}
 \usepackage[dvipsnames]{xcolor}
@@ -33,10 +33,21 @@ Unkeyed data structures are a special case where $\mathcal{K} = \{\epsilon\}$, a
 
 \section{Correctness}
 
-An adversarial notion of correctness is given by the following experiment for a mutable data structure $\Pi$ and error capacity $r$. A key $K$ is sampled from a key space $\mathcal{K}$. An adversary $A$ is equipped with oracles $\mathbf{Rep}(D)$, $\mathbf{Qry}(i,\mathsf{qry})$, and $\mathbf{Up}(i,\mathsf{up})$. The adversary may use $\mathbf{Rep}$ arbitrarily many times to gain representations $\mathsf{pub}_i$ of data objects $D_i$, in each case initializing a corresponding $err_i$ to zero. The $\mathbf{Qry}$ oracle takes the index of the $\mathsf{pub}_i$ to query along with a query object, returning $\bot$ if the same query has been made previously and the result of $\textsc{Qry}_K(\mathsf{pub}_i,\mathsf{qry})$ otherwise. If this does not agree with $\mathsf{qry}(D_i)$, $err_i$ is incremented. Finally, the $\mathbf{Up}$ oracle updates $D_i$ to $\mathsf{up}(D_i)$ and $\mathsf{pub}_i$ to $\textsc{Up}_K(\mathsf{pub}_i,\mathsf{up})$, returning the latter result. If any of the $err_i$ exceeds $r$, the experiment is a success for the adversary.
+An adversarial notion of correctness is given by the following experiment for a mutable data structure $\Pi$ and error capacity $r$. A key $K$ is sampled from the key space $\mathcal{K}$. An adversary $A$ is equipped with oracles $\mathbf{Rep}(D)$, $\mathbf{Qry}(i,\mathsf{qry})$, and $\mathbf{Up}(i,\mathsf{up})$. The adversary may use $\mathbf{Rep}$ arbitrarily many times to gain representations $\mathsf{pub}_i$ of data objects $D_i$, in each case initializing a corresponding $err_i$ to zero. The $\mathbf{Qry}$ oracle takes the index of the $\mathsf{pub}_i$ to query along with a query object, returning $\bot$ if the same query has been made previously and the result of $\textsc{Qry}_K(\mathsf{pub}_i,\mathsf{qry})$ otherwise. If this does not agree with $\mathsf{qry}(D_i)$, $err_i$ is incremented. Finally, the $\mathbf{Up}$ oracle updates $D_i$ to $\mathsf{up}(D_i)$ and $\mathsf{pub}_i$ to $\textsc{Up}_K(\mathsf{pub}_i,\mathsf{up})$, returning the latter result. If any of the $err_i$ exceeds $r$, the experiment is a success for the adversary.
 
 \section{Security}
 
+We use a similar adversarial experiment to determine security. For an adversary $A$ and specific leakage functions $\mathsf{lk}_r$ and $\mathsf{lk}_u$ defined on $\mathcal{D}$ and $\{0,1\}^* \times \mathcal{U}$ respectively, we conduct two experiments. In each, the adversary is given two oracles, one having domain $\mathcal{D}$ and the other having domain $\{0,1\}^* \times \mathcal{U}$. In the first experiment, a key $K$ is sampled from the key space $\mathcal{K}$, and the oracles simply compute $\textsc{Rep}_K$ and $\textsc{Up}_K$. In the second, the oracles pass $\mathsf{lk}_r$ or $\mathsf{lk}_u$ to a simulator $\mathsf{Sim}$ and output the result of the simulator. The adversary outputs a single bit as the result of the experiment, and the advantage of the adversary is the difference between the probability of outputting 1 in the first experiment and the probability of outputting 1 in the second experiment. If this advantage is small for all efficient adversaries, we say the data structure is secure relative to $(\mathsf{lk}_r,\mathsf{lk}_u)$.
+
+There is also the question of whether there is a natural analog to one-wayness for mutable data structures. Even if the adversary is not allowed to choose the underyling data object and must attempt to guess its contents from its public representation, in the mutable case we must assume the adversary can see the representation change over time as updates occur. We assume there is no way to know in advance which updates will be carried out, and hence no known distribution over $\mathcal{U}$. Therefore, to be cautious, we should let the adversary choose the updates. If the adversary can choose and apply any update it likes, the security notion would of course be impossible to achieve (the adversary will know what elements were added by the updates it chose to make). Instead, we have the adversary choose two updates, and have an oracle apply only one of them. This idea leads to the following pair of experiments:
+
+A counter $n$ is initialized to 0, $K$ is selected from $\mathcal{K}$, and $D$ is selected from some distribution on $\mathcal{D}$. This data object is stored twice, once as $D_0$ and once as $D_1$. Then $\mathsf{pub}$ is generated using $\textsc{Rep}_K(D)$, and the adversary is given $\mathsf{pub}$ and provided with an $\mathbf{Up}(\mathsf{up}_0,\mathsf{up}_1)$ oracle. This oracle first checks whether the leakages of the updates are the same. If not, it returns $\bot$. Otherwise, it updates $D_0$ to $\mathsf{up}_0(D_0)$, $D_1$ to $\mathsf{up}_1(D_1)$, and $\mathsf{pub}$ to $\textsc{Up}_K(\mathsf{pub},\mathsf{up}_b)$, where $b$ is either 0 or 1 depending on which experiment is being performed, and returns the new value of $\mathsf{pub}$. The adversary outputs a single bit, and succeeds if this bit matches the number of the experiment being performed.
+
+\section{Security for Bloom Filters}
+
+Because this security notion is an extension of the semantic security notion in the immutable case given by providing the adversary with an additional oracle, any data structure which is `immutably insecure' is also insecure under this new notion. In particular, the classic Bloom filter is not secure. In fact no unkeyed structure can be secure in this manner unless the leakage function is allowed to reveal the actual contents of the set being represented, since an adversary can simply compute the representation of any set independently without consulting the oracle.
+
+[More to come soon; results as yet uncertain.]
 
 \input{toms-mutable-filters}
 \end{document}
