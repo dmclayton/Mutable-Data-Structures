@@ -93,7 +93,7 @@ We start with a universe $\mathcal{D}$ of data objects, a key space $\mathcal{K}
 	\item $\textsc{Up}: \mathcal{K} \times \{0,1\}^* \times \mathcal{U} \to \{0,1\}^*$ is a randomized {\em update algorithm}, taking as input $K \in \mathcal{K}$, $\mathsf{pub} \in \{0,1\}^*$, and $\mathsf{up} \in \mathcal{U}$, and outputting an updated representation $\mathsf{pub}'$. We write this as $\mathsf{pub}' \gets^\$ \textsc{Up}_K(\mathsf{pub},\mathsf{up})$.
 \end{itemize}
 
-Unkeyed data structures are a special case where $\mathcal{K} = \{\epsilon\}$, and immutable data structures are a special case where $\mathcal{U} = \varnothing$.
+Unkeyed data structures are a special case where $\mathcal{K} = \{\epsilon\}$, and immutable data structures are a special case where the update algorithm deterministically returns $\textsc{Up}(\key,\mathsf{pub},\mathsf{up})=\mathsf{pub}$ for all inputs.  In the latter case, we will often drop mention of the update algorithm.
 
 \section{Correctness}
 
