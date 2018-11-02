@@ -12,7 +12,13 @@ data structure we study in this work.)
 %
 Although their definitions is specific to the case of Bloom filters, and do not
 incorporate keys, we generalize it in the natural way.
-
+\tsnote{I don't like this.  We say in the text, later on, that NY
+  \emph{only} covers secret representations, but the psuedocode
+  experiment that supposedly formalizes the NY notion (in our
+  notation) hides this fact!  It makes it look like we are less
+  different from NY than we are.  Also, NY needs to be called out on
+  their shit... the public vs.\ secret representation issue is
+  especially important in the mutable setting!}
 \begin{figure}[t]
   \twoCols{0.48}
   {
