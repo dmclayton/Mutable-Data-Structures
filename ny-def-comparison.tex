@@ -1,0 +1,204 @@
+\label{sec:compare-defs}
+\label{sec:errepone}
+\newcommand{\ny}{\notionfont{NY}}
+
+%\fixme{Uses $(t,q,\epsilon)$-style notion and theorem statements.  May
+%be okay because this is a self contained appendix, but better if
+%consistent with the rest of the document.}
+In this appendix we compare the Naor-Yogev definition of
+correctness~\cite{naor2015bloom} and ours. (We focus only on data structures
+with what they call \emph{steady representations}, which is the only kind of
+data structure we study in this work.)
+%
+Although their definitions is specific to the case of Bloom filters, and do not
+incorporate keys, we generalize it in the natural way.
+
+\begin{figure}[t]
+  \twoCols{0.48}
+  {
+    \experimentv{$\Exp{\ny}_{\struct}(\advA)$}\\[2pt]
+      $\setC \gets \emptyset$;
+      $\ky \getsr \keys$;
+      $\col \getsr \advA$\\
+      $\pub \getsr \Rep_\ky(\col)$\\
+      $z \getsr A^{\QRYO}(\pub)$;
+      $a \gets \Qry_\ky(\pub,\qry_z)$\\
+      return $\left( a = 1 \AND z \not\in \col \union \setC \right)$
+  \\[6pt]
+    \oraclev{$\QRYO(\qry_x)$}\\[2pt]
+      $\setC \gets \setC \union \{x\}$\\
+      return $\Qry_\ky(\pub, \qry_x)$
+  }
+  {
+    \experimentv{$\Exp{\errepone}_{\struct,r}(\advA)$}\\[2pt]
+      $\setC \gets \emptyset$;
+      $\err \gets 0$;
+      $\ky \gets \keys$;
+      $\col \getsr \advA$\\
+      $\pub \getsr \Rep_\ky(\col)$\\
+      $\bot \getsr \advA^{\QRYO}(\pub)$\\
+      return $(\err \ge r)$
+    \\[6pt]
+    \oraclev{$\QRYO(\qry)$}\\[2pt]
+      if $\qry \in \setC$ then return $\bot$\\
+      $\setC \gets \setC \cup \{\qry\}$;
+      $a \gets \Qry_\ky(\pub,\qry)$\\
+      if $a \neq \qry(\col)$ then $\err\gets\err+1$\\
+      return~$a$
+  }
+  \caption{\textbf{Left:} The Naor-Yogev (\ny) definition of correctness for set-membership structure
+  $\struct = (\Rep, \Qry)$.
+  %
+  \textbf{Right:} The \errepone notion for (set-membership) structure $\struct =
+  (\Rep, \Qry)$. (Equivalent to \errep with $q_R=1$.)}
+  \label{fig:ny-correct}
+  \vspace{6pt}\hrule
+\end{figure}
+%
+Let $\struct = (\Rep, \Qry)$ be a set-membership structure
+for~$\elts$ with key space~$\keys$.
+%i
+Consider the \ny experiment defined in the left panel of
+Figure~\ref{fig:ny-correct}, associated with~$\struct$ and an adversary~$\advA$.
+%
+First, ~$\advA$  outputs a set~$\col$ of size~$n$.
+%
+Next, a key~$\ky$ is chosen and the representation algorithm
+is executed on~$\ky$ and $\col$, resulting in~$\pub$.
+%
+Then $\advA$ is executed with input~$\pub$ and with access to
+an oracle~$\QRYO$ as in our definition of correctness.
+%
+Finally, $\advA$ outputs a value $z \in \elts$; it succeeds if
+$z \not\in \col$, it never previously queried $\qry_z$
+to $\QRYO$, and $\Qry_\ky(\pub, \qry_z)=1$.
+%
+We define the advantage of~$\advA$ in attacking~$\struct$ as
+\[
+  \Adv{\ny}_{\struct}(\advA) \bydef
+  \Prob{\Exp{\ny}_{\struct}(\advA)=1}\,,
+\]
+%
+and let $\Adv{\ny}_{\struct}(t, q)$ denote the maximum of
+this value, taken over all $\advA$ running for at most $t$
+steps and making at most $q$ oracle queries.
+
+We remark that there are two important differences between this
+definition and~\cite[Definition~2.4]{naor2015bloom}.
+%
+First, the adversary in Figure~\ref{fig:ny-correct} is given
+the representation~$\pub$, but not the key, in the second
+stage of its attack; in contrast, Naor-Yogev (implicitly)
+assume the entire data structure is private.
+%In fact, this is necessary in their setting, since
+%they do not syntactically distinguish between the public
+%representation and a \emph{key} for structure.  For example,
+%they consider a construction from a pseudorandom permutation
+%(PRP) for which the representation algorithm encodes a secret
+%key. If the adversary were given the representation, then it
+%would be impossible to appeal to the security of the underlying
+%PRP.
+%
+Second, we allow the attacker in Figure~\ref{fig:ny-correct} to
+choose the set~$\col$, whereas Naor-Yogev treat it as a
+parameter of the experiment.
+
+With these modifications in place, we have a basis for
+comparing the \ny definition to our own \errep. For the sake of exposition, we
+will restrict ourselves to the case of~$q_R=1$. In the right-hand panel of
+Figure~\ref{fig:ny-correct}, we define a game $\errepone$, which is equivalent
+to \errep when the adversary is restricted to just one~$\REPO$ query. (That is,
+for any structure~$\struct$ and integers $t,q,r\geq0$, it holds that
+$\Adv{\errep}_{\struct,r}(t,1,q) = \Adv{\errepone}_{\struct,r}(t,q)$.)
+%
+%
+%Let $\Adv{\ny}_{\struct}(t,q) = \max_\advA \Adv{\ny}_{\struct}(\advA)$,
+%where~$\advA$ is an adversary running in at most~$t$ steps (relative to some
+%model of computation), and making at most~$q$ queries to its~$\QRYO$.
+\begin{theorem}
+  Let $\struct$ be a set-membership data structure.
+  %
+  If $\Adv{\ny}_{\struct}(t,q) \leq \epsilon$, then for any $r \geq 1$
+  and $q' \leq q+1$ it holds that $\Adv{\errepone}_{\struct,r}(t,q') \leq
+  q'\epsilon/r$.
+\end{theorem}
+\begin{proof}
+  Assume that for some $q' \leq q+1$ and $r \geq 1$ there is an adversary $A$
+  running in time~$t$ and making $q'$ oracle queries such that
+  $\Adv{\errepone}_{\struct,r}(A) > q'\epsilon/r$.
+  %
+  (Note we may assume that $A$ always makes exactly $q'$ queries without loss of
+  generality.)
+  %
+  This means that with probability at least $q'\epsilon/r$ in an execution of
+  $\Exp{\errepone}_{\struct,r}(A)$, we have that $A$ makes at least $r$ distinct queries
+  to $\QRYO$ for which an incorrect answer is returned.
+  %
+  Let $A'$ be the algorithm that simply runs~$A$, but chooses uniformly one of
+  the $q'$ queries of $A$ to its $\QRYO$ oracle and outputs that query as
+  its final output.
+  %
+  Then with probability at least $r/q' \cdot (q'\epsilon/r)=\epsilon$ the query
+  chosen by $A'$ leads to an incorrect answer, and was not previously asked to
+  the $\QRYO$ oracle.  Since the running time of $A'$ is at most $t$, and
+  it makes at most $q'-1 \leq q$ queries to its oracle, this is a contradiction.
+  \hfill\qed
+\end{proof}
+
+We remark that the above is tight, at least for $r=1$. Specifically, consider a
+scheme in which every query is independently answered incorrectly with
+probability~$\epsilon$. Such a scheme satisfies $\Adv{\ny}_{\struct}(t,q)
+\leq \epsilon$ for any $t, q$, however an adversary making $q=1/\epsilon$
+queries has constant advantage with respect to our correctness definition (for
+$r=1$).
+
+In the other direction, we show that correctness for $r=1$
+easily implies correctness with respect to the Naor-Yogev
+definition.
+\begin{theorem}
+  Let $\struct$ be a set-membership structure.
+  %
+  If $\Adv{\errepone}_{\struct,1}(t,q) \leq \epsilon$, then
+  $\Adv{\ny}_{\struct}(t,q-1) \leq \epsilon$.
+\end{theorem}
+\begin{proof}
+  Assume there is an adversary $A$ running in time~$t$ and making at most $q-1$
+  oracle queries such that $\Adv{\ny}_{\Pi}(A) > \epsilon$.
+  %
+  Let $A'$ be the algorithm that simply runs~$A$, forwarding the oracle queries
+  of~$A$ to its own oracle, until~$A$ terminates with output~$z$; then, $A'$
+  sends~$\qry_z$ to $\QRYO$.
+  %
+  It is immediate that $A'$ makes at most $q$ oracle queries, and
+  $\Adv{\errepone}_{\struct,1}(A') \geq \Adv{\ny}_{\struct}(A)$, a contradiction.
+  \hfill\qed
+\end{proof}
+%
+For $r > 1$, however, we have the following separation:
+\begin{theorem}
+  For every integer $r \geq 1$ and set~$\elts$, there is a set-membership structure
+  $\struct$ for~$\elts$ for which
+  %
+  $\Adv{\errepone}_{\struct,r+1}(t,q)=0$ for all integers $t, q \geq 0$, but
+  $\Adv{\ny}_{\struct}(O(1),0) = 1$.
+\end{theorem}
+\begin{proof}
+  Fix an integer $r \geq 1$, a set~$\elts$, and distinct values $x_1, \ldots,
+  x_r \in \elts$.
+  %
+  Define $\struct = (\Rep, \Qry)$ so that $\Rep(\col)$ outputs
+  $\col$ and $\Qry(\col, \qry_y)$ outputs $\qry_y(\col)$ if
+  $y \notin \{ x_1, \ldots, x_r \}$, but outputs $1-\qry_y(\col)$ otherwise.
+  %
+  This scheme always answers incorrectly for~$r$ fixed queries, and answers
+  correctly for every other query.
+  %
+  The claim follows.
+  \hfill\qed
+\end{proof}
+
+%\jnote{Just noticed something (else) odd about the NY definition: we cannot assume w.l.o.g.\
+%that $A$ makes exactly $q$ queries, and in fact it is possible to have cases where increasing
+%the number of queries the attacker makes can decrease its advantage! This seems like
+%another drawback of the definition.}\tsnote{Really?  That seems worth
+%pointing out, as part of our list of complaints.}

@@ -1,0 +1,241 @@
+\paragraph{Comparison with Naor and Yogev.}
+As previously noted, Naor and Yogev~\cite{naor2015bloom} were the first to
+formalize adversarial correctness of Bloom filters.  Our work extends theirs
+significantly in several directions. First, we consider abstract data structures
+(rather than only set-membership structures), and consider privacy in addition
+to correctness. Even with respect to the specific case of correctness for
+set-membership structures, our work offers several advantages as compared
+to the Naor-Yogev treatment:
+\begin{itemize}
+  \item Our syntax distinguishes between the (secret) key and the public portion
+    of a data structure, an important distinction that is missing in their work.
+
+  \item The Naor-Yogev definition of correctness allows the
+      adversary to make several queries, some of which may
+      produce incorrect results; the attacker then succeeds
+      if it outputs a \emph{fresh} query that causes an
+      error. This separation seems arbitrary, and we
+      propose instead a parameterized definition in which
+      the attacker succeeds if it can cause a certain
+      number of (distinct) errors during its entire
+      execution.
+
+  \item Naor and Yogev analyze the correctness of a new Bloom filter variant of
+    their own design. In contrast, we are mainly interested in analyzing
+    existing, real-world constructions to understand their security.
+      \if{0}{
+        In particular, we analyze the most-common case of Bloom filters in the
+        random-oracle model, something not considered by Naor and~Yogev.
+      }\fi
+\end{itemize}
+We give a more technical comparison of our correctness notion
+and theirs in Appendix~\ref{sec:compare-defs}.
+
+\paragraph{Other related works.}
+There is a long tradition in computer science of designing structures that
+concisely (but probabilistically) represent data so as to support some set of
+queries, and each of these structures has its own correctness and privacy
+characteristics~\cite{chazelle2004bloomier,cormode2005improved,DP08a,DF03,fredman1984storing,mironov2011sketching}.
+
+We have already mentioned the ubiquity of Bloom filters in support of efficient
+network communication and computing protocols.  They also find use in
+security-critical environments, including spam filters, (distributed)
+denial-of-service attack detection, and deep packet
+inspection~\cite{tarkoma2012theory}.  Recently, Bloom filters were proposed as a
+means of efficient certificate-revocation list (CRL)
+distribution~\cite{larisch2017crlite}, a crucial component of public-key
+infrastructures.  To our knowledge, ours is the first work to propose general
+notions of \emph{privacy} for abstract data structures.  However, a variety of
+data structures with interesting privacy properties have been proposed.  For
+example, variants of Bloom filters that ensure privacy of the \emph{query} have
+been studied~\cite{bellovin2004privacy,nojima2009cryptographically}.
+%
+\jnote{History-independent data structures seem relevant to mention.}
+\cpnote{What does this mean?}
+
+% Correctness attacks
+Correctness of data structures in adversarial settings is well-motivated in the
+security literature and in practice.
+%
+Perhaps the earliest published attack on the correctness of a data structure was due to
+Lipton and Naughton~\cite{lipton1993clocked} who showed that timing analysis of
+record insertion in a hash table allows an adversary to adaptively choose
+elements so as to increase look-up time, effectively degrading a service's
+performance.
+%
+Crosby and Wallach~\cite{crosby2003denial} exploited hash collisions to increase
+the average URL load time in Squid, a web proxy used for caching content in
+order to reduce network bandwidth.
+%
+More recently, Gerbet \etal~\cite{gerbet2015power} described \emph{pollution
+attacks} on Bloom filters, whereby an adversary inserts a number of
+adaptively-chosen elements with the goal of forcing a high false-positive rate.
+Although some of their attacks exploit weak (i.e., non-cryptographic) hash
+functions (as do~\cite{crosby2003denial}), their methodology is effective even
+for good choices of hash functions.
+%
+They suggest revised parameter choices for Bloom filters (i.e., filter length and
+number of hashes) in order to cope with their attacks.
+
+% Naor Yogev
+
+Finally, we note that the dictionary construction considered in
+Section~\ref{sec:dict} bares resemblance (at least structurally) to
+\emph{garbled Bloom filters}, a tool used recently for efficient private-set
+intersection~\cite{dong2013when,rindal2017improved}.
+
+% NOTE(all) Below are notes and references we considered adding to related work.
+\if{0}{
+  Correctness in adversarial settings has been considered for broader ranges of
+  data structures.  Mironov, Naor, and Segev~\cite{mironov2011sketching} studied
+  a setting in which non-colluding parties interact with a third-party
+  \emph{referee} in order to compute a function of their data: For example,
+  whether their sets are equal, or the approximate size of their intersection.
+  The parties, which share a common reference string, but otherwise do not
+  communicate, send a concise \emph{sketch} of their data to the referee, who
+  performs the computation and publishes the result  The adversary is modeled as
+  a malicious party attempting to skew the result.
+  %
+  \cpnote{It would be interesting to see if there's a connection between our
+  notion of correctness and their setting.}
+}\fi
+
+\if{0}{
+  \emph{Secure indexes}, proposed by Eu-Jin Goh~\cite{goh2003secure}, structure
+  a document so that it can be searched by keyword if the querying party has a
+  special \emph{trapdoor} for the keyword. The party issuing trapdoors has a
+  secret key.  \jnote{I'm not sure the work of Goh is super relevant. Or, if it
+  is, then so is any searchable encryption scheme.}
+  %
+  \cpnote{I agree ... I included it since it was cited in the
+  survey~\cite{tarkoma2012theory} as an example of a ``secure'' Bloom filter
+variant.}
+}\fi
+
+\if{0}{
+  Other security notions for data structures, beyond correctness and privacy,
+  have been considered.  For example, \emph{authenticated data
+  structures}~\cite{tamassia2003authenticated} allow a trusted third party to
+  certify the validity of a query on a data set maintained by an untrusted
+  server.
+}\fi
+
+\if{0}{
+  We recommend reading the Naor-Yogev paper for a survey of related work and a
+  discussion of related papers. Here we mention a few additional practical
+  works, but stress that this only scratches the surface.
+  %
+  \jnote{Rather random collection of papers using Bloom filters and variants. I
+  removed it for now, since it's not clear that they have any particular
+relevance to us. I kept only the refs that seemed directly relevant.}
+  %
+  As previously mentioned, Bloom filters and their relatives are some of the most
+  widely used data structures supporting set-membership queries. As examples,
+  Hbase, the open-source implementation of Google's BigTable storage
+  system~\cite{chang2008bigtable}, a Hadoop-based NoSql database designed to
+  handle large datasets, includes an implementation of Bloom filters and
+  counting Bloom filters, and he Squid proxy~\cite{fan2000summary} uses a Bloom
+  filter as a ``summary'' of the set of URLs in its cache in order to improve
+  latency for web-object retrieval. Reynolds and
+  Vahdat~\cite{reynolds2003efficient} proposed an efficient distributed search
+  engine that can be used to search for files containing a particular keyword.
+  Their search engine maps the keywords of each file into a Bloom filter; a
+  look-up of the keyword in the Bloom filter tells whether the node has files
+  containing that keyword or not. Stochastic Fair Blue~\cite{feng2001stochastic}
+  uses counting Bloom filter to manage non-responsive TCP traffic.
+}\fi
+
+\if{0}{
+  \cite{gao2006internet} is an application of BFs for detecting pollution
+  attacks on web caches.
+  %
+  \heading{Related work: attacks}
+  \tsnote{Brought these back into the text just to help Chris get up to speed.}
+  \begin{itemize}
+    \item Niedermeyer et al., ``Cryptanalysis of Basic Bloom Filters Used for
+      Privacy-Preserving Record Linkage'', breaking privacy of
+      secret-hash-function Bloom filters. \tsnote{Journal of Privacy and
+      Confidentiality, 2014}
+
+    \item Gerbet, Kumar and Lauradoux, ``The power of evil choices in bloom
+      filters''. \tsnote{DSN'15: Looks like a real goldmine of related work!}
+
+    \item Crosby and Wallach, ``Denial of Service via Algorithmic Complexity
+      Attacks'' \tsnote{Gives attacks on Squid}
+
+    \item Gao et al., ``Internet Cache Pollution Attacks and Countermeasures''
+  \end{itemize}
+
+  %\ignore{
+  \heading{Related work: definitions(?)}
+  \begin{itemize}
+    \item Nojima and Kadobayashi, ``Cryptographically Secure Bloom Filters''.
+      \tsnote{Gives some security definitions for privacy. Quick scan, not super
+      clear what they achieve. The definition of client-privacy (Definition 1) for
+      example, makes no sense to me.  Actually, likewise for server-privacy
+      (Definition 2).  Both seem vague and thoroughly underspecified.}
+
+    \item Naor and Yogev
+
+    \item Eujin Goh, ``Secure Indexes'' \tsnote{A secure index can
+      be used for set membership.  Builds a secret-key data
+      structure (an Index) that allows searching for keyword~$w$
+      if one holds the trapdoor $T_w$ for~$w$, where the trapdoor
+      depends on the secret key.  Main construction uses
+      traditional Bloom filters and a PRF.  Construction appears
+      quite inefficient, needing a very long secret key, turning a
+      keyword~$w$ into a bunch of PRF outputs, and then storing
+      each of these PRF outputs in the BF.  Haven't read the full
+      analysis; don't know if this was ever published. }
+      \jnote{Never published. I think this work uses Bloom filters
+      for encrypted search; I don't remember the paper having much
+      to say about Bloom filters themselves.}
+  \end{itemize}
+
+  \heading{Related work: constructions}
+  \begin{itemize}
+    \item Bellovin and Cheswick, ``Privacy-Enhanced Searches Using Encrypted Bloom
+    Filters''.
+
+  \item Kerschbaum , ``Public-Key Encrypted Bloom Filters with
+    Applications to Supply Chain Integrity''.
+
+  \item S\"{a}rell\"{a} et al., ``BloomCasting: Security in Bloom Filter Based Multicast''.
+
+  \item Dong, Chen,
+      Wen, ``When Private Set Intersection Meets Big Data: An Efficient and
+      Scaleable Protocol'' \tsnote{``garbled bloom filters'', which actually store
+      the set element by storing~$k$ xor-shares, one at each of the~$k$ hash
+      indices (with care for reusing shares if hash collisions occur); also
+      and``oblivious bloom intersection''}\tsnote{If the filter and the hash
+      functions are public, there is a naive attack that works for some
+      interesting parameters.}
+
+  \item Tarkoma, Rothenberg, Lagerspetz ``Theory and Practice of Bloom Filters in Distributed
+      Systems''
+      %
+      \tsnote{Great high-level coverage.  Only found preprint version though.}
+      \cpnote{{ieeexplore.ieee.org/iel5/9739/6151681/05751342.pdf}}
+
+    \item Durham, Kantarcioglu, Xue, Kuzu, Malin ``Composite Bloom Filters for
+      Secure Record Linkage'' \tsnote{Per-field BFs, sampled and composed into
+      single BF that is then permuted by a secret random permutation.  No clear
+      statement of the problem that is being solved.  Should pull full version and
+      get details.}
+  \end{itemize}
+
+  \heading{Related work: tangential}
+  \begin{itemize}
+    \item Chang and Mitzenmacher ``Privacy Preserving Keyword Searches on Remote Encrypted Data''.
+
+    \item Mitzenmacher and Vadhan. ``Why Simple Hash Functions Work: Exploiting
+      the Entropy in a Data Stream''.
+
+    \item Dodis et al. ``Fuzzy Extractors: How to Generate Strong Keys from
+      Biometrics and Other Noisy Data'' \tsnote{Introduces ``secure sketches'',
+      which is a representation of a single-element set that is information
+      theoretically private (up to some function of the min-entropy of the
+      element); only tangentially related to ``sketches'' as defined in the Bloom
+      filter literature.}
+  \end{itemize}
+}\fi

@@ -1,0 +1,197 @@
+% macros.tex
+%
+% Macros for this paper. (Include build/headers.tex, then this.)
+%\usepackage{times}
+%\usepackage[dvipdf]{graphicx}
+\usepackage{pifont} % \ding{109}
+\usepackage{afterpage} % \afterpage{ ... }
+
+% Query spaces
+\newcommand{\qrysp}{\capgreekfont{\Gamma}}
+\newcommand{\univ}{\setfont{U}}
+\newcommand{\results}{\setfont{R}}
+\newcommand{\queries}{\setfont{Q}}
+
+% Data structures
+\newcommand{\struct}{\capgreekfont{\Pi}}
+\newcommand{\Rep}{\schemefont{Rep}}
+\newcommand{\Qry}{\schemefont{Qry}}
+\newcommand{\ky}{K}
+\newcommand{\pub}{\procfont{pub}} % TODO Change to \rep?
+\newcommand{\qry}{\procfont{qry}}
+\newcommand{\res}{a}
+\newcommand{\keys}{\setfont{K}}
+\newcommand{\col}{\setfont{S}}
+\newcommand{\elts}{\setfont{X}} % TODO What does "elts" mean?
+
+% Constructions
+\newcommand{\BF}{\schemefont{BF}}
+\newcommand{\SBF}{\schemefont{SBF}}
+\newcommand{\SKBF}{\schemefont{KBF}}
+\newcommand{\PRLBF}{\schemefont{PPRL}}
+\newcommand{\DICT}{\schemefont{DICT}}
+\newcommand{\bi}{\mathrm{bi}}
+\newcommand{\bloom}{\mathrm{bf}}
+\newcommand{\saltybloom}{\mathrm{sbf}}
+\newcommand{\prfbloom}{\mathrm{kbf}}
+\newcommand{\dict}{\mathrm{dict}}
+\newcommand{\hash}{\schemefont{Hash}}
+\newcommand{\hashbf}{\schemefont{2Hash}}
+\newcommand{\hashlin}{\schemefont{K2Hash}}
+\newcommand{\hashprf}{\schemefont{stupid}} % FIXME remove
+
+% Adversaries
+\newcommand{\advA}{\adversaryfont{A}}
+\newcommand{\advB}{\adversaryfont{B}}
+\newcommand{\advD}{\adversaryfont{D}}
+\newcommand{\dist}{\advD}
+
+% Oracles
+\newcommand{\OO}{\oraclefont{O}}
+\newcommand{\REPO}{\oraclefont{Rep}}
+\newcommand{\QRYO}{\oraclefont{Qry}}
+\newcommand{\PRFO}{\oraclefont{F}}
+\newcommand{\HASHO}{\oraclefont{Hash}}
+
+% Notions
+\newcommand{\prf}{\notionfont{PRF}}
+\newcommand{\errep}{\notionfont{ER\mbox{-}REP}}
+\newcommand{\ssrep}{\notionfont{SS\mbox{-}REP}}
+\def\ssrepX#1{\mbox{\ssrep-#1}}
+\newcommand{\owrep}{\notionfont{OW\mbox{-}REP}}
+\newcommand{\errepone}{\notionfont{ER\mbox{-}REP1}}
+
+% Sets
+\newcommand{\setA}{\setfont{A}}
+\newcommand{\setB}{\setfont{B}}
+\newcommand{\setC}{\setfont{C}}
+\newcommand{\setI}{\setfont{I}}
+\newcommand{\setK}{\setfont{K}}
+\newcommand{\setM}{\setfont{M}}
+\newcommand{\setN}{\setfont{N}}
+\newcommand{\setP}{\setfont{P}}
+\newcommand{\setQ}{\setfont{Q}}
+\newcommand{\setR}{\setfont{R}}
+\newcommand{\setS}{\setfont{S}}
+\newcommand{\setT}{\setfont{T}}
+\newcommand{\setV}{\setfont{V}}
+\newcommand{\setX}{\setfont{X}}
+\newcommand{\setW}{\setfont{W}}
+\newcommand{\setZ}{\setfont{Z}}
+
+% Variables
+\newcommand{\ct}{\varfont{ct}}
+\newcommand{\err}{\varfont{err}}
+\newcommand{\Ans}{\varfont{Ans}}
+\newcommand{\coins}{r}
+
+% Vectors
+\newcommand{\vv}{\vectorfont{v}}
+\newcommand{\hh}{\vectorfont{h}}
+
+% Misc.
+\def\ticks(#1,#2){\procfont{T}_{\hspace*{-1.5pt}#1}({#2})}
+\newcommand{\leak}{\procfont{lk}}
+\newcommand{\Sim}{\procfont{Sim}}
+\newcommand{\salt}{Z}
+\newcommand{\bigram}{\procfont{bigram}}
+\newcommand{\tableM}{\vectorfont{M}}
+\newcommand{\tableT}{\vectorfont{T}}
+
+% Authors' comments.
+\definecolor{darkgreen}{RGB}{50,127,0}
+\newcommand{\cpnote}[1]{\note{darkgreen}{Chris}{#1}}
+\newcommand{\cptodo}[1]{\todo{red}{Chris}{#1}}
+\newcommand{\tsnote}[1]{\note{blue}{Tom}{#1}}
+\newcommand{\jnote}[1]{\note{cyan}{Jon}{#1}}
+\newcommand{\review}[2]{\note{red}{Reviewer #1}{#2}}
+\newcommand{\anytodo}[1]{\todo{red}{\ignorespaces}{#1}}
+
+% Boxes
+\newcommand{\boxPrivacyNotions}[6]{
+  \makebox[\textwidth][c]{
+  \begin{tabular}{|@{\gamespadleft}l@{}@{\gamespad}l@{}|@{\gamespad}l|}
+    \hline
+    \rule{0pt}{1\normalbaselineskip}
+    \begin{minipage}[t]{#1\textwidth}\gamesfontsize
+      #4 \vspace{6pt}
+    \end{minipage} &
+    \begin{minipage}[t]{#2\textwidth}\gamesfontsize
+      #5 \vspace{6pt}
+    \end{minipage} &
+    \begin{minipage}[t]{#3\textwidth}\gamesfontsize
+      #6 \vspace{6pt}
+    \end{minipage} \\
+    \hline
+  \end{tabular}
+  }
+}
+
+\newcommand{\boxThmBFSaltCorrect}[5]{
+  \makebox[\textwidth][c]{
+  \begin{tabular}{|@{\gamespadleft}l@{}@{}@{\gamespad}l|}
+    \hline
+    \rule{0pt}{1\normalbaselineskip}
+    \begin{minipage}[t]{#1\textwidth}\gamesfontsize
+      #2 \vspace{6pt}
+    \end{minipage} \vline &
+    \begin{minipage}[t]{#1\textwidth}\gamesfontsize
+      #3 \vspace{6pt}
+    \end{minipage} \\
+    \hline
+    \rule{0pt}{1\normalbaselineskip}
+    \begin{minipage}[t]{#1\textwidth}\gamesfontsize
+      #4 \vspace{6pt}
+    \end{minipage} &
+    \begin{minipage}[t]{#1\textwidth}\gamesfontsize
+      #5 \vspace{6pt}
+    \end{minipage} \\
+    \hline
+  \end{tabular}
+  }
+}
+
+\newcommand{\boxThmBFPRFCorrect}[7]{
+  \makebox[\textwidth][c]{
+  \begin{tabular}{|@{\gamespadleft}l@{}@{}@{\gamespad}l|}
+    \hline
+    \rule{0pt}{1\normalbaselineskip}
+    \begin{minipage}[t]{#1\textwidth}\gamesfontsize
+      #2 \vspace{6pt}
+    \end{minipage} \vline &
+    \begin{minipage}[t]{#1\textwidth}\gamesfontsize
+      #3 \vspace{6pt}
+    \end{minipage} \\
+    \hline
+    \rule{0pt}{1\normalbaselineskip}
+    \begin{minipage}[t]{#1\textwidth}\gamesfontsize
+      #4 \vspace{6pt}
+    \end{minipage} &
+    \begin{minipage}[t]{#1\textwidth}\gamesfontsize
+      #5 \vspace{6pt}
+    \end{minipage} \\
+    \hline
+    \rule{0pt}{1\normalbaselineskip}
+    \begin{minipage}[t]{#1\textwidth}\gamesfontsize
+      #6 \vspace{6pt}
+    \end{minipage} \vline &
+    \begin{minipage}[t]{#1\textwidth}\gamesfontsize
+      #7 \vspace{6pt}
+    \end{minipage} \\
+    \hline
+  \end{tabular}
+  }
+}
+
+\definecolor{lightgreen}{RGB}{200,255,200}
+\definecolor{lightred}{RGB}{255,215,215}
+\definecolor{lightgray}{RGB}{230,230,230}
+\newcommand{\diff}[1]{\colorbox{grey}{\parbox{\dimexpr\linewidth-2\fboxsep-2\fboxrule\relax}{#1}}}
+%\newcommand{\diffplus}[1]{\colorbox{lightgreen}{#1}}
+%\newcommand{\diffplusbox}[1]{\colorbox{lightgreen}{\parbox{\dimexpr\textwidth-2\fboxsep-2\fboxrule\relax}{#1}}}
+%\newcommand{\diffminus}[1]{\colorbox{lightred}{#1}}
+%\newcommand{\diffminusbox}[1]{\colorbox{lightred}{\parbox{\dimexpr\textwidth-2\fboxsep-2\fboxrule\relax}{#1}}}
+\newcommand{\diffplus}[1]{\fbox{#1}}
+\newcommand{\diffplusbox}[1]{\fbox{\parbox{\dimexpr\textwidth-2\fboxsep-2\fboxrule\relax}{#1}}}
+\newcommand{\diffminus}[1]{\colorbox{lightgray}{#1}}
+\newcommand{\diffminusbox}[1]{\colorbox{lightgray}{\parbox{\dimexpr\textwidth-2\fboxsep-2\fboxrule\relax}{#1}}}
