@@ -1,4 +1,3 @@
-\section{Correctness}
 
 \begin{figure}[t]
   \twoColsNoDivide{0.48}
@@ -34,7 +33,7 @@
 
 An adversarial notion of correctness is given by the following experiment for a mutable data structure $\Pi$ and error capacity $r$. A key $K$ is sampled from the key space $\mathcal{K}$. An adversary $A$ is equipped with oracles $\mathbf{Rep}(D)$, $\mathbf{Qry}(i,\mathsf{qry})$, and $\mathbf{Up}(i,\mathsf{up})$. The adversary may use $\mathbf{Rep}$ arbitrarily many times to gain representations $\mathsf{pub}_i$ of data objects $D_i$, in each case initializing a corresponding $err_i$ to zero. The $\mathbf{Qry}$ oracle takes the index of the $\mathsf{pub}_i$ to query along with a query object, returning $\bot$ if the same query has been made previously and the result of $\textsc{Qry}_K(\mathsf{pub}_i,\mathsf{qry})$ otherwise. If this does not agree with $\mathsf{qry}(D_i)$, $err_i$ is incremented. Finally, the $\mathbf{Up}$ oracle updates $D_i$ to $\mathsf{up}(D_i)$ and $\mathsf{pub}_i$ to $\textsc{Up}_K(\mathsf{pub}_i,\mathsf{up})$, returning the latter result. If any of the $err_i$ exceeds $r$, the experiment is a success for the adversary.
 
-\section{Example Data Structures}
+\subsection{Example Data Structures}
 
 In general, each probabilistic data structure has some bound on the error size per query, assuming the adversary is not fully adaptive. In each case we want to show that allowing the adversary full adaptivity does not significantly increase the error rate. Generally, we have a data object space $\mathcal{D} \subseteq 2^\mathcal{X}$, a collection of subsets of some universe $\mathcal{X}$, and a response space $\mathcal{R} = \{0,1\}$ with the usual metric of $d(m,n) = |m-n|$. Then the query space consists of indicator functions $\mathsf{qry_x}$ for $x \in \mathcal{X}$, so that $\mathsf{qry_x}(D)$ is 1 if and only if $x \in D$. The update space at least consists of insertions, and may also include deletions.
 
@@ -48,7 +47,7 @@ Stable Bloom filters~\cite{xxx} are an example of a structure where typical choi
 
 Depending on the implementation, count-min sketch~\cite{xxx} may use a data object space $\mathcal{D} \subseteq \mathbb{N}^X$ or $\mathcal{D} \subseteq \mathbb{Z}^X$. In the former case we have two further sub-cases, the case where all updates increment the value associated with $x \in X$ and the case where updates may either increment or decrement the associated value (but not below 0). Additionally, count-min sketch supports multiple different types of queries, in each case yielding a response in $\mathbb{Z}$. For a point query, the difference between the query and the true value is bounded by $n\epsilon$ with probability $1-\delta$, where $n$ is the sum of the true frequencies of the stream elements. The maximum error of a single query is simply $n$, in the case that an element has never actually been added to the set but has incorrectly had all its counters incremented each of $n$ times another element has been added, so the expected non-adaptive error size is bounded above by $n\epsilon(1-\delta)+n\delta = n(\delta+\epsilon-\delta\epsilon)$.  Similarly, we find that the error size of an inner product query is bounded above by $n_1n_2\epsilon(1-\delta)+n_1n_2\delta = n_1n_2(\delta+\epsilon-\delta\epsilon)$. Range queries are tricky and I'm not quite sure on the precise bound in terms of $\delta$ and $\epsilon$.
 
-\section{Correctness Proofs \& Attacks}
+\subsection{Correctness Proofs \& Attacks}
 
 First, we note that any structure which is insecure in the immutable case is also insecure in the mutable case. Any adversary in the immutable case is identical to a corresponding adversary in the mutable case which simply never makes use of the $\UPO$ oracle. From this we know that standard (unsalted, unkeyed) Bloom filters cannot ensure correctness in the mutable case.
 

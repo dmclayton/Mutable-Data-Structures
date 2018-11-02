@@ -8,7 +8,7 @@
 \usepackage{color,soul}
 \usepackage[dvipsnames]{xcolor}
 \usepackage{enumitem}
-\usepackage[margin=1in]{geometry}
+%\usepackage[margin=1in]{geometry}
 \usepackage{amssymb}
 \include{header}
 
@@ -76,17 +76,21 @@
 \newcommand{\cptodo}[1]{\todo{darkgreen}{Chris}{#1}}
 \newcommand{\anytodo}[1]{\todo{red}{Anyone}{#1}}
 
-\title{Cryptographic Notions for Data Structures}
-\author{David Clayton}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\title{\bf Cryptographic Notions for Data Structures}
+\author{David Clayton, Jonathan Katz, Christopher Patton and Thomas Shrimpton}
 
 \begin{document}
 \maketitle
 
-\include{syntax}
-\include{correctness}
-\include{privacy}
+\section{Syntax}
+\input{syntax}
 
+\section{Correctness}
+\input{correctness}
 
+\section{Privacy}
+\input{privacy}
 
 \begin{thebibliography}{9}
 \bibitem{bloomfilter} 
@@ -94,4 +98,9 @@ Burton Bloom.
 \textit{Space/time trade-offs in hash coding with allowable errors.}
 Commun. ACM 13, 7 (July 1970), 422-426.
 \end{thebibliography}
+
+%\section{Old-stuff}
+%\input{toms-mutable-filters}
+
+
 \end{document}
