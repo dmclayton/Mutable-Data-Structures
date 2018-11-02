@@ -1,0 +1,281 @@
+\ignore{
+  \begin{figure}
+  \end{figure}
+}
+\label{sec:intro}
+%
+\tsnote{OLD INTRO}
+Data structures are fundamental to essentially all areas of computer science.  
+%The analysis of data structures, in particular 
+The traditional approach to analyzing the correctness of a data structure 
+%Typically, when
+%the performance of a data structure is studied (i.e., its running time, space
+%efficiency, or error probability) the analysis 
+is to assume that all inputs, and all queries, 
+%to the data structure are chosen
+%non-adversarially and, in particular, 
+are independent of any internal randomness used to construct it. 
+But as recently highlighted by Naor and
+Yogev~\cite{naor2015bloom}, there are important use-cases in which the inputs and queries
+may be chosen \emph{adversarially} and \emph{adaptively}, based on partial
+information and prior observations about the data structure. Attacks of this
+sort can be used to dramatically degrade the performance of real systems
+\cite{crosby2003denial,gerbet2015power,lipton1993clocked}.
+
+Standard treatments of data structures also assume that any party in
+possession of (information about) a data structure is trusted, and so privacy
+concerns do not arise.  But when a data structure is built from
+sensitive data, as is sometimes the case in practice, it
+is important to understand what information it leaks to adversarial parties.
+% TODO(cjp) Why is it important?
+%
+%A variety of such structures have been proposed, but their design is often
+%\emph{ad-hoc} and their security often misunderstood. This paper will explore
+%one such case in detail~\cite{schnell2011novel}.
+
+\ignore{\tsnote{The next two paragraphs are newly hacked.  In the first, I'm
+keeping it short and sweet -- this is our motivation, and this is what we
+actually treat, in terms of security notions.  In the second paragraph, I'm
+spinning the story that our syntax is broadly applicable.  We \emph{choose} to
+focus on a very important real-world data structure, and dig in.  To evidence a
+bit of breadth, we consider something quite different.  Implicitly, I want to
+give the message that one could write a paper that touches on a lot of different
+data structures, all conforming to our syntax, but you couldn't also go deep in
+one paper.  So we made a choice to look deeply at something real, leaving room
+for future researchers to build on our foundation.} }
+
+These real-world concerns motivate a careful and formal treatment of data
+structures in an adversarial setting.  In this work, we define and study notions
+of \emph{correctness} and \emph{privacy}.
+
+% NOTE(cjp) Seems to me don't need this line here.
+In support of this, we give a precise syntax for data structures as an abstract
+primitive.  Our syntax captures a wide variety of structures used in practice;
+%
+to focus the exposition, we will mostly concentrate on the heavily
+used Bloom filter~\cite{bloom1970space} and some important variants. Recall that
+a Bloom filter provides a compact representation of a set, and supports
+set-membership queries while admitting some false positives. Bloom filters are
+ubiquitous in distributed computing, including web caches (e.g., Squid) and hash
+tables (e.g., BigTable and Hadoop), resource and packet routing, and network
+measurement. (We refer the reader to the
+surveys~\cite{broder2004network,tarkoma2012theory} for a comprehensive list of
+applications.)
+%
+Bloom filters have also been modified and co-opted for security-critical
+applications; perhaps unsurprisingly, things go wrong. Schnell
+\etal~\cite{schnell2011novel} proposed using secretly-keyed Bloom filters in
+order to enable privacy-preserving record linkage (PPRL) across data sets.  This
+was deployed in medical-data applications in Australia, Brazil, Germany, and
+Switzerland~\cite{niedermeyer2014cryptanalysis}. As one exercise of our
+notions, we study their proposal in detail. % in Section~\ref{sec:bf-bigram}.
+%
+
+We do not focus exclusively on Bloom filters, nor on data structures
+that support only set-membership queries.  To hint at the broader scope of our formalisms, we analyze the
+so-called ``Bloomier filter''~\cite{chazelle2004bloomier}, which provides a
+compact representation of a \emph{dictionary} data structure.\footnote{Despite the
+name, the Bloom filter data structure and the Bloomier filter data structure are
+\emph{very} different primitives.}
+
+\if{0}{
+  We give a bit more detail about our syntax, our notions, and our findings.
+}\fi
+
+\heading{Data structures and their correctness.}
+%
+We formalize a data structure as a pair of algorithms $(\Rep, \Qry)$ denoting
+the \emph{representation} and \emph{query-evaluation} algorithms, respectively.
+Associated to the data structure is a set of supported queries~$\mathcal{Q}$.
+The representation algorithm is randomized, taking as input a
+key~$\ky$ and a collection of data~$\col$, and returning a
+representation~$\pub$ of~$\col$.  (To capture unkeyed data structures,
+one sets $\ky=\varepsilon$.)
+%
+The deterministic query-evaluation algorithm~$\Qry$ uses~$\ky$ and $\pub$ in
+order to respond to a requested query~$\qry \in \queries$ on~$\col$.
+
+For better efficiency, many data structures only approximately
+represent the collection~$\col$. In this case, the query-evaluation
+algorithm~$\Qry$ may err in its response to queries.  Roughly
+speaking,  our notion of adversarial correctness (\errep) captures how
+difficult it is for an attacker (given $\pub$) to find~$r>0$ distinct queries on
+which $\Qry$ returns an incorrect answer.
+\if{0}{, for a given value $r>0$.}\fi
+
+For Bloom filters, the representation~$\pub$ includes a bit array~$M$ that
+represents a set~$\col \subseteq \elts$ using hash functions
+$h_1,\ldots,h_k$. The supported queries are the predicates
+$\{\qry_x\}_{x\in\elts}$, where $\qry_x(\col)=1$ iff $x \in \col$. It is well
+known that Bloom filters may have false positives, and their false-positive rate
+for \emph{independently chosen} inputs and queries is well understood. (See
+Appendix~\ref{sec:mitz}.) Our correctness notion quantitatively captures the
+error rate even in the presence of an attacker that adaptively attempts to
+induce errors.
+
+We note that Naor and Yogev~\cite{naor2015bloom} were the first to formalize
+adversarial correctness of Bloom filters and, indeed, their work
+provided inspiration for this paper.  Our work significantly extends
+theirs in several ways, as we will detail, shortly.  One important
+extension is the consideration of data structure privacy.
+
+% ss-rep
+\if{0}{
+  \anytodo{Several reviewers have made the same complaint : why these notions?
+  In particular, are they interesting beyond an academic exercise?  We need to
+  address this head-on.  One idea is to try to build something on top of these
+  notions, but I really see that as a separate paper.  Unless we can build some
+  \emph{well known} primitive... but I'm not sure what it would be, or how
+  interesting.}
+  %
+  \cpnote{Alex Davidson's paper (ia.cr/2017/448) suggests that garbled Bloom
+  filters (or some variation of them) can be used for private-set intersection. We
+  could ask if privacy in our sense suffices for this application.
+  But \ssrep is not the right notion since it requires a key, and \owrep is
+  probably too weak. Davidson views GBFs as distributional virtual black-box
+  obfuscators, which are stronger than \owrep-secure structures.}
+  %
+  \cpnote{To my thinking, these notions were originally devised from the
+  perspective of what security properties do existing data structures admit. If
+  our intention is to use these properties in order to achieve some higher-level
+  goal, I don't think we have the right ones. Short of strengthening them, I think
+  our best bet  is to \emph{own} our original perspective. To that end, the place
+  we need the most motivation is \ssrep privacy of $\SKBF$, the PRF-based BF. See
+  my comments in Section~\ref{sec:bf-prf} for two ways we've already thought of.}
+}\fi
+
+\heading{Data structure privacy.}
+%
+Many data structures inherently leak information about the data they represent.
+For example, the classical Bloom filter is known to leak (a good approximation
+of) the cardinality of the underlying set. Moreover, some applications
+\emph{require} the data structure to leak certain information in order to
+fulfill a functional requirement of the system. (We give an example of this in
+Section~\ref{sec:bf-bigram}.)
+%
+%\anytodo{Fix citations below.}
+%
+But one can hope to leak \emph{nothing more} than what is absolutely
+necessary, and
+%\footnote{If more than $|\pub|$ is necessary to leak, the ``trivial'' privacy
+%solution of encrypting $\pub$ is not applicable.}
+this goal leads to our first notion of privacy.
+%In the tradition of the original semantic-security notion for
+%encryption~\cite{goldwasser1982ss}, and like more recent notions of privacy
+%for property-preserving encryption~\cite{xxx} and searchable
+%encryption~\cite{xxx},
+We define a simulation-based notion (\ssrep) that requires that $\pub$ leak
+nothing about~$\col$ other than what is specified by an explicit \emph{leakage}
+function.
+
+% ow-rep
+It is not hard to see that only keyed data structures can possibly satisfy this
+definition, since otherwise there is no secret from which to bootstrap security.
+Thus, we also consider a weaker privacy notion in which we ask that the data
+structure not leak any particular element of the data it represents. More
+specifically, our one-wayness notion (\owrep) requires that if $\col$ has
+sufficient min-entropy (in a sense we precisely define), then it should be
+infeasible for an attacker to recover any element of $\col$, given~$\pub$.
+
+\if{0}{
+  \anytodo{Motivate applications of secret-key data structures.  A consistent
+  reviewer complaint was the separation between $\pub$ and $\privaux$ as being
+  artificial and not motivated.  We need to address this vigorously here.  For
+  example, in a CDN, Bloom filters are passed between content servers; likewise
+  p2p networks, where trust may not be assumed.  Using something like Squid, even
+  if you don't transmit your bit array, the hash functions are public because
+  they are specified in the publicly available code.  } \jnote{Need to think more
+  about this. I don't see a setting where (1)~privacy is desired but
+  (2)~encryption cannot be used to hide $\pub$ from an attacker.}
+}\fi
+
+\heading{Constructions we analyze.}
+%
+We put our syntax and security notions to work in several case studies.
+%
+The brief description of Bloom filters given above was silent as to how the hash
+functions $h_1, \ldots, h_k$ are chosen, and whether or not they are
+public. In fact, these details have a significant effect on what notions of
+security the resulting structure satisfies:
+\begin{itemize}
+  \item
+    (Section~\ref{sec:bf}) If the hash functions are fixed and known to the
+    attacker prior to the filter being constructed, the data structure offers
+    neither correctness nor privacy for any practically interesting parameters.
+    We show this by exhibiting explicit attacks and analyzing their performance.
+
+  \item (Section~\ref{sec:bf-salt}) If \emph{salted} hash functions are used,
+    and the adversary is given the salt only after the collection $\col$ is
+    chosen, then %with modest changes to the parameters (i.e., the filter length and number of hashes), 
+    the structure can achieve the same correctness guarantees in the adversarial setting as do Bloom filters in the traditional
+    non-adversarial setting. 
+    %(Our analysis here treats the hash functions as random oracles; the usual analysis treats them as ideal random functions.)
+    We also show that this structure achieves our privacy notion of one-wayness.
+
+  \item (Section~\ref{sec:bf-prf}) We explore a natural, keyed variant of a
+    Bloom filter in which the hash functions are derived from a secretly keyed
+    pseudorandom function. (This is similar to a construction proposed by Naor
+    and Yogev~\cite{naor2015bloom}.) We show that this variant enjoys
+    simulation-based privacy, as well as a tighter security bound for
+    correctness than the salted Bloom filter.
+\end{itemize}
+%
+\noindent
+Our particular realization of the salted and secretly keyed Bloom filters
+leverages results from Kirsch and Mitzenmacher~\cite{kirsch2006less} that allow
+one to effectively implement $h_1,\ldots, h_k$ by making only two \emph{actual}
+evaluations of an underlying hash function or PRF, respectively.
+%
+In addition to the comprehensive analysis of Bloom filters described above, we
+also apply our definitions to:
+\begin{itemize}
+  \item (Section~\ref{sec:bf-bigram}) A keyed structure for privacy-preserving
+    record linkage introduced by Schnell \etal~\cite{schnell2011novel}, and
+    subsequently attacked by Niedermeyer
+    \etal~\cite{niedermeyer2014cryptanalysis}. In our framework we are able to
+    show precisely how their scheme breaks down.
+
+  \item (Section~\ref{sec:dict}) A dictionary proposed by Charles
+    and Chellapilla~\cite{charles2008bloomier2} that stores a set of~$n$
+    key/value pairs, where the keys are arbitrary bitstrings and the values are
+    of length at most~$m$, using just $O(mn)$ bits.
+\end{itemize}
+
+\heading{Future research directions.}
+%
+The syntax and security notions we develop apply to \emph{immutable} data
+structures, i.e., those for which the input~$\col$ does not change.
+%
+\if{0}{
+  Even within this class of data structures, we are only able to
+  thoroughly consider two types, set-membership data structures and dictionaries.
+  Our formalisms support future work to analyze other immutable structures.
+}\fi
+%
+It would be interesting to extend our work to the case of \emph{mutable} data
+structures. Specific examples to consider here are counting Bloom
+filters~\cite{fan2000summary}, scalable Bloom
+filters~\cite{almeida2007scalable}, count-min
+sketches~\cite{cormode2005improved}, and hierarchical Bloom
+filters~\cite{zhu2004hierarchical}, to name just a few in the extended Bloom
+filter family.
+
+% NOTE(all) Removed these citations: \cite{broder2004network,nojima2009cryptographically}
+Our goal is to establish foundations for the security of (immutable) data
+structures. But it would certainly be interesting to analyze high-level
+protocols that use these data structures, e.g.
+content-distribution networks~\cite{byers2002informed}, where many servers
+propagate representations of their local cache to their neighbors. The Bloom
+filter family alone has a wide range of practical applications, for example in
+large database query processing~\cite{broder2004network}, routing algorithms for
+peer-to-peer networks~\cite{reynolds2003efficient}, protocols for establishing
+linkages between medical-record databases~\cite{schnell2011novel}, fair routing
+of TCP packets~\cite{feng2001stochastic}, and Bitcoin wallet
+synchronization~\cite{gervais2014privacy}.
+%
+Analyzing higher-level primitives or protocols will require establishing
+appropriate syntax and security notions for those, too; hence we leave this for
+future work.
+
+%\heading{Related work.}
+\input{related}
