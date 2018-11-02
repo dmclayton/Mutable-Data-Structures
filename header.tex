@@ -84,6 +84,9 @@
 \newcommand{\getsr}{\mathrel{\leftarrow\mkern-14mu\leftarrow}}
 %\newcommand{\getsr}{\xleftarrow{\text{\tiny{\$}}}}
 %\newcommand{\getsr}{{\:{\leftarrow{\hspace*{-3pt}\raisebox{.75pt}{$\scriptscriptstyle\$$}}}\:}}
+\newcommand{\setop}[1]{\mathsf{set}(#1)} %^ \procfont
+\def\str(#1){\procfont{set}\left(#1\right)}
+\def\bydef{\stackrel{\rm def}{=}}
 
 % - String operations
 \newcommand{\emptystr}{\varepsilon}
@@ -249,8 +252,13 @@
   \textrm{\textcolor{#1}{(\getnotectr: #2 #3: #4)}}
 }}
 
-\newcommand{\note}[3]{\basenote{#1}{#2}{says}{#3}}
+% Uncomment to mute notes.
+%\renewcommand{\basenote}[4]{\ignorespaces}
+
+\renewcommand{\note}[3]{\basenote{#1}{#2}{says}{#3}}
+
 \newcommand{\todo}[2]{\basenote{red}{#1}{to-do}{#2}}
 \newcommand{\tsnote}[1]{\note{cyan}{TS}{#1}}
+\newcommand{\jnote}[1]{\note{green}{Jon}{#1}}
 
 \newcommand{\ignore}[1]{\if{0} #1 \fi}

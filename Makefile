@@ -3,13 +3,13 @@ proj = mutable
 pdf: $(proj).pdf
 
 $(proj).aux: *.tex
-	pdflatex -halt-on-error -draftmode $(proj)
+	pdflatex -halt-on-error $(proj)
 
 $(proj).bbl: $(proj).aux *.bib
 	bibtex $(proj)
 
 $(proj).pdf: $(proj).bbl
-	pdflatex -halt-on-error -draftmode $(proj)
+	pdflatex -halt-on-error $(proj)
 	pdflatex -halt-on-error $(proj)
 
 clean:
