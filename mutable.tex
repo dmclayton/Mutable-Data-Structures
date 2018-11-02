@@ -82,94 +82,9 @@
 \begin{document}
 \maketitle
 
-\section{Definitions}
-
-We start with a universe $\mathcal{D}$ of data objects, a key space $\mathcal{K}$, a set $\mathcal{R}$ of responses equipped with a metric $d: \mathcal{R}^2 \to [0,\infty)$, a set $\mathcal{Q} = \{\mathsf{qry}: \mathcal{D} \to \mathcal{R}\}$ of queries, and a set $\mathcal{U} = \{\mathsf{up}: \mathcal{D} \to \mathcal{D}\}$ of possible updates. A {\em mutable data structure} is a tuple $\Pi = (\textsc{Rep},\textsc{Qry},\textsc{Up})$, where:
-
-\begin{itemize}
-  \item $\textsc{Rep}: \mathcal{K} \times \mathcal{D} \to \{0,1\}^*$ is a randomized {\em representation algorithm}, taking as input a key $K \in \mathcal{K}$ and data object $D \in \mathcal{D}$, and outputting the public representation $\mathsf{pub} \in \{0,1\}^*$ of $D$. We write this as $\mathsf{pub} \gets^\$ \textsc{Rep}_K(D)$.
-  \item $\textsc{Qry}: \mathcal{K} \times \{0,1\}^* \times \mathcal{Q} \to \mathcal{R}$ is a deterministic {\em query-evaluation algorithm}, taking as input $K \in \mathcal{K}$, $\mathsf{pub} \in \{0,1\}^*$, and $\mathsf{qry} \in \mathcal{Q}$, and outputting an answer $a \in \mathcal{R}$. We write this as $a \gets \textsc{Qry}_K(\mathsf{pub},\mathsf{qry})$.
-  \item $\textsc{Up}: \mathcal{K} \times \{0,1\}^* \times \mathcal{U} \to \{0,1\}^*$ is a randomized {\em update algorithm}, taking as input $K \in \mathcal{K}$, $\mathsf{pub} \in \{0,1\}^*$, and $\mathsf{up} \in \mathcal{U}$, and outputting an updated representation $\mathsf{pub}'$. We write this as $\mathsf{pub}' \gets^\$ \textsc{Up}_K(\mathsf{pub},\mathsf{up})$.
-\end{itemize}
-
-Unkeyed data structures are a special case where $\mathcal{K} = \{\epsilon\}$, and immutable data structures are a special case where the update algorithm deterministically returns $\textsc{Up}(\key,\mathsf{pub},\mathsf{up})=\mathsf{pub}$ for all inputs.  In the latter case, we will often drop mention of the update algorithm.
-
-\section{Correctness}
-
-\begin{figure}[t]
-  \twoColsNoDivide{0.48}
-  {
-    \experimentv{$\Exp{\errep}_{\struct,r}(\advA)$}\\[2pt]
-      $\setC \gets \emptyset$; $\ct,\err_0 \gets 0$;
-      $\key \getsr \keys$\\
-      $i \getsr \advA^{\REPO,\UPO,\QRYO}$\\
-      return $(\err_i \geq r)$ \tsnote{Or something... possibly a function of $\vec\err_i=(\err_i[j])_{j\in[q]}$}
-    \\[6pt]
-    \oraclev{$\REPO(\col)$}\\[2pt]
-      $\ct\gets\ct+1$;
-      $\col_\ct \gets \col$\\
-      $\pub_\ct \getsr \Rep_\key(\col)$\\
-      return $\pub_\ct$
-  }
-  {
-    \oraclev{$\UPO(i, \up)$}\\[2pt]
-      $\col_i \gets \up(\col_i)$;
-      $\pub_i \getsr \Up_\key(\pub_i, \up)$\\
-      return $\pub_i$
-    \\[9pt]
-    \oraclev{$\QRYO(i, \qry)$}\\[2pt]
-      if $(i,\qry) \in \setC$ then return $\bot$\\
-      $\setC \gets \setC \union \{(i,\qry)\}$; $a \gets \Qry_K(\pub_i, \qry)$\\
-      $\err_i \gets \err_i + d(a,\qry(\col_i))$\\
-      return $a$
-  }
-  \caption{Adversarial correctness for a mutable data structure.}
-  \vspace{6pt}\hrule
-  \label{fig:security}
-\end{figure}
-
-An adversarial notion of correctness is given by the following experiment for a mutable data structure $\Pi$ and error capacity $r$. A key $K$ is sampled from the key space $\mathcal{K}$. An adversary $A$ is equipped with oracles $\mathbf{Rep}(D)$, $\mathbf{Qry}(i,\mathsf{qry})$, and $\mathbf{Up}(i,\mathsf{up})$. The adversary may use $\mathbf{Rep}$ arbitrarily many times to gain representations $\mathsf{pub}_i$ of data objects $D_i$, in each case initializing a corresponding $err_i$ to zero. The $\mathbf{Qry}$ oracle takes the index of the $\mathsf{pub}_i$ to query along with a query object, returning $\bot$ if the same query has been made previously and the result of $\textsc{Qry}_K(\mathsf{pub}_i,\mathsf{qry})$ otherwise. If this does not agree with $\mathsf{qry}(D_i)$, $err_i$ is incremented. Finally, the $\mathbf{Up}$ oracle updates $D_i$ to $\mathsf{up}(D_i)$ and $\mathsf{pub}_i$ to $\textsc{Up}_K(\mathsf{pub}_i,\mathsf{up})$, returning the latter result. If any of the $err_i$ exceeds $r$, the experiment is a success for the adversary.
-
-\section{Example Data Structures}
-
-In general, each probabilistic data structure has some bound on the error size per query, assuming the adversary is not fully adaptive. In each case we want to show that allowing the adversary full adaptivity does not significantly increase the error rate. Generally, we have a data object space $\mathcal{D} \subseteq 2^\mathcal{X}$, a collection of subsets of some universe $\mathcal{X}$, and a response space $\mathcal{R} = \{0,1\}$ with the usual metric of $d(m,n) = |m-n|$. Then the query space consists of indicator functions $\mathsf{qry_x}$ for $x \in \mathcal{X}$, so that $\mathsf{qry_x}(D)$ is 1 if and only if $x \in D$. The update space at least consists of insertions, and may also include deletions.
-
-A typical case occurs with standard Bloom filters~\cite{bloomfilter}. Since there are no false negatives, the size of the error a non-adaptive adversary is expected to create per query is simply equal to the false positive rate, which is on the order of $(1-e^{-\frac{kn}{m}})^k$ for an $m$-bit array with $k$ hash functions storing up to $n$ values. Compressed Bloom filters~\cite{xxx} operate in the same way, with a false positive rate which must also take into account the degree of compression~\todo{David}{Please address}\tsnote{what is it?}. 
-
-Counting Bloom filters~\cite{xxx} and cuckoo filters~\cite{xxx} are both extensions of this notion which increase $\mathcal{U}$ to include deletion operations, but fortunately the notions of correctness are still straightforward given that queries are simply testing for set membership. \todo{David}{Please address}\tsnote{Counting bloom filters are meant for frequency queries, not just set membership, so I don't know why you are lumping them in with cuckoo filters.}  
-
-Bloomier filters~\cite{xxx} instead enlarge the response space $\mathcal{R}$, and alter the data object space to a set of the form $\mathcal{D} \subseteq \mathcal{R}^\mathcal{X}$. \todo{David}{Please address}\tsnote{Not following this. Please explain.} One of the response values is $\bot$ to indicate that value has not been associated with any element of $\mathcal{R}$, and the only type of error that can occur is that a value which should return $\bot$ instead returns some other element of $\mathcal{R}$. Again we have a situation where `false positives' are the only type of error which can occur.
-
-Stable Bloom filters~\cite{xxx} are an example of a structure where typical choices of $\mathcal{D}$ and $\mathcal{U}$ will not work. Here, objects probabilistically decay from the filter over time, but our syntax requires that updates are functions rather than randomized algorithms. \todo{David}{Please address}\tsnote{I think there's some confusion here(?)  In the SBF, the update function is deterministic, but the algorithm that \emph{implements} the update, i.e. \textsc{Up}, is randomized.  The stream is the stream, it's only the representation of the stream that ``forgets'' that it saw stream elements (loosely speaking).}  One possibility is to have $\mathcal{D} \subseteq \{0,\ldots,t\}^X$ for some universe $X$ and natural number $t$, so that each element of the universe $X$ is associated with its remaining time to live. \todo{David}{Please address}\tsnote{I imagine that the max value is ``baked into'' \textsc{Up}.  It's not like the value changes; it's just a parameter of the DS, like the number of hash functions or the size of the array.}  In that case, each update function is of the form $\mathsf{up}_x$ for some $x \in X$, which decrements all nonzero values and then sets the value associated with $x$ to $t$. The query functions are then of the form $\mathsf{qry}_x$ for some $x \in X$ and return 0 if and only if the value associated with $x$ is 0. Note that when this data object is represented as a stable Bloom filter of $m$ bits with $p$ values decremented each update, the SBF's maximum time-to-live must be set to $\frac{pt}{m}$. Unfortunately, there are still some issues since it is not until stability is reached that the low error bound is guaranteed. If an adversary is allowed to generate the representations this stability is far from a guarantee.
-
-Depending on the implementation, count-min sketch~\cite{xxx} may use a data object space $\mathcal{D} \subseteq \mathbb{N}^X$ or $\mathcal{D} \subseteq \mathbb{Z}^X$. In the former case we have two further sub-cases, the case where all updates increment the value associated with $x \in X$ and the case where updates may either increment or decrement the associated value (but not below 0). Additionally, count-min sketch supports multiple different types of queries, in each case yielding a response in $\mathbb{Z}$. For a point query, the difference between the query and the true value is bounded by $n\epsilon$ with probability $1-\delta$, where $n$ is the sum of the true frequencies of the stream elements. The maximum error of a single query is simply $n$, in the case that an element has never actually been added to the set but has incorrectly had all its counters incremented each of $n$ times another element has been added, so the expected non-adaptive error size is bounded above by $n\epsilon(1-\delta)+n\delta = n(\delta+\epsilon-\delta\epsilon)$.  Similarly, we find that the error size of an inner product query is bounded above by $n_1n_2\epsilon(1-\delta)+n_1n_2\delta = n_1n_2(\delta+\epsilon-\delta\epsilon)$. Range queries are tricky and I'm not quite sure on the precise bound in terms of $\delta$ and $\epsilon$.
-
-\section{Correctness Proofs \& Attacks}
-
-First, we note that any structure which is insecure in the immutable case is also insecure in the mutable case. Any adversary in the immutable case is identical to a corresponding adversary in the mutable case which simply never makes use of the $\UPO$ oracle. From this we know that standard (unsalted, unkeyed) Bloom filters cannot ensure correctness in the mutable case.
-
-In the case that is no secret key, we have a result analogous to the immutable case showing that full-strength correctness is equivalent to correctness relative to an experiment where the adversary makes only a single query to the $\REPO$ oracle. \todo{David}{please typeset this into a nice theorem and proof.  Try to work out the concrete security statement, using the immutable-case draft as a guide for typesetting and style.} For any adversary $A$ in the ordinary experiment, we construct an adversary $B$ as follows. First, $B$ samples $q$ from $[q_R]$, where $q_R$ is the number of $\REPO$ queries $A$ makes, and then simulates $A$. When $A$ makes its $q$th $\REPO$ query, $B$ queries its $\REPO$ oracle for the resulting representation $\mathsf{pub}$, storing this value and returning it to $A$. For all preceding and following $\REPO$ queries, $B$ simply executes $\textsc{Rep}$ itself and returns the result. When $A$ makes a $\QRYO$ query to $\mathsf{pub}_q$, $B$ queries its $\QRYO$ oracle and returns the result to $A$. For all other $\QRYO$ queries, $B$ returns $\bot$ if $(i,\mathsf{qry})$ has been asked before and otherwise executes $\textsc{Qry}$ to determine the result of the query. Similarly, for any $\UPO$ query $A$ makes to $\mathsf{pub}_q$, $B$ queries its $\UPO$ oracle and returns the result, while for $\UPO$ queries to other $\mathsf{pub}_i$ we have $B$ execute $\textsc{Up}$ and return the result. Finally, any RO queries from $A$ are passed to the RO for $B$.
-
-The advantage of $B$ is smaller than that of $A$ by at most a factor of $q_R$, since there is a $\frac{1}{q_R}$ chance that $B$ randomly selects the same $q$ that $A$ eventually chooses as its output.
-
-Say that the update algorithm $\textsc{Up}_K$ is {\em invertible} if for every representation $\mathsf{pub}$ and update $\mathsf{up} \in \mathcal{U}$ there is $\mathsf{up}' \in \mathcal{U}$ such that $P(\textsc{Up}(\textsc{Up}(\mathsf{pub},\mathsf{up}),\mathsf{up}') = \mathsf{pub}) = 1$. In particular, the updates for both counting Bloom filters and count-min sketches are invertible. Each also has the additional feature of having a natural choice of {\em empty} structure such that every other structure can be constructed by starting with the empty structure and performing a corresponding sequence of update operations.
-We will show that for any mutable data structure with invertible updates and an empty structure, salts can provide no additional guarantee of correctness over an unsalted structure. \todo{David}{Again, please typeset as a nice theorem with concrete advantage bounds.} Consider an adversary $A$ in the case of a non-salted data structure which makes $q_R$ queries to $\REPO$ and $q_T$ queries to $\QRYO$. We construct an adversary $B$ for the salted case which produces the same errors as follows. First, $B$ calls the $\REPO$ oracle on the empty set, receiving an empty representation $\mathsf{pub}$ together with the salt used to create the representation. Whenever $A$ makes a query of the form $\REPO(\mathcal{S})$, $B$ performs a sequence of $\textsc{Up}$ operations on $\mathsf{pub}$ to transform it into $\mathcal{S}$, returns the resulting representation, stores $\mathcal{S}$, and then performs the opposite updates in reverse order to return to the original representation $\mathsf{pub}$. Then if $A$ makes a query of the form $\QRYO(\mathcal{S},\mathsf{qry})$ [...]
-
-In general this may use as many as $2n(q_R+q_T)$ update queries, where $n$ is the longest minimal sequence of update operations needed to generate a data structure in the space (which in a counting filter is equal to the maximum supported multiset size, and in count-min sketch is equal to the sum of the absolute values of the elements' frequences). However, in the case of an unkeyed structure it turns out that far fewer updates are required. By our earlier result, every adversary has a corresponding adversary which makes only a single $\REPO$ query and has an advantage differing by at most a factor of $q_R$. In this case, there is no need to `reset' the representation every time an oracle is queried. Because only one data structure is created at a time, the adversary $B$ can initialize an empty representation, append elements to form the representation of the single $\mathcal{S}$ given as input to the only $\REPO$ query. [...]
-
-As a concrete example, consider the heuristic attack used against standard (unsalted, unkeyed) Bloom filters. We can perform the same attack against salted counting Bloom filters with the following tweaks. We begin with a set $T$ of $s$ test queries and a set $T'$ of $r$ target queries. We want to induce false positives, by which we mean inputs to $\textsc{Qry}$ which produce an output of 1 or more when the correct response is 0. We construct a tree whose nodes are the subsets of $T$ with no more than $n$ elements, ordered by the $\subseteq$ relation with the empty set as the root. Then we take $\REPO(\{\})$ and perform a depth-first search of the tree. Every time we descend a level to a new node, that node contains one element not contained in its parent node. First we call $\UPO$ to insert this element into the representation, and then we check to see whether all the elements of $T'$ are false positives (which can be done simply by examining the filter in the keyless case, or by querying $\QRYO$ in the keyed case). When we ascend a level, we call $\UPO$ to delete the element corresponding to that node. This search displays exactly the same behavior as the corresponding attack on standard Bloom filters, except that $\UPO$ queries take the place of $\REPO$ queries (and as such, the fact that $\REPO$ has a random salt is irrelevant).
-
-Furthermore, both of the heuristics used in the original attack can be adapted to use here. [...]
-
-\section{Privacy}
-
-The semantic security of the immutable case cannot be easily extended to the mutable case. If the same experiment is used, but with the adversary additionally given access to an $\UPO$ oracle, the adversary can often easily learn the composition of the original set using this oracle. For example, with a standard Bloom filter, the adversary can attempt to insert an element of its choice. The representation will remain the same if and only if that element was already in the filter.
-
-There is also the question of whether there is a natural analog to one-wayness for mutable data structures. Even if the adversary is not allowed to choose the underlying data object and must attempt to guess its contents from its public representation, in the mutable case we must assume the adversary can see the representation change over time as updates occur. We assume there is no way to know in advance which updates will be carried out, and hence no known distribution over $\mathcal{U}$. Therefore, to be cautious, we should let the adversary choose the updates. If the adversary can choose and apply any update it likes, the security notion would of course be impossible to achieve (the adversary will know what elements were added by the updates it chose to make). An alternative is to have the two experiments. In each, the adversary chooses two updates with identical leakage, and the oracle either consistently applies the first (in experiment 0) or consistently applies the second (in experiment 1). But this again leads to problems where the adversary can observe whether the representation has changed in order to determine which elements have previously been added to it.
-
-In short, it is extremely unclear how to extend privacy notions to the mutable case without making the adversary so powerful that they can easily discern the contents of the data structures in question.
-
-%\input{toms-mutable-filters}
+\include{syntax}
+\include{correctness}
+\include{privacy}
 
 
 

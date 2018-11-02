@@ -1,0 +1,11 @@
+\section{Syntax}
+
+We start with a universe $\mathcal{D}$ of data objects, a key space $\mathcal{K}$, a set $\mathcal{R}$ of responses equipped with a metric $d: \mathcal{R}^2 \to [0,\infty)$, a set $\mathcal{Q} = \{\mathsf{qry}: \mathcal{D} \to \mathcal{R}\}$ of queries, and a set $\mathcal{U} = \{\mathsf{up}: \mathcal{D} \to \mathcal{D}\}$ of possible updates. A {\em mutable data structure} is a tuple $\Pi = (\textsc{Rep},\textsc{Qry},\textsc{Up})$, where:
+
+\begin{itemize}
+  \item $\textsc{Rep}: \mathcal{K} \times \mathcal{D} \to \{0,1\}^*$ is a randomized {\em representation algorithm}, taking as input a key $K \in \mathcal{K}$ and data object $D \in \mathcal{D}$, and outputting the public representation $\mathsf{pub} \in \{0,1\}^*$ of $D$. We write this as $\mathsf{pub} \gets^\$ \textsc{Rep}_K(D)$.
+  \item $\textsc{Qry}: \mathcal{K} \times \{0,1\}^* \times \mathcal{Q} \to \mathcal{R}$ is a deterministic {\em query-evaluation algorithm}, taking as input $K \in \mathcal{K}$, $\mathsf{pub} \in \{0,1\}^*$, and $\mathsf{qry} \in \mathcal{Q}$, and outputting an answer $a \in \mathcal{R}$. We write this as $a \gets \textsc{Qry}_K(\mathsf{pub},\mathsf{qry})$.
+  \item $\textsc{Up}: \mathcal{K} \times \{0,1\}^* \times \mathcal{U} \to \{0,1\}^*$ is a randomized {\em update algorithm}, taking as input $K \in \mathcal{K}$, $\mathsf{pub} \in \{0,1\}^*$, and $\mathsf{up} \in \mathcal{U}$, and outputting an updated representation $\mathsf{pub}'$. We write this as $\mathsf{pub}' \gets^\$ \textsc{Up}_K(\mathsf{pub},\mathsf{up})$.
+\end{itemize}
+
+Unkeyed data structures are a special case where $\mathcal{K} = \{\epsilon\}$, and immutable data structures are a special case where the update algorithm deterministically returns $\textsc{Up}(\key,\mathsf{pub},\mathsf{up})=\mathsf{pub}$ for all inputs.  In the latter case, we will often drop mention of the update algorithm.
