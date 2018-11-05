@@ -1,30 +1,39 @@
+\newcommand{\REVO}{\mathbf{Reveal}}
 
 \begin{figure}[t]
   \twoColsNoDivide{0.48}
   {
-    \experimentv{$\Exp{\errep}_{\struct,r}(\advA)$ \fbox{$\Exp{\erreps}_{\struct,r}(\advA)$}}\\[2pt]
-      $\setC \gets \emptyset$; $\ct,\err_0 \gets 0$;
+     \raisebox{-5pt}{\experimentv{$\Exp{\errep}_{\struct,r}(\advA)$ {$\boxed{\Exp{\erreps}_{\struct,r}(\advA)}$}}}\\[2pt]
+      $\setC,\setP \gets \emptyset$\\
+      $\ct,\err_0 \gets 0$ \\
       $\key \getsr \keys$\\
-      $i \getsr \advA^{\REPO,\UPO,\QRYO}$\\
-      return $(\err_i \geq r)$ 
+      $i \getsr \advA^{\REPO,\UPO,\QRYO{\scriptsize\boxed{\!,\!\REVO}}}$\\
+      if $i \in \setP$ then return 0 \\
+      return $[\err_i \geq r]$ 
     \\[6pt]
     \oraclev{$\REPO(\col)$}\\[2pt]
-      $\ct\gets\ct+1$;
+      $\ct\gets\ct+1$ \\
       $\col_\ct \gets \col$\\
       $\pub_\ct \getsr \Rep_\key(\col)$\\
-      return $\pub_\ct$ \fbox{return $\top$}
-  }
+      return $\pub_\ct$ \fbox{return $\top$}  }
   {
     \oraclev{$\UPO(i, \up)$}\\[2pt]
-      $\col_i \gets \up(\col_i)$;
+      $\col_i \gets \up(\col_i)$\\
       $\pub_i \getsr \Up_\key(\pub_i, \up)$\\
       return $\pub_i$ \fbox{return $\top$}
-    \\[9pt]
+      \medskip
+
     \oraclev{$\QRYO(i, \qry)$}\\[2pt]
       if $(i,\qry) \in \setC$ then return $\bot$\\
-      $\setC \gets \setC \union \{(i,\qry)\}$; $a \gets \Qry_K(\pub_i, \qry)$\\
+      $\setC \gets \setC \union \{(i,\qry)\}$\\
+      $a \gets \Qry_K(\pub_i, \qry)$\\
       $\err_i \gets \err_i + d(a,\qry(\col_i))$\\
       return $a$
+      \medskip
+
+    \oraclev{$\REVO(i, \qry)$}\\[2pt]
+     $\setP \gets \setP \cup \{i\}$ \\
+      return $\pub_i$
   }
   \caption{Two notions of adversarial correctness. The $\errep$ notion captures correctness when the representation is always known to the adversary, while the $\erreps$ notion captures correctness when the representation is secret.}
   \vspace{6pt}\hrule
@@ -55,7 +64,7 @@ In the case that is no secret key, we have a result analogous to the immutable c
 
 The advantage of $B$ is smaller than that of $A$ by at most a factor of $q_R$, since there is a $\frac{1}{q_R}$ chance that $B$ randomly selects the same $q$ that $A$ eventually chooses as its output.
 
-Say that the update algorithm $\textsc{Up}_K$ is {\em invertible} if for every representation $\mathsf{pub}$ and update $\mathsf{up} \in \mathcal{U}$ there is $\mathsf{up}' \in \mathcal{U}$ such that $P(\textsc{Up}(\textsc{Up}(\mathsf{pub},\mathsf{up}),\mathsf{up}') = \mathsf{pub}) = 1$. In particular, the updates for both counting Bloom filters and count-min sketches are invertible. Each also has the additional feature of having a natural choice of {\em empty} structure such that every other structure can be constructed by starting with the empty structure and performing a corresponding sequence of update operations.
+Say that the update algorithm $\textsc{Up}_K$ is {\em invertible} if for every representation $\mathsf{pub}$ and update $\mathsf{up} \in \mathcal{U}$ there is $\mathsf{up}' \in \mathcal{U}$ such that $\Prob{\textsc{Up}(\textsc{Up}(\mathsf{pub},\mathsf{up}),\mathsf{up}' = \mathsf{pub})} = 1$.  For example, the updates for both counting Bloom filters and count-min sketches are invertible, by consequence of being deterministic. Each also has the additional feature of having a natural choice of {\em empty} structure such that every other structure can be constructed by starting with the empty structure and performing a corresponding sequence of update operations.
 We will show that for any mutable data structure with invertible updates and an empty structure, salts can provide no additional guarantee of correctness over an unsalted structure. \todo{David}{Again, please typeset as a nice theorem with concrete advantage bounds.} Consider an adversary $A$ in the case of a non-salted data structure which makes $q_R$ queries to $\REPO$ and $q_T$ queries to $\QRYO$. We construct an adversary $B$ for the salted case which produces the same errors as follows. First, $B$ calls the $\REPO$ oracle on the empty set, receiving an empty representation $\mathsf{pub}$ together with the salt used to create the representation. Whenever $A$ makes a query of the form $\REPO(\mathcal{S})$, $B$ performs a sequence of $\textsc{Up}$ operations on $\mathsf{pub}$ to transform it into $\mathcal{S}$, returns the resulting representation, stores $\mathcal{S}$, and then performs the opposite updates in reverse order to return to the original representation $\mathsf{pub}$. Then if $A$ makes a query of the form $\QRYO(\mathcal{S},\mathsf{qry})$ [...]
 
 In general this may use as many as $2n(q_R+q_T)$ update queries, where $n$ is the longest minimal sequence of update operations needed to generate a data structure in the space (which in a counting filter is equal to the maximum supported multiset size, and in count-min sketch is equal to the sum of the absolute values of the elements' frequences). However, in the case of an unkeyed structure it turns out that far fewer updates are required. By our earlier result, every adversary has a corresponding adversary which makes only a single $\REPO$ query and has an advantage differing by at most a factor of $q_R$. In this case, there is no need to `reset' the representation every time an oracle is queried. Because only one data structure is created at a time, the adversary $B$ can initialize an empty representation, append elements to form the representation of the single $\mathcal{S}$ given as input to the only $\REPO$ query. [...]
