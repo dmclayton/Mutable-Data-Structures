@@ -100,4 +100,28 @@ In general this may use as many as $2n(q_R+q_T+q_U)$ update queries, where $n$ i
 
 Note that in a counting filter, $n$ is equal to the maximum supported multiset size, and in count-min sketch $n$ is equal to the sum of the absolute values of the elements' frequences. While this means a potentially large number of update queries are needed in the general case, for an unkeyed structure it turns out that far fewer updates are required. In the above proof, the only reason we needed to undo each sequence of $\UPO$ queries was because the following query might involve the representation of a different structure. But in the case of a salted but unkeyed structure, our initial lemma shows that for any adversary there is an adversary making only a single $\REPO$ query with an advantage differing by a factor of at most $q_R$. For an adversary which only ever makes one $\REPO$ query, we never need to reset the representation to the empty representation, and in the above simulation we can omit all $\UPO$ queries except those needed for $A$'s single $\REPO$ query and any $\UPO$ queries made by $A$ itself. For a concrete example, we present an attack against salted counting Bloom filters.
 
-%As a concrete example, consider the heuristic attack used against standard (unsalted, unkeyed) Bloom filters. We can perform the same attack against salted counting Bloom filters with the following tweaks. We begin with a set $T$ of $s$ test queries and a set $T'$ of $r$ target queries. We want to induce false positives, by which we mean inputs to $\textsc{Qry}$ which produce an output of 1 or more when the correct response is 0. We construct a tree whose nodes are the subsets of $T$ with no more than $n$ elements, ordered by the $\subseteq$ relation with the empty set as the root. Then we take $\REPO(\{\})$ and perform a depth-first search of the tree. Every time we descend a level to a new node, that node contains one element not contained in its parent node. First we call $\UPO$ to insert this element into the representation, and then we check to see whether all the elements of $T'$ are false positives (which can be done simply by examining the filter in the keyless case, or by querying $\QRYO$ in the keyed case). When we ascend a level, we call $\UPO$ to delete the element corresponding to that node. This search displays exactly the same behavior as the corresponding attack on standard Bloom filters, except that $\UPO$ queries take the place of $\REPO$ queries (and as such, the fact that $\REPO$ has a random salt is irrelevant).
+\begin{center}
+  \begin{tabular}{ | c | c | c | c | c | }
+    \hline
+    Salt & Key & Private Representation & Irreversible Updates & Correctness \\ \hline
+    0 & 0 & 0 & 0 & Standard attack from immutable case \\ \hline
+    0 & 0 & 0 & 1 & Standard attack from immutable case \\ \hline
+    0 & 0 & 1 & 0 & Standard attack from immutable case \\ \hline
+    0 & 0 & 1 & 1 & Standard attack from immutable case \\ \hline
+    0 & 1 & 0 & 0 & ``Online'' attack \\ \hline
+    0 & 1 & 0 & 1 & ``Online'' attack \\ \hline
+    0 & 1 & 1 & 0 & ``Online'' attack \\ \hline
+    0 & 1 & 1 & 1 & ``Online'' attack \\ \hline
+    1 & 0 & 0 & 0 & Standard attack from immutable case \\ \hline
+    1 & 0 & 0 & 1 & Standard attack from immutable case \\ \hline
+    1 & 0 & 1 & 0 & ? \\ \hline
+    1 & 0 & 1 & 1 & ? \\ \hline
+    1 & 1 & 0 & 0 & ``Online'' attack with $\UPO$ \\ \hline
+    1 & 1 & 0 & 1 & ? \\ \hline
+    1 & 1 & 1 & 0 & ? \\ \hline
+    1 & 1 & 1 & 1 & ? \\
+    \hline
+  \end{tabular}
+\end{center}
+
+%table: salt?, key?, public representation?, invertible update?
