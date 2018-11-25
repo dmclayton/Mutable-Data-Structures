@@ -245,6 +245,30 @@
   }
 }
 
+\newcommand{\boxThmBFSaltCorrect}[5]{
+  \makebox[\textwidth][c]{
+  \begin{tabular}{|@{\gamespadleft}l@{}@{}@{\gamespad}l|}
+    \hline
+    \rule{0pt}{1\normalbaselineskip}
+    \begin{minipage}[t]{#1\textwidth}\gamesfontsize
+      #2 \vspace{6pt}
+    \end{minipage} \vline &
+    \begin{minipage}[t]{#1\textwidth}\gamesfontsize
+      #3 \vspace{6pt}
+    \end{minipage} \\
+    \hline
+    \rule{0pt}{1\normalbaselineskip}
+    \begin{minipage}[t]{#1\textwidth}\gamesfontsize
+      #4 \vspace{6pt}
+    \end{minipage} &
+    \begin{minipage}[t]{#1\textwidth}\gamesfontsize
+      #5 \vspace{6pt}
+    \end{minipage} \\
+    \hline
+  \end{tabular}
+  }
+}
+
 % Notes
 \newcounter{notectr}[section]
 \newcommand{\getnotectr}{\stepcounter{notectr}\thesection.\thenotectr}
