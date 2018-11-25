@@ -120,9 +120,9 @@ Note that in a counting filter, $n$ is equal to the maximum supported multiset s
     0 & 1 & 1 & 0 & Attack 2 \\ \hline
     0 & 1 & 1 & 1 & Attack 2 \\ \hline
     1 & 0 & 0 & 0 & Attack 3 \\ \hline
-    1 & 0 & 0 & 1 & Attack 3, Theorem 1 \\ \hline
+    1 & 0 & 0 & 1 & Attack 3, Theorem~\ref{thm:bf-salt-bound} \\ \hline
     1 & 0 & 1 & 0 & ? \\ \hline
-    1 & 0 & 1 & 1 & ? \\ \hline
+    1 & 0 & 1 & 1 & Theorem~\ref{thm:bf-priv-salt-bound} \\ \hline
     1 & 1 & 0 & 0 & Attack 4 \\ \hline
     1 & 1 & 0 & 1 & ? \\ \hline
     1 & 1 & 1 & 0 & ? \\ \hline
@@ -155,7 +155,7 @@ Fix integers $k, m, n, \lambda, r\geq 0$, let $H \colon \bits^* \to [m]$ be a fu
 where $H$ is modeled as a random oracle.
 \end{theorem}
 
-By Lemma~\ref{lemma:errep} we have $\Adv{\errep}_{\struct,r}(t, q_R, q_T, q_U, q_H) \leq q_R\cdot\Adv{\errep1}_{\struct,r}(O(f(t)), q_T, q_U, q_H)$ where $f(t) = t + (q_R-1)\ticks(\Rep,t) + q_T\ticks(\Qry,t) + q_U\ticks(\Up,t)$, so we consider $\errep1$ adversaries.
+\begin{proof} By Lemma~\ref{lemma:errep} we have $\Adv{\errep}_{\struct,r}(t, q_R, q_T, q_U, q_H) \leq q_R\cdot\Adv{\errep1}_{\struct,r}(O(f(t)), q_T, q_U, q_H)$ where $f(t) = t + (q_R-1)\ticks(\Rep,t) + q_T\ticks(\Qry,t) + q_U\ticks(\Up,t)$, so we consider $\errep1$ adversaries.
 
 Given $\struct_s = (\Rep, \Qry)$, we define a deterministic algorithm $\Repx$ taking a collection $\col$ and salt $\salt$ and returns $\langle M, \salt\rangle$ where $M$ is the Bloom filter representation of $\col$ using $\salt$. Furthermore, define $\fff: [m]^2 \to [m]^k$ as $\fff(\hh) = \vv$, where $\vv_j = 1 + (\hh_1 + j \cdot \hh_2 \mod m)$. For an adversary $\advA$ making only a single $\REPO$ query, let $q_1$ be the number of $\HASHO$ queries made before this $\REPO$ query and $q_2$ be the number of $\HASHO$ queries made afterwards, so that $q_H = q_1 + q_2$. We may assume without loss of generality that the adversary makes no $\QRYO$ queries for elements of $\col$: since Bloom filters have no false negatives the adversary obtains no new information from such a query, and since $\QRYO$ has no side effects when a correct result is returned such a query can have no other effect on the game.
 
@@ -167,7 +167,8 @@ The game~$\G_2$ is the same as~$\G_1$ until $\bad_1$ is set, which occurs only w
 
 The final game~$\G_3$ is identical to~$\G_2$ from the adversary's perspective, but now the test for false positives occurs in the $\HASHO_3$ oracle rather than the $\QRYO$ oracle. When $\HASHO_3$ gets $(\salt,x)$, it first checks whether $T[\salt,x]$ is defined. But now if $\salt = \salt^*$, the salt used to create the representation, $\HASHO_3$ also checks to see whether $x$ is a false positive for $\pub$ and sets $\Ans[x]$ accordingly. Then when $\QRYO$ is called on $\qry_x$, the oracle first checks $\Ans[x]$ and only if that value is undefined does it send $(\salt^*,x)$ to $\HASHO_3$.
 
-The game~$\G_3(\advB)$ outputs 1 if and only if there are at least $r$ calls to $\HASHO_3$ which increment $\err$. These are queries with $x \not\in col$ but suc that $M[\vv_j] = 1$ for all $j \in [k]$. By construction, whenever $\advB$ makes a query $(\salt^*,x)$ to $\HASHO_3$ and $x \not\in \col$, the value $T[\salt^*,x]$ is undefined. Furthermore, whenever $\advB$ calls $\QRYO$ on $\qry_x$ and $x \not\in \col$, again $T[\salt^*,x]$ is undefined. (For this reasoning to hold it is important that $\UPO$ can only add elements to $\col$, not remove them.) There are at most $q_T + q_2$ queries made to $\HASHO_3$ of the form $(\salt^*,x)$ for $x \not\in \col$, which are the only queries that can potentially cause false positives and therefore increase $\err$. We assume without loss of generality that $\advB$ halts once it achieves $\err = r$, so there are $\binom{q_T+q_2}{r}$ ways $\advB$ can win. By the standard Bloom filter bound, the probability of a single error is $(1-e^{-kn/m})^k + O(1/n)$. Because each call to $\HASHO_3$ that potentially increments $\err$ is independent of all previous calls to $\HASHO_3$, the probability of $\advB$ succeeding at~$\G_3$ is bounded by $\binom{q_T+q_2}{r}\left((1-e^{-kn/m})^k + O(1/n)\right)^r$. Noting that $q_1 \le q_H$ and $q_2 \le q_H$, the claim follows.
+The game~$\G_3(\advB)$ outputs 1 if and only if there are at least $r$ calls to $\HASHO_3$ which increment $\err$. These are queries with $x \not\in col$ but suc that $M[\vv_j] = 1$ for all $j \in [k]$. By construction, whenever $\advB$ makes a query $(\salt^*,x)$ to $\HASHO_3$ and $x \not\in \col$, the value $T[\salt^*,x]$ is undefined. Furthermore, whenever $\advB$ calls $\QRYO$ on $\qry_x$ and $x \not\in \col$, again $T[\salt^*,x]$ is undefined. (For this reasoning to hold it is important that $\UPO$ can only add elements to $\col$, not remove them.) There are at most $q_T + q_2$ queries made to $\HASHO_3$ of the form $(\salt^*,x)$ for $x \not\in \col$, which are the only queries that can potentially cause false positives and therefore increase $\err$. We assume without loss of generality that $\advB$ halts once it achieves $\err = r$, so there are $\binom{q_T+q_2}{r}$ ways $\advB$ can win. By the standard Bloom filter bound, the probability of a single error is $(1-e^{-kn/m})^k + O(1/n)$. Because each call to $\HASHO_3$ that potentially increments $\err$ is independent of all previous calls to $\HASHO_3$, the probability of $\advB$ succeeding at~$\G_3$ is bounded by $\binom{q_T+q_2}{r}\left((1-e^{-kn/m})^k + O(1/n)\right)^r$. Noting that $q_1 \le q_H$ and $q_2 \le q_H$, the claim follows.\hfill\qed
+\end{proof}
 
 \begin{figure}
   \boxThmBFSaltCorrect{0.48}
