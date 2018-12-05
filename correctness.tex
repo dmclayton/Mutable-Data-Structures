@@ -79,7 +79,7 @@ First, we note that any structure which is insecure in the immutable case is als
   where $f(t) = t + (q_R-1)\ticks(\Rep,t) + q_T\ticks(\Qry,t) + q_U\ticks(\Up,t)$.
 \end{lemma}
 
-For a fixed $r \ge 0$, let $A$ be an $\errep$ adversary which runs in $t$ time steps and makes $q_R$ $\REPO$ queries, $q_T$ $\QRYO$ queries, $q_U$ $\UPO$ queries, and $q_H$ RO queries. We construct an adversary $B$ for $\errep1$ as follows.
+\begin{proof}For a fixed $r \ge 0$, let $A$ be an $\errep$ adversary which runs in $t$ time steps and makes $q_R$ $\REPO$ queries, $q_T$ $\QRYO$ queries, $q_U$ $\UPO$ queries, and $q_H$ RO queries. We construct an adversary $B$ for $\errep1$ as follows.
 
 First, $B$ initializes a counter $ct \gets 0$ and a set $\setC \gets \emptyset$, and samples $q \getsr [q_R]$. Next $B$ executes $A$, simulating the answers to its oracle queries as follows. When $A$ asks the query $\REPO(\col)$, $B$ sets $ct \gets ct + 1$ and stores $\col_{ct} \gets \col$. Then, if $ct = q$, $B$ forwards $\col$ to its own $\REPO$ oracle and returns the resulting $\pub$ to $A$. Otherwise, $B$ computes and returns $\pub_{ct} \getsr \Rep(\col)$. When $A$ asks for the query $\QRYO(i,\qry)$, $B$ first checks if $(i,\qry) \in \setC$ and returns $\bot$ if this condition holds. Otherwise $B$ forwards $(i,\qry)$ to its $\QRYO$ oracle and returns $a$ if $i = q$, and reutrns $\Qry(\pub_i,\qry)$ otherwise. Similarly, when $A$ makes an $\UPO(i,\up)$ query, $B$ forwards $(i,\up)$ to its $\UPO$ oracle if $i = q$ and evaluates $\Up(\pub_i,\up)$ otherwise. Finally, queries from $A$ to its RO are simply forwarded to $B$'s RO. When $A$ halts and outputs $j$, $B$ does the same.
 
@@ -89,7 +89,10 @@ $$\Adv{\errep}_{\struct,r}(t, q_R, q_T, q_U, q_H) \leq q_R\cdot\Adv{\errep1}_{\s
 
 Note that $B$ makes at most $q_T$ queries to $\QRYO$ and $q_H$ queries to its RO. Since $A$ runs in $t$ time steps and writing a bit takes 1 time step, the input length to any $\Rep$, $\Qry$, or $\Up$ evaluated by $B$ is at most $t$ bits. Hence, adversary $B$ runs in time $O(t+(q_R-1)\ticks(\Rep,t)+q_T\ticks(\Qry,t)+q_U\ticks(\Up,t))$.\hfill\qed
 
-Say that a structure is {\em invertible} if for every representation $\mathsf{pub}$ and update $\mathsf{up} \in \mathcal{U}$ there is $\mathsf{up}' \in \mathcal{U}$ such that $\Prob{\textsc{Up}(\textsc{Up}(\mathsf{pub},\mathsf{up}),\mathsf{up}' = \mathsf{pub})} = 1$.  For example, the updates for both counting Bloom filters and count-min sketches are invertible, by consequence of being deterministic and having both insertion and deletion operations. Each also has the additional feature of having a natural choice of {\em empty} structure such that every other structure can be constructed by starting with the empty structure and performing a corresponding sequence of update operations.
+Say that a structure is {\em invertible} if for every representation $\mathsf{pub}$ and update $\mathsf{up} \in \mathcal{U}$ there is $\mathsf{up}' \in \mathcal{U}$ such that $\Prob{\textsc{Up}(\textsc{Up}(\mathsf{pub},\mathsf{up}),\mathsf{up}' = \mathsf{pub})} = 1$.  For example, the updates for both counting Bloom filters and count-min sketches are invertible, by consequence of being deterministic and having both insertion and deletion operations. Each also has the additional feature of having a natural choice of {\em empty} structure such that every other structure can be constructed by starting with the empty structure and performing a corresponding sequence of update operations.\hfill\qed
+\end{proof}
+
+There is a similar equivalence between $\erreps1$ and $\erreps$; the reasoning is identical to that in the above proof.
 
 \begin{lemma}[Salts do not affect \errep for invertible structures]\label{lemma:nosalt}
   Let $\struct = (\Rep, \Qry, \Up)$ be a data structure with a salt randomly initialized at runtime and $\struct'$ be the same structure using a fixed value from the salt space in place of a randomized salt. For every $t, q_R, q_T, q_U, q_H, r\geq 0$, it holds that
@@ -271,4 +274,101 @@ The game~$\G_3(\advB)$ outputs 1 if and only if there are at least $r$ calls to 
   }
   \caption{Games 0--3 for proof of Theorem~\ref{thm:bf-salt-bound}.}
   \label{fig:bf-salt-bound}
+\end{figure}
+
+\begin{theorem}[Correctness Bound for Private-Representation Salted Bloom Filters]\label{thm:bf-priv-salt-bound}
+Fix integers $k, m, n, \lambda, r\geq 0$, let $H \colon \bits^* \to [m]$ be a function, and let $\struct_s = \SBF[\hashbf[H],k,m,n,\lambda]$.
+  For every $t, q_R, q_T, q_H \geq 0$ such that $q_T \geq r$, it holds that
+  \begin{eqnarray*}
+    \Adv{\erreps}_{\struct_\saltybloom,r}(t,&q_R,& q_T, q_U, q_H) \leq \\ && q_R \cdot
+     \left[
+      \frac{q_H}{2^\lambda} +
+      {\dbinom{q_T}{r}} \left( (1-e^{-kn/m})^k + O(1/n) \right)^r
+    \right] \,,
+\end{eqnarray*}
+where $H$ is modeled as a random oracle.
+\end{theorem}
+
+\begin{proof} We proceed in much the same way as for the public-representation case. Note that when we reduce to $\erreps1$, we may assume without loss of generality that the adversary $\advA$ never makes use of the $\REVO$ oracle, since doing so would prevent the adversary from having any possibility of winning. The game~$\G_0$ is simply the $\erreps1$ experiment with the $\REVO$ oracle omitted, so $\Adv{\errep1}_{\struct_s,r}(\advA) = \Prob{\G_0(\advA) = 1}$. In~$\G_1$ we again split the hash oracle into three, but this time the adversary is given $\HASHO_1$ in both stages of the game, while $\HASHO_3$ is reserved for the $\QRYO$ oracle exclusively. Once again for any $\advA$ for~$\G_0$ there is $\advB$ for~$\G_1$ which produces the same advantage by simulating $\advA$ and answering any hash queries of the form $\langle \salt, j, x\rangle$ using $\HASHO_1$. This preserves the adversary's advantage, so $\Adv{\errep1}_{\struct_s,r}(\advA) = \Prob{\G_1(\advA) = 1}$.
+
+The game~$\G_2$ is the same as in the previous proof, except now $\bad_1$ can be set during either phase of the adversary's operation, whenever they send $(\salt^*,x)$ to $\HASHO_1$ for some $x$. In the first phase, there is again a $q_1/2^\lambda$ chance of the adversary guessing the salt. In the second phase, the random sampling used by $\HASHO_i$ ensures that each call the adversary makes to the $\HASHO_i$ oracle is independent of all previous calls. We therefore have a $q_2/2^\lambda$ chance of the adversary guessing the salt during this phase, for a total chance of $q_H/2^\lambda$ chance of the adversary guessing the salt at some point during the experiment.
+
+When moving to the final game~$\G_3$ we can now assume the adversary never successfully guesses the salt. The adversary's advantage is now given by $\Adv{\errep1}_{\struct_s,r}(\advA) \le \Prob{\G_3(\advB) = 1} + q_H/2^\lambda$. Since the adversary never makes a $\HASHO_1$ query that would correspond to the same hash operation as a $\QRYO$ call, we may give $\HASHO_1$ a different table than that used for the other oracles. The $\HASHO_1$ oracle is now simply a random oracle, and $\advB$ can only interact with the data structure through the $\QRYO$ and $\UPO$ oracles. Only the $\QRYO$ calls can produce an error, which happens with probability given by the standard Bloom filter bound of $(1-e^{-kn/m})^k + O(1/n)$. Once again we assume loss of generality that the adversary stops once it finds these $r$ errors, and over the course of $q_T$ calls to $\QRYO$ this can occur in $\binom{q_T}{r}$ distinct ways. The total probability of $r$ errors is therefore $\binom{q_T}{r}\left((1-e^{-kn/m})^k + O(1/n)\right)^r$.\hfill\qed
+\end{proof}
+
+\begin{figure}
+  \boxThmBFSaltCorrect{0.48}
+  {
+    \underline{$\G_0(\advA)$}\\[2pt]
+      $\col \getsr \advA^H$; $\setC \gets \emptyset$; $\err \gets 0$\\
+      $\pub \getsr \Rep[\hashbf[H]](\col)$\\
+      $\bot \getsr \advA^{H,\QRYO,\UPO}$\\
+      return $(\err \geq r)$
+    \\[6pt]
+    \oraclev{$\QRYO(\qry_x)$}\\[2pt]
+      if $\qry_x \in \mathcal{C}$ then return $\bot$\\
+      $\setC \gets \setC \union \{\qry_x\}$\\
+      $a \gets \Qry[\hashbf[H]](\pub, \qry_x)$\\
+      if $a \neq \qry_x(\col)$ then $\err \gets \err + 1$\\
+      return~$a$
+    \\[6pt]
+    \oraclev{$\UPO(\up_x)$}\\[2pt]
+      $\col \gets \col \union \{x\}$\\
+      $\pub \gets \Up[\hashbf[H]](\pub,\up_x)$\\
+      return~$\pub$
+    \\[4pt]
+    \hspace*{-4pt}\rule{1.043\textwidth}{.4pt}
+    \\[5pt]
+    \oraclev{$\HASHO_1(\salt,x)$} \hfill\diffplus{$\G_2$}\;{$\G_1$}\hspace*{3pt}\\
+      $\hh \getsr [m]^2$; $\vv \gets \fff(\hh$)\\
+      if $\salt = \salt^*$ then\\
+      \tab $\bad_1 \gets 1$; \diffplus{return $\vv$}\\
+      if $T[\salt,x]$ is defined then $\vv \gets T[\salt,x]$\\
+      $T[\salt,x] \gets \vv$;
+      return $\vv$
+  }
+  {
+    \underline{$\G_1(\advB)$}\\[2pt]
+      $\salt^* \getsr \bits^\lambda$;
+      $\col \getsr \advB^{\HASHO_1}$\\
+      $\pub \gets \Repx[\HASHO_2](\col, \salt^*)$\\
+      $\setC \gets \emptyset$;
+      $\err \gets 0$\\
+      $\bot \getsr \advB^{\HASHO_1,\QRYO,\UPO}$\\
+      return $(\err \geq r)$
+    \\[6pt]
+    \oraclev{$\QRYO(\qry_x)$}\\[2pt]
+      if $\qry_x \in \mathcal{C}$ then return $\bot$\\
+      $\setC \gets \setC \cup \{\qry_x\}$\\
+      $a \gets \Qry[\HASHO_3](\pub, \qry_x)$\\
+      if $a \neq \qry_x(\col)$ then $\err \gets \err + 1$\\
+      return~$a$
+    \\[6pt]
+    \oraclev{$\UPO(\up_x)$}\\[2pt]
+      $\col \gets \col \union \{x\}$\\
+      $\pub \gets \Up[\HASHO_2](\pub,\up_x)$\\
+      return~$\pub$
+    \\[6pt]
+    \oraclev{$\HASHO_i(\salt,x)$}\\[2pt]
+      $\hh \getsr [m]^2$; $\vv \gets \fff(\hh$)\\
+      if $\salt = \salt^*$ then $\bad_i \gets 1$\\
+      if $T[\salt,x]$ is defined then\\
+      \tab $\vv \gets T[\salt,x]$\\
+      $T[\salt,x] \gets \vv$;
+      return $\vv$
+  }
+  {
+    \underline{$\G_3(\advB)$}\\[2pt]
+    \oraclev{$\HASHO_1(\salt,x)$}\\[2pt]
+      $\hh \getsr [m]^2$; $\vv \gets \fff(\hh$)\\
+      if $\salt = \salt^*$ then\\
+      \tab $\bad_1 \gets 1$; \diffplus{return $\vv$}\\
+      if $T'[\salt,x]$ is defined then $\vv \gets T'[\salt,x]$\\
+      $T'[\salt,x] \gets \vv$;
+      return $\vv$
+  }
+  {
+  }
+  \caption{Games 0--3 for proof of Theorem~\ref{thm:bf-priv-salt-bound}.}
+  \label{fig:bf-priv-salt-bound}
 \end{figure}
