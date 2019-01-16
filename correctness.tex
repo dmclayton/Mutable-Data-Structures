@@ -5,6 +5,7 @@
 \newcommand{\fff}{\schemefont{Fn}}
 \newcommand{\Repx}{\Rep1}
 \newcommand{\Ans}{\varfont{Ans}}
+\newcommand{\maxerr}{\varfont{maxerr}}
 \def\ticks(#1,#2){\procfont{T}_{\hspace*{-1.5pt}#1}({#2})}
 
 \begin{figure}[t]
@@ -47,6 +48,52 @@
       return $\pub_i$
   }
   \caption{Two notions of adversarial correctness. The $\errep$ notion captures correctness when the representation is always known to the adversary, while the $\erreps$ notion captures correctness when the representation is secret.}
+  \vspace{6pt}\hrule
+  \label{fig:security}
+\end{figure}
+
+\begin{figure}[t]
+  \twoColsNoDivide{0.48}
+  {
+     \raisebox{-5pt}{\experimentv{$\Exp{\errep}_{\struct,r}(\advA)$ {$\boxed{\Exp{\erreps}_{\struct,r}(\advA)}$}}}\\[2pt]
+      $\setP \gets \emptyset$\\
+      $\ct \gets 0$ \\
+      $\key \getsr \keys$\\
+      $i \getsr \advA^{\REPO,\UPO,\QRYO{\scriptsize\boxed{\!,\!\REVO}}}$\\
+      \fbox{if $i \in \setP$ then return 0} \\
+      return $[\err_i \geq r]$ 
+    \\[6pt]
+    \oraclev{$\REPO(\col)$}\\[2pt]
+      $\ct\gets\ct+1$ \\
+      $\col_\ct \gets \col$\\
+      $\pub_\ct \getsr \Rep_\key(\col)$\\
+      $\setC_\ct \gets \emptyset$\\
+      $\err_\ct \gets 0$\\
+      $\maxerr_\ct \gets 0$\\
+      return $\pub_\ct$ \fbox{return $\top$}  }
+  {
+    \oraclev{$\UPO(i, \up)$}\\[2pt]
+      $\col_i \gets \up(\col_i)$\\
+      $\pub_i \getsr \Up_\key(\pub_i, \up)$\\
+      $\setC_i \gets \emptyset$\\
+      $\err_i \gets 0$\\
+      return $\pub_i$ \fbox{return $\top$}
+      \medskip
+
+    \oraclev{$\QRYO(i, \qry)$}\\[2pt]
+      if $\qry \in \setC_i$ then return $\bot$\\
+      $\setC_i \gets \setC \union \{\qry\}$\\
+      $a \gets \Qry_K(\pub_i, \qry)$\\
+      $\err_i \gets \err_i + d(a,\qry(\col_i))$\\
+      if $\err_i > \maxerr_i$ then $\maxerr_i \gets \err_i$\\
+      return $a$
+      \medskip
+
+    \oraclev{$\REVO(i)$}\\[2pt]
+     $\setP \gets \setP \cup \{i\}$ \\
+      return $\pub_i$
+  }
+  \caption{A correctness notion capturing the adversary's ability to cause large numbers of errors at a single point in time, with progress being reset between updates.}
   \vspace{6pt}\hrule
   \label{fig:security}
 \end{figure}
