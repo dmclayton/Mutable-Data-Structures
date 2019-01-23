@@ -171,140 +171,6 @@ For a concrete example, we present an attack against salted counting Bloom filte
 
 \subsection{Proofs}
 
-\begin{theorem}[Correctness Bound for Salted Bloom Filters]\label{thm:bf-salt-bound}
-Fix integers $k, m, n, \lambda, r\geq 0$, let $H \colon \bits^* \to [m]$ be a function, and let $\struct_s = \SBF[\hashbf[H],k,m,n,\lambda]$.
-  For every $t, q_R, q_T, q_H \geq 0$ such that $q_T \geq r$, it holds that
-  \begin{eqnarray*}
-    \Adv{\errep}_{\struct_\saltybloom,r}(t,&q_R,& q_T, q_U, q_H) \leq \\ && q_R \cdot
-     \left[
-      \frac{q_H}{2^\lambda} +
-      {\dbinom{q_T + q_H}{r}} \left( (1-e^{-kn/m})^k + O(1/n) \right)^r
-    \right] \,,
-\end{eqnarray*}
-where $H$ is modeled as a random oracle.
-\end{theorem}
-
-\begin{proof} By Lemma~\ref{lemma:errep} we have $\Adv{\errep}_{\struct,r}(t, q_R, q_T, q_U, q_H) \leq q_R\cdot\Adv{\errep1}_{\struct,r}(O(f(t)), q_T, q_U, q_H)$ where $f(t) = t + (q_R-1)\ticks(\Rep,t) + q_T\ticks(\Qry,t) + q_U\ticks(\Up,t)$, so we consider $\errep1$ adversaries.
-
-Given $\struct_s = (\Rep, \Qry)$, we define a deterministic algorithm $\Repx$ taking a collection $\col$ and salt $\salt$ and returns $\langle M, \salt\rangle$ where $M$ is the Bloom filter representation of $\col$ using $\salt$. Furthermore, define $\fff: [m]^2 \to [m]^k$ as $\fff(\hh) = \vv$, where $\vv_j = 1 + (\hh_1 + j \cdot \hh_2 \mod m)$. For an adversary $\advA$ making only a single $\REPO$ query, let $q_1$ be the number of $\HASHO$ queries made before this $\REPO$ query and $q_2$ be the number of $\HASHO$ queries made afterwards, so that $q_H = q_1 + q_2$. We may assume without loss of generality that the adversary makes no $\QRYO$ queries for elements of $\col$: since Bloom filters have no false negatives the adversary obtains no new information from such a query, and since $\QRYO$ has no side effects when a correct result is returned such a query can have no other effect on the game.
-
-We proceed by a game-playing argument. Game~$\G_0$ is equivalent to the $\errep1$ game on~$\struct_s$ with error parameter~$r$, so $\Adv{\errep1}_{\struct_s,r}(\advA) = \Prob{\G_0(\advA) = 1}$. In~$\G_1$ we make two changes to the game. First, we generate the salt $\salt^*$ used to construct the representation before $\advA$ selects $\col$. Second, we split the random oracle mapping $\bits^*$ to $[m]$ into three $\HASHO_i$ oracles which map $\bits^\lambda \cross \bits^*$ to $[m]^k$. These three oracles are used at different times: $\HASHO_1$ is given to $\advA$ during the first stage prior to the construction of the representation, $\HASHO_2$ is used for the construction of the representation, and $\HASHO_3$ is given to $\advA$ during the second stage after the construction of the representation and is used by $\Qry$ and $\Up$ to answer $\QRYO$ and $\UPO$ queries. However, the three simulate a single lazily evaluated oracle because they populate the same table~$T$.
-
-For any adversary $\advA$ for $\G_0$ there is a corresponding $\advB$ for $\G_1$ with the same success rate. This $\advB$ creates a table $R$ with all values undefined and then simulates $\advA$. When $\advA$ makes a query $w$ to $H$, $\advB$ returns $R[w]$ if that entry in the table is defined. Otherwise, if there are $\salt \in \bits^\lambda$, $j \in [k]$, and $x \in \bits^*$ such that $w = \langle \salt, j, x\rangle$, forward $(\salt,x)$ to whichever of $\HASHO_1$ or $\HASHO_3$ that $\advB$ currently has access to. For each $j \in [k]$, set $R[\langle\salt, j, x\rangle] = \vv_j$, where $\vv$ is the output of the $\HASHO_i$ oracle. If there is no such triple of $\salt$, $j$, and $x$, then just sample $r$ uniformly from $[m]$ and set $R[w] = r$. In either case, return $R[w]$ to $\advA$. When $\advA$ outputs its collection $\col$, $\advB$ outputs $\col$ as well. Any queries by $\advA$ to $\QRYO$ or $\UPO$ are forwarded to $\advB$'s corresponding oracle. This simulation is perfect because $\Rep[\hashbf[H]](\col)$ and $\Up[\hashbf[H]](\col,\up)$ are identically distributed to $\Rep[\HASHO_2](\col)$ and $\Up[\HASHO_2](\col,\up)$ respectively.
-
-The game~$\G_2$ is the same as~$\G_1$ until $\bad_1$ is set, which occurs only when $\advB$ sends $(\salt^*,x)$ to $\HASHO_1$ for some $x$. In this case we assume the game is an automatic success for the adversary, but since $\salt^*$ is sampled uniformly from $\bits^\lambda$ and $\advB$ makes at most $q_1$ queries with distinct $\salt$ to $\HASHO_1$, the probability that this happens is at most $q_1/2^\lambda$. Then $\Adv{\errep1}_{\struct_s,r}(\advA) \le \Prob{\G_2(\advB) = 1} + q_1/2^\lambda$. Having taken this into account, we may now assume $\pub$ is independent of the queries $\advB$ makes in its first stage before selecting $\col$.
-
-The final game~$\G_3$ is identical to~$\G_2$ from the adversary's perspective, but now the test for false positives occurs in the $\HASHO_3$ oracle rather than the $\QRYO$ oracle. When $\HASHO_3$ gets $(\salt,x)$, it first checks whether $T[\salt,x]$ is defined. But now if $\salt = \salt^*$, the salt used to create the representation, $\HASHO_3$ also checks to see whether $x$ is a false positive for $\pub$ and sets $\Ans[x]$ accordingly. Then when $\QRYO$ is called on $\qry_x$, the oracle first checks $\Ans[x]$ and only if that value is undefined does it send $(\salt^*,x)$ to $\HASHO_3$.
-
-The game~$\G_3(\advB)$ outputs 1 if and only if there are at least $r$ calls to $\HASHO_3$ which increment $\err$. These are queries with $x \not\in col$ but such that $M[\vv_j] = 1$ for all $j \in [k]$. By construction, whenever $\advB$ makes a query $(\salt^*,x)$ to $\HASHO_3$ and $x \not\in \col$, the value $T[\salt^*,x]$ is undefined. Furthermore, whenever $\advB$ calls $\QRYO$ on $\qry_x$ and $x \not\in \col$, again $T[\salt^*,x]$ is undefined. (For this reasoning to hold it is important that $\UPO$ can only add elements to $\col$, not remove them.) There are at most $q_T + q_2$ queries made to $\HASHO_3$ of the form $(\salt^*,x)$ for $x \not\in \col$, which are the only queries that can potentially cause false positives and therefore increase $\err$. We assume without loss of generality that $\advB$ halts once it achieves $\err = r$, so there are $\binom{q_T+q_2}{r}$ ways $\advB$ can win. By the standard Bloom filter bound, the probability of a single error is $(1-e^{-kn/m})^k + O(1/n)$. Because each call to $\HASHO_3$ that potentially increments $\err$ is independent of all previous calls to $\HASHO_3$, the probability of $\advB$ succeeding at~$\G_3$ is bounded by $\binom{q_T+q_2}{r}\left((1-e^{-kn/m})^k + O(1/n)\right)^r$. Noting that $q_1 \le q_H$ and $q_2 \le q_H$, the claim follows.\hfill\qed
-\end{proof}
-
-\begin{figure}
-  \boxThmBFSaltCorrect{0.48}
-  {
-    \underline{$\G_0(\advA)$}\\[2pt]
-      $\col \getsr \advA^H$; $\setC \gets \emptyset$; $\err \gets 0$\\
-      $\pub \getsr \Rep[\hashbf[H]](\col)$\\
-      $\bot \getsr \advA^{H,\QRYO,\UPO}(\pub)$\\
-      return $(\err \geq r)$
-    \\[6pt]
-    \oraclev{$\QRYO(\qry_x)$}\\[2pt]
-      if $\qry_x \in \mathcal{C}$ then return $\bot$\\
-      $\setC \gets \setC \union \{\qry_x\}$\\
-      $a \gets \Qry[\hashbf[H]](\pub, \qry_x)$\\
-      if $a \neq \qry_x(\col)$ then $\err \gets \err + 1$\\
-      return~$a$
-    \\[6pt]
-    \oraclev{$\UPO(\up_x)$}\\[2pt]
-      $\setC \gets \emptyset$; $\err \gets 0$\\
-      $\col \gets \col \union \{x\}$\\
-      $\pub \gets \Up[\hashbf[H]](\pub,\up_x)$\\
-      return~$\pub$
-    \\[4pt]
-    \hspace*{-4pt}\rule{1.043\textwidth}{.4pt}
-    \\[5pt]
-    \oraclev{$\HASHO_1(\salt,x)$} \hfill\diffplus{$\G_2$}\;{$\G_1$}\hspace*{3pt}\\
-      $\hh \getsr [m]^2$; $\vv \gets \fff(\hh$)\\
-      if $\salt = \salt^*$ then\\
-      \tab $\bad_1 \gets 1$; \diffplus{return $\vv$}\\
-      if $T[\salt,x]$ is defined then $\vv \gets T[\salt,x]$\\
-      $T[\salt,x] \gets \vv$;
-      return $\vv$
-  }
-  {
-    \underline{$\G_1(\advB)$}\\[2pt]
-      $\salt^* \getsr \bits^\lambda$;
-      $\col \getsr \advB^{\HASHO_1}$\\
-      $\pub \gets \Repx[\HASHO_2](\col, \salt^*)$\\
-      $\setC \gets \emptyset$;
-      $\err \gets 0$\\
-      $\bot \getsr \advB^{\HASHO_3,\QRYO,\UPO}(\pub)$\\
-      return $(\err \geq r)$
-    \\[6pt]
-    \oraclev{$\QRYO(\qry_x)$}\\[2pt]
-      if $\qry_x \in \mathcal{C}$ then return $\bot$\\
-      $\setC \gets \setC \cup \{\qry_x\}$\\
-      $a \gets \Qry[\HASHO_3](\pub, \qry_x)$\\
-      if $a \neq \qry_x(\col)$ then $\err \gets \err + 1$\\
-      return~$a$
-    \\[6pt]
-    \oraclev{$\UPO(\up_x)$}\\[2pt]
-      $\setC \gets \emptyset$; $\err \gets 0$\\
-      $\col \gets \col \union \{x\}$\\
-      $\pub \gets \Up[\HASHO_2](\pub,\up_x)$\\
-      return~$\pub$
-    \\[6pt]
-    \oraclev{$\HASHO_i(\salt,x)$}\\[2pt]
-      $\hh \getsr [m]^2$; $\vv \gets \fff(\hh$)\\
-      if $\salt = \salt^*$ then $\bad_i \gets 1$\\
-      if $T[\salt,x]$ is defined then\\
-      \tab $\vv \gets T[\salt,x]$\\
-      $T[\salt,x] \gets \vv$;
-      return $\vv$
-  }
-  {
-    \underline{$\G_3(\advB)$}\\[2pt]
-      $\salt^* \getsr \bits^\lambda$;
-      $\col \getsr \advB^{\HASHO_1}$\\
-      $\pub \gets \Repx[\HASHO_2](\col, \salt^*)$\\
-      $\setC \gets \emptyset$;
-      $\err \gets 0$\\
-      $\bot \getsr \advB^{\HASHO_3,\QRYO}(\pub)$;
-      return $(\err \geq r)$
-    \\[6pt]
-    \oraclev{$\QRYO(\qry_x)$}\\[2pt]
-      if $\qry_x \in \setC$ then return $\bot$\\
-      $\setC \gets \setC \union \{\qry_x\}$\\
-      if $\Ans[x]$ is undefined then\\
-      \tab $\vv \gets \HASHO_3(\salt^*,x)$\\
-      return $\Ans[x]$
-    \\[6pt]
-    \oraclev{$\UPO(\up_x)$}\\[2pt]
-      $\setC \gets \emptyset$; $\err \gets 0$\\
-      $\col \gets \col \union \{x\}$\\
-      $\pub \gets \Up[\HASHO_2](\pub,\up_x)$\\
-      return~$\pub$
-  }
-  {
-    \oraclev{$\HASHO_3(\salt,x)$}\\[2pt]
-      $\hh \getsr [m]^2$\\
-      $\vv \gets \fff(\hh$)\\
-      if $T[\salt,x]$ is defined then\\
-      \tab $\vv \gets T[\salt,x]$\\
-      $T[\salt,x] \gets \vv$\\
-      if $\salt \ne \salt^*$ or $\qry_x \in \setC$ then return~$\vv$\\
-      $\setC \gets \setC \union \{\qry_x\}$\\
-      $\Ans[x] \gets 1$\\
-      for $j \gets 1$ to $k$ do\\
-      \tab\tab if $M[\vv_j] \neq 1$ then $\Ans[x] \gets 0$\\
-      if $\Ans[x] \ne \qry_x(\col)$ then\\
-      \tab $\err \gets \err + 1$\\
-      return $\vv$
-  }
-  \caption{Games 0--3 for proof of Theorem~\ref{thm:bf-salt-bound}.}
-  \label{fig:bf-salt-bound}
-\end{figure}
-
 \begin{theorem}[Correctness Bound for Private-Representation Salted Bloom Filters]\label{thm:bf-priv-salt-bound}
 Fix integers $k, m, n, \lambda, r\geq 0$, let $H \colon \bits^* \to [m]$ be a function, and let $\struct_s = \SBF[\hashbf[H],k,m,n,\lambda]$.
   For every $t, q_R, q_T, q_H \geq 0$ such that $q_T \geq r$, it holds that
@@ -342,6 +208,7 @@ When moving to the final game~$\G_3$ we can now assume the adversary never succe
       return~$a$
     \\[6pt]
     \oraclev{$\UPO(\up_x)$}\\[2pt]
+      $\setC \gets \emptyset$; $\err \gets 0$\\
       $\col \gets \col \union \{x\}$\\
       $\pub \gets \Up[\hashbf[H]](\pub,\up_x)$\\
       return~$\pub$
@@ -374,6 +241,7 @@ When moving to the final game~$\G_3$ we can now assume the adversary never succe
       return~$a$
     \\[6pt]
     \oraclev{$\UPO(\up_x)$}\\[2pt]
+      $\setC \gets \emptyset$; $\err \gets 0$\\
       $\col \gets \col \union \{x\}$\\
       $\pub \gets \Up[\HASHO_2](\pub,\up_x)$\\
       return~$\pub$
