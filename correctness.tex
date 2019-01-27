@@ -188,7 +188,17 @@ where $H$ is modeled as a random oracle.
 
 The game~$\G_2$ is the same as in the previous proof, except now $\bad_1$ can be set during either phase of the adversary's operation, whenever they send $(\salt^*,x)$ to $\HASHO_1$ for some $x$. In the first phase, there is again a $q_1/2^\lambda$ chance of the adversary guessing the salt. In the second phase, the random sampling used by $\HASHO_i$ ensures that each call the adversary makes to the $\HASHO_i$ oracle is independent of all previous calls. We therefore have a $q_2/2^\lambda$ chance of the adversary guessing the salt during this phase, for a total chance of $q_H/2^\lambda$ chance of the adversary guessing the salt at some point during the experiment.
 
-When moving to the final game~$\G_3$ we can now assume the adversary never successfully guesses the salt. The adversary's advantage is now given by $\Adv{\errep1}_{\struct_s,r}(\advA) \le \Prob{\G_3(\advB) = 1} + q_H/2^\lambda$. Since the adversary never makes a $\HASHO_1$ query that would correspond to the same hash operation as a $\QRYO$ call, we may give $\HASHO_1$ a different table than that used for the other oracles. The $\HASHO_1$ oracle is now simply a random oracle, and $\advB$ can only interact with the data structure through the $\QRYO$ and $\UPO$ oracles. Only the $\QRYO$ calls can produce an error, which happens with probability given by the standard Bloom filter bound of $(1-e^{-kn/m})^k + O(1/n)$. Once again we assume loss of generality that the adversary stops once it finds these $r$ errors, and over the course of $q_T$ calls to $\QRYO$ this can occur in $\binom{q_T}{r}$ distinct ways. The total probability of $r$ errors is therefore $\binom{q_T}{r}\left((1-e^{-kn/m})^k + O(1/n)\right)^r$.\hfill\qed
+When moving to the final game~$\G_3$ we can now assume the adversary never successfully guesses the salt. The adversary's advantage is now given by $\Adv{\errep1}_{\struct_s,r}(\advA) \le \Prob{\G_3(\advB) = 1} + q_H/2^\lambda$. Since the adversary never makes a $\HASHO_1$ query that would correspond to the same hash operation as a $\QRYO$ call, we may give $\HASHO_1$ a different table than that used for the other oracles. The $\HASHO_1$ oracle is now simply a random oracle, and $\advB$ can only interact with the data structure through the $\QRYO$ and $\UPO$ oracles. Only the $\QRYO$ calls can produce an error, which happens with probability given by the standard Bloom filter bound of $(1-e^{-kn/m})^k + O(1/n)$. Once again we assume loss of generality that the adversary stops once it finds these $r$ errors, and over the course of $q_T$ calls to $\QRYO$ this can occur in $\binom{q_T}{r}$ distinct ways. The total probability of $r$ errors is therefore $\binom{q_T}{r}\left((1-e^{-kn/m})^k + O(1/n)\right)^r$.
+
+We want to show that alternating between sequences of queries and sequences of updates is no better than making one long series of updates and then one long sequence of queries. There are three types of updates the adversary can make: updates to add elements that have been queried and found to be false positives; updates to add elements that have been queried and found not to be false positives; and updates to add elements that have not been queried yet. We may assume without loss of generality that the adversary never makes the first type of update, since doing so is never beneficial (it does not change the representation at all and decreases the number of errors the adversary has found).
+
+Note that the choices of $\vv$ constructed by the $\HASHO_i$ oracles are independent of all previous queries. Because of this, any update of type 3 is equivalent to any other update of type 3; the probability of any bit being flipped by one update is the same as the probability of the bit being flipped by the other update. Similarly, any update of type 2 is equivalent to any other update of type 2, but is not the same as type 3 since the probability is conditioned on $\vv$ not being a false positive. We assume the worst case, namely that all updates are type 2 (i.e. at least one bit is flipped by each update).
+
+Now we can assume the adversary never successfully guesses the salt, and so $\HASHO_1$ simply functions as a random oracle. Furthermore, we can assume the adversary never adds an element of $\col$ to $\col$ and never makes a $\QRYO$ call for an element which is already in $\col$, since neither of these provides any additional information and neither affects the rest of the experiment in any way. Now we move to game~$\G_3$. Here the adversary's view of the game is the same, but now the game ignores their actual queries and instead makes $\QRYO$ and $\UPO$ calls for completely arbitrary elements. Because the adversary never queries an element which is already in the filter and never attempts to re-add an element to the filter, all queries and updates occur on arguments which are not elements of $\col$ and which either have not been previously sent to $\QRYO$ or which returned a value of 0 after being set to $\QRYO$. Updating with an element which is (unbeknownst to the adversary) a false positive cannot benefit the adversary since such an update would not change the representation. Because of this, the~$\G_3$ assumption that all updates add elements which are not false positives can only benefit the adversary.
+
+% Simulate an adversary, giving RANDOM answers to queries instead of correct ones, conditioned only 
+
+\hfill\qed
 \end{proof}
 
 \begin{figure}
@@ -211,7 +221,7 @@ When moving to the final game~$\G_3$ we can now assume the adversary never succe
       $\setC \gets \emptyset$; $\err \gets 0$\\
       $\col \gets \col \union \{x\}$\\
       $\pub \gets \Up[\hashbf[H]](\pub,\up_x)$\\
-      return~$\pub$
+      return~$\bot$
     \\[4pt]
     \hspace*{-4pt}\rule{1.043\textwidth}{.4pt}
     \\[5pt]
@@ -244,7 +254,7 @@ When moving to the final game~$\G_3$ we can now assume the adversary never succe
       $\setC \gets \emptyset$; $\err \gets 0$\\
       $\col \gets \col \union \{x\}$\\
       $\pub \gets \Up[\HASHO_2](\pub,\up_x)$\\
-      return~$\pub$
+      return~$\bot$
     \\[6pt]
     \oraclev{$\HASHO_i(\salt,x)$}\\[2pt]
       $\hh \getsr [m]^2$; $\vv \gets \fff(\hh$)\\
@@ -256,15 +266,36 @@ When moving to the final game~$\G_3$ we can now assume the adversary never succe
   }
   {
     \underline{$\G_3(\advB)$}\\[2pt]
-    \oraclev{$\HASHO_1(\salt,x)$}\\[2pt]
-      $\hh \getsr [m]^2$; $\vv \gets \fff(\hh$)\\
-      if $\salt = \salt^*$ then\\
-      \tab $\bad_1 \gets 1$; \diffplus{return $\vv$}\\
-      if $T'[\salt,x]$ is defined then $\vv \gets T'[\salt,x]$\\
-      $T'[\salt,x] \gets \vv$;
-      return $\vv$
+      $\salt^* \getsr \bits^\lambda$;
+      $\col \getsr \advB^{\HASHO_1}$;
+      $y \gets 0$\\
+      $\pub \gets \Repx[\HASHO_2](\col, \salt^*)$\\
+      $\setC \gets \emptyset$;
+      $\err \gets 0$\\
+      $\bot \getsr \advB^{\HASHO_1,\QRYO,\UPO}$\\
+      return $(\err \geq r)$
+    \\[6pt]
+    \oraclev{$\QRYO(\qry_x)$}\\[2pt]
+      if $\qry_x \in \mathcal{C}$ then return $\bot$\\
+      $y \gets y+1$\\
+      $\setC \gets \setC \cup \{\qry_x\}$\\
+      $a \gets \Qry[\HASHO_3](\pub, \qry_x)$\\
+      if $a \neq \qry_x(\col)$ then $\err \gets \err + 1$\\
+      return~$a$
   }
   {
+    \oraclev{$\UPO(\up_x)$}\\[2pt]
+      $\setC \gets \emptyset$; $\err \gets 0$\\
+      $y \gets y+1$\\
+      while do $y \gets y+1$\\
+      $\col \gets \col \union \{y\}$\\
+      $\pub \gets \Up[\HASHO_2](\pub,\up_y)$\\
+      return~$\bot$
+    \\[6pt]
+    \oraclev{$\HASHO_i(\salt,x)$}\\[2pt]
+      $\hh \getsr [m]^2$; $\vv \gets \fff(\hh$)\\
+      if $\salt = \salt^*$ then $\bad_i \gets 1$\\
+      return $\vv$
   }
   \caption{Games 0--3 for proof of Theorem~\ref{thm:bf-priv-salt-bound}.}
   \label{fig:bf-priv-salt-bound}
