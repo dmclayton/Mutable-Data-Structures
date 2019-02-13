@@ -182,8 +182,10 @@ For a concrete example, we present an attack against salted counting Bloom filte
 
 \subsection{Proofs}
 
+Our first secure data structure is the salted Bloom filter, which at the time a representation is created chooses a salt $\salt$ which it will use for all further queries and updates. In order for security to be guaranteed, we must ensure that the representation, and in particular the salt, is kept secret from the adversary.
+
 \begin{theorem}[Correctness Bound for Private-Representation Salted Bloom Filters]\label{thm:bf-priv-salt-bound}
-Fix integers $k, m, n, \lambda, r\geq 0$, let $H \colon \bits^* \to [m]$ be a function, and let $\struct_s = \SBF[\hashbf[H],k,m,n,\lambda]$.
+Fix integers $k, m, n, \lambda, r\geq 0$, let $H \colon \bits^* \to [m]$ be a function, and let $\struct_s = \SBF[\hashbf[H],k,m,n,\lambda]$ in the private-representation setting.
   For every $t, q_R, q_T, q_H \geq 0$ such that $q_T \geq r$, it holds that
   \begin{eqnarray*}
     \Adv{\erreps}_{\struct_\saltybloom,r}(t,&q_R,& q_T, q_U, q_H) \leq \\ && q_R \cdot
@@ -194,6 +196,8 @@ Fix integers $k, m, n, \lambda, r\geq 0$, let $H \colon \bits^* \to [m]$ be a fu
 \end{eqnarray*}
 where $H$ is modeled as a random oracle.
 \end{theorem}
+
+This proof first reduces to the single-representation case, which as shown in Lemma 1 will reduce the adversary's advantage by at most a factor of $q_R$. The main idea behind the proof is to remove the adversary's adaptivity a step at a time. We isolate the possibility of the adversary guessing the salt, which would allow it to mount its own offline attack on the filter without relying on the $\QRYO$ oracle. If the adversary does not guess the salt, the outputs of the $\REPO$, $\QRYO$, and $\UPO$ oracles are unpredictable to the adversary, producing uniformly randomly distributed bits to set (for $\REPO$ and $\UPO$) or to check (for $\QRYO$). Under the assumption that the adversary does not predict the salt, queries made to distinct elements are independent of each other.
 
 \begin{figure}
   \boxThmBFSaltCorrect{0.48}
@@ -306,18 +310,23 @@ $$\Adv{\erreps_1}_{\struct_s,r}(\advA) \le q_R \cdot \left(\frac{q_H}{2^\lambda}
 \hfill\qed
 \end{proof}
 
+The case of a Bloom filter whose representations are always public but which uses a private key in addition to a salt is almost identical. In practice the bound is actually somewhat stronger: the instance of $q_H$ in the bound is replaced with $q_R$, which means that the adversary which attempts to guess the salt must rely entirely on `online' queries as opposed to `offline' queries to $q_H$.
+
+These two theorems together show that in order to guarantee correctness in the streaming setting, one must either ensure that representations are kept private from potential adversaries or use a secret key in addition to a salt when implementing a Bloom filter. In either case, some hidden information is necessary to protect the filter from an adversary.
+
 \begin{theorem}[Correctness Bound for Keyed Bloom Filters]\label{thm:bf-key-bound}
-Fix integers $k, m, n, \lambda, r\geq 0$, let $H \colon \bits^* \to [m]$ be a function, and let $\struct_s = \SKBF[\hashbf[H],k,m,n,\lambda]$.
-  For every $t, q_R, q_T, q_H \geq 0$ such that $q_T \geq r$, it holds that
+Fix integers $k, m, n, \lambda, r\geq 0$, where $m \geq \lambda$, and let $F \colon \bits^\lambda \times \bits^* \to [m]$ be a function.
+  For every $t, q_R, q_T \geq 0$ such that $q_T \geq r$, it holds that
   \begin{eqnarray*}
     \Adv{\erreps}_{\struct_\saltybloom,r}(t,&q_R,& q_T, q_U, q_H) \leq \\ && q_R \cdot
      \left[
-      \frac{q_H}{2^\lambda} +
-      {\dbinom{q_T}{r}} \left( (1-e^{-kn/m})^k + O(1/n) \right)^r
-    \right] \,,
+      \frac{q_R}{2^\lambda} +
+      {\dbinom{q_T+q_U}{r}} \left( (1-e^{-k(n+r)/m})^k + O(1/(n+r)) \right)^r
+    \right] \,.
 \end{eqnarray*}
-where $H$ is modeled as a random oracle.
 \end{theorem}
+
+Despite the similarity of the bounds, the proof is somewhat different than in the private-representation salted-but-unkeyed case. The first thing we want to do is move from a pseudorandom function to a truly random function, about which we can produce bounds much more easily.
 
 \begin{figure}
   \twoCols{0.50}
@@ -462,7 +471,7 @@ $$\Adv{\errep}_{\struct_\prfbloom,r}(\advA) \le \Adv{\prf}_F(\advB) + \frac{q_R^
 %       key: insecure because immutable case is insecure
 %     salt
 %       no key: adversary asks for empty representation, gets salt, then proceeds with attack as in the unsalted case
-%       key: ?
+%       key: secure (Theorem 2)
 % private rep
 %   immutable
 %     no salt
@@ -476,5 +485,5 @@ $$\Adv{\errep}_{\struct_\prfbloom,r}(\advA) \le \Adv{\prf}_F(\advB) + \frac{q_R^
 %       no key: same as public-rep case because construction of representations is deterministic
 %       key: same as public-rep case because construction of representations is deterministic
 %     salt
-%       no key: secure (see above)
-%       key: ?
+%       no key: secure (Theorem 1)
+%       key: secure because public rep case is secure
