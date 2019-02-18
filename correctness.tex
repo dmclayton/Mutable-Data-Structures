@@ -64,9 +64,31 @@
   \label{fig:security}
 \end{figure}
 
-We define two adversarial notions of correctness given by a pair of related experiments for a mutable data structure $\struct$ and error capacity $r$.
+We define two adversarial notions of correctness given by a pair of related experiments for a mutable data structure $\struct$ and error capacity $r$, one in which the representations of the true data are public ($\errep$), and one in which they are private ($\erreps$).  We will describe the former, as the latter is a closely related derivative.
 
-An adversarial notion of correctness is given by the following experiment for a mutable data structure $\struct$ and error capacity $r$. A key $\key$ is sampled from the key space $\keys$. An adversary $A$ is equipped with oracles $\REPO$, $\QRYO(i,\qry)$, and $\UPO(i,\up)$. The adversary may use $\REPO$ arbitrarily many times to gain representations $\pub_i$ of data objects $\col_i$, in each case initializing a corresponding $\err_i$ to zero. The $\QRYO$ oracle takes the index of the $\pub_i$ to query along with a query object, returning $\bot$ if the same query has been made previously and the result of $\Qry_\key(\pub_i,\qry)$ otherwise. If this does not agree with $\qry(\col_i)$, $\err_i$ is incremented. Finally, the $\UPO$ oracle updates $\col_i$ to $\up(\col_i)$ and $\pub_i$ to $\Up_\key(\pub_i,\up)$, returning the latter result. If any of the $\err_i$ exceeds $r$, the experiment is a success for the adversary.
+The both experiments maintain an array $\err_i[]$ for every data object~$\col_i$ whose representation~$\pub_i$ has been computed.  The array is indexed by query functions~$\qry$, and the value of $\err_i[\qry]$ is the ``weight'' of the error caused by~$\qry$, with respect to the \emph{current} data object~$\col_i$ and \emph{current} representation~$\pub_i$ (of~$\col_i$).  The value of~$\err_i[\qry]$ is updated within the $\QRYO$- and $\UPO$-oracles.  For all~$i \in \mathbb{N}$ and~$\qry \in \setQ$, the value of~$\err_i[\qry]$ initially $\mathtt{undefined}$ and, for purposes of comparison, we adopt the convention that $\mathtt{undefined} < n$ for all $n \in \mathbb{R}$.  The value of $\err_i[\qry]$ changes from $\mathtt{undefined}$ only upon a query $(i,\qry)$ to the~$\QRYO$-oracle.
+
+[Tom here]
+
+
+Within the $\QRYO$-oracle, $\err_i[\qry]$ is overwritten iff the error caused by~$\qry$ is larger (now) than it was the last time~$(i,\qry)$ was considered by the~$\QRYO$-oracle.  Note that the set $\setC_i$ tracks what~$\qry$ have been asked for the \emph{current}~$\col_i$/$\pub_i$; this set is initalized to empty when~$\pub_i$ is first computed (by a query to the~$\REPO$-oracle), it is populated within the~$\QRYO$-oracle, and it is reset to empty when~$\col_i$/$\pub_i$ is updated (via the $\UPO$-oracle). 
+%
+This ensures that $\err_i[\qry]$ is tracking the error caused by~$\qry$ for the \emph{current} data object~$\col_i$ and its representation.  
+%
+Note that the $\QRYO$-oracle disallows repeated queries~$(i,\qry)$ within the lifetime of the current data object. This is without loss, as~$\Qry$ is deterministic.
+
+While calls to the~$\QRYO$-oracle may only increase the value of~$\err_i[\qry]$, calls to the $\UPO$-oracle may only \emph{decrease} the value of~$\err_i[\qry]$.  This may seem counterintuitive, at first.  When a query $\UPO(i,\up)$ is made, the oracle first updates the data object~$\col_i$ and its corresponding representation.  (Note that the update algorithm~$\Up$ takes only previous representation as input, not the data object itself.)  The set~$\setC_i$ is reset to empty, because the data object~$\col_i$ is ``new'' again; for example, queries functions~$\qry$ that previously did not cause errors to~$\col_i$, may now do so.  Now, for each defined value~$\err_i[\qry]$, we reevaluate the error that \emph{would} be caused by the previously asked~$\qry$ upon the new~$\col_i$/$\pub_i$.  If the value of $\err_i[\qry]$, i.e., the error caused previously by~$\qry$, is larger than the error that~$\qry$ would cause to the \emph{updated}~$\col_i$/$\pub_i$, then we overwrite $\err_i[\qry]$ with the latter value.  Doing so insures that the array~$\err_i$ does not overcredit the attacker, with respect to \emph{current} data objects and representation.
+
+
+A key $\key$ is sampled from the (possibly empty) key space $\keys$. The adversary~$\advA$ is provided with with oracles $\REPO$, $\QRYO$, $\UPO$ and $\REVO$. 
+%
+On input a data object~$\col$, the $\REPO$-oracle assigns a representation index~$\ct$ to~$\col$, computes the representation~$\pub_\ct$ of the data, initializes a set of ``disallowed''~$\QRYO$-oracle queries for this representation, and returns $\pub_\ct$ to the adversary.
+%
+Any initialized representation $\pub_i$ of data object~$col_i$ may be queried via the~$\QRYO$-oracle.  
+%
+Any initialized data object/representation can be updated via the $\UPO$-oracle.  On input~$i,\up$, this oracle updates the data object~$\col_i$ according to the update function~$\up$, and the corresponding representation~$\pub_i$ is likewise updated. 
+
+The adversary may use $\REPO$ arbitrarily many times to gain representations $\pub_i$ of data objects $\col_i$, in each case initializing a corresponding $\err_i$ to zero. The $\QRYO$ oracle takes the index of the $\pub_i$ to query along with a query object, returning $\bot$ if the same query has been made previously and the result of $\Qry_\key(\pub_i,\qry)$ otherwise. If this does not agree with $\qry(\col_i)$, $\err_i$ is incremented. Finally, the $\UPO$ oracle updates $\col_i$ to $\up(\col_i)$ and $\pub_i$ to $\Up_\key(\pub_i,\up)$, returning the latter result. If any of the $\err_i$ exceeds $r$, the experiment is a success for the adversary.
 
 \subsection{Example Data Structures}
 
