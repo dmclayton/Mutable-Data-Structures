@@ -1,4 +1,4 @@
-We start with a universe $\mathcal{D}$ of data objects, a key space $\keys$, a set $\mathcal{R}$ of responses equipped with a metric $d: \mathcal{R}^2 \to [0,\infty)$, a set $\mathcal{Q} = \{\qry: \mathcal{D} \to \mathcal{R}\}$ of queries, and a set $\mathcal{U} = \{\up: \mathcal{D} \to \mathcal{D}\}$ of possible updates. A {\em mutable data structure} is a tuple $\Pi = (\Rep,\Qry,\Up)$, where:
+We start with a universe $\mathcal{D}$ of data objects, a key space $\keys$, a set $\mathcal{R}$ of responses equipped with a metric $d: \mathcal{R}^2 \to [0,\infty)$, a set $\mathcal{Q} = \{\qry: \mathcal{D} \to \mathcal{R}\}$ of queries, and a set $\mathcal{U} = \{\up: \mathcal{D} \to \mathcal{D}\}$ of possible updates. A {\em mutable data structure} is a tuple $\Pi = (\Rep,\Qry,\Up)$, where: \tsnote{Should the error metric be part of the syntax?}
 
 \begin{itemize}
   \item $\Rep: \keys \times \mathcal{D} \to \{0,1\}^*$ is a randomized {\em representation algorithm}, taking as input a key $\key \in \keys$ and data object $\col \in \mathcal{D}$, and outputting the public representation $\pub \in \{0,1\}^*$ of $D$. We write this as $\pub \getsr \Rep_\key(\col)$.
