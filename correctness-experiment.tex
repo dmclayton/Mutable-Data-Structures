@@ -1,0 +1,54 @@
+\begin{figure}[t]
+  \twoColsNoDivide{0.48}
+  {
+     \raisebox{-5pt}{\experimentv{$\Exp{\errep}_{\struct,r}(\advA)$ {\colorbox{lightgray}{$\Exp{\erreps}_{\struct,r}(\advA)$}}}}\\[2pt]
+      $\setP \gets \emptyset$\\
+      $\ct \gets 0$ \\
+      $\key \getsr \keys$\\
+      $i \getsr \advA^{\REPO,\UPO,\QRYO\highlighto{,\REVO}}$\\
+      \colorbox{lightgray}{if $i \in \setP$ then return 0} \\[2.0pt]
+      return $[\sum_\qry \err_i[\qry] \geq r]$ 
+    \\[6pt]
+    \oraclev{$\REPO(\col)$}\\[2pt]
+      $\ct\gets\ct+1$ \\
+      $\pub_\ct \getsr \Rep_\key(\col)$\\
+      $\setC_\ct \gets \emptyset$\\
+      $\col_\ct \gets \col$\\
+      $\mathrm{rv} \gets \pub_\ct$ \highlight{;\mathrm{rv} \gets \top} \\
+      return $\mathrm{rv}$
+
+      \medskip
+
+    \oraclev{$\REVO(i)$}\\[2pt]
+     $\setP \gets \setP \cup \{i\}$ \\
+      return $\pub_i$
+  }
+  {
+    \oraclev{$\UPO(i, \up)$}\\[2pt]
+%      $X \gets \col^{v[i]}_i
+%      $v[i] \gets v[i]+1$\\
+      $X \gets \col_i$ \\
+      $\col_i \gets \up(X)$\\
+      $\pub_i \getsr \Up_\key(\pub_i, \up)$\\
+      $\setC_i \gets \emptyset$\\
+      for $\qry$ in $\err_i$ do\\
+      \tab $a \gets \Qry_K(\pub_i, \qry)$\\
+      \tab if $\err_i[\qry] > d(a,\qry(\col_i))$ then\\
+      \tab\tab$\err_i[\qry] \gets d(a,\qry(\col_i))$\\
+      $\mathrm{rv} \gets \pub_i$ \highlight{;\mathrm{rv} \gets \top}\\
+      return $\mathrm{rv}$
+      \medskip
+
+    \oraclev{$\QRYO(i, \qry)$}\\[2pt]
+      if $\qry \in \setC_i$ then return $\bot$\\
+      $\setC_i \gets \setC \union \{\qry\}$\\
+      $a \gets \Qry_K(\pub_i, \qry)$\\
+      if $\err_i[\qry] < d(a,\qry(\col_i))$ then\\
+      \tab$\err_i[\qry] \gets d(a,\qry(\col_i))$\\
+      return $a$
+  }
+  \caption{Two notions of adversarial correctness. The $\errep$ notion captures correctness when the representation is always known to the adversary, while the $\erreps$ notion captures correctness when the representation is secret.}
+  \vspace{6pt}\hrule
+  \label{fig:security}
+\end{figure}
+ 

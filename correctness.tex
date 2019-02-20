@@ -1,58 +1,5 @@
-
-\begin{figure}[t]
-  \twoColsNoDivide{0.48}
-  {
-     \raisebox{-5pt}{\experimentv{$\Exp{\errep}_{\struct,r}(\advA)$ {\colorbox{lightgray}{$\Exp{\erreps}_{\struct,r}(\advA)$}}}}\\[2pt]
-      $\setP \gets \emptyset$\\
-      $\ct \gets 0$ \\
-      $\key \getsr \keys$\\
-      $i \getsr \advA^{\REPO,\UPO,\QRYO\highlighto{,\REVO}}$\\
-      \colorbox{lightgray}{if $i \in \setP$ then return 0} \\[2.0pt]
-      return $[\sum_\qry \err_i[\qry] \geq r]$ 
-    \\[6pt]
-    \oraclev{$\REPO(\col)$}\\[2pt]
-      $\ct\gets\ct+1$ \\
-      $\pub_\ct \getsr \Rep_\key(\col)$\\
-      $\setC_\ct \gets \emptyset$\\
-      $\col_\ct \gets \col$\\
-      $\mathrm{rv} \gets \pub_\ct$ \highlight{;\mathrm{rv} \gets \top} \\
-      return $\mathrm{rv}$
-
-      \medskip
-
-    \oraclev{$\REVO(i)$}\\[2pt]
-     $\setP \gets \setP \cup \{i\}$ \\
-      return $\pub_i$
-  }
-  {
-    \oraclev{$\UPO(i, \up)$}\\[2pt]
-%      $X \gets \col^{v[i]}_i
-%      $v[i] \gets v[i]+1$\\
-      $X \gets \col_i$ \\
-      $\col_i \gets \up(X)$\\
-      $\pub_i \getsr \Up_\key(\pub_i, \up)$\\
-      $\setC_i \gets \emptyset$\\
-      for $\qry$ in $\err_i$ do\\
-      \tab $a \gets \Qry_K(\pub_i, \qry)$\\
-      \tab if $\err_i[\qry] > d(a,\qry(\col_i))$ then\\
-      \tab\tab$\err_i[\qry] \gets d(a,\qry(\col_i))$\\
-      $\mathrm{rv} \gets \pub_i$ \highlight{;\mathrm{rv} \gets \top}\\
-      return $\mathrm{rv}$
-      \medskip
-
-    \oraclev{$\QRYO(i, \qry)$}\\[2pt]
-      if $\qry \in \setC_i$ then return $\bot$\\
-      $\setC_i \gets \setC \union \{\qry\}$\\
-      $a \gets \Qry_K(\pub_i, \qry)$\\
-      if $\err_i[\qry] < d(a,\qry(\col_i))$ then\\
-      \tab$\err_i[\qry] \gets d(a,\qry(\col_i))$\\
-      return $a$
-  }
-  \caption{Two notions of adversarial correctness. The $\errep$ notion captures correctness when the representation is always known to the adversary, while the $\erreps$ notion captures correctness when the representation is secret.}
-  \vspace{6pt}\hrule
-  \label{fig:security}
-\end{figure}
-
+\input{correctness-experiment}
+%
 We define two adversarial notions of correctness given by a pair of related experiments for a mutable data structure $\struct$ and error capacity $r$, one in which the representations of the true data are public ($\errep$), and one in which they are private ($\erreps$).  We will describe the former, as the latter is a closely related derivative.  Throughout, we assume that the adversary~$\advA$ does not make any pointless queries. 
 
 Both experiments aim to capture the total weight of the errors caused by the adversary, at any point in time, with respect to the current data objects $\col_i$ and their representations $\pub_i$.  Because we consider mutable data objects and representations, the notion of ``current'' is defined by calls to the $\REPO$ and $\UPO$ oracles.  Specifically, for each~$\col_i$, both experiments maintain a set~$\setC_i$ that is initially set to empty (when~$\col_i$ is first assigned via a~$\REPO$-query), and it is reset to empty whenever~$\col_i$ is updated via an $\UPO$-query.  This is capturing the fact that applying a non-empty update function~$\up$ to~$\col_i$ produces a new data object.
@@ -140,34 +87,8 @@ Note that in a counting filter, $n$ is equal to the maximum supported multiset s
 
 \subsection{Bloom filter results}
 \label{subsec:bloom-filters}
-\begin{table}[thp]
-\begin{center}
-  \begin{tabular}{ | c | c |c | c | c | }
-    \hline
-    Salt & Key & \parbox{.75in}{Private\\ Representation} & \parbox{.75in}{Irreversible\\ Updates} & Result \\ \hline\hline
-    0 & 0 & 0 & 0 & Attack 1 \\ \hline
-    0 & 0 & 0 & 1 & Attack 1 \\ \hline
-    0 & 0 & 1 & 0 & Attack 1 \\ \hline
-    0 & 0 & 1 & 1 & Attack 1 \\ \hline
-    0 & 1 & 0 & 0 & Attack 2 \\ \hline
-    0 & 1 & 0 & 1 & Attack 2 \\ \hline
-    0 & 1 & 1 & 0 & Attack 2 \\ \hline
-    0 & 1 & 1 & 1 & Attack 2 \\ \hline
-    1 & 0 & 0 & 0 & Attack 3 \\ \hline
-    1 & 0 & 0 & 1 & Attack 3 \\ \hline
-    1 & 0 & 1 & 0 & ? \\ \hline
-    1 & 0 & 1 & 1 & Theorem~\ref{thm:bf-priv-salt-bound} \\ \hline
-    1 & 1 & 0 & 0 & Attack 4 \\ \hline
-    1 & 1 & 0 & 1 & Theorem~\ref{thm:bf-key-bound} \\ \hline
-    1 & 1 & 1 & 0 & ? \\ \hline
-    1 & 1 & 1 & 1 & Theorem~\ref{thm:bf-key-bound} \\
-    \hline
-  \end{tabular}
-\end{center}
-\tsnote{This table feels unintutive, somehow. ``Salt'', ``Key'', ``Irreversible updates'' are all syntactic properties; ``Private Representation'' is an artifact of the attack model.  We need a better way to organize and present these results.}
-\caption{Summary table for Bloom filters. \textbf{Attack 1:}The adversary chooses a maximally large test set $\col$ and simulates $\Rep$ to produce a representation $\pub$. The adversary then simulates $\Rep$ for many arbitrarily chosen singleton sets disjoint from $\col$, checking each one to see if its element is a false positive for $\pub$. Once it has accumulated $r$ false positives, call $\REPO$ on $\col$, call $\QRYO$ for each false positive found, and return 1.  \textbf{Attack 2:} The adversary chooses a maximally large test set $\col$ and calls $\REPO$ to produce a representation $\pub$. The adversary then calls $\REPO$ for many arbitrarily chosen singleton sets disjoint from $\col$, using $\QRYO$ on each to determine if its element is a false positive for the representation constructed for $\col$. Once it has accumualated $r$ false positives, return 1. \textbf{Attack 3:}  The adversary chooses a maximally large test set $\col$ and calls $\REPO$ to receive a representation $\pub$ together with the salt $\salt$. Using the known salt, the adversary simulates $\Rep$ for many arbitrarily chosen singleton sets disjoint from $\col$, checking each one to see if its element is a false positive for $\pub$. Once it has accumulated $r$ false positives, call $\QRYO$ for each such false positive and return 1. \textbf{Attack 4:}The adversary chooses a test set $\col_0$ and a target set $\col_1$, performing a search on representable subsets of $\col_0$ represented as a tree ordered by $\subseteq$. Moving up or down in the tree is accomplished using $\UPO$, and at each node $\QRYO$ is called for each element of $\col_1$ to determine which are false positives. Once $r$ false positives are found, halt and return 1. }
-\label{tab:main}
-\end{table}
+
+\input{bf-summary-tab}
 
 \dctodo{needs intro text}
 Our first secure data structure is the salted Bloom filter, which at the time a representation is created chooses a salt $\salt$ which it will use for all further queries and updates. In order for security to be guaranteed, we must ensure that the representation, and in particular the salt, is kept secret from the adversary.
