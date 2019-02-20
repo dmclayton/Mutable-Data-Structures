@@ -117,55 +117,18 @@
 \newcommand{\anytodo}[1]{\todo{red}{Anyone}{#1}}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\title{\bf Cryptographic Notions for Data Structures}
-\author{David Clayton, Jonathan Katz, Christopher Patton and Thomas Shrimpton}
+\title{\bf Correctness and Privacy of Mutable Data Structures}
+%\author{David Clayton, Jonathan Katz, Christopher Patton and Thomas Shrimpton}
 
 \begin{document}
 \maketitle
 
-\begin{abstract}\tsnote{OLD ABSTRACT}
-  This work initiates the study of abstract data structures from a cryptographic
-  perspective.  We first establish a precise syntax that captures a broad
-  class of real-world data structures.  We then treat the
-  \emph{correctness} and \emph{privacy} of data structures
-  as security properties, and establish formal security notions for
-  each.  Loosely, our notion of correctness captures an (adaptive) adversary's ability to cause
-  a data structure to err in the course of responding to a set of supported
-  queries, and our two privacy notions neatly capture what a data structure leaks about
-  the data it represents.
-
-  We use our formalisms to explore the security of the widely used
-  Bloom filter~\cite{bloom1970space} and some important variants.
-  %
-  We find, for example, that the security of Bloom filters depends
-  crucially on whether or not the underlying hash functions are known
-  by the adversary prior to the filter being constructed.
-  %
-  We also study a real-world mechanism for privacy-preserving record
-  linkage (over hospital databases).  Our notions provide a crisp view of the
-  (in)security of this Bloom-filter-based mechanism. 
-  %
-  To demonstrate the broader applicability of our definitions, we move
-  from data structures supporting set-membership queries (only) to
-  dictionary data structures.  Concretely, we analyze the ``Bloomier
-  filter''~\cite{chazelle2004bloomier}, which provides a compact
-  representation of a key/value store.
-
-\ignore{
-\begin{keywords}
-    data structures,
-    Bloom filters,
-    dictionaries,
-    correctness,
-    privacy,
-    concrete security
-  \end{keywords}
-}
-\end{abstract}
+%\input{abstract}
 
 
 \section{Introduction}
-\input{intro}
+\tsnote{old intro commented out}
+%\input{intro}
 
 \section{Syntax}
 \input{syntax}
