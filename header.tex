@@ -9,6 +9,15 @@
 \usepackage{amsthm}
 \newtheorem{lemma}{Lemma}
 \newtheorem{theorem}{Theorem}
+\newtheorem{corollary}{Corollary}
+\newtheorem{definition}{Definition}
+\theoremstyle{remark}
+%\newtheorem*{remark}{Remark}
+\newtheorem{remark}{Remark}
+\newcommand{\missingqed}{}
+\else
+\documentclass[runningheads]{llncs}
+\newcommand{\missingqed}{\hfill\qed}
 \fi
 \usepackage{amsmath}
 \usepackage{amsfonts}
