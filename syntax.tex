@@ -7,3 +7,8 @@ We start with a universe $\mathcal{D}$ of data objects, a key space $\keys$, a s
 \end{itemize}
 
 Unkeyed data structures are a special case where $\keys = \{\epsilon\}$, and immutable data structures are a special case where the update algorithm returns $\textsc{Up}(\key,\pub,\up)=\pub$ for all inputs.  In the latter case, we will often drop mention of the update algorithm.
+
+
+Say that a structure is {\em invertible} if for every representation $\mathsf{pub}$ and update $\mathsf{up} \in \mathcal{U}$ there is $\mathsf{up}' \in \mathcal{U}$ such that $\Prob{\textsc{Up}(\textsc{Up}(\mathsf{pub},\mathsf{up}),\mathsf{up}' = \mathsf{pub})} = 1$.  For example, the updates for both counting Bloom filters and count-min sketches are invertible, by consequence of being deterministic and having both insertion and deletion operations. Each also has the additional feature of having a natural choice of {\em empty} structure such that every other structure can be constructed by starting with the empty structure and performing a corresponding sequence of update operations.
+
+\heading{Discussion.} \tsnote{Here you should unpack what has just been formalized.  What has been captured?  Are any of the choices subtle/restrictive/overly permissive/etc.?  If so, explain them.}

@@ -1,21 +1,4 @@
-\newcommand{\REVO}{\mathbf{Reveal}}
-\newcommand{\HASHO}{\oraclefont{Hash}}
-\newcommand{\diffplus}[1]{\fbox{#1}}
-\newcommand{\diffplusbox}[1]{\fbox{\parbox{\dimexpr\textwidth-2\fboxsep-2\fboxrule\relax}{#1}}}
-\newcommand{\diffminus}[1]{\colorbox{lightgray}{#1}}
-\newcommand{\diffminusbox}[1]{\colorbox{lightgray}{\parbox{\dimexpr\textwidth-2\fboxsep-2\fboxrule\relax}{#1}}}
-\newcommand{\hh}{\vectorfont{h}}
-\newcommand{\fff}{\schemefont{Fn}}
-\newcommand{\Rnd}{\schemefont{Rand}}
-\newcommand{\Repx}{\Rep1}
-\newcommand{\Qryx}{\Qry1}
-\newcommand{\Upx}{\Up1}
-\newcommand{\Ans}{\varfont{Ans}}
-\newcommand{\setE}{\mathcal{E}}
-\newcommand{\Resp}{\varfont{Resp}}
-\def\ticks(#1,#2){\procfont{T}_{\hspace*{-1.5pt}#1}({#2})}
-\newcommand{\highlighto}[1]{\colorbox{lightgray}{$\scriptstyle #1$}}
-\newcommand{\highlight}[1]{\colorbox{lightgray}{$\displaystyle #1$}}
+
 \begin{figure}[t]
   \twoColsNoDivide{0.48}
   {
@@ -90,32 +73,15 @@ Now, for each defined value~$\err_i[\qry]$, we reevaluate the error that \emph{w
 \tsnote{The next paragraph is a placeholder; it's too informal as written, but gets the point across for future edits.}
 Let us give an example to help make concrete these definitional choices.  Say that the adversary queries a set~$\col = \{1,2,3\}$ to the $\REPO$-oracle, and learns that~$4$ is a false-positive value for the representation~$\pub$ of~$\col$.  If it adds~$4$ to~$\col$ via an update query, then it is no longer a false-positive.  Our definition insures that this is properly accounted.
 
-\subsection{Example Data Structures}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Generic results}
+First, we note that any structure which is insecure in the immutable case is also insecure in the mutable case. Any adversary in the immutable case is identical to a corresponding adversary in the mutable case which simply never makes use of the $\UPO$ oracle. From this we know that standard (unsalted, unkeyed) Bloom filters cannot ensure correctness in the mutable case. 
 
-In general, each probabilistic data structure has some bound on the error size per query, assuming the adversary is not fully adaptive. In each case we want to show that allowing the adversary full adaptivity does not significantly increase the error rate. Generally, we have a data object space $\mathcal{D} \subseteq 2^\mathcal{X}$, a collection of subsets of some universe $\mathcal{X}$, and a response space $\mathcal{R} = \{0,1\}$ with the usual metric of $d(m,n) = |m-n|$. Then the query space consists of indicator functions $\qry_x$ for $x \in \mathcal{X}$, so that $\qry_x(\col)$ is 1 if and only if $x \in \col$. The update space at least consists of insertions, and may also include deletions.
 
-A typical case occurs with standard Bloom filters~\cite{bloomfilter}. Since there are no false negatives, the size of the error a non-adaptive adversary is expected to create per query is simply equal to the false positive rate, which is on the order of $(1-e^{-\frac{kn}{m}})^k$ for an $m$-bit array with $k$ hash functions storing up to $n$ values. Compressed Bloom filters~\cite{xxx} operate in the same way, with a false positive rate which must also take into account the degree of compression. The maximum amount we can compress a Bloom filter is determined by the probability that a given bit in the filter is 0, which is $\left(1-\frac{1}{m}\right)^kn$. This is closely approximated by $p = e^{-\frac{kn}{m}}$. For a given $p$, an optimal compressor will reduce an $m$-bit filter to $mH(p)$ bits, where $H$ is the entropy function $H(p) = -p\log p - (1-p)\log(1-p)$. Because of this, in order to compress the original $m$-bit filter down to $z$ bits we must have $z \ge mH(p)$. Note that an ordinary Bloom filter has false positive rate $(1-p)^k$; in the compressed case we instead have a false positive rate of $(1-p)^{-\frac{z \ln p}{nH(p)}}$.
-
-Cuckoo filters~\cite{xxx} are a straightforward extension of this notion increasing $\mathcal{U}$ to include deletion operations, but fortunately the notions of correctness are still straightforward given that queries are simply testing for set membership. Counting bloom filters~\cite{xxx} both allow deletion and broaden the data object space to $\mathcal{D} \subseteq \N^X$.
-
-Depending on the implementation, count-min sketch~\cite{xxx} may similarly use a data object space $\mathcal{D} \subseteq N^X$ or may use $\mathcal{D} \subseteq \Z^X$. In the former case we have two further sub-cases, the case where all updates increment the value associated with $x \in X$ and the case where updates may either increment or decrement the associated value (but not below 0). Additionally, count-min sketch supports multiple different types of queries, in each case yielding a response in $\mathbb{Z}$. For a point query, the difference between the query and the true value is bounded by $n\epsilon$ with probability $1-\delta$, where $n$ is the sum of the true frequencies of the stream elements. The maximum error of a single query is simply $n$, in the case that an element has never actually been added to the set but has incorrectly had all its counters incremented each of $n$ times another element has been added, so the expected non-adaptive error size is bounded above by $n\epsilon(1-\delta)+n\delta = n(\delta+\epsilon-\delta\epsilon)$.  Similarly, we find that the error size of an inner product query is bounded above by $n_1n_2\epsilon(1-\delta)+n_1n_2\delta = n_1n_2(\delta+\epsilon-\delta\epsilon)$. Range queries are tricky and I'm not quite sure on the precise bound in terms of $\delta$ and $\epsilon$.
-
-Bloomier filters~\cite{xxx} are designed to represent arbitrary functions instead of set membership, providing a larger response space $\mathcal{R}$ than the binary $\{0,1\}$ used with Bloom filters and altering the data object space to a set of the form $\mathcal{D} \subseteq \mathcal{R}^\mathcal{X}$. One of the response values is $\bot$ to indicate that value has not been associated with any element of $\mathcal{R}$, and the only type of error that can occur is that a value which should return $\bot$ instead returns some other element of $\mathcal{R}$. Again we have a situation where `false positives' are the only type of error which can occur. Update queries allow for changes in the element of $\mathcal{R}$ associated with each element of $\mathcal{X}$, though changing an element's associated value to or from $\bot$ is not permitted: neither insertion nor deletion is possible with this structure.
-
-Stable Bloom filters~\cite{xxx} are an example of a structure in the Bloom filter family which our notions cannot work with easily. One way in which they are unique is in featuring a probabilistic update algorithm, causing objects in the filter to probabilistically decay over time. While our syntax accounts for that, the more significant difference is that a stable Bloom filter only has good accuracy guarantees once it has seen enough updates to `stabilize'. Our current security notions do not encompass this type of conditional accuracy guarantee.
-
-\subsection{Correctness Notion Equivalence}
-
-Let $A$ be an adversary for the security notion in figure 1. We construct an adversary $B$ for the security notion in figure 4 which simulates $A$, forwarding any queries $A$ makes to its own oracles. As $B$ does so, it also keeps a table $\err_i$ for each representation, associating any $\qry$ passed to $\QRYO$ with the resulting error that query causes. Note that $B$ can easily compute this, since it knows both $\qry$ and the set $\col$ being represented, and so can compute the expected value of the query, $\qry(\col)$, on its own. Whenever $B$ makes an update query, it clears the table $\err_i$. If at any point the sum of the values in any $\err_i$ is at least $r$, 
-
-The adversary $B$ maintains a counter $\ct$ of how many representations have been created. Whenever $A$ makes a $\REPO(\col)$ query, $B$ increments $\ct$, initializes $\col_\ct$ to $\col$ and $\err_\ct$ to 0, constructs an empty table $\Resp_\ct$, forwards the query to its own oracle, and (in the public representation case only) returns the response from this oracle to $A$. Whenever $A$ makes an $\UPO(i,\up)$ query, $B$ sets $\err_i$ to 0, $\Resp$ to an empty table, and $\col_i$ to $\up(\col_i)$ before forwarding the query to its own oracle and (again only in the public representation case) returning the response to $A$. Whenever $A$ makes a $\QRYO(i,\qry)$ query, $B$ checks whether $\Resp[i,\qry]$ is defined. If so, $B$ simply returns that value to $A$. Otherwise, $B$ forwards the query to its own oracle, sets $\Resp[i,\qry]$ to the returned value, increments $\err_i$ by the difference between the returned value and $\qry(\col_i)$, and then returns the result of the query to $A$. Finally, any $\REVO$ or $\HASHO$ queries are simply forwarded to $B$'s oracle, and their responses are returned to $A$.
-
-\subsection{Correctness Proofs \& Attacks}
-
-First, we note that any structure which is insecure in the immutable case is also insecure in the mutable case. Any adversary in the immutable case is identical to a corresponding adversary in the mutable case which simply never makes use of the $\UPO$ oracle. From this we know that standard (unsalted, unkeyed) Bloom filters cannot ensure correctness in the mutable case.
+\heading{Keyless structures.}\tsnote{I've tried to organize these results into little sectionettes.  I don't know, yet, what is the right way to organize these generic results, but this is a start.  As you develop results, please try to keep them organized, whatever the organizational schema.} \dctodo{needs intro text.}
 
 \begin{lemma}[\errep1 implies \errep for keyless structures]\label{lemma:errep}
-  Let $\struct = (\Rep, \Qry, \Up)$ be a data structure with key
+  \dctodo{\errep1 undefined.} Let $\struct = (\Rep, \Qry, \Up)$ be a data structure with key
   space $\{\emptystr\}$. For every $t, q_R, q_T, q_U, q_H, r\geq 0$, it holds that
   \[
     \Adv{\errep}_{\struct,r}(t, q_R, q_T, q_U, q_H) \leq
@@ -135,10 +101,24 @@ $$\Adv{\errep}_{\struct,r}(t, q_R, q_T, q_U, q_H) \leq q_R\cdot\Adv{\errep1}_{\s
 Note that $B$ makes at most $q_T$ queries to $\QRYO$ and $q_H$ queries to its RO. Since $A$ runs in $t$ time steps and writing a bit takes 1 time step, the input length to any $\Rep$, $\Qry$, or $\Up$ evaluated by $B$ is at most $t$ bits. Hence, adversary $B$ runs in time $O(t+(q_R-1)\ticks(\Rep,t)+q_T\ticks(\Qry,t)+q_U\ticks(\Up,t))$.\hfill\qed
 \end{proof}
 
-Say that a structure is {\em invertible} if for every representation $\mathsf{pub}$ and update $\mathsf{up} \in \mathcal{U}$ there is $\mathsf{up}' \in \mathcal{U}$ such that $\Prob{\textsc{Up}(\textsc{Up}(\mathsf{pub},\mathsf{up}),\mathsf{up}' = \mathsf{pub})} = 1$.  For example, the updates for both counting Bloom filters and count-min sketches are invertible, by consequence of being deterministic and having both insertion and deletion operations. Each also has the additional feature of having a natural choice of {\em empty} structure such that every other structure can be constructed by starting with the empty structure and performing a corresponding sequence of update operations.
 
-There is a similar equivalence between $\erreps1$ and $\erreps$; the reasoning is identical to that in the above proof.
+There is a similar equivalence between $\erreps1$ and $\erreps$; the reasoning is identical to that in the above proof. \dctodo{Needs a formal statement.  Perhaps just fold it into the previous lemma.}
 
+\begin{lemma}[Salts do not affect \errep for keyless structures with public representation]\label{lemma:nosalt}
+  Let $\struct = (\Rep, \Qry, \Up)$ be a data structure with a salt randomly initialized at runtime and $\struct'$ be the same structure using a fixed value from the salt space in place of a randomized salt. For every $t, q_R, q_T, q_U, q_H, r\geq 0$, it holds that
+  \[
+    \Adv{\errep}_{\struct,r}(t, q_R, q_T, q_U, q_H) \leq
+    \Adv{\errep}_{\struct',r}(O(t), q_R, r, n, q_H) \,,
+  \]
+  where $n$ is the longest minimal sequence of update operations needed to generate a data structure in the space.
+\end{lemma}
+\begin{proof}
+Consider an adversary $A$ for a non-salted data structure which makes $q_R$ queries to $\REPO$ and $q_T$ queries to $\QRYO$. We construct an adversary $B$ for the salted case which produces the same errors by simulating $A$. The adversary $B$ maintains a counter $\ct$ initialized to 0. Whenever $A$ makes a $\REPO(\col)$ query, $B$ first forwards a $\REPO(\emptyset)$ query to its own $\REPO$ oracle, stores the salt $\salt_\ct$ and set $\col_\ct$, initializes an error counter $\err_\ct$ to 0 and a set $\setE_\ct$ to $\emptyset$, and increments $\ct$. Then $B$ simply computes the actual representation of $\col$ using the salt $\salt_\ct$ and returns that to $A$. Whenever $A$ makes a $\QRYO(i,\qry)$ query, $B$ computes the result itself. If it would cause an error, $\err_i$ is incremented appropriately and $\qry$ is added to $\setE_i$, and then $B$ returns the result of the query to $A$. Whenever $A$ makes a $\UPO(i, \up)$ query, $B$ resets $\err_i$ to 0 and again computes the result itself before returning it to $A$. Finally, $B$ simply forwards any $\HASHO$ queries to its own oracle. When $A$ halts and outputs $i$, $B$ performs a series of $\UPO(i, \up)$ queries to transform $\pub_i$ into a representation of its stored $\col_i$ and then calls the queries in $\setE_\ct$. Because the salt remains unchanged when the set is updated, these will induce errors for $B$ just as they did for $A$, and $B$ will win if and only if $A$ does.
+\end{proof}
+
+For a concrete example, we present an attack against salted counting Bloom filters. \tsnote{Huh?}
+
+\heading{Invertible structures.} \dctodo{needs intro text}
 \begin{lemma}[Salts do not affect \errep for invertible structures]\label{lemma:noinvsalt}
   Let $\struct = (\Rep, \Qry, \Up)$ be a data structure with a salt randomly initialized at runtime and $\struct'$ be the same structure using a fixed value from the salt space in place of a randomized salt. For every $t, q_R, q_T, q_U, q_H, r\geq 0$, it holds that
   \[
@@ -155,24 +135,16 @@ In general this may use as many as $2n(q_R+q_T+q_U)$ update queries, where $n$ i
 
 Note that in a counting filter, $n$ is equal to the maximum supported multiset size, and in count-min sketch $n$ is equal to the sum of the absolute values of the elements' frequences. While this means a potentially large number of update queries are needed in the general case, for an unkeyed structure it turns out that far fewer updates are required. In the above proof, the only reason we needed to undo each sequence of $\UPO$ queries was because the following query might involve the representation of a different structure. But in the case of a salted but unkeyed structure, our initial lemma shows that for any adversary there is an adversary making only a single $\REPO$ query with an advantage differing by a factor of at most $q_R$. For an adversary which only ever makes one $\REPO$ query, we never need to reset the representation to the empty representation, and in the above simulation we can omit all $\UPO$ queries except those needed for $A$'s single $\REPO$ query and any $\UPO$ queries made by $A$ itself.
 
-\begin{lemma}[Salts do not affect \errep for unkeyed structures with public representation]\label{lemma:nosalt}
-  Let $\struct = (\Rep, \Qry, \Up)$ be a data structure with a salt randomly initialized at runtime and $\struct'$ be the same structure using a fixed value from the salt space in place of a randomized salt. For every $t, q_R, q_T, q_U, q_H, r\geq 0$, it holds that
-  \[
-    \Adv{\errep}_{\struct,r}(t, q_R, q_T, q_U, q_H) \leq
-    \Adv{\errep}_{\struct',r}(O(t), q_R, r, n, q_H) \,,
-  \]
-  where $n$ is the longest minimal sequence of update operations needed to generate a data structure in the space.
-\end{lemma}
-\begin{proof}
-Consider an adversary $A$ for a non-salted data structure which makes $q_R$ queries to $\REPO$ and $q_T$ queries to $\QRYO$. We construct an adversary $B$ for the salted case which produces the same errors by simulating $A$. The adversary $B$ maintains a counter $\ct$ initialized to 0. Whenever $A$ makes a $\REPO(\col)$ query, $B$ first forwards a $\REPO(\emptyset)$ query to its own $\REPO$ oracle, stores the salt $\salt_\ct$ and set $\col_\ct$, initializes an error counter $\err_\ct$ to 0 and a set $\setE_\ct$ to $\emptyset$, and increments $\ct$. Then $B$ simply computes the actual representation of $\col$ using the salt $\salt_\ct$ and returns that to $A$. Whenever $A$ makes a $\QRYO(i,\qry)$ query, $B$ computes the result itself. If it would cause an error, $\err_i$ is incremented appropriately and $\qry$ is added to $\setE_i$, and then $B$ returns the result of the query to $A$. Whenever $A$ makes a $\UPO(i, \up)$ query, $B$ resets $\err_i$ to 0 and again computes the result itself before returning it to $A$. Finally, $B$ simply forwards any $\HASHO$ queries to its own oracle. When $A$ halts and outputs $i$, $B$ performs a series of $\UPO(i, \up)$ queries to transform $\pub_i$ into a representation of its stored $\col_i$ and then calls the queries in $\setE_\ct$. Because the salt remains unchanged when the set is updated, these will induce errors for $B$ just as they did for $A$, and $B$ will win if and only if $A$ does.
-\end{proof}
 
-For a concrete example, we present an attack against salted counting Bloom filters.
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+\subsection{Bloom filter results}
+\label{subsec:bloom-filters}
+\begin{table}[thp]
 \begin{center}
   \begin{tabular}{ | c | c | c | c | c | }
     \hline
-    Salt & Key & Private Representation & Irreversible Updates & Correctness \\ \hline
+    Salt & Key & \parbox{.75in}{Private\\ Representation} & \parbox{.75in}{Irreversible\\ Updates} & Result \\ \hline\hline
     0 & 0 & 0 & 0 & Attack 1 \\ \hline
     0 & 0 & 0 & 1 & Attack 1 \\ \hline
     0 & 0 & 1 & 0 & Attack 1 \\ \hline
@@ -192,18 +164,11 @@ For a concrete example, we present an attack against salted counting Bloom filte
     \hline
   \end{tabular}
 \end{center}
+\caption{Summary table for Bloom filters. \textbf{Attack 1:}The adversary chooses a maximally large test set $\col$ and simulates $\Rep$ to produce a representation $\pub$. The adversary then simulates $\Rep$ for many arbitrarily chosen singleton sets disjoint from $\col$, checking each one to see if its element is a false positive for $\pub$. Once it has accumulated $r$ false positives, call $\REPO$ on $\col$, call $\QRYO$ for each false positive found, and return 1.  \textbf{Attack 2:} The adversary chooses a maximally large test set $\col$ and calls $\REPO$ to produce a representation $\pub$. The adversary then calls $\REPO$ for many arbitrarily chosen singleton sets disjoint from $\col$, using $\QRYO$ on each to determine if its element is a false positive for the representation constructed for $\col$. Once it has accumualated $r$ false positives, return 1. \textbf{Attack 3:}  The adversary chooses a maximally large test set $\col$ and calls $\REPO$ to receive a representation $\pub$ together with the salt $\salt$. Using the known salt, the adversary simulates $\Rep$ for many arbitrarily chosen singleton sets disjoint from $\col$, checking each one to see if its element is a false positive for $\pub$. Once it has accumulated $r$ false positives, call $\QRYO$ for each such false positive and return 1. \textbf{Attack 4:}The adversary chooses a test set $\col_0$ and a target set $\col_1$, performing a search on representable subsets of $\col_0$ represented as a tree ordered by $\subseteq$. Moving up or down in the tree is accomplished using $\UPO$, and at each node $\QRYO$ is called for each element of $\col_1$ to determine which are false positives. Once $r$ false positives are found, halt and return 1.}
+\label{tab:main}
+\end{table}
 
-\subsection{Attacks}
-
-\begin{enumerate}
- \item The adversary chooses a maximally large test set $\col$ and simulates $\Rep$ to produce a representation $\pub$. The adversary then simulates $\Rep$ for many arbitrarily chosen singleton sets disjoint from $\col$, checking each one to see if its element is a false positive for $\pub$. Once it has accumulated $r$ false positives, call $\REPO$ on $\col$, call $\QRYO$ for each false positive found, and return 1.
- \item The adversary chooses a maximally large test set $\col$ and calls $\REPO$ to produce a representation $\pub$. The adversary then calls $\REPO$ for many arbitrarily chosen singleton sets disjoint from $\col$, using $\QRYO$ on each to determine if its element is a false positive for the representation constructed for $\col$. Once it has accumualated $r$ false positives, return 1.
- \item The adversary chooses a maximally large test set $\col$ and calls $\REPO$ to receive a representation $\pub$ together with the salt $\salt$. Using the known salt, the adversary simulates $\Rep$ for many arbitrarily chosen singleton sets disjoint from $\col$, checking each one to see if its element is a false positive for $\pub$. Once it has accumulated $r$ false positives, call $\QRYO$ for each such false positive and return 1.
- \item The adversary chooses a test set $\col_0$ and a target set $\col_1$, performing a search on representable subsets of $\col_0$ represented as a tree ordered by $\subseteq$. Moving up or down in the tree is accomplished using $\UPO$, and at each node $\QRYO$ is called for each element of $\col_1$ to determine which are false positives. Once $r$ false positives are found, halt and return 1.
-\end{enumerate}
-
-\subsection{Proofs}
-
+\dctodo{needs intro text}
 Our first secure data structure is the salted Bloom filter, which at the time a representation is created chooses a salt $\salt$ which it will use for all further queries and updates. In order for security to be guaranteed, we must ensure that the representation, and in particular the salt, is kept secret from the adversary.
 
 \begin{theorem}[Correctness Bound for Private-Representation Salted Bloom Filters]\label{thm:bf-priv-salt-bound}
@@ -518,3 +483,12 @@ Beyond this, is there any point to adding elements multiple times? Note that if 
 %     salt
 %       no key: secure (Theorem 1)
 %       key: secure because public rep case is secure
+
+
+
+\subsection{Correctness Notion Equivalence}
+\tsnote{Why is this still here?}
+Let $A$ be an adversary for the security notion in figure 1. We construct an adversary $B$ for the security notion in figure 4 which simulates $A$, forwarding any queries $A$ makes to its own oracles. As $B$ does so, it also keeps a table $\err_i$ for each representation, associating any $\qry$ passed to $\QRYO$ with the resulting error that query causes. Note that $B$ can easily compute this, since it knows both $\qry$ and the set $\col$ being represented, and so can compute the expected value of the query, $\qry(\col)$, on its own. Whenever $B$ makes an update query, it clears the table $\err_i$. If at any point the sum of the values in any $\err_i$ is at least $r$, 
+
+The adversary $B$ maintains a counter $\ct$ of how many representations have been created. Whenever $A$ makes a $\REPO(\col)$ query, $B$ increments $\ct$, initializes $\col_\ct$ to $\col$ and $\err_\ct$ to 0, constructs an empty table $\Resp_\ct$, forwards the query to its own oracle, and (in the public representation case only) returns the response from this oracle to $A$. Whenever $A$ makes an $\UPO(i,\up)$ query, $B$ sets $\err_i$ to 0, $\Resp$ to an empty table, and $\col_i$ to $\up(\col_i)$ before forwarding the query to its own oracle and (again only in the public representation case) returning the response to $A$. Whenever $A$ makes a $\QRYO(i,\qry)$ query, $B$ checks whether $\Resp[i,\qry]$ is defined. If so, $B$ simply returns that value to $A$. Otherwise, $B$ forwards the query to its own oracle, sets $\Resp[i,\qry]$ to the returned value, increments $\err_i$ by the difference between the returned value and $\qry(\col_i)$, and then returns the result of the query to $A$. Finally, any $\REVO$ or $\HASHO$ queries are simply forwarded to $B$'s oracle, and their responses are returned to $A$.
+

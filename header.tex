@@ -2,10 +2,14 @@
 %
 % Formatting and common macros for crypto papers. Include this first.
 \usepackage{graphics}
-%\usepackage[toc,page]{appendix}
 \usepackage[font={small}]{caption}
 \usepackage{hyperref}
 \usepackage{xspace}
+\iffull
+\usepackage{amsthm}
+\newtheorem{lemma}{Lemma}
+\newtheorem{theorem}{Theorem}
+\fi
 \usepackage{amsmath}
 \usepackage{amsfonts}
 \usepackage{parskip}
@@ -281,10 +285,16 @@
 % Uncomment to mute notes.
 %\renewcommand{\basenote}[4]{\ignorespaces}
 
+\iffull
+\newcommand{\note}[3]{\basenote{#1}{#2}{says}{#3}}
+\else
 \renewcommand{\note}[3]{\basenote{#1}{#2}{says}{#3}}
+\fi
 
 \newcommand{\todo}[2]{\basenote{red}{#1}{to-do}{#2}}
 \newcommand{\tsnote}[1]{\note{cyan}{TS}{#1}}
 \newcommand{\jnote}[1]{\note{green}{Jon}{#1}}
-
+\definecolor{darkgreen}{RGB}{50,127,0}
+\newcommand{\cpnote}[1]{\note{darkgreen}{Chris}{#1}}
+\newcommand{\dctodo}[1]{\todo{David}{#1}}
 \newcommand{\ignore}[1]{\if{0} #1 \fi}

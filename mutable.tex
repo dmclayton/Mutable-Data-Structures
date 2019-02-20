@@ -1,16 +1,25 @@
+\newif\iffull
+\fulltrue
+
+\iffull
+\documentclass{article}
+\usepackage[margin=1in]{geometry}
+\usepackage[toc,page]{appendix}
+\usepackage[font={small}]{caption}
+\else
 \documentclass{llncs}
-%\documentclass[11pt, pdftex]{article}
+\fi
+
 %\usepackage{epsf}
 \usepackage{epsfig}
 \usepackage{times}
 \usepackage{ifthen}
-%\usepackage{comment}
 \usepackage{amsfonts}
+\usepackage{amssymb}
 \usepackage{color,soul}
 \usepackage[dvipsnames]{xcolor}
 \usepackage{enumitem}
-%\usepackage[margin=1in]{geometry}
-\usepackage{amssymb}
+
 \include{header}
 %\include{macros}
 
@@ -110,11 +119,26 @@
 % Vectors
 \newcommand{\xx}{\vectorfont{x}}
 \newcommand{\vv}{\vectorfont{v}}
+\newcommand{\REVO}{\mathbf{Reveal}}
+\newcommand{\HASHO}{\oraclefont{Hash}}
+\newcommand{\diffplus}[1]{\fbox{#1}}
+\newcommand{\diffplusbox}[1]{\fbox{\parbox{\dimexpr\textwidth-2\fboxsep-2\fboxrule\relax}{#1}}}
+\newcommand{\diffminus}[1]{\colorbox{lightgray}{#1}}
+\newcommand{\diffminusbox}[1]{\colorbox{lightgray}{\parbox{\dimexpr\textwidth-2\fboxsep-2\fboxrule\relax}{#1}}}
+\newcommand{\hh}{\vectorfont{h}}
+\newcommand{\fff}{\schemefont{Fn}}
+\newcommand{\Rnd}{\schemefont{Rand}}
+\newcommand{\Repx}{\Rep1}
+\newcommand{\Qryx}{\Qry1}
+\newcommand{\Upx}{\Up1}
+\newcommand{\Ans}{\varfont{Ans}}
+\newcommand{\setE}{\mathcal{E}}
+\newcommand{\Resp}{\varfont{Resp}}
+\def\ticks(#1,#2){\procfont{T}_{\hspace*{-1.5pt}#1}({#2})}
+\newcommand{\highlighto}[1]{\colorbox{lightgray}{$\scriptstyle #1$}}
+\newcommand{\highlight}[1]{\colorbox{lightgray}{$\displaystyle #1$}}
 
-\definecolor{darkgreen}{RGB}{50,127,0}
-\newcommand{\cpnote}[1]{\note{darkgreen}{Chris}{#1}}
-\newcommand{\cptodo}[1]{\todo{darkgreen}{Chris}{#1}}
-\newcommand{\anytodo}[1]{\todo{red}{Anyone}{#1}}
+
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \title{\bf Correctness and Privacy of Mutable Data Structures}
@@ -131,12 +155,19 @@
 %\input{intro}
 
 \section{Syntax}
+\label{sec:syntax}
 \input{syntax}
 
+\section{Concrete Data Structures}
+\label{sec:structures}
+\input{structures}
+
 \section{Correctness}
+\label{sec:correctness}
 \input{correctness}
 
 \section{Privacy}
+\label{sec:privacy}
 \input{privacy}
 
 
