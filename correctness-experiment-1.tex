@@ -1,0 +1,44 @@
+\begin{figure}[t]
+  \twoColsNoDivide{0.48}
+  {
+     \raisebox{-5pt}{\experimentv{$\Exp{\errep1}_{\struct,r}(\advA)$ {\colorbox{lightgray}{$\Exp{\erreps1}_{\struct,r}(\advA)$}}}}\\[2pt]
+      $\setP \gets \emptyset$\\
+      $\key \getsr \keys$\\
+      $\col \getsr \advA$\\
+      $i \getsr \advA^{\UPO,\QRYO}(\REPO(\col))$\\
+      return $[\sum_\qry \err[\qry] \geq r]$ 
+    \\[6pt]
+    \oraclev{$\REPO(\col)$}\\[2pt]
+      $\pub \getsr \Rep_\key(\col)$\\
+      $\setC \gets \emptyset$\\
+      $\mathrm{rv} \gets \pub$ \highlight{;\mathrm{rv} \gets \top} \\
+      return $\mathrm{rv}$
+  }
+  {
+    \oraclev{$\UPO(\up)$}\\[2pt]
+%      $X \gets \col^{v[i]}_i
+%      $v[i] \gets v[i]+1$\\
+      $X \gets \col$ \\
+      $\col \gets \up(X)$\\
+      $\pub \getsr \Up_\key(\pub, \up)$\\
+      $\setC \gets \emptyset$\\
+      for $\qry$ in $\err$ do\\
+      \tab $a \gets \Qry_K(\pub, \qry)$\\
+      \tab if $\err[\qry] > d(a,\qry(\col))$ then\\
+      \tab\tab$\err[\qry] \gets d(a,\qry(\col))$\\
+      $\mathrm{rv} \gets \pub$ \highlight{;\mathrm{rv} \gets \top}\\
+      return $\mathrm{rv}$
+      \medskip
+
+    \oraclev{$\QRYO(\qry)$}\\[2pt]
+      if $\qry \in \setC$ then return $\bot$\\
+      $\setC \gets \setC \union \{\qry\}$\\
+      $a \gets \Qry_K(\pub, \qry)$\\
+      if $\err[\qry] < d(a,\qry(\col))$ then\\
+      \tab$\err[\qry] \gets d(a,\qry(\col))$\\
+      return $a$
+  }
+  \caption{The $\errep1$ adn $\erreps1$ notions of adversarial correctness. These are equivalent to the standard $\errep$ and $\erreps$ notions where the adversary is only allowed to make a single call to $\REPO$.}
+  \vspace{6pt}\hrule
+  \label{fig:security}
+\end{figure}
