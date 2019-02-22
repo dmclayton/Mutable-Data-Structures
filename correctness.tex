@@ -379,6 +379,104 @@ Note that if an adversary constructs a representation with $n$ elements and disc
 
 Beyond this, is there any point to adding elements multiple times? Note that if adding an element once does not produce a false positive, adding it again will not produce a false positive either, since the exact same bits will be set again
 
+\begin{figure}
+  \boxThmBFSaltCorrect{0.48}
+  {
+    \underline{$\G_0(\advA)$}\\[2pt]
+      $\col \getsr \advA^H$; $\setC \gets \emptyset$; $\err \gets 0$\\
+      $\pub \getsr \Rep[\hashbf[H]](\col)$\\
+      $\bot \getsr \advA^{H,\QRYO,\UPO}$\\
+      return $(\err \geq r)$
+    \\[6pt]
+    \oraclev{$\QRYO(x)$}\\[2pt]
+      if $x \in \mathcal{C}$ then return $\bot$\\
+      $\setC \gets \setC \union \{x\}$\\
+      $a \gets \Qry[\hashbf[H]](\pub, x)$\\
+      if $a \neq [x \in \col]$ then $\err \gets \err + 1$\\
+      return~$a$
+    \\[6pt]
+    \oraclev{$\UPO(x,b)$}\\[2pt]
+      $\setC \gets \emptyset$\\
+      $a \gets \Qry[\hashbf[H]](\pub, \qry_x)$\\
+      if $x \in \setC$ and $b = a \neq [x \in \col]$ then\\
+      \tab $\err \gets \err-1$\\
+      if $b = 1$ then\\
+      \tab $\col \gets \col \union \{x\}$\\
+      else\\
+      \tab $\col \gets \col \setminus \{x\}$\\
+      $\pub \gets \Up[\hashbf[H]](\pub,\up_{x,b})$\\
+      return~$\bot$
+    \\[4pt]
+    \hspace*{-4pt}\rule{1.043\textwidth}{.4pt}
+    \\[5pt]
+    \oraclev{$\HASHO_1(\salt,x)$} \hfill\diffplus{$\G_2$}\;{$\G_1$}\hspace*{3pt}\\
+      $\hh \getsr [m]^2$; $\vv \gets \fff(\hh$)\\
+      if $\salt = \salt^*$ then\\
+      \tab $\bad_1 \gets 1$; \diffplus{return $\vv$}\\
+      if $T[\salt,x]$ is defined then $\vv \gets T[\salt,x]$\\
+      $T[\salt,x] \gets \vv$;
+      return $\vv$
+  }
+  {
+    \underline{$\G_1(\advB)$}\\[2pt]
+      $\salt^* \getsr \bits^\lambda$;
+      $\col \getsr \advB^{\HASHO_1}$\\
+      $\pub \gets \Repx[\HASHO_2](\col, \salt^*)$\\
+      $\setC \gets \emptyset$;
+      $\err \gets 0$\\
+      $\bot \getsr \advB^{\HASHO_1,\QRYO,\UPO}$\\
+      return $(\err \geq r)$
+    \\[6pt]
+    \oraclev{$\QRYO(\qry_x)$}\\[2pt]
+      if $\qry_x \in \mathcal{C}$ then return $\bot$\\
+      $\setC \gets \setC \cup \{\qry_x\}$\\
+      $a \gets \Qry[\HASHO_2](\pub, \qry_x)$\\
+      if $a \neq \qry_x(\col)$ then $\err \gets \err + 1$\\
+      return~$a$
+    \\[6pt]
+    \oraclev{$\UPO(\up_x)$}\\[2pt]
+      $\setC \gets \emptyset$\\
+      $a \gets \Qry[\hashbf[H]](\pub, \qry_x)$\\
+      if $a \neq \qry_x(\col)$ and $\qry_x \in \setC$ then\\
+      \tab $\err \gets \err-1$\\
+      $\col \gets \col \union \{x\}$\\
+      $\pub \gets \Up[\HASHO_2](\pub,\up_x)$\\
+      return~$\bot$
+    \\[6pt]
+    \oraclev{$\HASHO_2(\salt,x)$}\\[2pt]
+      $\hh \getsr [m]^2$; $\vv \gets \fff(\hh$)\\
+      if $T[\salt,x]$ is defined then\\
+      \tab $\vv \gets T[\salt,x]$\\
+      $T[\salt,x] \gets \vv$;
+      return $\vv$
+  }
+  {
+    \underline{$\G_3(\advB)$}\\[2pt]
+    \oraclev{$\QRYO(\qry_x)$}\\[2pt]
+      $a \gets \Qry[\HASHO_3](\pub, \qry_x)$\\
+      if $a \neq \qry_x(\col)$ then $\err \gets \err + 1$\\
+      $\col \gets \col \union \{x\}$
+      $\pub \gets \Up[\HASHO_2](\pub,\up_x)$\\
+      return~$a$
+  }
+  {
+    \oraclev{$\UPO(\up_x)$}\\[2pt]
+      $a \gets \Qry[\HASHO_3](\pub, \qry_x)$\\
+      if $a \neq \qry_x(\col)$ then $\err \gets \err + 1$\\
+      $\col \gets \col \union \{x\}$
+      $\pub \gets \Up[\HASHO_2](\pub,\up_x)$\\
+      return~$\bot$
+    \\[6pt]
+    \oraclev{$\HASHO_i(\salt,x)$}\\[2pt]
+      $\hh \getsr [m]^2$; $\vv \gets \fff(\hh$)\\
+      return $\vv$
+  }
+  \caption{Games 0--3 for proof of Theorem~\ref{thm:count-bf-bound}.}
+  \label{fig:count-bf-bound}
+\end{figure}
+
+Because this structure has no private key, we can again use the result that the adversary's advantage in $\erreps$ is at most $q_R$ times their advantage in $\erreps1$. As in the case of an ordinary Bloom filter, we then want to reduce the counting Bloom filter to a structure using random functions rather than a concrete hash algorithm. Before the adversary makes its initial $\REPO$ query, it has no information about the filter that will be constructed, and so the adversary cannot perform better than random chance at guessing the hash. Given up to $q_H$ queries to $\HASHO$, the probability the adversary succeeds in this way, guessing the hash before the representation is created, is $q_H/2^\lambda$.
+
 % public rep
 %   immutable
 %     no salt
