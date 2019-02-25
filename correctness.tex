@@ -477,6 +477,14 @@ Beyond this, is there any point to adding elements multiple times? Note that if 
 
 Because this structure has no private key, we can again use the result that the adversary's advantage in $\erreps$ is at most $q_R$ times their advantage in $\erreps1$. As in the case of an ordinary Bloom filter, we then want to reduce the counting Bloom filter to a structure using random functions rather than a concrete hash algorithm. Before the adversary makes its initial $\REPO$ query, it has no information about the filter that will be constructed, and so the adversary cannot perform better than random chance at guessing the hash. Given up to $q_H$ queries to $\HASHO$, the probability the adversary succeeds in this way, guessing the hash before the representation is created, is $q_H/2^\lambda$.
 
+%%%
+
+Since the adversary only has access to deletion, there are effectively four types of updates they can make: removing a false positive, removing a true positive, or removing a (true or false) negative. Attempting to remove an element which the filter believes is not present in the set will do nothing, so we may assume without loss of generality that the adversary does not do this. While removing a true positive clearly cannot increase the chances of getting a false positive, since counters are only decremented and not incremented, it is possible for removing a true positive to cause a false negative.
+
+\subsection{Attack on Counting Filters}
+
+First, $\advA$ chooses an arbitrary set $\col$ of size $n$ and calls $\REPO$ to get a representation of $\col$. The adversary then chooses $q_U$ distinct elements not in $\col$ and makes a series of $\UPO$ calls to remove each of these from the set. Finally, the adversary chooses up to $q_T$ elements from $\col$ and makes a series of $\QRYO$ calls to test for membership of these elements in the set.
+
 % public rep
 %   immutable
 %     no salt
