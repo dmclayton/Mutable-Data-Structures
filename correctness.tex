@@ -25,18 +25,18 @@ Let us give an example to help make concrete these definitional choices.  Say th
 First, we note that any structure which is insecure in the immutable case is also insecure in the mutable case. Any adversary in the immutable case is identical to a corresponding adversary in the mutable case which simply never makes use of the $\UPO$ oracle. From this we know that standard (unsalted, unkeyed) Bloom filters cannot ensure correctness in the mutable case. 
 
 
-\heading{Keyless structures.}\tsnote{I've tried to organize these results into little sectionettes.  I don't know, yet, what is the right way to organize these generic results, but this is a start.  As you develop results, please try to keep them organized, whatever the organizational schema.} \dctodo{needs intro text.}
+\heading{Keyless structures.}\tsnote{I've tried to organize these results into little sectionettes.  I don't know, yet, what is the right way to organize these generic results, but this is a start.  As you develop results, please try to keep them organized, whatever the organizational schema.}
 
 In a keyless structure, we assume all details of the algorithm used are known beforehand by the adversary, except any which might be generated `on the fly' as representations are created and modified. For example, many of these structures will assume the use of a random salt which is picked at the time the representation is created. A structure with neither randomization nor a private key is usually vulnerable to pre-computation and offline attacks, where the adversary can search for errors to produce without having to interact with the structure itself.
 
-In many cases, it is easier to reason about an adversary which only has the chance to create and manipulate a single representation, rather than being able to call a $\REPO$ oracle as many times as it likes. Fortunately, in the case of keyless structures we can show that the adversary's advantage in a single-representation case is bounded above by a multiple of the advantage in the general case. There are two equivalent ways of defining the $\errep1$ experiment. First, we may define it as a modified version of $\errep$ in which the adversary is constrained to make no more than one call to $\REPO$. We may equivalently define it as a two-stage adversary in the following experiment:
+In many cases, it is easier to reason about an adversary which only has the chance to create and manipulate a single representation, rather than being able to call a $\REPO$ oracle as many times as it likes. Fortunately, in the case of keyless structures we can show that the adversary's advantage in a single-representation case is bounded above by a multiple of the advantage in the general case. There are two equivalent ways of defining the $\errep1$ experiment. First, we may define it as a modified version of $\errep$ in which the adversary is constrained to make no more than one call to $\REPO$. We may equivalently define it as a two-stage adversary in the experiment below.
 
 \input{correctness-experiment-1}
 
 Note that in the $\erreps1$ scenario we need not provide the adversary with a $\REVO$ oracle. If the adversary uses only a single representation, may assume without loss of generality that they make no call to $\REVO$, since doing so would prevent the adversary from having any possibility of winning. Using this definition of $\errep1$, we can show the equivalence between $\errep1$ and $\errep$ using a straightforward reduction argument.
 
-\begin{lemma}[\errep1 implies \errep for keyless structures]\label{lemma:errep}
-  \dctodo{\errep1 undefined.} Let $\struct = (\Rep, \Qry, \Up)$ be a data structure with key
+\begin{lemma}[$\errep1$ and $\erreps1$ imply \errep and \erreps for keyless structures]\label{lemma:errep}
+  Let $\struct = (\Rep, \Qry, \Up)$ be a data structure with key
   space $\{\emptystr\}$. For every $t, q_R, q_T, q_U, q_H, r\geq 0$, it holds that
   \[
     \Adv{\errep}_{\struct,r}(t, q_R, q_T, q_U, q_H) \leq
@@ -47,7 +47,7 @@ Note that in the $\erreps1$ scenario we need not provide the adversary with a $\
 
 \begin{proof}For a fixed $r \ge 0$, let $A$ be an $\errep$ adversary which runs in $t$ time steps and makes $q_R$ $\REPO$ queries, $q_T$ $\QRYO$ queries, $q_U$ $\UPO$ queries, and $q_H$ RO queries. We construct an adversary $B$ for $\errep1$ as follows.
 
-First, $B$ initializes a counter $ct \gets 0$ and a set $\setC \gets \emptyset$, and samples $q \getsr [q_R]$. Next $B$ executes $A$, simulating the answers to its oracle queries as follows. When $A$ asks the query $\REPO(\col)$, $B$ sets $ct \gets ct + 1$ and stores $\col_{ct} \gets \col$. Then, if $ct = q$, $B$ forwards $\col$ to its own $\REPO$ oracle and returns the resulting $\pub$ to $A$. Otherwise, $B$ computes and returns $\pub_{ct} \getsr \Rep(\col)$. When $A$ asks for the query $\QRYO(i,\qry)$, $B$ first checks if $(i,\qry) \in \setC$ and returns $\bot$ if this condition holds. Otherwise $B$ forwards $(i,\qry)$ to its $\QRYO$ oracle and returns $a$ if $i = q$, and reutrns $\Qry(\pub_i,\qry)$ otherwise. Similarly, when $A$ makes an $\UPO(i,\up)$ query, $B$ forwards $(i,\up)$ to its $\UPO$ oracle if $i = q$ and evaluates $\Up(\pub_i,\up)$ otherwise. Finally, queries from $A$ to its RO are simply forwarded to $B$'s RO. When $A$ halts and outputs $j$, $B$ does the same.
+First, $\advB$ initializes a counter $ct \gets 0$ and a set $\setC \gets \emptyset$, and samples $q \getsr [q_R]$. Next $\advB$ executes $\advA$, simulating the answers to its oracle queries as follows. When $\advA$ asks the query $\REPO(\col)$, $\advB$ sets $ct \gets ct + 1$ and stores $\col_{ct} \gets \col$. Then, if $ct = q$, $B$ forwards $\col$ to its own $\REPO$ oracle, returning the resulting value ($\pub$ in the public-representation case, or $\top$ in the private-representation case) to $\advA$. Otherwise, $\advB$ computes $\pub_{ct} \getsr \Rep(\col)$ and returns either $\pub_{ct}$ or $\top$. When $\advA$ asks for the query $\QRYO(i,\qry)$, $\advB$ first checks if $(i,\qry) \in \setC$ and returns $\bot$ if this condition holds. Otherwise $\advB$ forwards $(i,\qry)$ to its $\QRYO$ oracle and returns $a$ if $i = q$, and reutrns $\Qry(\pub_i,\qry)$ otherwise. Similarly, when $\advA$ makes an $\UPO(i,\up)$ query, $\advB$ forwards $(i,\up)$ to its $\UPO$ oracle if $i = q$ and evaluates $\Up(\pub_i,\up)$ otherwise. Finally, queries from $\advA$ to its RO are simply forwarded to $\advB$'s RO. When $\advA$ halts and outputs $j$, $\advB$ does the same.
 
 If $j = q$, then $B$ wins if $A$ does, since all queries from $A$ to $\pub_j$ were forwarded to $B$'s $\QRYO$ oracle. Given that $q$ is sampled uniformly from the range $[q_R]$, it follows that
 
@@ -56,10 +56,7 @@ $$\Adv{\errep}_{\struct,r}(t, q_R, q_T, q_U, q_H) \leq q_R\cdot\Adv{\errep1}_{\s
 Note that $B$ makes at most $q_T$ queries to $\QRYO$ and $q_H$ queries to its RO. Since $A$ runs in $t$ time steps and writing a bit takes 1 time step, the input length to any $\Rep$, $\Qry$, or $\Up$ evaluated by $B$ is at most $t$ bits. Hence, adversary $B$ runs in time $O(t+(q_R-1)\ticks(\Rep,t)+q_T\ticks(\Qry,t)+q_U\ticks(\Up,t))$.\missingqed
 \end{proof}
 
-
-There is a similar equivalence between $\erreps1$ and $\erreps$; the reasoning is identical to that in the above proof. \dctodo{Needs a formal statement.  Perhaps just fold it into the previous lemma.}
-
-\begin{lemma}[Salts do not affect \errep for keyless structures with public representation]\label{lemma:nosalt}
+\begin{lemma}[Salts do not affect \errep for keyless structures]\label{lemma:nosalt}
   Let $\struct = (\Rep, \Qry, \Up)$ be a data structure with a salt randomly initialized at runtime and $\struct'$ be the same structure using a fixed value from the salt space in place of a randomized salt. For every $t, q_R, q_T, q_U, q_H, r\geq 0$, it holds that
   \[
     \Adv{\errep}_{\struct,r}(t, q_R, q_T, q_U, q_H) \leq
@@ -86,7 +83,21 @@ Consider an adversary $A$ in the case of a non-salted data structure which makes
 In general this may use as many as $2n(q_R+q_T+q_U)$ update queries, where $n$ is the longest minimal sequence of update operations needed to generate a data structure in the space. Furthermore $B$ succeeds if $A$ does, so the adversaries' advantages are equal.\missingqed
 \end{proof}
 
-Note that in a counting filter, $n$ is equal to the maximum supported multiset size, and in count-min sketch $n$ is equal to the sum of the absolute values of the elements' frequences. While this means a potentially large number of update queries are needed in the general case, for an unkeyed structure it turns out that far fewer updates are required. In the above proof, the only reason we needed to undo each sequence of $\UPO$ queries was because the following query might involve the representation of a different structure. But in the case of a salted but unkeyed structure, our initial lemma shows that for any adversary there is an adversary making only a single $\REPO$ query with an advantage differing by a factor of at most $q_R$. For an adversary which only ever makes one $\REPO$ query, we never need to reset the representation to the empty representation, and in the above simulation we can omit all $\UPO$ queries except those needed for $A$'s single $\REPO$ query and any $\UPO$ queries made by $A$ itself.
+\begin{lemma}[Salts do not affect \errep for unkeyed invertible structures]\label{lemma:noinvsaltunkeyed}
+  Let $\struct = (\Rep, \Qry, \Up)$ be an unkeyed data structure with a salt randomly initialized at runtime and $\struct'$ be the same structure using a fixed value from the salt space in place of a randomized salt. For every $t, q_R, q_T, q_U, q_H, r\geq 0$, it holds that
+  \[
+    \Adv{\errep}_{\struct,r}(t, q_R, q_T, q_U, q_H) \leq
+    q_R \cdot \Adv{\errep1}_{\struct',r}(O(f(t)), q_T, q_U, q_H) \,,
+  \]
+  where $n$ is the longest minimal sequence of update operations needed to generate a data structure in the space.
+\end{lemma}
+\begin{proof}
+Consider an adversary $A$ in the case of a non-salted data structure which makes $q_R$ queries to $\REPO$ and $q_T$ queries to $\QRYO$. We construct an adversary $B$ for the salted case which produces the same errors as follows. First, $B$ initializes a counter $ct$ to 0 and calls the $\REPO$ oracle on the empty set, receiving an empty representation $\pub$ together with the salt used to create the representation. Then $B$ runs $A$, answering its oracle queries as follows. Whenever $A$ makes a query of the form $\REPO(\col)$, $B$ sets $ct \gets ct + 1$ and calls $\UPO$ repeatedly on $\pub$ to transform it into a representation of $\col$. Then $B$ returns the modified $\pub$ to $A$, stores $\col_{ct} \gets \col$, and performs the opposite updates in reverse order to return to the original empty representation $\pub$. If $A$ makes a query of the form $\QRYO(i,\qry)$, $B$ calls $\UPO$ repeatedly to transform $\pub$ into a representation of $\col_i$ and then returns the result of querying its own oracle with $\QRYO(1, \qry)$. Then once again $B$ performs the inverse updates to transform $\pub$ back into the original empty representation. If $A$ queries for $\UPO(i, \up)$, $B$ sets $\col_i \gets \up(\col_i)$ and again uses $\UPO$ queries to transform $\pub$ into a representation of $\col_i$, returns the value of $\pub$, and then performs opposite $\UPO$ queries to return $\pub$ to the empty representation. Finally, $B$ forwards any of $A$'s RO queries to its own RO.
+
+In general this may use as many as $2n(q_R+q_T+q_U)$ update queries, where $n$ is the longest minimal sequence of update operations needed to generate a data structure in the space. Furthermore $B$ succeeds if $A$ does, so the adversaries' advantages are equal.\missingqed
+\end{proof}
+
+Note that in a counting filter, $n$ is equal to the maximum supported multiset size, and in count-min sketch $n$ is equal to the sum of the absolute values of the elements' frequences. While this means a potentially large number of update queries are needed in the general case, for an unkeyed structure it turns out that far fewer updates are required. In the above proof, the only reason we needed to undo each sequence of $\UPO$ queries was because the following query might involve the representation of a different structure. But in the case of a salted but unkeyed structure, Lemma 1 shows that for any adversary there is an adversary making only a single $\REPO$ query with an advantage differing by a factor of at most $q_R$. For an adversary which only ever makes one $\REPO$ query, we never need to reset the representation to the empty representation, and in the above simulation we can omit all $\UPO$ queries except those needed for $A$'s single $\REPO$ query and any $\UPO$ queries made by $A$ itself.
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -373,11 +384,7 @@ $$\Adv{\errep}_{\struct_\prfbloom,r}(\advA) \le \Adv{\prf}_F(\advB) + \frac{q_R^
 \missingqed
 \end{proof}
 
-Consider the case of a counting Bloom filter. In this setting, an update to add an element increments each of the counters mapped to by the hash functions, with some maximum ceiling $c$ above which the counter cannot increase. A Bloom filter would then just be a counting Bloom filter with a maximum counter value of 1, but we make the additional change that a counting Bloom filter can perform delete operations which hashes the element, checks to make sure all the counters corresponding to the hashes are nonzero, and then decrements them.
-
-Note that if an adversary constructs a representation with $n$ elements and discovers a false positive, it can increase the error counter up to $c$ total times by re-adding the same $n$ elements $c$ times each using $\UPO$ calls.
-
-Beyond this, is there any point to adding elements multiple times? Note that if adding an element once does not produce a false positive, adding it again will not produce a false positive either, since the exact same bits will be set again
+Next, we consider the case of a counting Bloom filter. In this setting, an update to add an element increments each of the counters mapped to by the hash functions, with some maximum ceiling $c$ above which the counter cannot increase. A Bloom filter would then just be a counting Bloom filter with a maximum counter value of 1, but we make the additional change that a counting Bloom filter can perform delete operations which work by hashing the element and decrementing the counters at those indices.
 
 \begin{figure}
   \boxThmBFSaltCorrect{0.48}
@@ -481,9 +488,37 @@ Because this structure has no private key, we can again use the result that the 
 
 Since the adversary only has access to deletion, there are effectively four types of updates they can make: removing a false positive, removing a true positive, or removing a (true or false) negative. Attempting to remove an element which the filter believes is not present in the set will do nothing, so we may assume without loss of generality that the adversary does not do this. While removing a true positive clearly cannot increase the chances of getting a false positive, since counters are only decremented and not incremented, it is possible for removing a true positive to cause a false negative.
 
+In the next game, we make three changes to the experiment. First, $\QRYO$ tests for potential false positives not in the current representation of the set, but instead in the initial representation constructed by $\Rep$. Next, each $\UPO$ call directly calls $\QRYO$, so that deleting an element which was originally a false positive increments the error counter in addition to producing possible false negatives. Finally, deletions do not merely decrement the associated counters, but actually reset them to 0.
+
+First, note that repeated $\UPO$ and $\QRYO$ calls on elements outside the original set $\col$ are never helpful. With only deletions as updates, a true negative can never become a false positive, and since deletions zero out the associated counters repeated $\UPO$ calls on the same element do nothing. Additionally, because $\UPO$ checks against the original filter rather than the current filter, $\UPO$ calls do not decrease the false positive probability of further $\UPO$ calls. Since any false positives which could be found by $\QRYO$ can also be found by $\UPO$, in this new game there is no reason for an adversary to prefer a $\QRYO$ call on an element outside of the original set to an $\UPO$ call. In fact, there is no reason for an adversary to prefer making both a $\QRYO$ and $\UPO$ call on a single element outside $\col$ over just making an $\UPO$ call, since both produce the same result. We may therefore assume without loss of generality that all $\QRYO$ and $\UPO$ calls are made to different elements. Because $\UPO$ calls consist only of deletions, they can only increase the probability of false negatives and can only decrease the probability of false positives.
+
+The adversary wins if it accumulates $r$ errors, and we may assume without loss of generality that it halts upon achieving this goal. The $r$ errors may accumulate over each of the $q_U$ calls to $\UPO$ as well as the $q_T$ calls to $\QRYO$. The $\UPO$ calls only produce false positives, while $q_T$ can produce false positives or false negatives. The probability of a false positive is bounded by the Kirsch and Mitzenmacher result of $(1-e^{kn/m})^k + O(1/n)$, while that of a false negative is given by the bound of Guo et al.
+
+These can be split between false positives and false negatives. There may be up to $q_U + q_T$ chances to find a false positive, with the success probability given by the Kirsch and Mitzenmacher bound for a filter with $n$ elements, and up to $q_T$ chances to find a false negative after $q_U$ elements have been removed from the filter.
+
+% Conjecture: the adversary's chances of finding a false positive are no better than in the case of an ordinary Bloom 
+% this is certainly true in the deletion-only case
+% in the case of insertion and deletion, consider an adversary which simply ignores all deletions and all insertions that do not increase the maximum set size seen so far
+
+% on the other hand, if the adversary is only trying to produce false negatives, adding more elements to the filter is unhelpful since it can only lower the chances of finding a false negative... unless you later turn that element into a false negative
+% however, this is unecessary unless q_T > n, so that you can mess with all the original elements and then begin adding in new elements to mess with
+
 \subsection{Attack on Counting Filters}
 
 First, $\advA$ chooses an arbitrary set $\col$ of size $n$ and calls $\REPO$ to get a representation of $\col$. The adversary then chooses $q_U$ distinct elements not in $\col$ and makes a series of $\UPO$ calls to remove each of these from the set. Finally, the adversary chooses up to $q_T$ elements from $\col$ and makes a series of $\QRYO$ calls to test for membership of these elements in the set.
+
+\begin{tabular}{|l|} 
+ \hline
+ \underline{adversary $\advA$:}\\
+ $\col \gets [n]$\\
+ $\REPO(\col)$\\
+ for $i \in [q_U]$ do\\
+ \tab $\UPO(0,\up_{i+n}')$\\
+ for $j \in [q_T]$ do\\
+ \tab $\QRYO(0,\qry_{j})$\\
+ return 0\\
+ \hline
+\end{tabular}
 
 % public rep
 %   immutable
