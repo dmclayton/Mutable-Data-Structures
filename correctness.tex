@@ -496,6 +496,24 @@ The adversary wins if it accumulates $r$ errors, and we may assume without loss 
 
 These can be split between false positives and false negatives. There may be up to $q_U + q_T$ chances to find a false positive, with the success probability given by the Kirsch and Mitzenmacher bound for a filter with $n$ elements, and up to $q_T$ chances to find a false negative after $q_U$ elements have been removed from the filter.
 
+Suppose the errors consist of $f_p$ false positives and $f_n$ false negatives. The probability of this is given by $\binom{q_U + q_T}{f_p}p(k,n,m)^{f_p}\binom{q_T}{f_n}q(k,n,q_U,m)^{f_n}$.
+
+% with insertion, it is also possible to insert an arbitrary element already in the set, insert an arbitrary element not already in the set, insert known false negatives, and insert known true negatives
+
+% inserting an element already in the set may get rid of false negatives; if it does so, it may also introduce false positives
+% inserting an element not in the set may get rid of false negatives and/or introduce false positives
+% inserting a known false negative removes the false negative and may remove other false negatives, but may also introduce false positives
+% inserting a known true negative may remove false negatives, but may also introduce false positives
+
+% are known false negatives equivalent to each other, so that adding one is indistinguishable from adding another?
+% no: consider {x,y} being tested for false negativity where x is found to be a false negative while y is not; then we remove another element and find that y is a false negative; x is likely to be missing more bits than y because the removal of the additional element may have decremented bits of x
+% for creating false positives, the best that can happen is
+
+% problem: the adversary learns about the filter from its queries, can adjust accordingly
+% adversary may not need to guess salt at all: suppose they add x twice and remove y; if x is now a false positive, they know two of y's hashes collide
+% adversary cannot guess what might happen when querying/updating on a new element, but can learn about elements that have already been inserted/removed/queried
+% consider an element that has been queried but not inserted/deleted at any point; further insertions are no more likely to make this element a false positive than an element that has not been queried, while further deletions are not more likely to make this element a false positive at all; we may therefore assume that a query to an element which has not been previously manipulated is also to an element which has not been previously queried
+
 % Conjecture: the adversary's chances of finding a false positive are no better than in the case of an ordinary Bloom 
 % this is certainly true in the deletion-only case
 % in the case of insertion and deletion, consider an adversary which simply ignores all deletions and all insertions that do not increase the maximum set size seen so far
@@ -519,34 +537,3 @@ First, $\advA$ chooses an arbitrary set $\col$ of size $n$ and calls $\REPO$ to 
  return 0\\
  \hline
 \end{tabular}
-
-% public rep
-%   immutable
-%     no salt
-%       no key: insecure (old paper)
-%       key: insecure because adversary can just ask for representations and then find false positives itself
-%     salt
-%       no key: semi-secure (old paper)
-%       key: secure (old paper)
-%   mutable
-%     no salt
-%       no key: insecure because immutable case is insecure
-%       key: insecure because immutable case is insecure
-%     salt
-%       no key: adversary asks for empty representation, gets salt, then proceeds with attack as in the unsalted case
-%       key: secure (Theorem 2)
-% private rep
-%   immutable
-%     no salt
-%       no key: same as public-rep case because construction of representations is deterministic
-%       key: same as public-rep case because construction of representations is deterministic
-%     salt
-%       no key: at least as secure as public rep case; is it on par with public rep secret key + salt?
-%       key: at least as secure as public rep case
-%   mutable
-%     no salt
-%       no key: same as public-rep case because construction of representations is deterministic
-%       key: same as public-rep case because construction of representations is deterministic
-%     salt
-%       no key: secure (Theorem 1)
-%       key: secure because public rep case is secure
