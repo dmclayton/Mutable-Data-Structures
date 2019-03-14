@@ -97,6 +97,24 @@ Consider an adversary $A$ in the case of a non-salted data structure which makes
 In general this may use as many as $2n(q_R+q_T+q_U)$ update queries, where $n$ is the longest minimal sequence of update operations needed to generate a data structure in the space. Furthermore $B$ succeeds if $A$ does, so the adversaries' advantages are equal.\missingqed
 \end{proof}
 
+\begin{lemma}[]\label{lemma:immutabletomutable}
+  Let $\struct = (\Rep, \Qry, \Up)$ be an unkeyed data structure, and $\struct'$ be the same structure except that any random parameters are fixed across representations, any pseudorandom functions are replaced by true random functions, and no nontrivial updates exist. For every $t, q_r, q_T, q_U, q_H, r \geq 0$, it holds that
+  \[
+    \Adv{\errep}_{\struct,r}(t, q_R, q_T, q_U, q_H) \leq
+    \Adv{\prf}_F(\advB) + \Adv{\errep}_{\struct',r}(O(t), q_R + q_U, q_T, 0, q_H) \,,
+  \]
+\end{lemma}
+\begin{proof}
+Given an adversary $\advA$ making queries $(q_R, q_U, q_T, q_H)$, we can construct $\advB$ making queries $(q_R+q_U, 0, q_T, q_H)$ which achieves the same advantage.
+
+For a structure $\Pi$, we denote by $\Pi'$ the same structure with pseudo-random functions replaced by true-random functions. Using conditional probabilities, we have $\Adv{\errep}_{\struct,r}(\advA) \le \Adv{\prf}_F(\advB) + \Adv{\errep}_{\struct_1,r}(\advA)$.
+
+In the truly random structure $\struct_1$, the representation of a set is simply a randomly-chosen valid representation of that set. Revealing this therefore reveals no new information about any other representations which have been constructed, and so calling $\REVO$ can only decrease an adversary's chance of success. We may now assume $\REVO$ is never called.
+
+We next modify the structure to $\struct_2$, where all randomized parameters are fixed across representations at the beginning of the experiment, but not revealed to the adversary. We create an adversary $C$ for the correctness experiment on $\struct_2$ which simulates $\advA$ as follows. The adversary $C$ keeps track of a counter $ct$ and list $L$ of indices and simulates $\advA$. When $\advA$ calls $\REPO$, $C$ appends $ct$ to the end of $L$ and then increments $ct$. When $\advA$ calls $\UPO(i,\up)$, $C$ calls $\REPO(\up(\col_{I(i)}))$, sets $L(i) \gets ct$, and increments $ct$. Finally, when $\advA$ calls $\QRYO(i,\qry)$, $C$ calls $\QRYO(L(i),\qry)$. Since $\REVO$ is never called, $C$ need not implement this oracle. Since all queries are called on representations of the same sets, $C$ has the same probability of success as $A$.
+
+\end{proof}
+
 Note that in a counting filter, $n$ is equal to the maximum supported multiset size, and in count-min sketch $n$ is equal to the sum of the absolute values of the elements' frequences. While this means a potentially large number of update queries are needed in the general case, for an unkeyed structure it turns out that far fewer updates are required. In the above proof, the only reason we needed to undo each sequence of $\UPO$ queries was because the following query might involve the representation of a different structure. But in the case of a salted but unkeyed structure, Lemma 1 shows that for any adversary there is an adversary making only a single $\REPO$ query with an advantage differing by a factor of at most $q_R$. For an adversary which only ever makes one $\REPO$ query, we never need to reset the representation to the empty representation, and in the above simulation we can omit all $\UPO$ queries except those needed for $A$'s single $\REPO$ query and any $\UPO$ queries made by $A$ itself.
 
 
@@ -117,10 +135,10 @@ Fix integers $k, m, n, \lambda, r\geq 0$, let $H \colon \bits^* \to [m]$ be a fu
     \Adv{\erreps}_{\struct_\saltybloom,r}(t,&q_R,& q_T, q_U, q_H) \leq \\ && q_R \cdot
      \left[
       \frac{q_H}{2^\lambda} +
-      {\dbinom{q_T+q_U}{r}} \left( (1-e^{-k(n+r)/m})^k + O(1/(n+r)) \right)^r
+      {\dbinom{q_T+q_U}{r}} p(k, m, n+r)^r
     \right] \,,
 \end{eqnarray*}
-where $H$ is modeled as a random oracle.
+where $H$ is modeled as a random oracle and $p(k, m, n+r)$ is the false-positive probability on a Bloom filter with the given parameters.
 \end{theorem}
 
 This proof first reduces to the single-representation case, which as shown in Lemma 1 will reduce the adversary's advantage by at most a factor of $q_R$. The main idea behind the proof is to remove the adversary's adaptivity a step at a time. We isolate the possibility of the adversary guessing the salt, which would allow it to mount its own offline attack on the filter without relying on the $\QRYO$ oracle. If the adversary does not guess the salt, the outputs of the $\REPO$, $\QRYO$, and $\UPO$ oracles are unpredictable to the adversary, producing uniformly randomly distributed bits to set (for $\REPO$ and $\UPO$) or to check (for $\QRYO$). Under the assumption that the adversary does not predict the salt, queries made to distinct elements are independent of each other. The only remaining issue is that the adversary can potentially gain an advantage by testing whether some object $x$ is a false positive for the filter, and then updating the filter to include $x$ only if the test query returned `false'. An analysis shows that this is now (once imperfect pseudorandom functions and salt collisions have been dealt with) the only way for the adversary to gain an advantage over making queries to an immutable Bloom filter. Because this adaptive strategy introduces tricky conditional possibilities, we cannot compute an exact value for the adversary's advantage. Instead, we move to an alternate scenario where each $\QRYO$ also produces a free update and every $\UPO$ first performs a free query. This makes $\QRYO$ and $\UPO$ calls indistinguishable, so that the adversary is effectively making a series of independent random queries that each have a chance to increment the error counter. Because the size of the filter can only increase, the probability of a false positive from any one of these queries is bounded above by the probability of a false positive on the final maximally-sized filter, a probability which is given by the Kirsch and Mitzenmacher bound.
@@ -246,7 +264,7 @@ Fix integers $k, m, n, \lambda, r\geq 0$, where $m \geq \lambda$, and let $F \co
     \Adv{\erreps}_{\struct_\saltybloom,r}(t,&q_R,& q_T, q_U, q_H) \leq \\ && q_R \cdot
      \left[
       \frac{q_R}{2^\lambda} +
-      {\dbinom{q_T+q_U}{r}} \left( (1-e^{-k(n+r)/m})^k + O(1/(n+r)) \right)^r
+      {\dbinom{q_T+q_U}{r}} p(k, m, n+r)^r
     \right] \,.
 \end{eqnarray*}
 \end{theorem}
@@ -513,6 +531,24 @@ Suppose the errors consist of $f_p$ false positives and $f_n$ false negatives. T
 % adversary may not need to guess salt at all: suppose they add x twice and remove y; if x is now a false positive, they know two of y's hashes collide
 % adversary cannot guess what might happen when querying/updating on a new element, but can learn about elements that have already been inserted/removed/queried
 % consider an element that has been queried but not inserted/deleted at any point; further insertions are no more likely to make this element a false positive than an element that has not been queried, while further deletions are not more likely to make this element a false positive at all; we may therefore assume that a query to an element which has not been previously manipulated is also to an element which has not been previously queried
+% querying an element that has been previously inserted/deleted gives the adversary information of the form "this element shares at least one bit with {}, does not share more than one bit with {}, etc."
+% the worst case is that the adversary gets to choose all of these factors, so that it can produce $k$ false negatives from every element, though this still requires an additional update and $k$ additional queries
+
+% additionally, adversary can say "a is a false positive for S but not for T, therefore S and T are unlikely to share bits" or "a is a false positive for S and for T, therefore S and T must share at least k bits"
+
+% advantage of an adversary in the single-private-rep salted mutable case is no greater than the advantage of an adversary in a multiple-(strictly-)private-rep unsalted immutable case
+% by "strictly private" we mean \REPO does not return the representation and the adversary does not get access to \REVO
+% what security properties does this have in general? ex. what is the security of an immutable unsalted Bloom filter with a strictly private representation?
+% Bloom filter: the usual attacks don't work, but...
+
+% want to get to a game where each query is actually independent of previous queries
+
+% we can handle insertions alone or deletions alone; the question is how they interact
+% insert an element, make queries, possibly delete element
+% OR delete an element (false negative), make queries, possibly insert element
+% false negatives / discovered false negatives...
+% assume that the adversary can use queries to locally reconstruct a copy of the filter as it currently exists, and the positioning of previously-queried elements; however, they cannot predict how future additions/queries will work
+% if removal of some elements will produce false negatives, or addition of other elements will produce
 
 % Conjecture: the adversary's chances of finding a false positive are no better than in the case of an ordinary Bloom 
 % this is certainly true in the deletion-only case
@@ -537,3 +573,24 @@ First, $\advA$ chooses an arbitrary set $\col$ of size $n$ and calls $\REPO$ to 
  return 0\\
  \hline
 \end{tabular}
+
+% Consider the count-min sketch data structure.
+
+% Note: if an adversary makes $n$ updates to an empty sketch to produce an off-by-1 error, it can make $nk$ updates to produce an off-by-$k$ error for any $k$
+
+% this works for structures which are salted OR keyed OR neither, but not both...
+% salt ==> no salt, but with a parameter hidden from the adversary
+% key ==> key (unchanged)
+% mutable ==> immutable (but with q_U calls replaced by q_R calls)
+% private representation ==> strictly private representation(?)
+
+% with salt and key, we can reduce to a situation where the adversary can choose whether hidden parameters are shared across certain representations... to some degree... can we just reduce this to a situation with only hidden parameters, with the argument that it's never worse for the adversary?
+
+% conjecture: a "secret parameter" is equivalent to a secret key
+% we can model a hash function with secret parameters as a random function iff the parameter is not guessed (so there is an extra $1/|P|$ term, with parameter space |P|, which should be 2^\lambda); on the other hand, there is no need for an Adv^prf term
+
+
+% Adv(mutable salted counting filter with private representation) <= q_R \times Adv(immutable secret-parameter counting filter with strictly private representation)
+
+% conjecture: a "secret salt" is equivalent to a (possibly public) salt plus a secret key
+% 
