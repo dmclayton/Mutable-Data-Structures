@@ -98,10 +98,10 @@ In general this may use as many as $2n(q_R+q_T+q_U)$ update queries, where $n$ i
 \end{proof}
 
 \begin{lemma}[]\label{lemma:immutabletomutable}
-  Let $\struct = (\Rep, \Qry, \Up)$ be an unkeyed data structure, and $\struct'$ be the same structure except that any random parameters are fixed across representations, any pseudorandom functions are replaced by true random functions, and no nontrivial updates exist. For every $t, q_r, q_T, q_U, q_H, r \geq 0$, it holds that
+  Let $\struct = (\Rep, \Qry, \Up)$ be a data structure, and $\struct'$ be the same structure except that any per-representation random parameters are chosen once and fixed across representations. For every $t, q_r, q_T, q_U, q_H, q_V, r \geq 0$, it holds that
   \[
-    \Adv{\errep}_{\struct,r}(t, q_R, q_T, q_U, q_H) \leq
-    \Adv{\prf}_F(\advB) + \Adv{\errep}_{\struct',r}(O(t), q_R + q_U, q_T, 0, q_H) \,,
+    \Adv{\errep}_{\struct,r}(t, q_R, q_T, q_U, q_H, q_V) \leq
+    \Adv{\prf}_F(\advB) + \Adv{\errep}_{\struct',r}(O(t), q_R + q_U, q_T, 0, q_H, 0) \,,
   \]
 \end{lemma}
 \begin{proof}
@@ -112,10 +112,32 @@ For a structure $\Pi$, we denote by $\Pi'$ the same structure with pseudo-random
 In the truly random structure $\struct_1$, the representation of a set is simply a randomly-chosen valid representation of that set. Revealing this therefore reveals no new information about any other representations which have been constructed, and so calling $\REVO$ can only decrease an adversary's chance of success. We may now assume $\REVO$ is never called.
 
 We next modify the structure to $\struct_2$, where all randomized parameters are fixed across representations at the beginning of the experiment, but not revealed to the adversary. We create an adversary $C$ for the correctness experiment on $\struct_2$ which simulates $\advA$ as follows. The adversary $C$ keeps track of a counter $ct$ and list $L$ of indices and simulates $\advA$. When $\advA$ calls $\REPO$, $C$ appends $ct$ to the end of $L$ and then increments $ct$. When $\advA$ calls $\UPO(i,\up)$, $C$ calls $\REPO(\up(\col_{I(i)}))$, sets $L(i) \gets ct$, and increments $ct$. Finally, when $\advA$ calls $\QRYO(i,\qry)$, $C$ calls $\QRYO(L(i),\qry)$. Since $\REVO$ is never called, $C$ need not implement this oracle. Since all queries are called on representations of the same sets, $C$ has the same probability of success as $A$.
+\end{proof}
+
+\subsection{Immutabilization}
+
+We say that a structure has `independent representations' if knowing the representation of one set does not provide any additional information about the representation of any other set. For example, the standard Bloom filter vacuously has independent representations, since the adversary can perfectly predict the representation of any set without needing to see the representation of other sets. A filter which uses true random sampling in place of hash functions also has independent representations, but a filter which uses a secret key need not have independent representations.
+
+In each of our example structures involving the use of a secret key, we formalize the system using a pseudorandom function. In each correctness proof, the first thing we do is always moving to a game where the pseudorandom functions are replaced by true random functions, since this gives very similar adversarial advantage (assuming the use of a good prf) while making the behavior of the game much easier to reason about.
+
+In the case of a structure with independent representations, we may assume without loss of generality that the adversary never calls the $\REVO$ oracle, since doing so can only decrease their probability of success.
+
+We define the following alternate game. In this game, all parameters necessary for the $\REPO$ oracle to construct the representation of the set are chosen at the beginning of the game, before the adversary makes any oracle queries.
+
+\begin{lemma}[]\label{lemma:immutabletomutablenew}
+  Let $\struct = (\Rep, \Qry, \Up)$ be a data structure, and $\struct'$ be the same structure except that any per-representation random parameters are chosen once and fixed across representations. For every $t, q_r, q_T, q_U, q_H, q_V, r \geq 0$, it holds that
+  \[
+    \Adv{\errep}_{\struct,r}(t, q_R, q_T, q_U, q_H, q_V) \leq
+    \Adv{\errep'}_{\struct,r}(O(t), q_R + q_U, q_T, 0, q_H, 0) \,,
+  \]
+\end{lemma}
+\begin{proof}
+
+We create an adversary $\advB$ for the modified correctness experiment which simulates $\advA$ as follows. The adversary $\advB$ keeps track of a counter $ct$ and list $L$ of indices and simulates $\advA$. When $\advA$ calls $\REPO$, $\advB$ appends $ct$ to the end of $L$ and then increments $ct$. When $\advA$ calls $\UPO(i,\up)$, $\advB$ calls $\REPO(\up(\col_{I(i)}))$, sets $L(i) \gets ct$, and increments $ct$. Finally, when $\advA$ calls $\QRYO(i,\qry)$, $\advB$ calls $\QRYO(L(i),\qry)$. Since $\REVO$ is never called, $\advB$ need not implement this oracle. Since all queries are called on representations of the same sets, $C$ has the same probability of success as $A$.
 
 \end{proof}
 
-Note that in a counting filter, $n$ is equal to the maximum supported multiset size, and in count-min sketch $n$ is equal to the sum of the absolute values of the elements' frequences. While this means a potentially large number of update queries are needed in the general case, for an unkeyed structure it turns out that far fewer updates are required. In the above proof, the only reason we needed to undo each sequence of $\UPO$ queries was because the following query might involve the representation of a different structure. But in the case of a salted but unkeyed structure, Lemma 1 shows that for any adversary there is an adversary making only a single $\REPO$ query with an advantage differing by a factor of at most $q_R$. For an adversary which only ever makes one $\REPO$ query, we never need to reset the representation to the empty representation, and in the above simulation we can omit all $\UPO$ queries except those needed for $A$'s single $\REPO$ query and any $\UPO$ queries made by $A$ itself.
+%Note that in a counting filter, $n$ is equal to the maximum supported multiset size, and in count-min sketch $n$ is equal to the sum of the absolute values of the elements' frequences. While this means a potentially large number of update queries are needed in the general case, for an unkeyed structure it turns out that far fewer updates are required. In the above proof, the only reason we needed to undo each sequence of $\UPO$ queries was because the following query might involve the representation of a different structure. But in the case of a salted but unkeyed structure, Lemma 1 shows that for any adversary there is an adversary making only a single $\REPO$ query with an advantage differing by a factor of at most $q_R$. For an adversary which only ever makes one $\REPO$ query, we never need to reset the representation to the empty representation, and in the above simulation we can omit all $\UPO$ queries except those needed for $A$'s single $\REPO$ query and any $\UPO$ queries made by $A$ itself.
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
