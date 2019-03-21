@@ -595,24 +595,3 @@ First, $\advA$ chooses an arbitrary set $\col$ of size $n$ and calls $\REPO$ to 
  return 0\\
  \hline
 \end{tabular}
-
-% Consider the count-min sketch data structure.
-
-% Note: if an adversary makes $n$ updates to an empty sketch to produce an off-by-1 error, it can make $nk$ updates to produce an off-by-$k$ error for any $k$
-
-% this works for structures which are salted OR keyed OR neither, but not both...
-% salt ==> no salt, but with a parameter hidden from the adversary
-% key ==> key (unchanged)
-% mutable ==> immutable (but with q_U calls replaced by q_R calls)
-% private representation ==> strictly private representation(?)
-
-% with salt and key, we can reduce to a situation where the adversary can choose whether hidden parameters are shared across certain representations... to some degree... can we just reduce this to a situation with only hidden parameters, with the argument that it's never worse for the adversary?
-
-% conjecture: a "secret parameter" is equivalent to a secret key
-% we can model a hash function with secret parameters as a random function iff the parameter is not guessed (so there is an extra $1/|P|$ term, with parameter space |P|, which should be 2^\lambda); on the other hand, there is no need for an Adv^prf term
-
-
-% Adv(mutable salted counting filter with private representation) <= q_R \times Adv(immutable secret-parameter counting filter with strictly private representation)
-
-% conjecture: a "secret salt" is equivalent to a (possibly public) salt plus a secret key
-% 
