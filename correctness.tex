@@ -579,6 +579,8 @@ Suppose the errors consist of $f_p$ false positives and $f_n$ false negatives. T
 % on the other hand, if the adversary is only trying to produce false negatives, adding more elements to the filter is unhelpful since it can only lower the chances of finding a false negative... unless you later turn that element into a false negative
 % however, this is unecessary unless q_T > n, so that you can mess with all the original elements and then begin adding in new elements to mess with
 
+% at worst, the adversary learns all previously-queried hash values exactly... which allows replication of a Bloom-filter-like attack
+
 \subsection{Attack on Counting Filters}
 
 First, $\advA$ chooses an arbitrary set $\col$ of size $n$ and calls $\REPO$ to get a representation of $\col$. The adversary then chooses $q_U$ distinct elements not in $\col$ and makes a series of $\UPO$ calls to remove each of these from the set. Finally, the adversary chooses up to $q_T$ elements from $\col$ and makes a series of $\QRYO$ calls to test for membership of these elements in the set.
@@ -595,3 +597,15 @@ First, $\advA$ chooses an arbitrary set $\col$ of size $n$ and calls $\REPO$ to 
  return 0\\
  \hline
 \end{tabular}
+
+\subsection{Cuckoo Filters}
+
+Consider the case of a salted cuckoo filter with private representations. By `salted', we mean that both the hashing and the fingerprinting makes use of a salt chosen on a per-represntation basis. Because the structure is unkeyed, we can reduce to the single-representation case, whose advantage is lower by a factor of at most $q_R$.
+
+As with the case of a Bloom filter, the goal is to move to a game where the salted hash function is replaced by a true random function. Doing so requires that the adversary never be able to guess the hash function. We split the hash oracle into two oracles, giving the adversary direct access to $\HASHO_1$ while the other oracles make use of $\HASHO_2$. For any $\advA$ for $\G_0$, there is $\advB$ for $\G_1$ which produces the same advantage by simulating $\advA$. [...]
+
+The game $\G_2$ is the same as $\G_1$ until the $\mathrm{bad}$ flag is set, which occurs exactly when $\advB$ sends $(\salt^*,x)$ to its $\HASHO_1$ oracle for some $x$. Since the $\HASHO$ oracles use random sampling, there is only a $q_H/2^\lambda$ chance of the adversary guessing the salt during the experiment. So $\Adv{\erreps_1}_{\struct_s,r}(\advA) \le \Prob{\G_2(\advB) = 1} + q_H/2^\lambda$. Having separated out the $q_H/2^\lambda$ term, we may now assume that the adversary never guesses the salt.
+
+Because membership tests rely on objects having the same fingerprint, and a single bucket may contain multiple copies of the same fingerprint, deleting $n$ false positives can only produce up to $n$ false negatives, one per fingerprint removed. Unless the filter becomes full, it is therefore never helpful for an adversary to delete a false positive, since it cannot increase the number of errors. We may then assume, subject to the condition that the adversary never has to worry about the filter becoming full, that the adversary only makes insertion updates. Furthermore, we may assume the adversary never inserts elements which are already in the set, or elements which have already been queried and found to be false positives, since these also cannot increase the number of errors.
+
+We want to show that alternating between sequences of queries and updates is no better than making updates first and queries afterwards. We have shown that the adversary only makes two types of updates: inserting unqueried elements which are not in the set and inserting known true negatives.
