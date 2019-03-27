@@ -147,7 +147,8 @@ We create an adversary $\advB$ for the modified correctness experiment which sim
 
 \input{bf-summary-tab}
 
-\dctodo{needs intro text}
+The standard Bloom filter shows a variety of different behaviors depending on its exact implementation. If the hash functions used are chosen beforehand and potentially known to the adversary, this public information allows offline attacks to be mounted against the data structure which can produce potentially damaging false positives. In the case of immutable Bloom filters, making use of a per-representation salt is sufficient to prevent these attacks, though depending on the use case the use of non-fixed per-representation randomness may or may not be feasible. Furthermore, in the case of mutable Bloom filters there are additional difficulties with offline attacks due to adversarially-chosen updates. To guarantee correctness in this case we must additionally guarantee that representations can be kept private from the adversary.
+
 Our first secure data structure is the salted Bloom filter, which at the time a representation is created chooses a salt $\salt$ which it will use for all further queries and updates. In order for security to be guaranteed, we must ensure that the representation, and in particular the salt, is kept secret from the adversary.
 
 \begin{theorem}[Correctness Bound for Private-Representation Salted Bloom Filters]\label{thm:bf-priv-salt-bound}
@@ -580,6 +581,23 @@ Suppose the errors consist of $f_p$ false positives and $f_n$ false negatives. T
 % however, this is unecessary unless q_T > n, so that you can mess with all the original elements and then begin adding in new elements to mess with
 
 % at worst, the adversary learns all previously-queried hash values exactly... which allows replication of a Bloom-filter-like attack
+
+% an adversary may want to find representations with large overlap, to search for false positives, or may want to find representations with small overlap, to find new elements to add to the set
+% no other additions are necessary, so we only care about these extremes
+
+%if you know the overlap of all representations created so far, is that equivalent to knowing the representations (up to permutation)?
+% A \cap B has overlap 2
+% A \cap C has overlap 2
+% B \cap C has overlap 2
+% A \cap B \cap C has overlap 1
+% no, but only because you don't know exactly which elements are causing the overlap
+% suppose the adversary begins by constructing only singleton sets
+% this allows them to automatically detect false positives, and even determine exactly which elements will become false negatives if the false positive is `removed'
+% this is not much different from the case of a standard Bloom filter, except that up to $k$ errors are produced with each false positive found... and once again there are issues when you run into the maximum allowed size of the filter; the adversary can choose a set with little overlap to produce a large number of 1s...
+% can we prove that the adversary's best option is to only construct singleton sets?
+% well, the adversary really only gets a single representation with updates
+% successive updates differ only by 1
+% this is equivalent to making singletons and calculating the differences between successive updates
 
 \subsection{Attack on Counting Filters}
 
