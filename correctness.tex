@@ -599,6 +599,14 @@ Suppose the errors consist of $f_p$ false positives and $f_n$ false negatives. T
 % successive updates differ only by 1
 % this is equivalent to making singletons and calculating the differences between successive updates
 
+We modify the $\UPO$ oracle so that it returns complete information about the overlap between all elements which have been previously handled by any oracle: any element of the original $\col$, any element inserted or removed at a later point, and any element which has been queried. Any information that could be gained through the $\QRYO$ oracle is now given automatically each time the representation is modified.
+
+Because new $\QRYO$ and $\UPO$ calls are based on random sampling, this does not provide the adversary with any additional information about how additional elements which might be queried, inserted, or deleted in the future might behave. However, any element which is sent to $\QRYO$ or $\UPO$ which acts as a false positive will be immediately recognized as such.
+
+We then modify the game so that producing a false positive gives the adversary credit to $\err$ equal to $\max(k \cdot d(0,1), d(1,0))$. Because false negatives can only be produced by deleting false positives, and the deletion of $n$ false positives can only produce as many as $nk$ false negatives, this means that the adversary has no need to cause false negatives. Doing so can only decrease the chances of producing additional errors by reducing the values of counters in the filter. The only additional concern is that the maximum capacity of the filter might be reached. [...]
+
+Until the maximum capacity of the filter is reached, knowledge of the overlap between representation elements provides no additional useful information. However, after that point the adversary can optimize the filter by choosing a representation for a maximum-size set which has as little overlap between elements as possible. This will minimize the number of counters which are set to 0 and increase the expected number of false positives beyond the average for a maximum-capacity filter.
+
 \subsection{Attack on Counting Filters}
 
 First, $\advA$ chooses an arbitrary set $\col$ of size $n$ and calls $\REPO$ to get a representation of $\col$. The adversary then chooses $q_U$ distinct elements not in $\col$ and makes a series of $\UPO$ calls to remove each of these from the set. Finally, the adversary chooses up to $q_T$ elements from $\col$ and makes a series of $\QRYO$ calls to test for membership of these elements in the set.
