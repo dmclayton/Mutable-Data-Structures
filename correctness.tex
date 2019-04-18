@@ -137,12 +137,7 @@ Note that most of the data structures we consider have some degree of per-repres
 
 We create an adversary $\advB$ for the modified correctness experiment which simulates $\advA$ as follows. The adversary $\advB$ keeps track of a counter $ct$ and list $L$ of indices and simulates $\advA$. When $\advA$ calls $\REPO$, $\advB$ appends $ct$ to the end of $L$ and then increments $ct$. When $\advA$ calls $\UPO(i,\up)$, $\advB$ calls $\REPO(\up(\col_{I(i)}))$, sets $L(i) \gets ct$, and increments $ct$. Finally, when $\advA$ calls $\QRYO(i,\qry)$, $\advB$ calls $\QRYO(L(i),\qry)$. Since $\REVO$ is never called, $\advB$ need not implement this oracle. Since all queries are called on representations of the same sets, $C$ has the same probability of success as $A$.
 
-\end{proof}
-
-%Note that in a counting filter, $n$ is equal to the maximum supported multiset size, and in count-min sketch $n$ is equal to the sum of the absolute values of the elements' frequences. While this means a potentially large number of update queries are needed in the general case, for an unkeyed structure it turns out that far fewer updates are required. In the above proof, the only reason we needed to undo each sequence of $\UPO$ queries was because the following query might involve the representation of a different structure. But in the case of a salted but unkeyed structure, Lemma 1 shows that for any adversary there is an adversary making only a single $\REPO$ query with an advantage differing by a factor of at most $q_R$. For an adversary which only ever makes one $\REPO$ query, we never need to reset the representation to the empty representation, and in the above simulation we can omit all $\UPO$ queries except those needed for $A$'s single $\REPO$ query and any $\UPO$ queries made by $A$ itself.
-
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\end{proof
 
 \subsection{Bloom filter results}
 \label{subsec:bloom-filters}
@@ -278,6 +273,12 @@ $$\Adv{\erreps_1}_{\struct_s,r}(\advA) \le q_R \cdot \left(\frac{q_H}{2^\lambda}
 \missingqed
 \end{proof}
 
+Without `thresholding', where the addition to a filter fails if a certain proportion of bits are set to 1, the bound improves somewhat.
+
+Once we have reduced to the case of $\HASHO_1$ functioning as a random oracle and $\QRYO$ calls only being made to distinct elements not in $\col$, the adversary has only three ways of interacting with the filter: querying an element not in $\col$ which has not yet been queried, inserting a new element into $\col$ which has not yet been queried, and inserting a new element into $\col$ which has been queried and was found to not be a false positive. In the non-threshold case, the last of these is exploitable, since an element which is confirmed not to be a false positive will necessarily flip at least one bit when inserted into the representation. However, when a maximum proportion $p$ of the bits are allowed to be set to 1, adding known non-false-positives rather than unqueried elements only causes the threshold to be reached faster, without providing any additional benefit to the adversary. In any case the adversary can do no better than setting exactly $pm$ bits to 1, in which case the false positive rate will be exactly $p^k$ and the adversarial advantage will be
+
+$$\Adv{\erreps_1}_{\struct_s,r}(\advA) \le q_R \cdot \left(\frac{q_H}{2^\lambda} + \binom{q_T}{r}p^{kr}\right).$$
+
 The case of a Bloom filter whose representations are always public but which uses a private key in addition to a salt is almost identical. In practice the bound is actually somewhat stronger: the instance of $q_H$ in the bound is replaced with $q_R$, which means that the adversary which attempts to guess the salt must rely entirely on `online' queries as opposed to `offline' queries to $q_H$.
 
 These two theorems together show that in order to guarantee correctness in the streaming setting, one must either ensure that representations are kept private from potential adversaries or use a secret key in addition to a salt when implementing a Bloom filter. In either case, some hidden information is necessary to protect the filter from an adversary.
@@ -291,7 +292,7 @@ Fix integers $k, m, n, \lambda, r\geq 0$, where $m \geq \lambda$, and let $F \co
       \frac{q_R}{2^\lambda} +
       {\dbinom{q_T+q_U}{r}} p(k, m, n+r)^r
     \right] \,.
-\end{eqnarray*}
+  \end{eqnarray*}
 \end{theorem}
 
 Despite the similarity of the bounds, the proof is somewhat different than in the private-representation salted-but-unkeyed case. The first thing we want to do is move from a pseudorandom function to a truly random function, about which we can produce bounds much more easily. This is problematic only if the adversary can easily distinguish between the pseudorandom function and a true random function, which for a good choice of pseudorandom function will not occur. Next, we note that for a true random function, the queries and updates in different representations will be independent unless the randomly-chosen salt $\salt$ is the same across two or more representations. The birthday bound gives us the chances of this occurring, but for sufficiently large salt size $\lambda$ the chance of this will also be small. Once we have reduced to a case where the filter operates on true random functions and salts never repeat, we are again left with a series of almost-independent queries where the adversary may be able to gain an advantage by following up a $\QRYO$ call with an $\UPO$ call. We take the same approach as in the previous case, turning $\QRYO$ and $\UPO$ into identical independent queries and then applying the Kirsch and Mitzenmacher upper bound for the largest set represented during the game.
@@ -546,7 +547,7 @@ First, $\advA$ chooses an arbitrary set $\col$ of size $n$ and calls $\REPO$ to 
 
 \subsection{Cuckoo Filters}
 
-Cuckoo filters provide a way of filtering elements with lower space overhead than counting filters while still allowing for deletion. We consider the case of a salted cuckoo filter with private representations. By `salted', we mean that both the hashing and the fingerprinting makes use of a salt chosen on a per-represntation basis. Using this definition, we can make use of the lemmas that allow us to talk about the structure in the single-represntation case with true random functions.
+Cuckoo filters provide a way of filtering elements with lower space overhead than counting filters while still allowing for deletion. We consider the case of a salted cuckoo filter with private representations. By `salted', we mean that both the hashing and the fingerprinting makes use of a salt chosen on a per-represntation basis. Using this definition, we can make use of the lemmas that allow us to talk about the structure in the single-represntation case with true random functions. A bound for the false positive rate in cuckoo filters is given by $\binom{n}{2k+1}\left(\frac{2}{2^f \cdot cn}\right)^{2k}$ for a set of $n$ elements in a filter with $b$ entries per bucket and fingerprint size $f$.
 
 \begin{theorem}[Correctness Bound for Cuckoo Filters]\label{thm:cuckoo-salt-bound}
 Fix integers $b, k, \lambda, r\geq 0$, where $m \geq \lambda$, and let $F \colon \bits^\lambda \times \bits^* \to [m]$ be a function.
@@ -639,3 +640,34 @@ We move to a second game where each $\QRYO$ call also inserts that element. Addi
 $$\Adv{\erreps}_{\struct_s,r}(\advA) \le q_R \cdot \left(\frac{q_H}{2^\lambda} + \binom{q_U+q_T}{r}P(b,k+r)^r\right).$$\missingqed
 
 \end{proof}
+
+\subsection{Concrete Bounds}
+
+As a typical example, we look at a Bloom filter with $k = 4$ hash functions, $m = 1024$ bits in the filter, a maximum of $n = 100$ elements in the sets represented, and a key space parameter of $\lambda = 64$.
+
+The difference between the standard error rate and the advantage achievable by an adaptive adversary is primarily given by the factor of $q_R$ which occurs in each of the bounds. Unless a small salt space is chosen, the portion of the adversarial advantage that comes from guessing the salt is minimal.
+
+% adaptive probability of r errors: q_R * (q_T + q_U choose r)(0.01)^r(0.99)^(r-q_T-q_U)
+% non-adaptive probability of r errors: binomial distribution with n = q_T and p = 0.01, i.e. (q_T choose r)(0.01)^r(0.99)^(r-q_T)
+
+\subsection{Count-Min Sketch}
+
+%The fact that queries can test not just for set membership, but for frequency, means that new attacks are possible. For example, an adversary can pick a set $\col$ and an element $x \not\in \col$ and use $\REPO$ to create several different sketches representing $\col$. If the $\QRYO$ oracle reveals that $x$ is a false positive (i.e. appears in the filter with nonzero frequency) for any of these, the adversary can use $\UPO$ to insert all the elements of $\col$ an additional $r$ times. Then a single further $\QRYO(x)$ call will produce an error of magnitude $r$, causing the adversary to succeed at the experiment.
+
+%The success rate of this attack depends on $|\col|$. The probability of $x$ being a false positive is given by the standard Bloom filter bound, $(1-e^{-k|\col|/m})^k$ for a $k$-by-$m$ count-min sketch. Since the adversary needs $(r-1)|\col|$ calls to $\UPO$ to produce an error of size $r$
+
+The fact that queries can test not just for set membership, but for frequency, means that new attacks are possible. For example, the adversary can pick a set $\col$ and an element $x \not\in \col$. They then use $\REPO$ to create several different sketches representing a multiset containing each element of $\col$ exactly $c$ times, where $c$ is the smallest natural number such that $d(c,0) \ge r$, and uses $\QRYO$ to test $x$'s membership in each of these. A single such mistake is by definition sufficient for the adversary to win the experiment, so the probability of adversarial victory is the same as the probability of an adversary finding a single element that creates a hash collision in each of the $k$ rows of the sketch. Winning at the $r$-error game with a set of size $n$ can therefore be reduced to the problem of winning at the $r'$-error game with a set of size $\lfloor\frac{n}{c}\rfloor$, for any $r' > 0$.
+
+%%
+
+Depending on the choice of $d$, it is possible no such $c$ exists. One natural choice of $d$ is the Euclidean metric, with $d(x,y) = |x-y|$, but an alternative is to simply define $d(x,y)$ to be 1 if $|x-y| \ge n\epsilon$ and 0 otherwise, where $n$ is the maximum allowed stream size and $\epsilon$ is one of the error parameters. The non-adaptive guarantee for count-min sketch is that each point query has probability no more than $1-\delta$ of producing an error.
+
+What if the threshold for an error is 1? In other words, the adversary gets a point for every `false positive'. Assuming the hash functions are independent, the false positive probability in a count-min sketch is the same as the probability of getting simultaneous false positives in each of $k$ Bloom filters using a single hash function each, which is $\left(1-e^{-n/m}\right)^k$.
+
+%%
+
+%Getting rid of the $q_R$ bound in the salted private-representation case...
+
+%We need a salt, since otherwise the adversary can ask for two representations and reveal one to see what the other looks like.
+
+%In fact, we need independent random representations. Once we have this, seeing representations does not help the adversary. What benefit can there be, then? Suppose an adversary wants to select for representations with certain properties, and ignore others. Since the representation is private, these properties can only be determined by $\QRYO$ calls.
