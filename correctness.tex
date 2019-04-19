@@ -17,15 +17,14 @@ When a query $\UPO(i,\up)$ is made, the oracle first updates the data object~$\c
 %
 Now, for each defined value~$\err_i[\qry]$, we reevaluate the error that \emph{would} be caused by the previously asked~$\qry$ w.r.t. the newly updated $\col_i$ and $\pub_i$.  If the existing value of $\err_i[\qry]$ is larger than the error that~$\qry$ would cause to w.r.t. the newly updated~$\col_i$ and $\pub_i$, then we overwrite $\err_i[\qry]$ with the smaller value.  Doing so insures that the array~$\err_i$ does not overcredit the attacker for errors against the current data object and representation.
 
-\tsnote{The next paragraph is a placeholder; it's too informal as written, but gets the point across for future edits.}
-Let us give an example to help make concrete these definitional choices.  Say that the adversary queries a set~$\col = \{1,2,3\}$ to the $\REPO$-oracle, and learns that~$4$ is a false-positive value for the representation~$\pub$ of~$\col$.  If it adds~$4$ to~$\col$ via an update query, then it is no longer a false-positive.  Our definition insures that this is properly accounted.
+For a concrete example of why these choices are necessary, consider a representation~$\pub$ of the set~$\col = \{1,2,3\}$ in some structure that supports set membership queries. Suppose an adversary learns that~$4$ is a false-positive value for $\pub$. If the adversary later uses an $\UPO$ query to add~$4$ to~$\col$, this should no longer count as a false positive. Our definition ensures that these known false positives are checked for and no longer counted if added to the set.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{Generic results}
 First, we note that any structure which is insecure in the immutable case is also insecure in the mutable case. Any adversary in the immutable case is identical to a corresponding adversary in the mutable case which simply never makes use of the $\UPO$ oracle. From this we know that standard (unsalted, unkeyed) Bloom filters cannot ensure correctness in the mutable case. 
 
 
-\heading{Keyless structures.}\tsnote{I've tried to organize these results into little sectionettes.  I don't know, yet, what is the right way to organize these generic results, but this is a start.  As you develop results, please try to keep them organized, whatever the organizational schema.}
+\heading{Keyless structures.}
 
 In a keyless structure, we assume all details of the algorithm used are known beforehand by the adversary, except any which might be generated `on the fly' as representations are created and modified. For example, many of these structures will assume the use of a random salt which is picked at the time the representation is created. A structure with neither randomization nor a private key is usually vulnerable to pre-computation and offline attacks, where the adversary can search for errors to produce without having to interact with the structure itself.
 
@@ -137,7 +136,7 @@ Note that most of the data structures we consider have some degree of per-repres
 
 We create an adversary $\advB$ for the modified correctness experiment which simulates $\advA$ as follows. The adversary $\advB$ keeps track of a counter $ct$ and list $L$ of indices and simulates $\advA$. When $\advA$ calls $\REPO$, $\advB$ appends $ct$ to the end of $L$ and then increments $ct$. When $\advA$ calls $\UPO(i,\up)$, $\advB$ calls $\REPO(\up(\col_{I(i)}))$, sets $L(i) \gets ct$, and increments $ct$. Finally, when $\advA$ calls $\QRYO(i,\qry)$, $\advB$ calls $\QRYO(L(i),\qry)$. Since $\REVO$ is never called, $\advB$ need not implement this oracle. Since all queries are called on representations of the same sets, $C$ has the same probability of success as $A$.
 
-\end{proof
+\end{proof}
 
 \subsection{Bloom filter results}
 \label{subsec:bloom-filters}
