@@ -671,7 +671,12 @@ The difference between the standard error rate and the advantage achievable by a
 
 The fact that queries can test not just for set membership, but for frequency, means that new attacks are possible. For example, the adversary can pick a set $\col$ and an element $x \not\in \col$. They then use $\REPO$ to create several different sketches representing a multiset containing each element of $\col$ exactly $c$ times, where $c$ is the smallest natural number such that $d(c,0) \ge r$, and uses $\QRYO$ to test $x$'s membership in each of these. A single such mistake is by definition sufficient for the adversary to win the experiment, so the probability of adversarial victory is the same as the probability of an adversary finding a single element that creates a hash collision in each of the $k$ rows of the sketch. Winning at the $r$-error game with a set of size $n$ can therefore be reduced to the problem of winning at the $r'$-error game with a set of size $\lfloor\frac{n}{c}\rfloor$, for any $r' > 0$.
 
-%%
+% The initial representation, together with n calls to q_U, lets you view n objects; each additional 2n calls to q_U let you view an additional n objects; let the adversary win if they find a single error
+% $1-\left(1-\left(1-e^{-n/m}\right)^k\right)^{q_U/(2n)}$
+
+As in the case of counting filters, we are forced to make use of a thresholding assumption, namely that the sum of the absolute values of the counters in the sketch must remain below some upper bound $N$.
+
+%
 
 Depending on the choice of $d$, it is possible no such $c$ exists. One natural choice of $d$ is the Euclidean metric, with $d(x,y) = |x-y|$, but an alternative is to simply define $d(x,y)$ to be 1 if $|x-y| \ge n\epsilon$ and 0 otherwise, where $n$ is the maximum allowed stream size and $\epsilon$ is one of the error parameters. The non-adaptive guarantee for count-min sketch is that each point query has probability no more than $1-\delta$ of producing an error.
 

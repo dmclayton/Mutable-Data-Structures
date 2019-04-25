@@ -10,8 +10,10 @@
       return $[\sum_\qry \err_i[\qry] \geq r]$ 
     \\[6pt]
     \oraclev{$\REPO(\col)$}\\[2pt]
+      $\pub \getsr \Rep_\key(\col)$\\
+      if $\pub = \bot$ return $\bot$\\
       $\ct\gets\ct+1$ \\
-      $\pub_\ct \getsr \Rep_\key(\col)$\\
+      $\pub_\ct \gets \pub$\\
       $\setC_\ct \gets \emptyset$\\
       $\col_\ct \gets \col$\\
       $\mathrm{rv} \gets \pub_\ct$ \highlight{;\mathrm{rv} \gets \top} \\
@@ -27,9 +29,11 @@
     \oraclev{$\UPO(i, \up)$}\\[2pt]
 %      $X \gets \col^{v[i]}_i
 %      $v[i] \gets v[i]+1$\\
+      $\pub \getsr \Up_\key(\pub_i, \up)$\\
+      if $\pub = \bot$ return $\bot$\\
       $X \gets \col_i$ \\
       $\col_i \gets \up(X)$\\
-      $\pub_i \getsr \Up_\key(\pub_i, \up)$\\
+      $\pub_i \getsr \pub$\\
       $\setC_i \gets \emptyset$\\
       for $\qry$ in $\err_i$ do\\
       \tab $a \gets \Qry_K(\pub_i, \qry)$\\
@@ -51,4 +55,3 @@
   \vspace{6pt}\hrule
   \label{fig:security}
 \end{figure}
- 
