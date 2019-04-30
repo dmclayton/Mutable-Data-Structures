@@ -1,6 +1,8 @@
 \input{correctness-experiment}
-%
+
 We define two adversarial notions of correctness given by a pair of related experiments for a mutable data structure $\struct$ and error capacity $r$, one in which the representations of the true data are public ($\errep$), and one in which they are private ($\erreps$).  We will describe the former, as the latter is a closely related derivative.  Throughout, we assume that the adversary~$\advA$ does not make any pointless queries. 
+
+While many potential errors may exist for a given representation of a set, in the form of queries $\qry$ that would return an inaccurate answer when sent to $\QRYO$, we want an experiment that forces the adversary to actually find specific erroneous queries. In particular, we only give the adersary credit when they actually make a $\QRYO$ call that produces an error.
 
 Both experiments aim to capture the total weight of the errors caused by the adversary, at any point in time, with respect to the current data objects $\col_i$ and their representations $\pub_i$.  Because we consider mutable data objects and representations, the notion of ``current'' is defined by calls to the $\REPO$ and $\UPO$ oracles.  Specifically, for each~$\col_i$, both experiments maintain a set~$\setC_i$ that is initially set to empty (when~$\col_i$ is first assigned via a~$\REPO$-query), and it is reset to empty whenever~$\col_i$ is updated via an $\UPO$-query.  This is capturing the fact that applying a non-empty update function~$\up$ to~$\col_i$ produces a new data object.
 
@@ -19,6 +21,8 @@ Now, for each defined value~$\err_i[\qry]$, we reevaluate the error that \emph{w
 
 For a concrete example of why these choices are necessary, consider a representation~$\pub$ of the set~$\col = \{1,2,3\}$ in some structure that supports set membership queries. Suppose an adversary learns that~$4$ is a false-positive value for $\pub$. If the adversary later uses an $\UPO$ query to add~$4$ to~$\col$, this should no longer count as a false positive. Our definition ensures that these known false positives are checked for and no longer counted if added to the set.
 
+Given the experiments defined here, we define the advantage of an adversary $\advA$ as the probability it succeeds at the experiment, i.e. $\Adv{\errep}_{\struct,r}(\advA) = \Prob{\Exp{\errep}_{\struct,r}(\advA) = 1}$ in the public-representation case and $\Adv{\erreps}_{\struct,r}(\advA) = \Prob{\Exp{\erreps}_{\struct,r}(\advA) = 1}$ in the private-representation case. For constants $t$, $q_R$, $q_T$, $q_U$, $q_H$, we define $\Adv{\errep}_{\struct,r}(t,q_R,q_T,q_U,q_H)$ to be the maximum advantage attained by an adversary running in $t$ time steps and making $q_R$ calls to $\REPO$, $q_T$ calls to $\QRYO$, $q_U$ calls to $\UPO$, and $q_H$ calls to a random oracle. The advantage is defined analagously in the private-representation setting.
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{Generic results}
 First, we note that any structure which is insecure in the immutable case is also insecure in the mutable case. Any adversary in the immutable case is identical to a corresponding adversary in the mutable case which simply never makes use of the $\UPO$ oracle. From this we know that standard (unsalted, unkeyed) Bloom filters cannot ensure correctness in the mutable case. 
@@ -28,11 +32,13 @@ First, we note that any structure which is insecure in the immutable case is als
 
 In a keyless structure, we assume all details of the algorithm used are known beforehand by the adversary, except any which might be generated `on the fly' as representations are created and modified. For example, many of these structures will assume the use of a random salt which is picked at the time the representation is created. A structure with neither randomization nor a private key is usually vulnerable to pre-computation and offline attacks, where the adversary can search for errors to produce without having to interact with the structure itself.
 
-In many cases, it is easier to reason about an adversary which only has the chance to create and manipulate a single representation, rather than being able to call a $\REPO$ oracle as many times as it likes. Fortunately, in the case of keyless structures we can show that the adversary's advantage in a single-representation case is bounded above by a multiple of the advantage in the general case. There are two equivalent ways of defining the $\errep1$ experiment. First, we may define it as a modified version of $\errep$ in which the adversary is constrained to make no more than one call to $\REPO$. We may equivalently define it as a two-stage adversary in the experiment below.
+In many cases, it is easier to reason about an adversary which only has the chance to create and manipulate a single representation, rather than being able to call a $\REPO$ oracle as many times as it likes. Fortunately, in the case of keyless structures we can show that the adversary's advantage in a single-representation case is bounded above by a multiple of the advantage in the general case. We use $\errep1$ and $\erreps1$ to denote the public-representation and private-representation experiments where the adversary makes a single $\REPO$ query. In writing the advantage for these games we omit the $q_R$ parameter since it is fixed at 1.
 
-\input{correctness-experiment-1}
+%There are two equivalent ways of defining the $\errep1$ experiment. First, we may define it as a modified version of $\errep$ in which the adversary is constrained to make no more than one call to $\REPO$. We may equivalently define it as a two-stage adversary in the experiment below.
 
-Note that in the $\erreps1$ scenario we need not provide the adversary with a $\REVO$ oracle. If the adversary uses only a single representation, may assume without loss of generality that they make no call to $\REVO$, since doing so would prevent the adversary from having any possibility of winning. Since the case of a single $\REPO$ query is considerably simpler to handle, the first step in each of our proofs will be to reduce $\errep$ and $\erreps$ to $\errep1$ and $\erreps1$ respectively. In addition to this, we wish to move from actual hash functions to true random functions. To make these two general steps, we make use of the reduction arguments presented in the following lemmas.
+%\input{correctness-experiment-1}
+
+Note that in the $\erreps1$ scenario we need not provide the adversary with a $\REVO$ oracle. If the adversary uses only a single representation, may assume without loss of generality that they make no call to $\REVO$, since doing so would prevent the adversary from having any possibility of winning. Since the case of a single $\REPO$ query is considerably simpler to handle, the first step in each of our proofs will be to reduce $\errep$ and $\erreps$ to $\errep1$ and $\erreps1$ respectively. In addition to this, we wish to move from actual hash functions to true random functions. Using the following lemmas, we may reduce the case of $\errep$ for any structure using a salted hash to the case of $\errep1$ using a true random function, and we may reduce $\erreps$ for a structure using a secret-keyed hash to the case of $\erreps1$ using a true random function.
 
 \begin{lemma}[\errep1 and \erreps1 imply \errep and \erreps for keyless structures]\label{lemma:errep}
   Let $\struct = (\Rep, \Qry, \Up)$ be a data structure with key
@@ -44,7 +50,7 @@ Note that in the $\erreps1$ scenario we need not provide the adversary with a $\
   where $f(t) = t + (q_R-1)\ticks(\Rep,t) + q_T\ticks(\Qry,t) + q_U\ticks(\Up,t)$.
 \end{lemma}
 
-\begin{proof}For a fixed $r \ge 0$, let $A$ be an $\errep$ adversary which runs in $t$ time steps and makes $q_R$ $\REPO$ queries, $q_T$ $\QRYO$ queries, $q_U$ $\UPO$ queries, and $q_H$ RO queries. We construct an adversary $B$ for $\errep1$ as follows.
+\begin{proof}For a fixed $r \ge 0$, let $\advA$ be an $\errep$ or $\erreps$ adversary which runs in $t$ time steps and makes $q_R$ $\REPO$ queries, $q_T$ $\QRYO$ queries, $q_U$ $\UPO$ queries, and $q_H$ RO queries. We construct an adversary $B$ for $\errep1$ or $\erreps1$, respectively, as follows.
 
 First, $\advB$ initializes a counter $ct \gets 0$ and a set $\setC \gets \emptyset$, and samples $q \getsr [q_R]$. Next $\advB$ executes $\advA$, simulating the answers to its oracle queries as follows. When $\advA$ asks the query $\REPO(\col)$, $\advB$ sets $ct \gets ct + 1$ and stores $\col_{ct} \gets \col$. Then, if $ct = q$, $B$ forwards $\col$ to its own $\REPO$ oracle, returning the resulting value ($\pub$ in the public-representation case, or $\top$ in the private-representation case) to $\advA$. Otherwise, $\advB$ computes $\pub_{ct} \getsr \Rep(\col)$ and returns either $\pub_{ct}$ or $\top$. When $\advA$ asks for the query $\QRYO(i,\qry)$, $\advB$ first checks if $(i,\qry) \in \setC$ and returns $\bot$ if this condition holds. Otherwise $\advB$ forwards $(i,\qry)$ to its $\QRYO$ oracle and returns $a$ if $i = q$, and reutrns $\Qry(\pub_i,\qry)$ otherwise. Similarly, when $\advA$ makes an $\UPO(i,\up)$ query, $\advB$ forwards $(i,\up)$ to its $\UPO$ oracle if $i = q$ and evaluates $\Up(\pub_i,\up)$ otherwise. Finally, queries from $\advA$ to its RO are simply forwarded to $\advB$'s RO. When $\advA$ halts and outputs $j$, $\advB$ does the same.
 
@@ -55,10 +61,10 @@ $$\Adv{\errep}_{\struct,r}(t, q_R, q_T, q_U, q_H) \leq q_R\cdot\Adv{\errep1}_{\s
 Note that $B$ makes at most $q_T$ queries to $\QRYO$ and $q_H$ queries to its RO. Since $A$ runs in $t$ time steps and writing a bit takes 1 time step, the input length to any $\Rep$, $\Qry$, or $\Up$ evaluated by $B$ is at most $t$ bits. Hence, adversary $B$ runs in time $O(t+(q_R-1)\ticks(\Rep,t)+q_T\ticks(\Qry,t)+q_U\ticks(\Up,t))$.\missingqed
 \end{proof}
 
-\begin{lemma}[Salted hashing is almost as good as random functions in \errep1]\label{lemma:salttorand}
-  Let $\struct = (\Rep, \Qry, \Up)$ be a data structure with key space $\{\emptystr\}$ and salt space $\bits^\lambda$, and let $\struct'$ be the same structure using true random functions in place of satlted hash functions. For every $t, q_R, q_T, q_U, q_H, r \geq 0$, it holds that
+\begin{lemma}[In the ROM, salted hashing is almost as good as distinct random functions in \errep1]\label{lemma:salttorand}
+  Let $\struct = (\Rep, \Qry, \Up)$ be a data structure with key space $\{\emptystr\}$ and salt space $\bits^\lambda$, and let $\struct'$ be the same structure using true random functions in place of salted hash functions. For every $t, q_R, q_T, q_U, q_H, r \geq 0$, it holds that
   \[
-    \Adv{\errep1}_{\struct,r}(t, q_R, q_T, q_U, q_H) \leq
+    \Adv{\errep1}_{\struct,r}(t, q_R, q_T, q_U, q_H) \leq \frac{q_H}{2^\lambda} + \Adv{\errep1}_{\struct',r}(t, q_R, q_T, q_U, q_H)
   \]
 \end{lemma}
 
@@ -66,7 +72,15 @@ Note that $B$ makes at most $q_T$ queries to $\QRYO$ and $q_H$ queries to its RO
 Let $\G_0$ be the standard $\errep1$ game for the structure $\struct$, and let $\G_1$ be the same game for $\struct'$. There exists an adversary $\advB$ such that $\Prob{\G_0(\advA) = 1} \le \Prob{\G_1(\advB) = 1} + q_H/2^\lambda$. This adversary initializes an empty table $R$ and simulates $\advA$. When a query $w$ is sent to $\HASHO$, $\advB$ returns $R[w]$ if this entry in the table is defined. Otherwise, if $w = \langle\salt, x\rangle$ for some $\salt \in \bits^\lambda$ and $x \in \bits^*$, forward $(\salt, x)$ to $\HASHO$, store the result in $R[w]$, and return this value. Finally, if $R[w]$ is not defined and $w$ is not of this form, sample $r$ uniformly from the range of the hash function, store the result in $R[w]$ and return that result. Queries to all other oracles are simply forwarded to $\advB$'s oracle. Assuming the output of the hash function is uniformly distributed, this simulation is perfect unless $\advA$ guesses the salt correctly, which happens with probability $q_H/2^\lambda$.\missingqed
 \end{proof}
 
+\heading{Keyed structures.}
+
+As in the keyless case, we can reduce the case of $\erreps$ for a secretly-keyed hash to the case of $\erreps1$ using a true random function. Though the proof is different, we achieve a similar bound as in the unkeyed private-representation case. Despite the similar-looking bounds, the secret-keyed case is preferable in practice because the $q_R$ $\REPO$ queries are `online' while the $q_H$ $\HASHO$ queries are `offline', limited only by the computational capabilities of the adversary.
+
 \begin{lemma}[\errep1 with random functions implies \errep with keyed hashing]\label{lemma:keytorand}
+  Let $\struct = (\Rep, \Qry, \Up)$ be a data structure with key space $\mathcal{K}$ and salt space $\bits^\lambda$, and let $\struct'$ be the same structure using true random functions in place of salted and keyed hash functions. For every $t, q_R, q_T, q_U, q_H, r \geq 0$, it holds that
+  \[
+    \Adv{\errep1}_{\struct,r}(t, q_R, q_T, q_U, q_H) \leq \frac{q_R^2}{2^\lambda} + q_R \cdot \Adv{\errep1}_{\struct',r}(t, q_R, q_T, q_U, q_H)
+  \]
 \end{lemma}
 
 \begin{proof}
@@ -81,9 +95,10 @@ However, because each representation makes use of a random function for determin
 $$\Adv{\errep}_{\struct,r}(\advA) \le \Adv{\prf}_F(\advB) + \frac{q_R^2}{2^\lambda} + q_R \cdot \Prob{\G_4(A) = 1}$$\missingqed
 \end{proof}
 
-With these lemmas, we may reduce the case of $\erreps$ for any structure using a salted hash to the case of $\erreps1$ using a true random function, and we may reduce $\erreps$ for a structure using a secret-keyed hash to the case of $\erreps1$ using a true random function. Though the proofs are different, we achieve a similar bound in each case. However, the secret-keyed case is preferable in practice because $q_R$ queries are `online' while $q_H$ queries may be computed offline by the adversary.
-
 \heading{Invertible structures.}
+
+Several structures are designed to implement both insertion and deletion operates. This allows the adversary a great deal of variety in the updates it can perform during the security experiment. For a more general notion, we define an \textit{invertible} structure as one where, for any initial representation $\pub$ and any other representation $\pub' = \Up_K(\ldots\Up_K(\pub,\up_1)\ldots,\up_n)$ generated by a sequence of update operations applied to the initial representation, there exists another sequence of update operations such that $\Up_K(\ldots\Up_K(\pub',\up'_1)\ldots,\up'_m) = \pub$. In other words, any sequence of updates applied to any representation can be undone by further updates.
+
 \begin{lemma}[Salts do not affect \errep for invertible structures]\label{lemma:noinvsalt}
   Let $\struct = (\Rep, \Qry, \Up)$ be a data structure with a salt randomly initialized at runtime and $\struct'$ be the same structure using a fixed value from the salt space in place of a randomized salt. For every $t, q_R, q_T, q_U, q_H, r\geq 0$, it holds that
   \[
@@ -98,52 +113,45 @@ Consider an adversary $A$ in the case of a non-salted data structure which makes
 In general this may use as many as $2n(q_R+q_T+q_U)$ update queries, where $n$ is the longest minimal sequence of update operations needed to generate a data structure in the space. Furthermore $B$ succeeds if $A$ does, so the adversaries' advantages are equal.\missingqed
 \end{proof}
 
-\begin{lemma}[]\label{lemma:immutabletomutable}
-  Let $\struct = (\Rep, \Qry, \Up)$ be a data structure, and $\struct'$ be the same structure except that any per-representation random parameters are chosen once and fixed across representations. For every $t, q_r, q_T, q_U, q_H, q_V, r \geq 0$, it holds that
-  \[
-    \Adv{\errep}_{\struct,r}(t, q_R, q_T, q_U, q_H, q_V) \leq
-    \Adv{\prf}_F(\advB) + \Adv{\errep}_{\struct',r}(O(t), q_R + q_U, q_T, 0, q_H, 0) \,,
-  \]
-\end{lemma}
-\begin{proof}
-Given an adversary $\advA$ making queries $(q_R, q_U, q_T, q_H)$, we can construct $\advB$ making queries $(q_R+q_U, 0, q_T, q_H)$ which achieves the same advantage.
+%\subsection{Immutabilization}
 
-For a structure $\Pi$, we denote by $\Pi'$ the same structure with pseudo-random functions replaced by true-random functions. Using conditional probabilities, we have $\Adv{\errep}_{\struct,r}(\advA) \le \Adv{\prf}_F(\advB) + \Adv{\errep}_{\struct_1,r}(\advA)$.
+%We say that a structure has `independent representations' if knowing the representation of one set does not provide any additional information about the representation of any other set. More formally, $\Pi$ has independent representations if $\Prob{\Rep_K(\col) = \pub | \Rep_K(\col')}$
 
-In the truly random structure $\struct_1$, the representation of a set is simply a randomly-chosen valid representation of that set. Revealing this therefore reveals no new information about any other representations which have been constructed, and so calling $\REVO$ can only decrease an adversary's chance of success. We may now assume $\REVO$ is never called.
+%For example, the standard Bloom filter vacuously has independent representations, since the adversary can perfectly predict the representation of any set without needing to see the representation of other sets. A filter which uses true random sampling in place of hash functions also has independent representations, but a filter which uses a secret key need not have independent representations.
 
-We next modify the structure to $\struct_2$, where all randomized parameters are fixed across representations at the beginning of the experiment, but not revealed to the adversary. We create an adversary $C$ for the correctness experiment on $\struct_2$ which simulates $\advA$ as follows. The adversary $C$ keeps track of a counter $ct$ and list $L$ of indices and simulates $\advA$. When $\advA$ calls $\REPO$, $C$ appends $ct$ to the end of $L$ and then increments $ct$. When $\advA$ calls $\UPO(i,\up)$, $C$ calls $\REPO(\up(\col_{I(i)}))$, sets $L(i) \gets ct$, and increments $ct$. Finally, when $\advA$ calls $\QRYO(i,\qry)$, $C$ calls $\QRYO(L(i),\qry)$. Since $\REVO$ is never called, $C$ need not implement this oracle. Since all queries are called on representations of the same sets, $C$ has the same probability of success as $A$.
-\end{proof}
+%In each of our example structures involving the use of a secret key, we formalize the system using a pseudorandom function. In each correctness proof, the first thing we do is always moving to a game where the pseudorandom functions are replaced by true random functions, since this gives very similar adversarial advantage (assuming the use of a good prf) while making the behavior of the game much easier to reason about.
 
-\subsection{Immutabilization}
+%In the case of a structure with sufficiently `independent' representations, we may assume without loss of generality that the adversary never calls the $\REVO$ oracle, since doing so can only decrease their probability of success.
 
-We say that a structure has `independent representations' if knowing the representation of one set does not provide any additional information about the representation of any other set. For example, the standard Bloom filter vacuously has independent representations, since the adversary can perfectly predict the representation of any set without needing to see the representation of other sets. A filter which uses true random sampling in place of hash functions also has independent representations, but a filter which uses a secret key need not have independent representations.
+%Note that most of the data structures we consider have some degree of per-representation randomness, such as a salt chosen for hash functions. We consider an alternate correctness game that forces this randomness to behave the same across all representations constructed. In particular, any randomly-chosen parameters which would be chosen during the computation of $\REPO$ are selected at the beginning of the game, using the same random distribution, before the adversary makes any oracle queries. The $\REPO$ oracle then uses this fixed value for any random parameters in place of sampling a new random value.
 
-In each of our example structures involving the use of a secret key, we formalize the system using a pseudorandom function. In each correctness proof, the first thing we do is always moving to a game where the pseudorandom functions are replaced by true random functions, since this gives very similar adversarial advantage (assuming the use of a good prf) while making the behavior of the game much easier to reason about.
+%\begin{lemma}[]\label{lemma:immutabletomutable}
+%  Let $\struct = (\Rep, \Qry, \Up)$ be a data structure, and $\struct'$ be the same structure except that any per-representation random parameters are chosen once and fixed across representations. For every $t, q_r, q_T, q_U, q_H, q_V, r \geq 0$, it holds that
+%  \[
+%    \Adv{\errep}_{\struct,r}(t, q_R, q_T, q_U, q_H, q_V) \leq
+%    \Adv{\prf}_F(\advB) + \Adv{\errep}_{\struct',r}(O(t), q_R + q_U, q_T, 0, q_H, 0) \,,
+%  \]
+%\end{lemma}
+%\begin{proof}
+%Given an adversary $\advA$ making queries $(q_R, q_U, q_T, q_H)$, we can construct $\advB$ making queries $(q_R+q_U, 0, q_T, q_H)$ which achieves the same advantage.
 
-In the case of a structure with independent representations, we may assume without loss of generality that the adversary never calls the $\REVO$ oracle, since doing so can only decrease their probability of success.
+%For a structure $\Pi$, we denote by $\Pi'$ the same structure with pseudo-random functions replaced by true-random functions. Using conditional probabilities, we have $\Adv{\errep}_{\struct,r}(\advA) \le \Adv{\prf}_F(\advB) + \Adv{\errep}_{\struct_1,r}(\advA)$.
 
-Note that most of the data structures we consider have some degree of per-representation randomness, such as a salt chosen for hash functions. We consider an alternate correctness game that forces this randomness to behave the same across all representations constructed. In particular, any randomly-chosen parameters which would be chosen during the computation of $\REPO$ are selected at the beginning of the game, using the same random distribution, before the adversary makes any oracle queries. The $\REPO$ oracle then uses this fixed value for any random parameters in place of sampling a new random value.
+%In the truly random structure $\struct_1$, the representation of a set is simply a randomly-chosen valid representation of that set. Revealing this therefore reveals no new information about any other representations which have been constructed, and so calling $\REVO$ can only decrease an adversary's chance of success. We may now assume $\REVO$ is never called.
 
-\begin{lemma}[]\label{lemma:immutabletomutablenew}
-  Let $\struct = (\Rep, \Qry, \Up)$ be a data structure, and $\struct'$ be the same structure except that any per-representation random parameters are chosen once and fixed across representations. For every $t, q_r, q_T, q_U, q_H, q_V, r \geq 0$, it holds that
-  \[
-    \Adv{\errep(s)}_{\struct,r}(t, q_R, q_T, q_U, q_H, q_V) \leq
-    \Adv{\errep(s)'}_{\struct,r}(O(t), q_R + q_U, q_T, 0, q_H, 0) \,,
-  \]
-\end{lemma}
-\begin{proof}
+%We next modify the structure to $\struct_2$, where all randomized parameters are fixed across representations at the beginning of the experiment, but not revealed to the adversary. We create an adversary $C$ for the correctness experiment on $\struct_2$ which simulates $\advA$ as follows. The adversary $C$ keeps track of a counter $ct$ and list $L$ of indices and simulates $\advA$. When $\advA$ calls $\REPO$, $C$ appends $ct$ to the end of $L$ and then increments $ct$. When $\advA$ calls $\UPO(i,\up)$, $C$ calls $\REPO(\up(\col_{I(i)}))$, sets $L(i) \gets ct$, and increments $ct$. Finally, when $\advA$ calls $\QRYO(i,\qry)$, $C$ calls $\QRYO(L(i),\qry)$. Since $\REVO$ is never called, $C$ need not implement this oracle. Since all queries are called on representations of the same sets, $C$ has the same probability of success as $A$.
+%\end{proof}
 
-We create an adversary $\advB$ for the modified correctness experiment which simulates $\advA$ as follows. The adversary $\advB$ keeps track of a counter $ct$ and list $L$ of indices and simulates $\advA$. When $\advA$ calls $\REPO$, $\advB$ appends $ct$ to the end of $L$ and then increments $ct$. When $\advA$ calls $\UPO(i,\up)$, $\advB$ calls $\REPO(\up(\col_{I(i)}))$, sets $L(i) \gets ct$, and increments $ct$. Finally, when $\advA$ calls $\QRYO(i,\qry)$, $\advB$ calls $\QRYO(L(i),\qry)$. Since $\REVO$ is never called, $\advB$ need not implement this oracle. Since all queries are called on representations of the same sets, $C$ has the same probability of success as $A$.
-
-\end{proof}
-
-\subsection{Bloom filter lower bounds}
+\subsection{Bloom filter results}
 \label{subsec:bloom-filters}
 
-\input{bf-summary-tab}
+%\subsection{Bloom filter lower bounds}
 
-A generic attack against unsalted, unkeyed data structures handling set membership queries is for the adversary to choose a large set $\col$ of potential filter elements and simulate $\REPO$ to produce representations for $\{x\}$ for each $x \in \col$. Given these, it can perform offline computations to determine disjoint $\setT$, $\setR \subseteq \col$ such that the elements of $\setR$ all produce errors when sent as queries to $\REPO(\setT)$. After a sufficiently large $\setR$ has been found, the adversary makes a single $\REPO$ call on $\setT$ and makes one $\QRYO$ call per element of $\setR$, resulting in guaranteed success for the adversary with only a minimal number of queries performed.
+%\input{bf-summary-tab}
+
+The standard Bloom filter shows a variety of different behaviors depending on its exact implementation. If the hash functions used are chosen beforehand and potentially known to the adversary, this public information allows offline attacks to be mounted against the data structure which can produce potentially damaging false positives. In the case of immutable Bloom filters, making use of a per-representation salt is sufficient to prevent these attacks, though depending on the use case the use of non-fixed per-representation randomness may or may not be feasible. Furthermore, in the case of mutable Bloom filters there are additional difficulties with offline attacks due to adversarially-chosen updates. To guarantee correctness in this case we must additionally guarantee that representations can be kept private from the adversary.
+
+A generic attack against unsalted, unkeyed data structures handling set membership queries is for the adversary to choose a large set $\col$ of potential filter elements and simulate $\REPO$ to produce representations for $\{x\}$ for each $x \in \col$. Given these, it can perform offline computations to determine disjoint $\setT$, $\setR \subseteq \col$ such that the elements of $\setR$ all produce errors when queried for membership in $\REPO(\setT)$. After a sufficiently large $\setR$ has been found, the adversary makes a single $\REPO$ call on $\setT$ and makes one $\QRYO$ call per element of $\setR$, resulting in guaranteed success for the adversary with only a minimal number of queries performed.
 
 In general, such an attack may not be computationally feasible in the real world. However, because the attack is entirely offline, many structures with non-negligible error probabilities are vulnerable to these attacks. For example, consider a Bloom filter with false positive probability $10^{-5}$ with an adversary wishing to construct $r = 10$ false positives. The adversary can fix $\setT$ in advance and perform somewhere on the order of a million hash queries to random elements in order to construct a $\setR$ of size 10, and then perform only a single $\REPO$ calls and ten $\QRYO$ calls to the service hosting the Bloom filter. This is likely to be much more feasible for the adversary than performing on the order of a million $\QRYO$ calls in an online attack which randomly guesses elements until it accumulates 10 false positives.
 
@@ -153,17 +161,11 @@ The opposite of this, using a private key without a salt, does weaken the attack
 
 % ...
 
-In the public-representation case, this weaker attack may be possible even if the structure makes use of a per-representation salt. If the $\UPO$ oracle provided to the adversary is sufficiently powerful, they may be able to construct representations of arbitrary singleton sets using a single $\REPO$ call and multiple $\UPO$ calls. For example, given a counting filter structure with both insertion and deletion operations, the adversary may use $\REPO$ to initialize an empty filter. Then, for some each element $x_1, \ldots, x_{|\col|}$ that the adversary wishes to test, they may first use $\UPO$ to insert the element and then use a second $\UPO$ call to delete the element, returning again to an empty filter. After determining the representation of each singleton subset of $\col$, they can again find $\setT$, $\setR \subseteq \col$ offline computations, where each element of $\setR$ is a false positive for the representation of $\setT$. (Note that, since there is only a single representation being manipulated, the salt is in fact constant across the entire experiment.) This attack requires a single $\REPO$ call to initialize the filter, $2|\col|$ calls to $\UPO$ to test the elements plus an additional $|\setT|$ calls to $\UPO$ to reinsert the elements found to produce false positives, and $|\setR|$ calls to $\QRYO$ to win the experiment.
-
-\subsection{Bloom filter upper bounds}
-
-The standard Bloom filter shows a variety of different behaviors depending on its exact implementation. If the hash functions used are chosen beforehand and potentially known to the adversary, this public information allows offline attacks to be mounted against the data structure which can produce potentially damaging false positives. In the case of immutable Bloom filters, making use of a per-representation salt is sufficient to prevent these attacks, though depending on the use case the use of non-fixed per-representation randomness may or may not be feasible. Furthermore, in the case of mutable Bloom filters there are additional difficulties with offline attacks due to adversarially-chosen updates. To guarantee correctness in this case we must additionally guarantee that representations can be kept private from the adversary.
-
-Our first secure data structure is the salted Bloom filter, which at the time a representation is created chooses a salt $\salt$ which it will use for all further queries and updates. In order for security to be guaranteed, we must ensure that the representation, and in particular the salt, is kept secret from the adversary.
+Using a salted Bloom filter in the private representation setting, however, does provide some security. At the time a representation is created, the structure chooses a salt $\salt$ which it will use for all further queries and updates. In order for maximum security to be guaranteed, we must ensure that the representation, and in particular the salt, is kept secret from the adversary. We define this structure $\SBF[H,k,m,n,\lambda]$ as the Bloom filter structure that uses $H(s) = (h_1(s),\ldots,h_k(s))$ for hashing inputs to $k$ values in $[m]$. Furthermore, each call of $\Rep$ first involves picking a salt $\salt$ from the salt space $\bits^\lambda$, and all hashes made to insert or query for an element $x$ are determined using $H(x \Vert \salt)$. Finally, the parameter $n$ means that any attempts to represent sets with more than $n$ elements fail.
 
 \begin{theorem}[Correctness Bound for Private-Representation Salted Bloom Filters]\label{thm:bf-priv-salt-bound}
-Fix integers $k, m, n, \lambda, r\geq 0$, let $H \colon \bits^* \to [m]$ be a function, and let $\struct_s = \SBF[\hashbf[H],k,m,n,\lambda]$ in the private-representation setting.
-  For every $t, q_R, q_T, q_H \geq 0$ such that $q_T \geq r$, it holds that
+Fix integers $k, m, n, \lambda, r\geq 0$, let $H \colon \bits^* \to [m]$ be a function, and let $\struct_s = \SBF[H,k,m,n,\lambda]$.
+  For every $t, q_R, q_T, q_H \geq 0$, it holds that
   \begin{eqnarray*}
     \Adv{\erreps}_{\struct_\saltybloom,r}(t,&q_R,& q_T, q_U, q_H) \leq \\ && q_R \cdot
      \left[
@@ -171,34 +173,34 @@ Fix integers $k, m, n, \lambda, r\geq 0$, let $H \colon \bits^* \to [m]$ be a fu
       {\dbinom{q_T+q_U}{r}} p(k, m, n+r)^r
     \right] \,,
 \end{eqnarray*}
-where $H$ is modeled as a random oracle and $p(k, m, n+r)$ is the false-positive probability on a Bloom filter with the given parameters.
+where $H$ is modeled as a random oracle and $p(k, m, n+r)$ is the standard, non-adaptive false-positive probability on a Bloom filter with the given parameters.
 \end{theorem}
 
-This proof first reduces to the single-representation case, which as shown in Lemma 1 will reduce the adversary's advantage by at most a factor of $q_R$. The main idea behind the proof is to remove the adversary's adaptivity a step at a time. We isolate the possibility of the adversary guessing the salt, which would allow it to mount its own offline attack on the filter without relying on the $\QRYO$ oracle. If the adversary does not guess the salt, the outputs of the $\REPO$, $\QRYO$, and $\UPO$ oracles are unpredictable to the adversary, producing uniformly randomly distributed bits to set (for $\REPO$ and $\UPO$) or to check (for $\QRYO$). Under the assumption that the adversary does not predict the salt, queries made to distinct elements are independent of each other. The only remaining issue is that the adversary can potentially gain an advantage by testing whether some object $x$ is a false positive for the filter, and then updating the filter to include $x$ only if the test query returned `false'. An analysis shows that this is now (once imperfect pseudorandom functions and salt collisions have been dealt with) the only way for the adversary to gain an advantage over making queries to an immutable Bloom filter. Because this adaptive strategy introduces tricky conditional possibilities, we cannot compute an exact value for the adversary's advantage. Instead, we move to an alternate scenario where each $\QRYO$ also produces a free update and every $\UPO$ first performs a free query. This makes $\QRYO$ and $\UPO$ calls indistinguishable, so that the adversary is effectively making a series of independent random queries that each have a chance to increment the error counter. Because the size of the filter can only increase, the probability of a false positive from any one of these queries is bounded above by the probability of a false positive on the final maximally-sized filter, a probability which is given by the Kirsch and Mitzenmacher bound.
+This proof first reduces to the single-representation case, which as shown in lemma~\ref{lemma:errep} will reduce the adversary's advantage by at most a factor of $q_R$. The main idea behind the proof is to remove the adversary's adaptivity a step at a time. We isolate the possibility of the adversary guessing the salt, which would allow it to mount its own offline attack on the filter without relying on the $\QRYO$ oracle. If the adversary does not guess the salt, the outputs of the $\REPO$, $\QRYO$, and $\UPO$ oracles are unpredictable to the adversary, producing uniformly randomly distributed bits to set (for $\REPO$ and $\UPO$) or to check (for $\QRYO$). Under the assumption that the adversary does not predict the salt, queries made to distinct elements are independent of each other. The only remaining issue is that the adversary can potentially gain an advantage by testing whether some object $x$ is a false positive for the filter, and then updating the filter to include $x$ only if the test query returned `false'. An analysis shows that this is now (once imperfect pseudorandom functions and salt collisions have been dealt with) the only way for the adversary to gain an advantage over making queries to an immutable Bloom filter. Because this adaptive strategy introduces tricky conditional possibilities, we cannot compute an exact value for the adversary's advantage. Instead, we move to an alternate scenario where each $\QRYO$ also produces a free update and every $\UPO$ first performs a free query. This makes $\QRYO$ and $\UPO$ calls indistinguishable, so that the adversary is effectively making a series of independent random queries that each have a chance to increment the error counter. Because the number of 1s in the filter can only increase, the probability of a false positive from any one of these queries is bounded above by the probability of a false positive on the final maximally-sized filter, a probability which is given by the Kirsch and Mitzenmacher bound.
 
 \begin{figure}
   \boxThmBFSaltCorrect{0.48}
   {
     \underline{$\G_0(\advA)$}\\[2pt]
       $\col \getsr \advA^H$; $\setC \gets \emptyset$; $\err \gets 0$\\
-      $\pub \getsr \Rep[\hashbf[H]](\col)$\\
+      $\pub \getsr \Rep[H](\col)$\\
       $\bot \getsr \advA^{H,\QRYO,\UPO}$\\
       return $(\err \geq r)$
     \\[6pt]
     \oraclev{$\QRYO(\qry_x)$}\\[2pt]
       if $\qry_x \in \mathcal{C}$ then return $\bot$\\
       $\setC \gets \setC \union \{\qry_x\}$\\
-      $a \gets \Qry[\hashbf[H]](\pub, \qry_x)$\\
+      $a \gets \Qry[H](\pub, \qry_x)$\\
       if $a \neq \qry_x(\col)$ then $\err \gets \err + 1$\\
       return~$a$
     \\[6pt]
     \oraclev{$\UPO(\up_x)$}\\[2pt]
       $\setC \gets \emptyset$\\
-      $a \gets \Qry[\hashbf[H]](\pub, \qry_x)$\\
+      $a \gets \Qry[H](\pub, \qry_x)$\\
       if $\qry_x \in \setC$ and $a \neq \qry_x(\col)$ then\\
       \tab $\err \gets \err-1$\\
       $\col \gets \col \union \{x\}$\\
-      $\pub \gets \Up[\hashbf[H]](\pub,\up_x)$\\
+      $\pub \gets \Up[H](\pub,\up_x)$\\
       return~$\bot$
     \\[4pt]
     \hspace*{-4pt}\rule{1.043\textwidth}{.4pt}
@@ -230,7 +232,7 @@ This proof first reduces to the single-representation case, which as shown in Le
     \\[6pt]
     \oraclev{$\UPO(\up_x)$}\\[2pt]
       $\setC \gets \emptyset$\\
-      $a \gets \Qry[\hashbf[H]](\pub, \qry_x)$\\
+      $a \gets \Qry[H](\pub, \qry_x)$\\
       if $a \neq \qry_x(\col)$ and $\qry_x \in \setC$ then\\
       \tab $\err \gets \err-1$\\
       $\col \gets \col \union \{x\}$\\
@@ -269,7 +271,7 @@ This proof first reduces to the single-representation case, which as shown in Le
   \label{fig:bf-priv-salt-bound}
 \end{figure}
 
-\begin{proof} We first reduce from the $\erreps$ case to the $\erreps1$ case, which by Lemma 1 may scale the adversary's advantage only by a factor of $q_R$. The game~$\G_0$ is exactly equivalent to the $\erreps1$ experiment, so $\Adv{\errep1}_{\struct_s,r}(\advA) = \Prob{\G_0(\advA) = 1}$. In~$\G_1$ we split the hash oracle into three, giving the adversary access $\HASHO_1$ in both stages of the game, while $\HASHO_2$ is reserved for oracular use by $\Repx$, $\QRYO$, and $\UPO$. For any $\advA$ for~$\G_0$, there is $\advB$ for~$\G_1$ which produces the same advantage by simulating $\advA$. This adversary first creates its own table $R$ with all values initially undefined. When $\advA$ makes a query $w$ to $H$, $\advB$ returns $R[w]$ if that entry in the table is defined. Otherwise, if there are $\salt \in \bits^\lambda$, $j \in [k]$, and $x \in \bits^*$ such that $w = \langle\salt, j, x\rangle$, forward $(\salt,x)$ to $\HASHO_1$. For each $j \in [k]$, set $R[\langle\salt, j, x\rangle] = \vv_j$, where $\vv$ is the output of the $\HASHO_1$ oracle. If there is no such triple $\langle\salt, j, x\rangle$, just sample $r$ from $[m]$ uniformly and set $R[w] = r$. In either case, return $R[w]$ to $\advA$. When $\advA$ outputs its collection $\col$, $\advB$ outputs $\col$ as well. Any queries by $\advA$ to $\QRYO$ or $\UPO$ are forwarded to $\advB$'s corresponding oracle. The simulation is perfect because $\Rep[\hashbf[H]](\col)$ and $\Up[\hashbf[H]](\col,\up)$ are identically distributed to $\Rep[\HASHO_2](\col)$ and $\Up[\HASHO_2](\col,\up)$. Because we have a perfect simulation, $\Adv{\erreps1}_{\struct_s,r}(\advA) = \Prob{\G_1(\advA) = 1}$.
+\begin{proof} We first reduce from the $\erreps$ case to the $\erreps1$ case, which by lemma~\ref{lemma:errep} may scale the adversary's advantage only by a factor of $q_R$. The game~$\G_0$ is exactly equivalent to the $\erreps1$ experiment, so $\Adv{\errep1}_{\struct_s,r}(\advA) = \Prob{\G_0(\advA) = 1}$. In~$\G_1$ we split the hash oracle into three, giving the adversary access $\HASHO_1$ in both stages of the game, while $\HASHO_2$ is reserved for oracular use by $\Repx$, $\QRYO$, and $\UPO$. For any $\advA$ for~$\G_0$, there is $\advB$ for~$\G_1$ which produces the same advantage by simulating $\advA$. This adversary first creates its own table $R$ with all values initially undefined. When $\advA$ makes a query $w$ to $H$, $\advB$ returns $R[w]$ if that entry in the table is defined. Otherwise, if there are $\salt \in \bits^\lambda$, $j \in [k]$, and $x \in \bits^*$ such that $w = \langle\salt, j, x\rangle$, forward $(\salt,x)$ to $\HASHO_1$. For each $j \in [k]$, set $R[\langle\salt, j, x\rangle] = \vv_j$, where $\vv$ is the output of the $\HASHO_1$ oracle. If there is no such triple $\langle\salt, j, x\rangle$, just sample $r$ from $[m]$ uniformly and set $R[w] = r$. In either case, return $R[w]$ to $\advA$. When $\advA$ outputs its collection $\col$, $\advB$ outputs $\col$ as well. Any queries by $\advA$ to $\QRYO$ or $\UPO$ are forwarded to $\advB$'s corresponding oracle. The simulation is perfect because $\Rep[H](\col)$ and $\Up[H](\col,\up)$ are identically distributed to $\Rep[\HASHO_2](\col)$ and $\Up[\HASHO_2](\col,\up)$. Because we have a perfect simulation, $\Adv{\erreps1}_{\struct_s,r}(\advA) = \Prob{\G_1(\advA) = 1}$.
 
 The game~$\G_2$ is the same as~$\G_1$ until $\bad_1$ is set, which occurs exactly when $\advB$ sends $(\salt^*,x)$ to $\HASHO_1$ for some $x$. In the first phase, there is again a $q_1/2^\lambda$ chance of the adversary guessing the salt. In the second phase, the random sampling used by $\HASHO_i$ ensures that each call the adversary makes to the $\HASHO_i$ oracle is independent of all previous calls. We therefore have a $q_2/2^\lambda$ chance of the adversary guessing the salt during this phase, for a total chance of $q_H/2^\lambda$ chance of the adversary guessing the salt at some point during the experiment. Then $\Adv{\erreps_1}_{\struct_s,r}(\advA) \le \Prob{\G_2(\advB) = 1} + q_H/2^\lambda$. Having taken this into account, we may now assume the adversary never guesses the salt.
 
@@ -279,14 +281,14 @@ Note that the choices of $\vv$ constructed by the $\HASHO_i$ oracles are indepen
 
 Because the adversary never guesses the salt, $\HASHO_1$ simply functions as a random oracle. Furthermore, we can assume the adversary never adds an element of $\col$ to $\col$ and never makes a $\QRYO$ call for an element which is already in $\col$, since neither of these provides any additional information and neither affects the rest of the experiment in any way.
 
-Now we move to the game~$\G_3$. Here each $\QRYO$ query also calls $\UPO$ to add that element to $\col$. Additionally, the penalty for adding known false positives is removed. To avoid penalizing the adversary by prematurely maxing out the number of elements in $\col$ because of added false positives, we also increase the maximum size of $\col$ from $n$ to $n+r$. Because the adversary (without loss of generality) stops after accumulating $r$ errors, only $r$ false positives will be added to $\col$ and so a maximum size of $n+r$ is sufficient to produce no penalty for the adversary. Furthermore, each $\UPO$ call is preceded by a $\QRYO$ call. Neither of these changes can produce a worse result for the adversary, so $\Prob{\G_2(\advB) = 1} \le \Prob{\G_3(\advB) = 1}$. Now, however, there is no longer any distinction between $\QRYO$ and $\UPO$ calls. All calls to either oracle are independent of each other and produce the same effect, querying and then updating $\col$. Each of these queries for false positives is at most as successful as a query to a Bloom filter with $n+r$ elements, so the adversary's probability of finding a false positive on any query is bounded above by the standard success rate for a Bloom filter with those parameters, $(1-e^{-k(n+r)/m})^k+O(1/(n+r))$. The adversary is required to produce $r$ errors over the course of $q_T+q_U$ queries, which by the binomial theorem gives an advantage bound of $\Prob{\G_3(\advB) = 1} \le \binom{q_T+q_U}{r}((1-e^{-k(n+r)/m})^k+O(1/(n+r)))^r$.
+Now we move to the game~$\G_3$. Here each $\QRYO$ query also calls $\UPO$ to add that element to $\col$. Additionally, the penalty for adding known false positives is removed. To avoid penalizing the adversary by prematurely maxing out the number of elements in $\col$ because of added false positives, we also increase the maximum size of $\col$ from $n$ to $n+r$. Because the adversary (without loss of generality) stops after accumulating $r$ errors, only $r$ false positives will be added to $\col$ and so a maximum size of $n+r$ is sufficient to produce no penalty for the adversary. Furthermore, each $\UPO$ call is preceded by a $\QRYO$ call. Neither of these changes can produce a worse result for the adversary, so $\Prob{\G_2(\advB) = 1} \le \Prob{\G_3(\advB) = 1}$. Now, however, there is no longer any distinction between $\QRYO$ and $\UPO$ calls. All calls to either oracle are independent of each other and produce the same effect, querying and then updating $\col$. Each of these queries for false positives is at most as successful as a query to a Bloom filter with $n+r$ elements, so the adversary's probability of finding a false positive on any query is bounded above by the standard success rate for a Bloom filter with those parameters. The adversary is required to produce $r$ errors over the course of $q_T+q_U$ queries, which by the binomial theorem gives an advantage bound of $\Prob{\G_3(\advB) = 1} \le \binom{q_T+q_U}{r}p(k, m, n+r)^r$.
 
 The full adversarial advantage is then
-$$\Adv{\erreps_1}_{\struct_s,r}(\advA) \le q_R \cdot \left(\frac{q_H}{2^\lambda} + \binom{q_T+q_U}{r}((1-e^{-k(n+r)/m})^k+O(1/(n+r)))^r\right).$$
+$$\Adv{\erreps_1}_{\struct_s,r}(\advA) \le q_R \cdot \left(\frac{q_H}{2^\lambda} + \binom{q_T+q_U}{r}p(k, m, n+r)^r\right).$$
 \missingqed
 \end{proof}
 
-Without `thresholding', where the addition to a filter fails if a certain proportion of bits are set to 1, the bound improves somewhat.
+%Without `thresholding', where the addition to a filter fails if a certain proportion of bits are set to 1, the bound improves somewhat.
 
 Once we have reduced to the case of $\HASHO_1$ functioning as a random oracle and $\QRYO$ calls only being made to distinct elements not in $\col$, the adversary has only three ways of interacting with the filter: querying an element not in $\col$ which has not yet been queried, inserting a new element into $\col$ which has not yet been queried, and inserting a new element into $\col$ which has been queried and was found to not be a false positive. In the non-threshold case, the last of these is exploitable, since an element which is confirmed not to be a false positive will necessarily flip at least one bit when inserted into the representation. However, when a maximum proportion $p$ of the bits are allowed to be set to 1, adding known non-false-positives rather than unqueried elements only causes the threshold to be reached faster, without providing any additional benefit to the adversary. In any case the adversary can do no better than setting exactly $pm$ bits to 1, in which case the false positive rate will be exactly $p^k$ and the adversarial advantage will be
 
@@ -294,10 +296,10 @@ $$\Adv{\erreps_1}_{\struct_s,r}(\advA) \le q_R \cdot \left(\frac{q_H}{2^\lambda}
 
 The case of a Bloom filter whose representations are always public but which uses a private key in addition to a salt is almost identical. In practice the bound is actually somewhat stronger: the instance of $q_H$ in the bound is replaced with $q_R$, which means that the adversary which attempts to guess the salt must rely entirely on `online' queries as opposed to `offline' queries to $q_H$.
 
-These two theorems together show that in order to guarantee correctness in the streaming setting, one must either ensure that representations are kept private from potential adversaries or use a secret key in addition to a salt when implementing a Bloom filter. In either case, some hidden information is necessary to protect the filter from an adversary.
+These two theorems together show that in order to guarantee maximal correctness in the streaming setting, one must ensure that representations are kept private from potential adversaries, and possibly use a secret key in addition to a salt when implementing a Bloom filter. In either case, the hidden information is necessary to protect the filter from an adversary.
 
 \begin{theorem}[Correctness Bound for Keyed Bloom Filters]\label{thm:bf-key-bound}
-Fix integers $k, m, n, \lambda, r\geq 0$, where $m \geq \lambda$, and let $F \colon \bits^\lambda \times \bits^* \to [m]$ be a function.
+Fix integers $k, m, n, \lambda, r\geq 0$, where $m \geq \lambda$.
   For every $t, q_R, q_T \geq 0$ such that $q_T \geq r$, it holds that
   \begin{eqnarray*}
     \Adv{\erreps}_{\struct_\saltybloom,r}(t,&q_R,& q_T, q_U, q_H) \leq \\ && q_R \cdot
@@ -342,7 +344,7 @@ Despite the similarity of the bounds, the proof is somewhat different than in th
       $\col_i \gets \up(\col_i)$\\
       \diffminus{$\pub_i \getsr \Upx[F_\ky](\pub_i,\up)$}\\
       \diffplus{$\pub_i \getsr \Upx[\Rnd](\pub_i,\up)$}\\
-      $a \gets \Qry[\hashbf[H]](\pub, \qry_x)$\\
+      $a \gets \Qry[H](\pub, \qry_x)$\\
       if $a \neq \qry_x(\col)$ and $a \in \setC$ then\\
       \tab $\err_i \gets \err_i-1$\\
       return~$\pub_i$
@@ -398,7 +400,7 @@ Despite the similarity of the bounds, the proof is somewhat different than in th
     \oraclev{$\UPO(i, \up)$}\\[2pt]
       $\col_i \gets \up(\col_i)$\\
       $\pub_i \getsr \Upx[\Rnd](\pub_i,\up)$\\
-      $a \gets \Qry[\hashbf[H]](\pub, \qry_x)$\\
+      $a \gets \Qry[H](\pub, \qry_x)$\\
       if $a \neq \qry_x(\col)$ and $qry_x \in \setC$ then\\
       \tab $\err \gets \err-1$\\
       return~$\pub_i$
@@ -436,25 +438,40 @@ We then revise the game to~$\G_3$, where the adversary gets credit for queries $
 
 Next, in~$\G_4$ we modify $\QRYO$ and $\UPO$ to perform the same function. Each one tests the given element for false positive status across all extant representations, and then updates only the queried representation with that element. As in the case of the salted Bloom filter, we must remove the penalty for adding a false positive and increase the maximum size of the filter from $n$ to $n+r$ so that this change can never reduce the adversary's chances of success.  Because all queries are independent of each other, adding a known non-false-positive is again the optimal choice for the adversary under any circumstance. Furthermore, note that while the adversary may not be aware of its score in each representation, we can assume without loss of generality that it halts if it has sent several $\QRYO$ calls to the same representation and $r$ of those have returned a false positive. This means that no more than $r$ false positives will be added to any single representation. Then $\Adv{\errep}_{\struct_\prfbloom,r}(\advA) \le \Adv{\prf}_F(\advB) + q_R^22^{-\lambda} + \Prob{\G_4(\advA)=1}$.
 
-Finally, in~$\G_5$ we keep track of how many $\QRYO$ calls have previously been made, and use $\setQ$ to keep track of those queries with indices in $\setI$. Only these $r$ queries can increment the error counters, but they do so if they cause an error in any of the currently-existing $\pub_j$. To win, the adversary must therefore return an $i$ so that all queries in $\setQ$ produce errors when directed at $\pub_i$. Assuming without loss of generality that the adversary does not add any elements to the set which it knows to be false positives, this condition is sufficient as well as necessary. Given that an adversary is successful in~$\G_3$, it is successful in~$\G_4$ with probability at least $\binom{q_T+q_U}{r}^{-1}$ since that is the chance of randomly selecting $r$ successful queries from the total collection of $q_T+q_U$ queries. Then we have $\Adv{\errep}_{\struct_\prfbloom,r}(\advA) \le \Adv{\prf}_F(\advB) + q_R^22^{-\lambda} + \binom{q_T+q_U}{r}\Prob{\G_4(\advA)=1}$. But since the salts are unique for each representation, the probability of winning in each representation is independent of the probability of winning in the others, and the so $\Prob{\G_4(\advA)=1}$ is just $q_R$ times the standard Kirsch and Mitzenmacher bound. Substituting this result into our earlier bound, we arrive at the final result of
-$$\Adv{\errep}_{\struct_\prfbloom,r}(\advA) \le \Adv{\prf}_F(\advB) + \frac{q_R^2}{2^\lambda} + q_R\binom{q_T+q_U}{r}\left((1-e^{-k(n+r)/m})^k+O(1/(n+r))\right)^r.$$
+Finally, in~$\G_5$ we keep track of how many $\QRYO$ calls have previously been made, and use $\setQ$ to keep track of those queries with indices in $\setI$. Only these $r$ queries can increment the error counters, but they do so if they cause an error in any of the currently-existing $\pub_j$. To win, the adversary must therefore return an $i$ so that all queries in $\setQ$ produce errors when directed at $\pub_i$. Assuming without loss of generality that the adversary does not add any elements to the set which it knows to be false positives, this condition is sufficient as well as necessary. Given that an adversary is successful in~$\G_3$, it is successful in~$\G_4$ with probability at least $\binom{q_T+q_U}{r}^{-1}$ since that is the chance of randomly selecting $r$ successful queries from the total collection of $q_T+q_U$ queries. Then we have $\Adv{\errep}_{\struct_\prfbloom,r}(\advA) \le \Adv{\prf}_F(\advB) + q_R^22^{-\lambda} + \binom{q_T+q_U}{r}\Prob{\G_4(\advA)=1}$. But since the salts are unique for each representation, the probability of winning in each representation is independent of the probability of winning in the others, and the so $\Prob{\G_4(\advA)=1}$ is just $q_R$ times the standard (non-adpative) Bloom filter bound, yielding the final result of:
+$$\Adv{\errep}_{\struct_\prfbloom,r}(\advA) \le \Adv{\prf}_F(\advB) + \frac{q_R^2}{2^\lambda} + q_R\binom{q_T+q_U}{r}p(k, m, n+r)^r.$$
 \missingqed
 \end{proof}
 
+We can use this final and best bound to demonstrate some of the possible bounds with various parameter settings. Figure ? shows the upper bound for a various combination of parameters, starting from the default parameters of $k = 4$, $m = 1024$, $n = 100$, $r = 5$, $q_R = 1$, $q_T = 100$, and $q_U = 100$. The most significant factor in the adversarial advantage is $q_R$, with even small increases producing a drastic increase in the adversarial advantage. Since this is the only part of the error bound that is not clearly associated with an attack, it is possible that this term could be reduced or eliminated.
+
+(These need to be formatted.)
+
+\includegraphics[scale=0.5]{Figure_1}
+\includegraphics[scale=0.5]{Figure_2}
+\includegraphics[scale=0.5]{Figure_3}
+\includegraphics[scale=0.5]{Figure_4}
+\includegraphics[scale=0.5]{Figure_5}
+\includegraphics[scale=0.5]{Figure_6}
+\includegraphics[scale=0.5]{Figure_7}
+
+\subsection{Counting filter results}
+
 Next, we consider the case of a counting Bloom filter. In this setting, an update to add an element increments each of the counters mapped to by the hash functions, with some maximum ceiling $c$ above which the counter cannot increase. A Bloom filter would then just be a counting Bloom filter with a maximum counter value of 1, but we make the additional change that a counting Bloom filter can perform delete operations which work by hashing the element and decrementing the counters at those indices.
 
-In this scenario it is necessary to use the thresholding assumption that insertions are rejected when the proportion of nonzero counters in the filter reaches some limit $p$. Without this assumption, the adversary can attempt to optimize the number of nonzero counters while keeping the size of the filter (in terms of the number of elements stored in the underlying set) below some constant maximum value. For example, if some $x$ is known to be a false positive for two different sets $\col_1$ and $\col_2$, this increases the probability that elements of $\col_1$ are false positives for the filter representation of $\col_2$ and vice versa. However, using the assumption that there is a limit on the allowed number of nonzero counters, we can derive a false positive bound similar to that of a standard Bloom filter.
+Because a counting filter without deletion behaves identically (in terms of responding to queries) to a standard Bloom filter, any attack on a Bloom filter can be trivially converted into an attack against a counting filter simply by performing the exact same operations in the same order. This means that the adversarial advantage against a counting filter, under any of the correctness notions and using any parameters, is bounded below by the advantage against a Bloom filter with the same parameters.
+
+This lower bound is not tight, however, since there are some attacks which exploit the more powerful $\UPO$ oracle provided to the adversary in the case of a counting filter. Consider the public-representation case for an example, where we suppose the structure makes use of a per-representation salt. With a counting filter, the adversary is able to construct representations of arbitrary singleton sets using a single $\REPO$ call and multiple $\UPO$ calls. They begin the game by using $\REPO$ to initialize an empty filter. Then, for some each element $x_1, \ldots, x_{|\col|}$ that the adversary wishes to test, they may first use $\UPO$ to insert the element and then use a second $\UPO$ call to delete the element, returning again to an empty filter. After determining the representation of each singleton subset of $\col$, they can again find $\setT$, $\setR \subseteq \col$ offline computations, where each element of $\setR$ is a false positive for the representation of $\setT$. Since there is only a single representation being manipulated, the salt is in fact constant across the entire experiment. This attack requires a single $\REPO$ call to initialize the filter, $2|\col|$ calls to $\UPO$ to test the elements plus an additional $|\setT|$ calls to $\UPO$ to reinsert the elements found to produce false positives, and $|\setR|$ calls to $\QRYO$ to win the experiment.
+
+In order to achieve good security for a counting filter, it is necessary to use the thresholding assumption that insertions are rejected when the proportion of nonzero counters in the filter reaches some limit $p$. Without this assumption, the adversary can attempt to optimize the number of nonzero counters while keeping the size of the filter (in terms of the number of elements stored in the underlying set) below some constant maximum value. For example, if some $x$ is known to be a false positive for two different sets $\col_1$ and $\col_2$, this increases the probability that elements of $\col_1$ are false positives for the filter representation of $\col_2$ and vice versa. However, using the assumption that there is a limit on the allowed number of nonzero counters, we can derive a false positive bound similar to that of a standard Bloom filter.
 
 \begin{theorem}[Correctness Bound for Counting Filters]\label{thm:count-bf-bound}
-Fix integers $k, m, n, \lambda, r\geq 0$, where $m \geq \lambda$, and let $F \colon \bits^\lambda \times \bits^* \to [m]$ be a function.
-  For every $t, q_R, q_T \geq 0$ such that $q_T \geq r$, it holds that
+Fix integers $k, m, n, \lambda, r\geq 0$, a threshold ratio $p \in [0,1]$, and an error function $d$.
+  For every $t, q_R, q_T \geq 0$, it holds that
   \begin{eqnarray*}
-    \Adv{\erreps}_{\struct_\saltybloom,r}(t,&q_R,& q_T, q_U, q_H) \leq \\ && q_R \cdot
-     \left[
-      \frac{q_H}{2^\lambda} +
-      {\dbinom{q_T+q_U}{r}} p(k, m, n+r)^r
-    \right] \,.
+    \Adv{\erreps}_{\struct_\saltybloom,r}(t,&q_R,& q_T, q_U, q_H) \leq \\ && q_R \cdot \left[\frac{q_H}{2^\lambda} + \binom{q_T}{\mu}\left(p+\frac{k\mu}{m}\right]^{k\mu}\right) \,,
 \end{eqnarray*}
+where $\mu = \lceil r/\max(k \cdot d(0,1), d(1,0)) \rceil$
 \end{theorem}
 
 \begin{figure}
@@ -509,11 +526,11 @@ Fix integers $k, m, n, \lambda, r\geq 0$, where $m \geq \lambda$, and let $F \co
       \tab $\err \gets \err + \max(k \cdot d(0,1), d(1,0))$\\
       $\setB \gets \setB \cup x$\\
       $\setC \gets \emptyset$\\
-      $a \gets \Qry[\hashbf[H]](\pub, \qry_x)$\\
+      $a \gets \Qry[H](\pub, \qry_x)$\\
       if $x \in \setC$ and $a \neq [x \in \col]$ then\\
       \tab $\err \gets \err-1$\\
       $\col \gets \col + \{x\}$\\
-      $\pub \gets \Up[\hashbf[H]](\pub,\up_{x,b})$\\
+      $\pub \gets \Up[H](\pub,\up_{x,b})$\\
       return~$\bot$
   }
   {
@@ -541,29 +558,39 @@ $$\Adv{\erreps}_{\struct_s,r}(\advA) \le q_R \cdot \left(\frac{q_H}{2^\lambda} +
 
 \end{proof}
 
-\subsection{Attack on Counting Filters}
+For concrete error bounds, we assume that $d(0,1) = d(1,0) = 1$, so that $\mu = \lceil r/k \rceil$.
 
-First, $\advA$ chooses an arbitrary set $\col$ of size $n$ and calls $\REPO$ to get a representation of $\col$. The adversary then chooses $q_U$ distinct elements not in $\col$ and makes a series of $\UPO$ calls to remove each of these from the set. Finally, the adversary chooses up to $q_T$ elements from $\col$ and makes a series of $\QRYO$ calls to test for membership of these elements in the set.
+\includegraphics[scale=0.5]{Ct_Figure_1}
+\includegraphics[scale=0.5]{Ct_Figure_2}
+\includegraphics[scale=0.5]{Ct_Figure_3}
+\includegraphics[scale=0.5]{Ct_Figure_4}
+\includegraphics[scale=0.5]{Ct_Figure_5}
+\includegraphics[scale=0.5]{Ct_Figure_6}
+\includegraphics[scale=0.5]{Ct_Figure_7}
 
-\begin{tabular}{|l|} 
- \hline
- \underline{adversary $\advA$:}\\
- $\col \gets [n]$\\
- $\REPO(\col)$\\
- for $i \in [q_U]$ do\\
- \tab $\UPO(0,\up_{i+n}')$\\
- for $j \in [q_T]$ do\\
- \tab $\QRYO(0,\qry_{j})$\\
- return 0\\
- \hline
-\end{tabular}
+%\subsection{Attack on Counting Filters}
+
+%First, $\advA$ chooses an arbitrary set $\col$ of size $n$ and calls $\REPO$ to get a representation of $\col$. The adversary then chooses $q_U$ distinct elements not in $\col$ and makes a series of $\UPO$ calls to remove each of these from the set. Finally, the adversary chooses up to $q_T$ elements from $\col$ and makes a series of $\QRYO$ calls to test for membership of these elements in the set.
+
+%\begin{tabular}{|l|} 
+% \hline
+% \underline{adversary $\advA$:}\\
+% $\col \gets [n]$\\
+% $\REPO(\col)$\\
+% for $i \in [q_U]$ do\\
+% \tab $\UPO(0,\up_{i+n}')$\\
+% for $j \in [q_T]$ do\\
+% \tab $\QRYO(0,\qry_{j})$\\
+% return 0\\
+% \hline
+%\end{tabular}
 
 \subsection{Cuckoo Filters}
 
-Cuckoo filters provide a way of filtering elements with lower space overhead than counting filters while still allowing for deletion. We consider the case of a salted cuckoo filter with private representations. By `salted', we mean that both the hashing and the fingerprinting makes use of a salt chosen on a per-represntation basis. Using this definition, we can make use of the lemmas that allow us to talk about the structure in the single-represntation case with true random functions. A bound for the false positive rate in cuckoo filters is given by $\binom{n}{2k+1}\left(\frac{2}{2^f \cdot cn}\right)^{2k}$ for a set of $n$ elements in a filter with $b$ entries per bucket and fingerprint size $f$.
+Cuckoo filters provide a way of filtering elements with lower space overhead than counting filters while still allowing for deletion. While they are not as closely related to Bloom filters as counting filters are, and so we do not have the precise lower bound that \textit{any} attack against a Bloom filter also works against a cuckoo filter, it is true that since cuckoo filters are set-membership structures the specific bounds given in the Bloom filter section apply here. To establish acceptable upper bounds, we consider the case of a salted cuckoo filter with private representations. By `salted', we mean that both the hashing and the fingerprinting makes use of a salt chosen on a per-represntation basis. Using this definition, we can make use of the lemmas that allow us to talk about the structure in the single-represntation case with true random functions. A bound for the false positive rate in cuckoo filters is given by $\binom{n}{2k+1}\left(\frac{2}{2^f \cdot cn}\right)^{2k}$ for a set of $n$ elements in a filter with $b$ entries per bucket and fingerprint size $f$.
 
 \begin{theorem}[Correctness Bound for Cuckoo Filters]\label{thm:cuckoo-salt-bound}
-Fix integers $b, k, \lambda, r\geq 0$, where $m \geq \lambda$, and let $F \colon \bits^\lambda \times \bits^* \to [m]$ be a function.
+Fix integers $b, k, \lambda, r\geq 0$, where $m \geq \lambda$.
   For every $t, q_R, q_T \geq 0$ such that $q_T \geq r$, it holds that
   $$\Adv{\erreps}_{\struct,r}(t, q_R, q_T, q_U, q_H) \leq q_R \cdot
      \left[
@@ -654,15 +681,6 @@ $$\Adv{\erreps}_{\struct_s,r}(\advA) \le q_R \cdot \left(\frac{q_H}{2^\lambda} +
 
 \end{proof}
 
-\subsection{Concrete Bounds}
-
-As a typical example, we look at a Bloom filter with $k = 4$ hash functions, $m = 1024$ bits in the filter, a maximum of $n = 100$ elements in the sets represented, and a key space parameter of $\lambda = 64$.
-
-The difference between the standard error rate and the advantage achievable by an adaptive adversary is primarily given by the factor of $q_R$ which occurs in each of the bounds. Unless a small salt space is chosen, the portion of the adversarial advantage that comes from guessing the salt is minimal.
-
-% adaptive probability of r errors: q_R * (q_T + q_U choose r)(0.01)^r(0.99)^(r-q_T-q_U)
-% non-adaptive probability of r errors: binomial distribution with n = q_T and p = 0.01, i.e. (q_T choose r)(0.01)^r(0.99)^(r-q_T)
-
 \subsection{Count-Min Sketch}
 
 %The fact that queries can test not just for set membership, but for frequency, means that new attacks are possible. For example, an adversary can pick a set $\col$ and an element $x \not\in \col$ and use $\REPO$ to create several different sketches representing $\col$. If the $\QRYO$ oracle reveals that $x$ is a false positive (i.e. appears in the filter with nonzero frequency) for any of these, the adversary can use $\UPO$ to insert all the elements of $\col$ an additional $r$ times. Then a single further $\QRYO(x)$ call will produce an error of magnitude $r$, causing the adversary to succeed at the experiment.
@@ -682,7 +700,21 @@ Depending on the choice of $d$, it is possible no such $c$ exists. One natural c
 
 What if the threshold for an error is 1? In other words, the adversary gets a point for every `false positive'. Assuming the hash functions are independent, the false positive probability in a count-min sketch is the same as the probability of getting simultaneous false positives in each of $k$ Bloom filters using a single hash function each, which is $\left(1-e^{-n/m}\right)^k$.
 
-%%
+%
+
+Given that there is a binary error threshold, we can assume without loss of generality that the adversary never adds an element multiple times, since doing so cannot cause additional errors.
+
+% the adversary can: query for a previously-tested element, query for an untested element, insert an unknown element, insert a known correct element, insert a known overestimated element, insert a known underestimated element, delete an unknown element, delete a known correct element, delete a known overestimated element, or delete a known underestimated element
+
+% inserting an unknown element can increase the number of overestimated elements, and can increase the amount they are overestimated by; it can also decrease the number of underestimaged elements, and can decrease the amount they are underestimated by; it does not affect the estimate of the inserted element
+% inserting a known correct element does the same thing, and also does not affect the estimate of the inserted element, so this is equivalent to inserting an unknown element
+
+% inserting any element can increase the number of overestimated elements, and can increase the amount they are overestimated by; it can also decrease the number of underestimaged elements, and can decrease the amount they are underestimated by; it does not affect the estimate of the inserted element; the estimate of the element itself remains unchanged
+% the opposite is true for deletion
+% there is no upper bound on the number of errors that can be caused by a single insertion or deletion(!)
+% in particular, deleting an element immediately causes all otherwise-correct elements that overlap at any point to become off by 1 (too low)
+
+% provide the same $\INTO$ as for a counting filter
 
 %Getting rid of the $q_R$ bound in the salted private-representation case...
 
