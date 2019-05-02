@@ -1,6 +1,10 @@
 \input{correctness-experiment}
 
-We define two adversarial notions of correctness given by a pair of related experiments for a mutable data structure $\struct$ and error capacity $r$, one in which the representations of the true data are public ($\errep$), and one in which they are private ($\erreps$).  We will describe the former, as the latter is a closely related derivative.  Throughout, we assume that the adversary~$\advA$ does not make any pointless queries. 
+%We will measure error with the help of an error function $d: \mathcal{R}^2 \to [0,\infty)$, which may depend on the application rather than being given by the specification of a data structure alone. The value $d(x,y)$ represents the `badness' of getting an erroneous result of $x$ from $\Qry$ when $y$ should actually have been returned. In general we require $d(x,x) = 0$, but otherwise place no restrictions on what the error function might look like.
+
+We define two adversarial notions of correctness given by a pair of related experiments for a mutable data structure $\struct$, error function $d: \mathcal{R}^2 \to [0,\infty)$, and error capacity $r$. The vales $d(x,y)$ of the error function represent the `badness' of getting an erroneous result of $x$ from $\Qry$ when $y$ should actually have been returned. In general we require $d(x,x) = 0$ for all $x$, but otherwise place no restrictions on what the error function might look like.
+
+In the first correctness notion, the representations of the true data are public ($\errep$), and one in which they are private ($\erreps$). We will describe the former, as the latter is a closely related derivative. Throughout, we assume that the adversary~$\advA$ does not make any pointless queries. 
 
 While many potential errors may exist for a given representation of a set, in the form of queries $\qry$ that would return an inaccurate answer when sent to $\QRYO$, we want an experiment that forces the adversary to actually find specific erroneous queries. In particular, we only give the adersary credit when they actually make a $\QRYO$ call that produces an error.
 
@@ -165,7 +169,7 @@ Using a salted Bloom filter in the private representation setting, however, does
 
 \begin{theorem}[Correctness Bound for Private-Representation Salted Bloom Filters]\label{thm:bf-priv-salt-bound}
 Fix integers $k, m, n, \lambda, r\geq 0$, let $H \colon \bits^* \to [m]$ be a function, and let $\struct_s = \SBF[H,k,m,n,\lambda]$.
-  For every $t, q_R, q_T, q_H \geq 0$, it holds that
+  For every $t, q_R, q_T, q_U, q_H \geq 0$, it holds that
   \begin{eqnarray*}
     \Adv{\erreps}_{\struct_\saltybloom,r}(t,&q_R,& q_T, q_U, q_H) \leq \\ && q_R \cdot
      \left[
@@ -300,7 +304,7 @@ These two theorems together show that in order to guarantee maximal correctness 
 
 \begin{theorem}[Correctness Bound for Keyed Bloom Filters]\label{thm:bf-key-bound}
 Fix integers $k, m, n, \lambda, r\geq 0$, where $m \geq \lambda$.
-  For every $t, q_R, q_T \geq 0$ such that $q_T \geq r$, it holds that
+  For every $t, q_R, q_T, q_U, q_H \geq 0$ such that $q_T \geq r$, it holds that
   \begin{eqnarray*}
     \Adv{\erreps}_{\struct_\saltybloom,r}(t,&q_R,& q_T, q_U, q_H) \leq \\ && q_R \cdot
      \left[
@@ -467,9 +471,9 @@ In order to achieve good security for a counting filter, it is necessary to use 
 
 \begin{theorem}[Correctness Bound for Counting Filters]\label{thm:count-bf-bound}
 Fix integers $k, m, n, \lambda, r\geq 0$, a threshold ratio $p \in [0,1]$, and an error function $d$.
-  For every $t, q_R, q_T \geq 0$, it holds that
+  For every $t, q_R, q_T, q_U, q_H \geq 0$, it holds that
   \begin{eqnarray*}
-    \Adv{\erreps}_{\struct_\saltybloom,r}(t,&q_R,& q_T, q_U, q_H) \leq \\ && q_R \cdot \left[\frac{q_H}{2^\lambda} + \binom{q_T}{\mu}\left(p+\frac{k\mu}{m}\right]^{k\mu}\right) \,,
+    \Adv{\erreps}_{\struct_\saltybloom,r}(t,&q_R,& q_T, q_U, q_H) \leq \\ && q_R \cdot \left[\frac{q_H}{2^\lambda} + \binom{q_T}{\mu}\left(p+\frac{k\mu}{m}\right)^{k\mu}\right] \,,
 \end{eqnarray*}
 where $\mu = \lceil r/\max(k \cdot d(0,1), d(1,0)) \rceil$
 \end{theorem}
@@ -546,7 +550,7 @@ Applying lemma~\ref{lemma:errep} and lemma~\ref{lemma:salttorand}, we reduce the
 
 Because new $\QRYO$ and $\UPO$ calls are based on random sampling, this does not provide the adversary with any additional information about how additional elements which might be queried, inserted, or deleted in the future might behave. However, any element which is sent to $\QRYO$ or $\UPO$ which acts as a false positive will be immediately recognized as such. Because of this, our next step will be to move to a game $\G_2$ where any insertion of a false positive immediately gives the adversary credit for the worst possible error that could be caused by either inserting or deleting that element.
 
-Define $\delta = \max(k \cdot d(0,1), d(1,0))$ and $\mu = \lceil r/\delta \rceil$. In $\G_2$, we modify the game so that producing a false positive increments $\err$ by $\delta$, but so that elements cannot be removed from the set. Because false negatives can only be produced by deleting false positives, and the deletion of $n$ false positives can only produce as many as $nk$ false negatives, this means that the adversary has no need to cause false negatives. Doing so can only decrease the chances of producing additional errors by reducing the values of counters in the filter, and so this does not decerase the adversary's ability to produce errors. Furthermore, we increase the allowed number of nonzero counters from $mp$ to $mp + k\lceil r/\delta \rceil$. The only way in which not being able to remove false positives can decrease the adversary's effectiveness is if the maximum capacity of the filter is reached. Since each false positive removed causes $k$ nonzero counters to be returned to zero, and the adversary stops after accumulating $r$ errors, an allowance of an extra $k\lceil r/\delta \rceil$ nonzero counters is enough to make up for this.
+Define $\delta = \max(k \cdot d(0,1), d(1,0))$ and $\mu = \lceil r/\delta \rceil$. In $\G_2$, we modify the game so that producing a false positive increments $\err$ by $\delta$, but so that elements cannot be removed from the set. Because false negatives can only be produced by deleting false positives, and the deletion of $n$ false positives can only produce as many as $nk$ false negatives, this means that the adversary has no need to cause false negatives. Doing so can only decrease the chances of producing additional errors by reducing the values of counters in the filter, and so this does not decrease the adversary's ability to produce errors. Furthermore, we increase the allowed number of nonzero counters from $mp$ to $mp + k\lceil r/\delta \rceil$. The only way in which not being able to remove false positives can decrease the adversary's effectiveness is if the maximum capacity of the filter is reached. Since each false positive removed causes $k$ nonzero counters to be returned to zero, and the adversary stops after accumulating $r$ errors, an allowance of an extra $k\lceil r/\delta \rceil$ nonzero counters is enough to make up for this.
 
 Since each new element queried from outside $\col$ has its corresponding indices determined by a true random function, the adversary can do no better than maximizing the number of nonzero counters in its attempt to produce false positives. Assuming the adversary is able to achieve a maximum-capacity number of nonzero counters, the probability of any particular counter being nonzero is $(mp + k\lceil r/\delta \rceil)/m = p + \frac{k}{m}\lceil\frac{r}{\delta}\rceil$. Over $k$ total hashes, the probability of a false positive is $\left((mp + k\lceil r/\delta \rceil)/m = p + \frac{k}{m}\lceil\frac{r}{\delta}\rceil\right)^k$. Since the adversary needs to accumulate $\lceil\frac{r}{\delta}\rceil$ errors over the course of $q_T$ queries, the probability of the adversary succeeding in this game is
 
@@ -591,7 +595,7 @@ Cuckoo filters provide a way of filtering elements with lower space overhead tha
 
 \begin{theorem}[Correctness Bound for Cuckoo Filters]\label{thm:cuckoo-salt-bound}
 Fix integers $b, k, \lambda, r\geq 0$, where $m \geq \lambda$.
-  For every $t, q_R, q_T \geq 0$ such that $q_T \geq r$, it holds that
+  For every $t, q_R, q_T, q_U, q_H \geq 0$ such that $q_T \geq r$, it holds that
   $$\Adv{\erreps}_{\struct,r}(t, q_R, q_T, q_U, q_H) \leq q_R \cdot
      \left[
       \frac{q_H}{2^\lambda} +
@@ -687,22 +691,129 @@ $$\Adv{\erreps}_{\struct_s,r}(\advA) \le q_R \cdot \left(\frac{q_H}{2^\lambda} +
 
 %The success rate of this attack depends on $|\col|$. The probability of $x$ being a false positive is given by the standard Bloom filter bound, $(1-e^{-k|\col|/m})^k$ for a $k$-by-$m$ count-min sketch. Since the adversary needs $(r-1)|\col|$ calls to $\UPO$ to produce an error of size $r$
 
-The fact that queries can test not just for set membership, but for frequency, means that new attacks are possible. For example, the adversary can pick a set $\col$ and an element $x \not\in \col$. They then use $\REPO$ to create several different sketches representing a multiset containing each element of $\col$ exactly $c$ times, where $c$ is the smallest natural number such that $d(c,0) \ge r$, and uses $\QRYO$ to test $x$'s membership in each of these. A single such mistake is by definition sufficient for the adversary to win the experiment, so the probability of adversarial victory is the same as the probability of an adversary finding a single element that creates a hash collision in each of the $k$ rows of the sketch. Winning at the $r$-error game with a set of size $n$ can therefore be reduced to the problem of winning at the $r'$-error game with a set of size $\lfloor\frac{n}{c}\rfloor$, for any $r' > 0$.
+The count-min sketch data structure comes in several varieties which each have slightly different security properties. There are also many possible error functions which can be considered, unlike with set membership queries where all errors are simply false positives or false negatives. Some implementations of count-min sketch allow for elements to be assigned negative frequency (so that the response space is $\Z$), while others do not (so that the response space is $\N$). In the latter case, updates may either include only insertion or may include both insertion and deletion. The easiest error function to work with is a binary error function which gives the adversary 1 point if it discovers a query which is off from the true value by at least some constant $c$, so that $d(x,y) = [|x - y| \ge c]$.
 
-% The initial representation, together with n calls to q_U, lets you view n objects; each additional 2n calls to q_U let you view an additional n objects; let the adversary win if they find a single error
-% $1-\left(1-\left(1-e^{-n/m}\right)^k\right)^{q_U/(2n)}$
+%Of course, $d$ is not an actual parameter of the data structure. Like $r$, it is a part of the security experiment, and measures how bad we consider certain errors to be. There are two `obvious' choices for $d$. First, there may have a certain precision a structure is intended to achieve, and any error outside the acceptable bounds counts as 1 point for the adversary. Second, we could have an error function that scales linearly with the size of the error, such as $d(x,y) = |x - y|$.
 
-As in the case of counting filters, we are forced to make use of a thresholding assumption, namely that the sum of the absolute values of the counters in the sketch must remain below some upper bound $N$.
+As in the case of counting filters, we are forced to make use of a thresholding assumption, namely that the sum of the counters in the sketch must remain below some upper bound $N$.
+
+\begin{theorem}[Correctness Bound for Count-Min Sketch]\label{thm:count-ms-bound}
+Fix integers $k, m, n, \lambda, r\geq 0$, a threshold ratio $p \in [0,1]$, and an error function $d(x,y) = [|x - y| > 0]$ for some $c \in \N$.
+  For every $t, q_R, q_T, q_U, q_H \geq 0$, it holds that
+  \begin{eqnarray*}
+    \Adv{\erreps}_{\struct_s,r}(t,&q_R,& q_T, q_U, q_H) \leq \\ && q_R \cdot \left[\frac{q_H}{2^\lambda} + \binom{q_T}{\lceil r/k \rceil}\left(p+\frac{\lceil r/k \rceil}{m}\right)^{k\lceil r/k \rceil}\right] \,,
+\end{eqnarray*}
+\end{theorem}
+
+\begin{figure}
+  \boxThmBFSaltCorrect{0.48}
+  {
+    \underline{$\G_0(\advA)$}\\[2pt]
+      $\col \getsr \advA^H$; $\setC \gets \emptyset$; $\setB \gets \col$; $\err \gets 0$\\
+      $\pub \getsr \Rep[\HASHO](\col)$\\
+      $\bot \getsr \advA^{\HASHO,\QRYO,\UPO,\INTO}$\\
+      return $(\err \geq r)$
+    \\[6pt]
+    \oraclev{$\QRYO(x)$}\\[2pt]
+      $\setB \gets \setB \cup x$\\
+      if $x \in \mathcal{C}$ then return $\bot$\\
+      $\setC \gets \setC \union \{x\}$\\
+      $a \gets \Qry[\HASHO](\pub, x)$\\
+      if $a \neq [x \in \col]$ then $\err \gets \err + 1$\\
+      return~$a$
+    \\[6pt]
+    \oraclev{$\UPO(x,b)$}\\[2pt]
+      $\setB \gets \setB \cup x$\\
+      $\setC \gets \emptyset$\\
+      $a \gets \Qry[\HASHO](\pub, \qry_x)$\\
+      if $x \in \setC$ and $b = a \neq [x \in \col]$ then\\
+      \tab $\err \gets \err-1$\\
+      if $b = 1$ then\\
+      \tab $\col \gets \col + \{x\}$\\
+      else\\
+      \tab $\col \gets \col - \{x\}$\\
+      $\pub \gets \Up[\HASHO](\pub,\up_{x,b})$\\
+      return~$\bot$
+    \\[6pt]
+    \oraclev{$\HASHO(x)$}\\
+      $\hh \getsr [m]^2$; $\vv \gets \fff(\hh$)\\
+      if $T[x]$ is defined then $\vv \gets T[x]$\\
+      $T[x] \gets \vv$;
+      return $\vv$
+  }
+  {
+    \underline{$\G_1(\advA)$}\\[2pt]
+    \oraclev{$\INTO(x,y)$}\\
+      if $x \not\in \col$ or $y \not\in \col$ then\\
+      \tab return $\bot$\\
+      $i \gets 0$\\
+      for $h$ in $\HASHO(x)$ do\\
+      \tab if $h$ in $\HASHO(y)$ then $i \gets i+1$\\
+      return $i$
+    \\[6pt]
+    \underline{$\G_2(\advA)$}\\[2pt]
+    \oraclev{$\UPO(x)$}\\
+      if $\QRYO(x)$ and $x \not\in \col$ then\\
+      \tab $\err \gets \err + \max(k \cdot d(0,1), d(1,0))$\\
+      $\setB \gets \setB \cup x$\\
+      $\setC \gets \emptyset$\\
+      $a \gets \Qry[H](\pub, \qry_x)$\\
+      if $x \in \setC$ and $a \neq [x \in \col]$ then\\
+      \tab $\err \gets \err-1$\\
+      $\col \gets \col + \{x\}$\\
+      $\pub \gets \Up[H](\pub,\up_{x,b})$\\
+      return~$\bot$
+  }
+  {
+  }
+  {
+  }
+  \caption{Games 0--3 for proof of Theorem~\ref{thm:count-ms-bound}.}
+  \label{fig:count-ms-bound}
+\end{figure}
+
+\begin{proof}
+
+Applying lemma~\ref{lemma:errep} and lemma~\ref{lemma:salttorand}, we reduce the $\erreps$ experiment to the $\erreps1$ experiment with a salted hash function replaced by true random sampling from $[m]$ for each of the $k$ distinct hash values. This is given in $\G_0$. In $\G_1$, we account for the possibility that the adversary can glean information about the overlap between sets by querying each of them separately. In particular, we give the adversary an additional oracle $\INTO$ that returns the number of locations in which two elements overlap. However, we constrain $\INTO$ to only return an answer when the element has previously been sent to some other oracle.
+
+Because new $\QRYO$ and $\UPO$ calls are based on random sampling, this does not provide the adversary with any additional information about how additional elements which might be queried, inserted, or deleted in the future might behave. However, any element which is sent to $\QRYO$ or $\UPO$ which acts as a false positive will be immediately recognized as such. Because of this, our next step will be to move to a game $\G_2$ where any insertion of a false positive immediately gives the adversary credit for the worst possible error that could be caused by either inserting or deleting that element.
+
+%Define $\delta = \max(k \cdot d(0,1), d(1,0))$ and $\mu = \lceil r/\delta \rceil$.
+
+In $\G_2$, we modify the game so that producing a false positive increments $\err$ by $k$, but so that elements cannot be removed from the set. Because underestimation errors can only be produced by deleting `false positives' (i.e. elements that should have 0 frequency but which are reported to have positive frequency), and the deletion of $n$ false positives can only produce as many as $nk$ underestimation errors, this means that the adversary has no need to cause underestimation errors. Doing so can only decrease the chances of producing additional errors by reducing the values of counters in the sketch, and so this does not decrease the adversary's ability to produce errors. Furthermore, we increase the allowed number of nonzero counters from $mp$ to $mp + k\lceil r/k \rceil$. The only way in which not being able to remove false positives can decrease the adversary's effectiveness is if the maximum capacity of the sketch is reached. Since each false positive removed causes at most 1 nonzero counters to be returned to zero, and the adversary stops after accumulating $r$ errors, an allowance of an extra $\lceil r/k \rceil$ nonzero counters per row is enough to make up for this.
+
+Since each new element queried from outside $\col$ has its corresponding indices determined by a true random function, the adversary can do no better than maximizing the number of nonzero counters in its attempt to produce false positives. Assuming the adversary is able to achieve a maximum-capacity number of nonzero counters, the probability of any particular counter being nonzero is $(mp + \lceil r/k \rceil)/m = p + \frac{1}{m}\lceil\frac{r}{k}\rceil$. Over $k$ total hashes, the probability of a false positive is $\left((mp + \lceil r/k \rceil)/m\right)^k = \left(p + \frac{1}{m}\lceil\frac{r}{k}\rceil\right)^k$. Since the adversary needs to accumulate $\lceil\frac{r}{k}\rceil$ errors over the course of $q_T$ queries, the probability of the adversary succeeding in this game is
+
+$$\Prob{\G_2(\advA) = 1} = \binom{q_U + q_T}{\lceil r/k \rceil}\left(p+\frac{\lceil r/k \rceil}{m}\right)^{k\lceil r/k \rceil}$$
+
+Therefore the advantage of the adversary in the original game is
+
+$$\Adv{\erreps}_{\struct_s,r}(\advA) \le q_R \cdot \left(\frac{q_H}{2^\lambda} + \binom{q_T}{\lceil r/k \rceil}\left(p+\frac{\lceil r/k \rceil}{m}\right)^{k\lceil r/k \rceil}\right).$$\missingqed
+
+%%
+
+%We give the adversary access to an $\INTO$ algorithm that tells the adversary the precise overlap between any combination of elements which have already been queried to $\QRYO$ or $\UPO$, or which were in the original representation. Furthermore, we give the adversary credit for any inaccuracy in the frequency count, not just an innacuracy above the threshold of $\delta$. This can only help the adversary, since any error that existed in the original game is also an error here.
+
+%However, since the `hash functions' in this game are actually true random functions, knowing the overlap between already-queried elements does not give an adversary any advantage in predicting how future elements will be hashed. This game is in fact exactly equivalent to the final counting filter game, where the adversary's chance of success is given by the chances of randomly assembling a filter that produces at least $r$ errors. This probability is given by
+%$$\Adv{\erreps}_{\struct_s,r}(\advA) \le q_R \cdot \left(\frac{q_H}{2^\lambda} + \binom{q_T}{\mu}\left(p+\frac{k\mu}{m}\right)^{k\mu}\right).$$
+
+\end{proof}
+
+If we raise the threshold for what counts as an error, it can only become more difficult for the adversary to succeed, so in fact all error functions of the form $d(x,y) = [|x - y| > c]$ for some constant $c$ also have this upper bound.
+
+Another obvious alternative is to simply use the Euclidean distance metric, so that $d(x,y) = |x - y|$. Using this notion of error in fact turns out to be at least as good for the adversary as the binary error metric. Any attack in the correctness experiment with error function $d'(x,y) = [|x - y| \ge 1]$ and $r' = r$ performs at least as well against a count-min sketch with error function $d(x,y) = |x - y|$. Similarly, any attack in the game with error function $d'(x,y) = [x - y > 2]$ and $r' = r/2$ performs at least as well in the game with error function $d(x,y) = |x - y|$, and so on for any other binary error function which gives some fixed credit for finding an error which is off from the correct value by at least some minimum constant value. This means that, if $d$ is the Euclidean distance error function and $d_k'$ is the binary function $d_c'(x,y) = [|x - y| \ge c]$, we have $\Adv{\erreps}_{\struct_s,r,d}(t, q_R, q_T, q_U, q_H) \le \Adv{\erreps}_{\struct_s,r/c,d'}(t, q_R, q_T, q_U, q_H)$.
+
+%In fact, not only is the advantage for the Euclidean metric game bounded below by that of the binary-error-function game, the bound is in some cases strict. The fact that the Euclidean error function allows for unboundedly large errors to be produced by a single query provides the adversary with new possible attacks. For example, the adversary can pick a set $\col$ of size $\frac{n}{r}$ and use $\REPO$ to create a sketch containing each element of $\col$ exactly $r$ times. They then use select several values $x \not\in \col$ and use $\QRYO$ to test each $x$'s membership in the representation. A single such mistake is by definition sufficient for the adversary to win the experiment, so the probability of adversarial victory is the same as the probability of an adversary finding a single element that creates a hash collision in each of the $k$ rows of the sketch. Each of the rows acts as a Bloom filter with a single hash function, so the probability of a collision within a single row is on the order of $(1-e^{-n/(rm)})$, and the probability of such a collision in each of $k$ rows is $(1-e^{-n/(rm)})^k$. Over the course of $q_T$ calls to $\QRYO$, the adversarial advantage is the probability that they find a collision in each row for any value of $x$ tested, which is $1-(1-(1-e^{-n/(rm)})^k)^{q_T}$. When $q_T$ is large but the other resource constraints are small, this may exceed the bound for the binary error function given in the theorem above. For example, if $k = 4$, $m = 1024$, $n = 100$, $r = 4$, $q_T = $, $q_R = 1$, and $q_U = q_H = 0$, we find that the bound for the binary error function is _ while the advantage of this attack is about $3.4 \cdot 10^{-4}$.
 
 %
 
-Depending on the choice of $d$, it is possible no such $c$ exists. One natural choice of $d$ is the Euclidean metric, with $d(x,y) = |x-y|$, but an alternative is to simply define $d(x,y)$ to be 1 if $|x-y| \ge n\epsilon$ and 0 otherwise, where $n$ is the maximum allowed stream size and $\epsilon$ is one of the error parameters. The non-adaptive guarantee for count-min sketch is that each point query has probability no more than $1-\delta$ of producing an error.
+%Depending on the choice of $d$, it is possible no such $c$ exists. One natural choice of $d$ is the Euclidean metric, with $d(x,y) = |x-y|$, but an alternative is to simply define $d(x,y)$ to be 1 if $|x-y| \ge n\epsilon$ and 0 otherwise, where $n$ is the maximum allowed stream size and $\epsilon$ is one of the error parameters. The non-adaptive guarantee for count-min sketch is that each point query has probability no more than $1-\delta$ of producing an error.
 
-What if the threshold for an error is 1? In other words, the adversary gets a point for every `false positive'. Assuming the hash functions are independent, the false positive probability in a count-min sketch is the same as the probability of getting simultaneous false positives in each of $k$ Bloom filters using a single hash function each, which is $\left(1-e^{-n/m}\right)^k$.
+%What if the threshold for an error is 1? In other words, the adversary gets a point for every `false positive'. Assuming the hash functions are independent, the false positive probability in a count-min sketch is the same as the probability of getting simultaneous false positives in each of $k$ Bloom filters using a single hash function each, which is $\left(1-e^{-n/m}\right)^k$.
 
-%
+% Note that if there is a linear error function rather than a binary threshold, it becomes even easier for the adversary to produce errors. After all, anything that produces an error in the binary case will also produce an error in the linear case, with the only difference being that the adversary may be able to make the error even worse and get even more `credit' for it later on. This means we have a linear ordering of correctness bounds, with linear-error-function count-min sketches below binary-error-function count-min sketches, which in turn are below counting filters.
 
-Given that there is a binary error threshold, we can assume without loss of generality that the adversary never adds an element multiple times, since doing so cannot cause additional errors.
+%Given that there is a binary error threshold, we can assume without loss of generality that the adversary never adds an element multiple times, since doing so cannot cause additional errors.
 
 % the adversary can: query for a previously-tested element, query for an untested element, insert an unknown element, insert a known correct element, insert a known overestimated element, insert a known underestimated element, delete an unknown element, delete a known correct element, delete a known overestimated element, or delete a known underestimated element
 
