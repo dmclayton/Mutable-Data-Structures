@@ -4,13 +4,47 @@ In each of the following cases, we consider four variations, where each structur
 
 \begin{table}[thp]
 \begin{center}
-  \begin{tabular}{ | c | p{3cm} | p{1cm} | p{4cm} | p{4cm} | }
+\small
+  \begin{tabular}{ | l | p{2.5cm} | p{3.5cm} | p{4cm} | p{4cm}|}
+    \hline
+    {\bf Structure} & {\bf Data Objects} & {\bf Supported Queries} & {\bf Supported Updates} & {\bf Parameters} \\ \hline
+    Bloom filter 
+          & \parbox[c][6ex]{4cm}{Sets\\$\col\subseteq \mathcal{X}$} %, or\\ $\col \in \Func(\mathcal{X},\{0,1\})$} 
+          & $\qry_x(\col) = [x \in \col]$
+          &  $\up_x(\col) = \col \cup \{x\}$ 
+          & \parbox[c]{4cm}{$n$, max $|\col|$\\$k$, no.\ hash functions\\$m$, array size (bits)} 
+          \\\hline
+    Counting filter 
+          & \parbox[c]{3.5cm}{Multisets\\ $\col \in \Func(\mathcal{X},\N)$}
+          & $\qry_x(\col) = [\col(x) > 0]$
+          & \parbox[c][10ex]{4cm}{$\up_{x,0}(\col)(x) = \col(x)+1$ \\ $\up_{x,1}(\col)(x) = \col(x)-1$ \\ $\up_{x,b}(\col)(y) = \col(y)$ for $x \neq y$}
+          &\\ \hline
+    Cuckoo filter
+          & \parbox[c]{3.5cm}{Multisets\\ $\col \in \Func(\mathcal{X},\N)$}
+          & $\qry_x(\col) = [\col(x) > 0]$
+          & \parbox[c][10ex]{4cm}{$\up_{x,0}(\col)(x) = \col(x)+1$ \\ $\up_{x,1}(\col)(x) = \col(x)-1$ \\ $\up_{x,b}(\col)(y) = \col(y)$ for $x \neq y$}
+          & \\ \hline
+     Count-min sketch
+          & \parbox[c]{3.5cm}{Multisets\\ $\col \in \Func(\mathcal{X},\N)$}
+          & $\qry_x(\col) = \col(x)$
+          & \parbox[c][10ex]{4cm}{$\up_{x,0}(\col)(x) = \col(x)+1$ \\ $\up_{x,1}(\col)(x) = \col(x)-1$ \\ $\up_{x,b}(\col)(y) = \col(y)$ for $x \neq y$}
+          & \\ \hline
+   
+  \end{tabular}
+\end{center}
+\caption{blah blah blah}
+\end{table}
+
+\ignore{
+\begin{table}[thp]
+\begin{center}
+  \begin{tabular}{ | c | p{4cm} | p{4cm} | p{4cm} | p{4cm} | }
     \hline
     Structure & $\mathcal{D}$ & $\mathcal{R}$ & $\mathcal{Q}$ & $\mathcal{U}$ \\ \hline
     Bloom filter & $[\mathcal{X}]^{\le n}$ for some universe $\mathcal{X}$ & $\bits$ & $\{\qry_x: x \in \mathcal{X}\}$, where $\qry_x(\col) = [x \in \col]$ & $\{\up_x : x \in \mathcal{X}\}$, where $\up_x(\col) = \col \cup \{x\}$ \\ \hline
     Counting filter & $Func(\mathcal{X},\Z)$ & $\bits$ & $\{\qry_x: x \in \mathcal{X}\}$, where $\qry_x(\col) = [\col(x) > 0]$ & $\{\up_{x,b} : x \in \mathcal{X}, b \in \bits\}$, where $\up_{x,0}(\col)(x) = \col(x)+1$, $\up_{x,1}(\col)(x) = \col(x)-1$, and $\up_{x,b}(\col)(y) = \col(y)$ for $x \neq y$ \\ \hline
     Cuckoo filter & $Func(\mathcal{X},\N)$ & $\bits$ & $\{\qry_x: x \in \mathcal{X}\}$, where $\qry_x(\col) = [\col(x) > 0]$ & $\{\up_{x,b} : x \in \mathcal{X}, b \in \bits\}$, where $\up_{x,0}(\col)(x) = \col(x)+1$, $\up_{x,1}(\col)(x) = \col(x)-1$, and $\up_{x,b}(\col)(y) = \col(y)$ for $x \neq y$ \\ \hline
-    Count-min sketch & $Func(\mathcal{X},\Z)$ & $\Z$ & $\{\qry_x: x \in \mathcal{X}\}$, where $\qry_x(\col) = \col(x)$ & $\{\up_{x,b} : x \in \mathcal{X}, b \in \bits\}$, where $\up_{x,0}(\col)(x) = \col(x)+1$, $\up_{x,1}(\col)(x) = \col(x)-1$, and $\up_{x,b}(\col)(y) = \col(y)$ for $x \neq y$ \\ \hline
+    Count-min sketch & $Func(\mathcal{X},\N)$ & $\Z$ & $\{\qry_x: x \in \mathcal{X}\}$, where $\qry_x(\col) = \col(x)$ & $\{\up_{x,b} : x \in \mathcal{X}, b \in \bits\}$, where $\up_{x,0}(\col)(x) = \col(x)+1$, $\up_{x,1}(\col)(x) = \col(x)-1$, and $\up_{x,b}(\col)(y) = \col(y)$ for $x \neq y$ \\ \hline
   \end{tabular}
 \end{center}
 \end{table}
@@ -27,7 +61,7 @@ In each of the following cases, we consider four variations, where each structur
   \end{tabular}
 \end{center}
 \end{table}
-
+}
 %A typical case occurs with standard Bloom filters~\cite{bloomfilter}, which is parametrized by positive integers $k$, $m$, $n$, representing the number of hash functions used, the size of the filter, and the maximum set size supported by the filter.
 
 %The object space is given by $\mathcal{D} = [\mathcal{X}]^{\le n}$, consisting of all subsets of some universe $\mathcal{X}$ that have cardinality no greater than a constant $n$. The standard $\Rep$ algorithm initializes an array of $m$ bits to zero and then hashes each element of the set using $k$ distinct hash functions $h_i: \mathcal{X} \to [m]$. Each of the indices specified by each of the hash function outputs is then set to 1.
