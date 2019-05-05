@@ -2,42 +2,6 @@ In general, each probabilistic data structure has some bound on the error size p
 
 In each of the following cases, we consider four variations, where each structure may be constructed with or without a randomly-chosen per-representation salt and with or without a private key. We also sometimes consider the possibility of adding a `threshold' to detect when a structure is too full. For example, we may modify the $\Up$ algorithm of a counting filter to fail if it is called to insert an element when the sum over all the counters in the filter has reached some threshold value. This variation can in some cases provide substantially better error bounds by preventing the adversary from exploiting more naive limits on the fullness of a filter, such as the number of elements in the set being represented.
 
-\begin{table}[t]
-\begin{center}
-\small
-  \begin{tabular}{ | l | p{2.5cm} | p{3.0cm} | p{4cm} | p{3cm}|}
-    \hline
-    {\bf Structure} & {\bf Data Objects} & {\bf Supported Queries} & {\bf Supported Updates} & {\bf Parameters} \\ \hline
-    Bloom filter 
-          & \parbox[c][6ex]{4cm}{Sets\\$\col\subseteq \mathcal{X}$} %, or\\ $\col \in \Func(\mathcal{X},\{0,1\})$} 
-          & $\qry_x(\col) = [x \in \col]$
-          &  $\up_x(\col) = \col \cup \{x\}$ 
-          & \parbox[c]{4cm}{$n$, max $|\col|$\\$k$, no.\ hash functions\\$m$, array size (bits)} 
-          \\\hline
-    Counting filter 
-          & \parbox[c]{3.5cm}{Multisets\\ $\col \in \Func(\mathcal{X},\N)$}
-          & $\qry_x(\col) = [\col(x) > 0]$
-          & \parbox[c][10ex]{4cm}{$\up_{x,0}(\col)(x) = \col(x)+1$ \\ $\up_{x,1}(\col)(x) = \col(x)-1$ \\ $\up_{x,b}(\col)(y) = \col(y)$ for $x \neq y$}
-          & \parbox[c]{3cm}{\dctodo{fill in}}
-         \\ \hline
-    Cuckoo filter
-          & \parbox[c]{3.5cm}{Multisets\\ $\col \in \Func(\mathcal{X},\N)$}
-          & $\qry_x(\col) = [\col(x) > 0]$
-          & \parbox[c][10ex]{4cm}{$\up_{x,0}(\col)(x) = \col(x)+1$ \\ $\up_{x,1}(\col)(x) = \col(x)-1$ \\ $\up_{x,b}(\col)(y) = \col(y)$ for $x \neq y$}
-          & \parbox[c]{3cm}{\dctodo{fill in}}
-          \\ \hline
-     Count-min sketch
-          & \parbox[c]{3.5cm}{Multisets\\ $\col \in \Func(\mathcal{X},\N)$}
-          & $\qry_x(\col) = \col(x)$
-          & \parbox[c][10ex]{4cm}{$\up_{x,0}(\col)(x) = \col(x)+1$ \\ $\up_{x,1}(\col)(x) = \col(x)-1$ \\ $\up_{x,b}(\col)(y) = \col(y)$ for $x \neq y$}
-          & \parbox[c]{3cm}{\dctodo{fill in}}
-          \\ \hline
-   
-  \end{tabular}
-\end{center}
-\caption{The data structrues that we consider.  The set~$\mathcal{X}$ is some understood universe of base objects.  Each data structure yields a space-efficient representation of its input data object and, in the presense of non-adaptive attacks, provides approximately correct responses to the supported queries.  For counting filters, cuckoo filters, and count-min sketch, typical implementations prevent updates that would cause $\col(x)-1 < 0$.}
-\end{table}
-
 \ignore{
 \begin{table}[thp]
 \begin{center}
