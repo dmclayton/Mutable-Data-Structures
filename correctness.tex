@@ -179,17 +179,3 @@ Another obvious alternative is to simply use the Euclidean distance metric, so t
 %We need a salt, since otherwise the adversary can ask for two representations and reveal one to see what the other looks like.
 
 %In fact, we need independent random representations. Once we have this, seeing representations does not help the adversary. What benefit can there be, then? Suppose an adversary wants to select for representations with certain properties, and ignore others. Since the representation is private, these properties can only be determined by $\QRYO$ calls.
-
-There are two immediate distinctions that can be made between different security games. First, we can ask whether it is possible for the adversary to predict the representations ahead of time, in which case the $\REPO$ and $\UPO$ oracles are largely unnecessary. Second, we can ask whether it is possible for the adversary, given its knowledge of the representations, to predict the outputs of $\QRYO$ ahead of time.
-
-%
-
-In the case that the adversary can predict representations ahead of time and can predict query responses based on that representation, the structure is inherently insecure because the adversary need not rely on any of the oracles in the experiment. Instead, it can simulate $\REPO$, $\UPO$, and $\QRYO$ itself and search for a representation which produces a large number of errors. Once this is found, the adversary can call $\REPO$ to construct this representation and call $\QRYO$ for each of the errors it has found until it surpasses the error threshold $r$ and wins. Assuming the minimum size of an error is 1, this requires only the resources $q_R = 1$ and $q_T = r$, which is the minimum necessary for any attacker to succeed. Furthermore, it always succeeds unless $r$ is so large as to be unachievable for the given structure with the given parameters.
-
-%
-
-If the adversary cannot guess representations but can predict query responses given representations, there are still limits on how secure the structure can be.
-
-%
-
-Finally, if both representations and queries are unpredictable by the adversary, we would like to say that the adversary cannot do any better than the non-adaptive case
