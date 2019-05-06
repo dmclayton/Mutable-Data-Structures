@@ -45,7 +45,7 @@ For example, count-min sketches are invertible, by consequence of being determin
           & \parbox[c]{2.5cm}{Multisets\\ $\col \in \Func(\mathcal{X},\N)$}
           & $\qry_x(\col) = [\col(x) > 0]$
           & \parbox[c][10ex]{4cm}{$\up_{x,0}(\col)(x) = \col(x)+1$ \\ $\up_{x,1}(\col)(x) = \col(x)-1$ \\ $\up_{x,b}(\col)(y) = \col(y)$ for $x \neq y$}
-          & \parbox[c]{3.5cm}{$n$, max $|\col|$\\$k$, \# hash functions\\$m$, array size (counters)}
+          & \parbox[c]{3.5cm}{$n$, max $|\col|$\\$k$, \# hash functions\\$m$, array size (counters)\\ $d$, bits per counter}
          \\ \hline
     \parbox[c]{1.5cm}{Cuckoo\\ filter}
           & \parbox[c]{2.5cm}{Multisets\\ $\col \in \Func(\mathcal{X},\N)$}
@@ -57,7 +57,7 @@ For example, count-min sketches are invertible, by consequence of being determin
           & \parbox[c]{2.5cm}{Multisets\\ $\col \in \Func(\mathcal{X},\N)$}
           & $\qry_x(\col) = \col(x)$
           & \parbox[c][10ex]{4cm}{$\up_{x,0}(\col)(x) = \col(x)+1$ \\ $\up_{x,1}(\col)(x) = \col(x)-1$ \\ $\up_{x,b}(\col)(y) = \col(y)$ for $x \neq y$}
-          & \parbox[c]{3.75cm}{$n$, max $|\col|$\\$k$, \# hash functions and rows\\$m$, bits per row}
+          & \parbox[c]{3.75cm}{$n$, max $|\col|$\\$k$, \# hash functions and arrays\\$m$, array size (counters)\\$d$, bits per counter}
           \\ \hline
   \end{tabular}
 \caption{The data structrues that we consider.  The set~$\mathcal{X}$ is some understood universe of base objects.  Each data structure yields a space-efficient representation of its input data object and, in the presense of non-adaptive attacks, provides approximately correct responses to the supported queries.  For counting filters, cuckoo filters, and count-min sketch, typical implementations prevent updates that would cause $\col(x)-1 < 0$.}
