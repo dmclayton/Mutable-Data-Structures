@@ -1,5 +1,5 @@
 \begin{figure}[t]
-  \twoColsNoDivide{0.48}
+  \fourColsOneDivide{0.25}
   {
      \raisebox{-5pt}{\experimentv{$\Exp{\errep}_{\struct,r}(\advA)$ {\colorbox{lightgray}{$\Exp{\erreps}_{\struct,r}(\advA)$}}}}\\[2pt]
       $\setP \gets \emptyset$\\
@@ -8,7 +8,8 @@
       $i \getsr \advA^{\REPO,\UPO,\QRYO\highlighto{,\REVO}}$\\
       \colorbox{lightgray}{if $i \in \setP$ then return 0} \\[2.0pt]
       return $[\sum_\qry \err_i[\qry] \geq r]$ 
-    \\[6pt]
+ }
+{
     \oraclev{$\REPO(\col)$}\\[2pt]
       $\pub \getsr \Rep_\key(\col)$\\
       if $\pub = \bot$ return $\bot$\\
@@ -42,7 +43,8 @@
       $\mathrm{rv} \gets \pub_i$ \highlight{;\mathrm{rv} \gets \top}\\
       return $\mathrm{rv}$
       \medskip
-
+}
+{
     \oraclev{$\QRYO(i, \qry)$}\\[2pt]
       if $\qry \in \setC_i$ then return $\bot$\\
       $\setC_i \gets \setC \union \{\qry\}$\\
