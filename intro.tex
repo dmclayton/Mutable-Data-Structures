@@ -4,7 +4,21 @@
 }
 \label{sec:intro}
 %
-\tsnote{OLD INTRO}
+\tsnote{Intro structure, thoughts...}
+\begin{itemize}
+\item Point to NY, quickly pivot to mutable DS
+\item Our syntax and what it captures
+\item Our correctness and what it captures (don't forget: immutability as an
+  adversarial restriction, not a syntactic one) 
+\item Loosely speaking, what the results say (see picture of
+  chalkboard) --~rough ``structure'' of all results: non-adaptive
+  term, plus ``(informed) guessing'' term)
+\item Data structures we consider: BF, counting filter, cuckoo filter,
+  CMS,... what about Bloomier filter results from old paper?
+\item future directions
+\end{itemize}
+
+\tsnote{OLD INTRO follows}
 Data structures are fundamental to essentially all areas of computer science.  
 %The analysis of data structures, in particular 
 The traditional approach to analyzing the correctness of a data structure 
@@ -84,8 +98,8 @@ name, the Bloom filter data structure and the Bloomier filter data structure are
 
 \heading{Data structures and their correctness.}
 %
-We formalize a data structure as a pair of algorithms $(\Rep, \Qry)$ denoting
-the \emph{representation} and \emph{query-evaluation} algorithms, respectively.
+We formalize a data structure as a triple of algorithms $(\Rep, \Qry, \Up)$ denoting
+the \emph{representation}, \emph{query-evaluation}, and \emph{Update} algorithms, respectively.
 Associated to the data structure is a set of supported queries~$\mathcal{Q}$.
 The representation algorithm is randomized, taking as input a
 key~$\ky$ and a collection of data~$\col$, and returning a
@@ -94,14 +108,14 @@ one sets $\ky=\varepsilon$.)
 %
 The deterministic query-evaluation algorithm~$\Qry$ uses~$\ky$ and $\pub$ in
 order to respond to a requested query~$\qry \in \queries$ on~$\col$.
+\textcolor{blue}{[[...]]}
 
 For better efficiency, many data structures only approximately
 represent the collection~$\col$. In this case, the query-evaluation
-algorithm~$\Qry$ may err in its response to queries.  Roughly
+algorithm~$\Qry$ may err in its response to queries.  \oldstuff{Roughly
 speaking,  our notion of adversarial correctness (\errep) captures how
 difficult it is for an attacker (given $\pub$) to find~$r>0$ distinct queries on
-which $\Qry$ returns an incorrect answer.
-\if{0}{, for a given value $r>0$.}\fi
+which $\Qry$ returns an incorrect answer.}
 
 For Bloom filters, the representation~$\pub$ includes a bit array~$M$ that
 represents a set~$\col \subseteq \elts$ using hash functions
@@ -111,14 +125,12 @@ known that Bloom filters may have false positives, and their false-positive rate
 for \emph{independently chosen} inputs and queries is well understood. (See
 Appendix~\ref{sec:mitz}.) Our correctness notion quantitatively captures the
 error rate even in the presence of an attacker that adaptively attempts to
-induce errors.
+induce errors. \textcolor{blue}{[[...]]}
 
 We note that Naor and Yogev~\cite{naor2015bloom} were the first to formalize
 adversarial correctness of Bloom filters and, indeed, their work
 provided inspiration for this paper.  Our work significantly extends
-theirs in several ways, as we will detail, shortly.  One important
-extension is the consideration of data structure privacy.
-
+theirs in several ways, as we will detail, shortly.  \textcolor{blue}{[[...]]}
 % ss-rep
 \if{0}{
   \anytodo{Several reviewers have made the same complaint : why these notions?
@@ -142,51 +154,6 @@ extension is the consideration of data structure privacy.
   our best bet  is to \emph{own} our original perspective. To that end, the place
   we need the most motivation is \ssrep privacy of $\SKBF$, the PRF-based BF. See
   my comments in Section~\ref{sec:bf-prf} for two ways we've already thought of.}
-}\fi
-
-\heading{Data structure privacy.}
-%
-Many data structures inherently leak information about the data they represent.
-For example, the classical Bloom filter is known to leak (a good approximation
-of) the cardinality of the underlying set. Moreover, some applications
-\emph{require} the data structure to leak certain information in order to
-fulfill a functional requirement of the system. (We give an example of this in
-Section~\ref{sec:bf-bigram}.)
-%
-%\anytodo{Fix citations below.}
-%
-But one can hope to leak \emph{nothing more} than what is absolutely
-necessary, and
-%\footnote{If more than $|\pub|$ is necessary to leak, the ``trivial'' privacy
-%solution of encrypting $\pub$ is not applicable.}
-this goal leads to our first notion of privacy.
-%In the tradition of the original semantic-security notion for
-%encryption~\cite{goldwasser1982ss}, and like more recent notions of privacy
-%for property-preserving encryption~\cite{xxx} and searchable
-%encryption~\cite{xxx},
-We define a simulation-based notion (\ssrep) that requires that $\pub$ leak
-nothing about~$\col$ other than what is specified by an explicit \emph{leakage}
-function.
-
-% ow-rep
-It is not hard to see that only keyed data structures can possibly satisfy this
-definition, since otherwise there is no secret from which to bootstrap security.
-Thus, we also consider a weaker privacy notion in which we ask that the data
-structure not leak any particular element of the data it represents. More
-specifically, our one-wayness notion (\owrep) requires that if $\col$ has
-sufficient min-entropy (in a sense we precisely define), then it should be
-infeasible for an attacker to recover any element of $\col$, given~$\pub$.
-
-\if{0}{
-  \anytodo{Motivate applications of secret-key data structures.  A consistent
-  reviewer complaint was the separation between $\pub$ and $\privaux$ as being
-  artificial and not motivated.  We need to address this vigorously here.  For
-  example, in a CDN, Bloom filters are passed between content servers; likewise
-  p2p networks, where trust may not be assumed.  Using something like Squid, even
-  if you don't transmit your bit array, the hash functions are public because
-  they are specified in the publicly available code.  } \jnote{Need to think more
-  about this. I don't see a setting where (1)~privacy is desired but
-  (2)~encryption cannot be used to hide $\pub$ from an attacker.}
 }\fi
 
 \heading{Constructions we analyze.}
@@ -243,15 +210,7 @@ also apply our definitions to:
 
 \heading{Future research directions.}
 %
-The syntax and security notions we develop apply to \emph{immutable} data
-structures, i.e., those for which the input~$\col$ does not change.
-%
-\if{0}{
-  Even within this class of data structures, we are only able to
-  thoroughly consider two types, set-membership data structures and dictionaries.
-  Our formalisms support future work to analyze other immutable structures.
-}\fi
-%
+\ignore{
 It would be interesting to extend our work to the case of \emph{mutable} data
 structures. Specific examples to consider here are counting Bloom
 filters~\cite{fan2000summary}, scalable Bloom
@@ -259,9 +218,10 @@ filters~\cite{almeida2007scalable}, count-min
 sketches~\cite{cormode2005improved}, and hierarchical Bloom
 filters~\cite{zhu2004hierarchical}, to name just a few in the extended Bloom
 filter family.
+}
 
 % NOTE(all) Removed these citations: \cite{broder2004network,nojima2009cryptographically}
-Our goal is to establish foundations for the security of (immutable) data
+Our goal is to establish foundations for the security of  data
 structures. But it would certainly be interesting to analyze high-level
 protocols that use these data structures, e.g.
 content-distribution networks~\cite{byers2002informed}, where many servers
