@@ -1,0 +1,192 @@
+%\newif\iffull
+%\fulltrue
+
+%\iffull
+%\documentclass{article}
+%\else
+%\documentclass{llncs}
+%\fi
+
+%\usepackage{epsf}
+
+%\include{macros}
+
+% Notions
+\newcommand{\errep}{\notionfont{ERR\mbox{-}UP}}
+\newcommand{\erreps}{\notionfont{ERR\mbox{-}UP(S)}}
+\newcommand{\indrep}{\notionfont{IND\mbox{-}UP}}
+\newcommand{\indrepr}{\notionfont{IND\mbox{-}UPR}}
+\newcommand{\prf}{\notionfont{PRF}}
+\newcommand{\ssrep}{\notionfont{SS\mbox{-}REP}}
+\def\ssrepX#1{\mbox{\ssrep-#1}}
+\newcommand{\owrep}{\notionfont{OW\mbox{-}REP}}
+\newcommand{\errepone}{\notionfont{ER\mbox{-}REP1}}
+\def\indrepX#1{\indrep\mbox{-}#1}
+\def\indreprX#1{\indrepr\mbox{-}#1}
+\def\prfX#1{\prf\mbox{-}#1}
+
+% Structures
+\newcommand{\struct}{\capgreekfont{\Pi}}
+\newcommand{\Init}{\schemefont{Init}}
+\newcommand{\Up}{\schemefont{Up}}
+\newcommand{\Qry}{\schemefont{Qry}}
+\newcommand{\Rep}{\schemefont{Rep}}
+\newcommand{\qry}{\procfont{qry}}
+\newcommand{\lk}{\procfont{lk}}
+\newcommand{\up}{\procfont{up}}
+%\newcommand{\pub}{\procfont{pub}}
+\newcommand{\pub}{\procfont{repr}}
+\newcommand{\param}{\procfont{par}}
+\newcommand{\key}{K}
+\newcommand{\pp}{\mathit{pp}}
+\renewcommand{\sp}{\mathit{sp}}
+
+\newcommand{\ky}{K}
+\newcommand{\res}{a}
+\newcommand{\elts}{\setfont{X}} % TODO What does "elts" mean?
+
+% Constructions
+\newcommand{\BF}{\schemefont{BF}}
+\newcommand{\SBF}{\schemefont{SBF}}
+\newcommand{\SKBF}{\schemefont{KBF}}
+\newcommand{\PRLBF}{\schemefont{PPRL}}
+\newcommand{\DICT}{\schemefont{DICT}}
+\newcommand{\bi}{\mathrm{bi}}
+\newcommand{\bloom}{\mathrm{bf}}
+\newcommand{\saltybloom}{\mathrm{sbf}}
+\newcommand{\prfbloom}{\mathrm{kbf}}
+\newcommand{\dict}{\mathrm{dict}}
+%\newcommand{\hashprf}{\schemefont{stupid}} % FIXME remove
+
+% Other schemes
+\newcommand{\hashbf}{\schemefont{2Hash}}
+\newcommand{\hash}{\schemefont{Hash}}
+\newcommand{\hashlin}{\schemefont{2Hash}}
+\newcommand{\tinyhash}{\schemefont{Tiny}}
+\newcommand{\kbf}{\schemefont{KBF}}
+
+% Sets
+\newcommand{\univ}{\setfont{U}}
+\newcommand{\queries}{\setfont{Q}}
+\newcommand{\results}{\setfont{R}}
+\newcommand{\mutants}{\setfont{M}}
+\newcommand{\keys}{\setfont{K}}
+\newcommand{\col}{\setfont{S}}
+
+\newcommand{\setA}{\setfont{A}}
+\newcommand{\setB}{\setfont{B}}
+\newcommand{\setC}{\setfont{C}}
+\newcommand{\setI}{\setfont{I}}
+\newcommand{\setK}{\setfont{K}}
+\newcommand{\setM}{\setfont{M}}
+\newcommand{\setN}{\setfont{N}}
+\newcommand{\setP}{\setfont{P}}
+\newcommand{\setQ}{\setfont{Q}}
+\newcommand{\setR}{\setfont{R}}
+\newcommand{\setS}{\setfont{S}}
+\newcommand{\setT}{\setfont{T}}
+\newcommand{\setV}{\setfont{V}}
+\newcommand{\setX}{\setfont{X}}
+\newcommand{\setW}{\setfont{W}}
+\newcommand{\setZ}{\setfont{Z}}
+% Adversaries
+\newcommand{\advA}{\adversaryfont{A}}
+\newcommand{\advB}{\adversaryfont{B}}
+\newcommand{\dist}{\adversaryfont{D}}
+
+% Variables
+\newcommand{\err}{\varfont{err}}
+\newcommand{\ct}{\varfont{ct}}
+\renewcommand{\st}{\varfont{st}}
+\newcommand{\salt}{Z}
+
+% Oracles
+\newcommand{\REPO}{\oraclefont{Rep}}
+\newcommand{\UPO}{\oraclefont{Up}}
+\newcommand{\QRYO}{\oraclefont{Qry}}
+\newcommand{\PRFO}{\oraclefont{F}}
+
+% Vectors
+\newcommand{\xx}{\vectorfont{x}}
+\newcommand{\vv}{\vectorfont{v}}
+\newcommand{\REVO}{\mathbf{Reveal}}
+\newcommand{\HASHO}{\oraclefont{Hash}}
+\newcommand{\INTO}{\oraclefont{Int}}
+\newcommand{\diffplus}[1]{\fbox{#1}}
+\newcommand{\diffplusbox}[1]{\fbox{\parbox{\dimexpr\textwidth-2\fboxsep-2\fboxrule\relax}{#1}}}
+\newcommand{\diffminus}[1]{\colorbox{lightgray}{#1}}
+\newcommand{\diffminusbox}[1]{\colorbox{lightgray}{\parbox{\dimexpr\textwidth-2\fboxsep-2\fboxrule\relax}{#1}}}
+\newcommand{\hh}{\vectorfont{h}}
+\newcommand{\fff}{\schemefont{Fn}}
+\newcommand{\Rnd}{\schemefont{Rand}}
+\newcommand{\Repx}{\Rep1}
+\newcommand{\Qryx}{\Qry1}
+\newcommand{\Upx}{\Up1}
+\newcommand{\Ans}{\varfont{Ans}}
+\newcommand{\setE}{\mathcal{E}}
+\newcommand{\Resp}{\varfont{Resp}}
+\def\ticks(#1,#2){\procfont{T}_{\hspace*{-1.5pt}#1}({#2})}
+\newcommand{\highlighto}[1]{\colorbox{lightgray}{$\scriptstyle #1$}}
+\newcommand{\highlight}[1]{\colorbox{lightgray}{$\displaystyle #1$}}
+
+\newcommand{\emptystring}{\varepsilon}
+
+%\input{abstract}
+
+\section{Introduction}
+\input{intro}
+
+\section{Syntax}
+\label{sec:syntax}
+\input{syntax}
+
+\section{Concrete Data Structures}
+\label{sec:structures}
+\input{structures}
+
+\section{Notions of Adversarial Correctness}
+\label{sec:correctness}
+\input{correctness}
+
+\section{Bloom Filter Results}
+\label{sec:bloom}
+\input{bloom}
+
+\section{Counting Filter Results}
+\label{sec:counting}
+\input{counting}
+
+\section{Cuckoo Filter Results}
+\label{cuckoo}
+\input{cuckoo}
+
+\section{Count-Min Sketch Results}
+\label{cms}
+\input{cms}
+
+%\section{Privacy}
+%\label{sec:privacy}
+%\input{privacy}
+
+\newpage
+
+\begin{appendix}
+  \section{Comparison to Naor-Yogev}
+  \input{ny-def-comparison}
+
+  \section{The standard Bloom filter bound}
+  \input{mitz}
+
+  \section{Proofs}
+%  \input{appendix-proofs}
+\end{appendix}
+
+%\begin{thebibliography}{9}
+%\bibitem{bloomfilter} 
+%Burton Bloom.
+%\textit{Space/time trade-offs in hash coding with allowable errors.}
+%Commun. ACM 13, 7 (July 1970), 422-426.
+%\end{thebibliography}
+
+%\section{Old-stuff}
+%\input{toms-mutable-filters}

@@ -10,11 +10,11 @@ While many potential errors may exist for a given representation of a set, in th
 
 Both experiments aim to capture the total weight of the errors caused by the adversary, at any point in time, with respect to the current data objects $\col_i$ and their representations $\pub_i$.  Because we consider mutable data objects and representations, the notion of ``current'' is defined by calls to the $\REPO$ and $\UPO$ oracles.  Specifically, for each~$\col_i$, both experiments maintain a set~$\setC_i$ that is initially set to empty (when~$\col_i$ is first assigned via a~$\REPO$-query), and it is reset to empty whenever~$\col_i$ is updated via an $\UPO$-query.  This is capturing the fact that applying a non-empty update function~$\up$ to~$\col_i$ produces a new data object.
 
-To track errors, both experiments maintain an array $\err_i[]$ for every data object~$\col_i$ that has been defined.   Initially, $\err_i[]$ is implicitly assigned the value of~$\undef$ at every index.  For purposes of value comparison, we adopt the convention that $\undef < n$ for all $n \in \mathbb{R}$.
+To track errors, both experiments maintain an array $\err_i[]$ for every data object~$\col_i$ that has been defined.   Initially, $\err_i[]$ is implicitly assigned the value of~$\undefn$ at every index.  For purposes of value comparison, we adopt the convention that $\undefn < n$ for all $n \in \mathbb{R}$.
 %
 Now, the array~$\err_i$ is indexed by query functions~$\qry$, and the value of $\err_i[\qry]$ is the ``weight'' of the error caused by~$\qry$, with respect to the \emph{current} data object~$\col_i$ and \emph{current} representation~$\pub_i$ (of~$\col_i$).  
 %
-The value of~$\err_i[\qry]$ is updated within the $\QRYO$- and $\UPO$-oracles, but observe that $\err_i[\qry] = \undef$ until $(i,\qry)$ is queried to the $\QRYO$-oracle.  Intuitively, a representation~$\pub_i$ of data object~$\col_i$ cannot surface errors until it is queried.
+The value of~$\err_i[\qry]$ is updated within the $\QRYO$- and $\UPO$-oracles, but observe that $\err_i[\qry] = \undefn$ until $(i,\qry)$ is queried to the $\QRYO$-oracle.  Intuitively, a representation~$\pub_i$ of data object~$\col_i$ cannot surface errors until it is queried.
 
 When~$\QRYO(i,\qry)$ executes, the value in $\err_i[\qry]$ is overwritten iff the error caused by~$\qry$ is larger than the existing value of $\err_i[\qry]$.  The first time $(i,\qry)$ is queried to~$\QRYO$ this is guaranteed, since the minimum possible value of $d$ is 0.  Since the set $\setC_i$ is used to prevent (WLOG) the adversary from repeating a query~$\QRYO(i,\qry)$ for a given~$\col_i$, increases to the value of $\err_i[\qry]$ may only be made ``across'' updates to~$\col_i$.  This may seem to be overly conservative, as an error-heavy~$\col_i$ may become less so after an update.  But we account for this within the $\UPO$-oracle.
 In particular, calls to the $\UPO$-oracle may only \emph{decrease} the value of~$\err_i[\qry]$.  
@@ -73,7 +73,7 @@ Note that $B$ makes at most $q_T$ queries to $\QRYO$ and $q_H$ queries to its RO
 \end{lemma}
 
 \begin{proof}
-Let $\G_0$ be the standard $\errep1$ game for the structure $\struct$, and let $\G_1$ be the same game for $\struct'$. There exists an adversary $\advB$ such that $\Prob{\G_0(\advA) = 1} \le \Prob{\G_1(\advB) = 1} + q_H/2^\lambda$. This adversary initializes an empty table $R$ and simulates $\advA$. When a query $w$ is sent to $\HASHO$, $\advB$ returns $R[w]$ if this entry in the table is defined. Otherwise, if $w = \langle\salt, x\rangle$ for some $\salt \in \bits^\lambda$ and $x \in \bits^*$, forward $(\salt, x)$ to $\HASHO$, store the result in $R[w]$, and return this value. Finally, if $R[w]$ is not defined and $w$ is not of this form, sample $r$ uniformly from the range of the hash function, store the result in $R[w]$ and return that result. Queries to all other oracles are simply forwarded to $\advB$'s oracle. Assuming the output of the hash function is uniformly distributed, this simulation is perfect unless $\advA$ guesses the salt correctly, which happens with probability $q_H/2^\lambda$.\missingqed
+Let $\game_0$ be the standard $\errep1$ game for the structure $\struct$, and let $\game_1$ be the same game for $\struct'$. There exists an adversary $\advB$ such that $\Prob{\game_0(\advA) = 1} \le \Prob{\game_1(\advB) = 1} + q_H/2^\lambda$. This adversary initializes an empty table $R$ and simulates $\advA$. When a query $w$ is sent to $\HASHO$, $\advB$ returns $R[w]$ if this entry in the table is defined. Otherwise, if $w = \langle\salt, x\rangle$ for some $\salt \in \bits^\lambda$ and $x \in \bits^*$, forward $(\salt, x)$ to $\HASHO$, store the result in $R[w]$, and return this value. Finally, if $R[w]$ is not defined and $w$ is not of this form, sample $r$ uniformly from the range of the hash function, store the result in $R[w]$ and return that result. Queries to all other oracles are simply forwarded to $\advB$'s oracle. Assuming the output of the hash function is uniformly distributed, this simulation is perfect unless $\advA$ guesses the salt correctly, which happens with probability $q_H/2^\lambda$.\missingqed
 \end{proof}
 
 \heading{Keyed structures.}
@@ -88,15 +88,15 @@ As in the keyless case, we can reduce the case of $\erreps$ for a secretly-keyed
 \end{lemma}
 
 \begin{proof}
-In each of the structures considered here, we model the use of a secretly keyed hash function with the use of a pseudorandom function $F_K$. Let $\G_0$ be the $\errep$ game on this structure. Our first step is to move to a game $\G_1$ where the pseudorandom function $F_K$ is replaced by a true random function $\Rnd$ which is lazily evaluated as necessary when $\REPO$, $\QRYO$, and $\UPO$ are called. By a conditioning argument, the advantage of the adversary is given by $\Adv{\errep}_{\struct,r}(\advA) = \Adv{\prf}_F(\advB) + \Prob{\G_1(\advA)=1}$.
+In each of the structures considered here, we model the use of a secretly keyed hash function with the use of a pseudorandom function $F_K$. Let $\game_0$ be the $\errep$ game on this structure. Our first step is to move to a game $\game_1$ where the pseudorandom function $F_K$ is replaced by a true random function $\Rnd$ which is lazily evaluated as necessary when $\REPO$, $\QRYO$, and $\UPO$ are called. By a conditioning argument, the advantage of the adversary is given by $\Adv{\errep}_{\struct,r}(\advA) = \Adv{\prf}_F(\advB) + \Prob{\game_1(\advA)=1}$.
 
-Consider another game $\G_2$ that ensures the salts do not repeat, by choosing $\salt$ exclusively from salts which have not been previously used. The game is identical to $\G_1$ until a salt repeats, which by the birthday bound occurs with probability $q_R^2/2^\lambda$. Therefore $\Adv{\errep}_{\struct,r}(\advA) = \Adv{\prf}_F(\advB) + q_R^2/2^\lambda + \Prob{\G_2(A) = 1}$.
+Consider another game $\game_2$ that ensures the salts do not repeat, by choosing $\salt$ exclusively from salts which have not been previously used. The game is identical to $\game_1$ until a salt repeats, which by the birthday bound occurs with probability $q_R^2/2^\lambda$. Therefore $\Adv{\errep}_{\struct,r}(\advA) = \Adv{\prf}_F(\advB) + q_R^2/2^\lambda + \Prob{\game_2(A) = 1}$.
 
-Next, we revise the game to $\G_3$ where the adversary gets credit for queries $\QRYO(i,\qry)$ which are false positives for any $\pub_j$, regardless of the actual argument $i$ given to $\QRYO$. Since this can only benefit the adversary, $\Adv{\errep}_{\struct,r}(\advA) \le \Adv{\prf}_F(\advB) + q_R^2/2^\lambda + \Prob{\G_3(A) = 1}$.
+Next, we revise the game to $\game_3$ where the adversary gets credit for queries $\QRYO(i,\qry)$ which are false positives for any $\pub_j$, regardless of the actual argument $i$ given to $\QRYO$. Since this can only benefit the adversary, $\Adv{\errep}_{\struct,r}(\advA) \le \Adv{\prf}_F(\advB) + q_R^2/2^\lambda + \Prob{\game_3(A) = 1}$.
 
-However, because each representation makes use of a random function for determining the value of all representations, updates, and queries, the probability of a previously unqueried element producing an error in one representation is independent of its probability of producing an error in the other representations. When we move to the final game $\G_4$ where the adversary is only allowed to call $\REPO$ once, the adversary's advantage will then decrease by a factor of at most $q_R$. This gives us the final result:
+However, because each representation makes use of a random function for determining the value of all representations, updates, and queries, the probability of a previously unqueried element producing an error in one representation is independent of its probability of producing an error in the other representations. When we move to the final game $\game_4$ where the adversary is only allowed to call $\REPO$ once, the adversary's advantage will then decrease by a factor of at most $q_R$. This gives us the final result:
 
-$$\Adv{\errep}_{\struct,r}(\advA) \le \Adv{\prf}_F(\advB) + \frac{q_R^2}{2^\lambda} + q_R \cdot \Prob{\G_4(A) = 1}$$\missingqed
+$$\Adv{\errep}_{\struct,r}(\advA) \le \Adv{\prf}_F(\advB) + \frac{q_R^2}{2^\lambda} + q_R \cdot \Prob{\game_4(A) = 1}$$\missingqed
 \end{proof}
 
 \heading{Invertible structures.}
@@ -165,7 +165,7 @@ Another obvious alternative is to simply use the Euclidean distance metric, so t
 % the adversary can: query for a previously-tested element, query for an untested element, insert an unknown element, insert a known correct element, insert a known overestimated element, insert a known underestimated element, delete an unknown element, delete a known correct element, delete a known overestimated element, or delete a known underestimated element
 
 % inserting an unknown element can increase the number of overestimated elements, and can increase the amount they are overestimated by; it can also decrease the number of underestimaged elements, and can decrease the amount they are underestimated by; it does not affect the estimate of the inserted element
-% inserting a known correct element does the same thing, and also does not affect the estimate of the inserted element, so this is equivalent to inserting an unknown element
+% inserting a known correct element does the same tne hing, and also does not affect the estimate of the inserted element, so this is equivalent to inserting an unknown element
 
 % inserting any element can increase the number of overestimated elements, and can increase the amount they are overestimated by; it can also decrease the number of underestimaged elements, and can decrease the amount they are underestimated by; it does not affect the estimate of the inserted element; the estimate of the element itself remains unchanged
 % the opposite is true for deletion
@@ -179,3 +179,17 @@ Another obvious alternative is to simply use the Euclidean distance metric, so t
 %We need a salt, since otherwise the adversary can ask for two representations and reveal one to see what the other looks like.
 
 %In fact, we need independent random representations. Once we have this, seeing representations does not help the adversary. What benefit can there be, then? Suppose an adversary wants to select for representations with certain properties, and ignore others. Since the representation is private, these properties can only be determined by $\QRYO$ calls.
+
+There are two immediate distinctions that can be made between different security games. First, we can ask whether it is possible for the adversary to predict the representations ahead of time, in which case the $\REPO$ and $\UPO$ oracles are largely unnecessary. Second, we can ask whether it is possible for the adversary, given its knowledge of the representations, to predict the outputs of $\QRYO$ ahead of time.
+
+%
+
+In the case that the adversary can predict representations ahead of time and can predict query responses based on that representation, the structure is inherently insecure because the adversary need not rely on any of the oracles in the experiment. Instead, it can simulate $\REPO$, $\UPO$, and $\QRYO$ itself and search for a representation which produces a large number of errors. Once this is found, the adversary can call $\REPO$ to construct this representation and call $\QRYO$ for each of the errors it has found until it surpasses the error threshold $r$ and wins. Assuming the minimum size of an error is 1, this requires only the resources $q_R = 1$ and $q_T = r$, which is the minimum necessary for any attacker to succeed. Furthermore, it always succeeds unless $r$ is so large as to be unachievable for the given structure with the given parameters.
+
+%
+
+If the adversary cannot guess representations but can predict query responses given representations, there are still limits on how secure the structure can be.
+
+%
+
+Finally, if both representations and queries are unpredictable by the adversary, we would like to say that the adversary cannot do any better than the non-adaptive case

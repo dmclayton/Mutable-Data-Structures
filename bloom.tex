@@ -34,7 +34,7 @@ This proof first reduces to the single-representation case, which as shown in le
 \begin{figure}
   \boxThmBFSaltCorrect{0.48}
   {
-    \underline{$\G_0(\advA)$}\\[2pt]
+    \underline{$\game_0(\advA)$}\\[2pt]
       $\col \getsr \advA^H$; $\setC \gets \emptyset$; $\err \gets 0$\\
       $\pub \getsr \Rep[H](\col)$\\
       $\bot \getsr \advA^{H,\QRYO,\UPO}$\\
@@ -58,7 +58,7 @@ This proof first reduces to the single-representation case, which as shown in le
     \\[4pt]
     \hspace*{-4pt}\rule{1.043\textwidth}{.4pt}
     \\[5pt]
-    \oraclev{$\HASHO_1(\salt,x)$} \hfill\diffplus{$\G_2$}\;{$\G_1$}\hspace*{3pt}\\
+    \oraclev{$\HASHO_1(\salt,x)$} \hfill\diffplus{$\game_2$}\;{$\game_1$}\hspace*{3pt}\\
       $\hh \getsr [m]^2$; $\vv \gets \fff(\hh$)\\
       if $\salt = \salt^*$ then\\
       \tab $\bad_1 \gets 1$; \diffplus{return $\vv$}\\
@@ -67,7 +67,7 @@ This proof first reduces to the single-representation case, which as shown in le
       return $\vv$
   }
   {
-    \underline{$\G_1(\advB)$}\\[2pt]
+    \underline{$\game_1(\advB)$}\\[2pt]
       $\salt^* \getsr \bits^\lambda$;
       $\col \getsr \advB^{\HASHO_1}$\\
       $\pub \gets \Repx[\HASHO_2](\col, \salt^*)$\\
@@ -100,7 +100,7 @@ This proof first reduces to the single-representation case, which as shown in le
       return $\vv$
   }
   {
-    \underline{$\G_3(\advB)$}\\[2pt]
+    \underline{$\game_3(\advB)$}\\[2pt]
     \oraclev{$\QRYO(\qry_x)$}\\[2pt]
       $a \gets \Qry[\HASHO_3](\pub, \qry_x)$\\
       if $a \neq \qry_x(\col)$ then $\err \gets \err + 1$\\
@@ -124,9 +124,9 @@ This proof first reduces to the single-representation case, which as shown in le
   \label{fig:bf-priv-salt-bound}
 \end{figure}
 
-\begin{proof} We first reduce from the $\erreps$ case to the $\erreps1$ case, which by lemma~\ref{lemma:errep} may scale the adversary's advantage only by a factor of $q_R$. The game~$\G_0$ is exactly equivalent to the $\erreps1$ experiment, so $\Adv{\errep1}_{\struct_s,r}(\advA) = \Prob{\G_0(\advA) = 1}$. In~$\G_1$ we split the hash oracle into three, giving the adversary access $\HASHO_1$ in both stages of the game, while $\HASHO_2$ is reserved for oracular use by $\Repx$, $\QRYO$, and $\UPO$. For any $\advA$ for~$\G_0$, there is $\advB$ for~$\G_1$ which produces the same advantage by simulating $\advA$. This adversary first creates its own table $R$ with all values initially undefined. When $\advA$ makes a query $w$ to $H$, $\advB$ returns $R[w]$ if that entry in the table is defined. Otherwise, if there are $\salt \in \bits^\lambda$, $j \in [k]$, and $x \in \bits^*$ such that $w = \langle\salt, j, x\rangle$, forward $(\salt,x)$ to $\HASHO_1$. For each $j \in [k]$, set $R[\langle\salt, j, x\rangle] = \vv_j$, where $\vv$ is the output of the $\HASHO_1$ oracle. If there is no such triple $\langle\salt, j, x\rangle$, just sample $r$ from $[m]$ uniformly and set $R[w] = r$. In either case, return $R[w]$ to $\advA$. When $\advA$ outputs its collection $\col$, $\advB$ outputs $\col$ as well. Any queries by $\advA$ to $\QRYO$ or $\UPO$ are forwarded to $\advB$'s corresponding oracle. The simulation is perfect because $\Rep[H](\col)$ and $\Up[H](\col,\up)$ are identically distributed to $\Rep[\HASHO_2](\col)$ and $\Up[\HASHO_2](\col,\up)$. Because we have a perfect simulation, $\Adv{\erreps1}_{\struct_s,r}(\advA) = \Prob{\G_1(\advA) = 1}$.
+\begin{proof} We first reduce from the $\erreps$ case to the $\erreps1$ case, which by lemma~\ref{lemma:errep} may scale the adversary's advantage only by a factor of $q_R$. The game~$\game_0$ is exactly equivalent to the $\erreps1$ experiment, so $\Adv{\errep1}_{\struct_s,r}(\advA) = \Prob{\game_0(\advA) = 1}$. In~$\game_1$ we split the hash oracle into three, giving the adversary access $\HASHO_1$ in both stages of the game, while $\HASHO_2$ is reserved for oracular use by $\Repx$, $\QRYO$, and $\UPO$. For any $\advA$ for~$\game_0$, there is $\advB$ for~$\game_1$ which produces the same advantage by simulating $\advA$. This adversary first creates its own table $R$ with all values initially undefined. When $\advA$ makes a query $w$ to $H$, $\advB$ returns $R[w]$ if that entry in the table is defined. Otherwise, if there are $\salt \in \bits^\lambda$, $j \in [k]$, and $x \in \bits^*$ such that $w = \langle\salt, j, x\rangle$, forward $(\salt,x)$ to $\HASHO_1$. For each $j \in [k]$, set $R[\langle\salt, j, x\rangle] = \vv_j$, where $\vv$ is the output of the $\HASHO_1$ oracle. If there is no such triple $\langle\salt, j, x\rangle$, just sample $r$ from $[m]$ uniformly and set $R[w] = r$. In either case, return $R[w]$ to $\advA$. When $\advA$ outputs its collection $\col$, $\advB$ outputs $\col$ as well. Any queries by $\advA$ to $\QRYO$ or $\UPO$ are forwarded to $\advB$'s corresponding oracle. The simulation is perfect because $\Rep[H](\col)$ and $\Up[H](\col,\up)$ are identically distributed to $\Rep[\HASHO_2](\col)$ and $\Up[\HASHO_2](\col,\up)$. Because we have a perfect simulation, $\Adv{\erreps1}_{\struct_s,r}(\advA) = \Prob{\game_1(\advA) = 1}$.
 
-The game~$\G_2$ is the same as~$\G_1$ until $\bad_1$ is set, which occurs exactly when $\advB$ sends $(\salt^*,x)$ to $\HASHO_1$ for some $x$. In the first phase, there is again a $q_1/2^\lambda$ chance of the adversary guessing the salt. In the second phase, the random sampling used by $\HASHO_i$ ensures that each call the adversary makes to the $\HASHO_i$ oracle is independent of all previous calls. We therefore have a $q_2/2^\lambda$ chance of the adversary guessing the salt during this phase, for a total chance of $q_H/2^\lambda$ chance of the adversary guessing the salt at some point during the experiment. Then $\Adv{\erreps_1}_{\struct_s,r}(\advA) \le \Prob{\G_2(\advB) = 1} + q_H/2^\lambda$. Having taken this into account, we may now assume the adversary never guesses the salt.
+The game~$\game_2$ is the same as~$\game_1$ until $\bad_1$ is set, which occurs exactly when $\advB$ sends $(\salt^*,x)$ to $\HASHO_1$ for some $x$. In the first phase, there is again a $q_1/2^\lambda$ chance of the adversary guessing the salt. In the second phase, the random sampling used by $\HASHO_i$ ensures that each call the adversary makes to the $\HASHO_i$ oracle is independent of all previous calls. We therefore have a $q_2/2^\lambda$ chance of the adversary guessing the salt during this phase, for a total chance of $q_H/2^\lambda$ chance of the adversary guessing the salt at some point during the experiment. Then $\Adv{\erreps_1}_{\struct_s,r}(\advA) \le \Prob{\game_2(\advB) = 1} + q_H/2^\lambda$. Having taken this into account, we may now assume the adversary never guesses the salt.
 
 We want to show that alternating between sequences of queries and sequences of updates is no better than making one long series of updates and then one long sequence of queries. There are three types of updates the adversary can make: updates to add elements that have been queried and found to be false positives; updates to add elements that have been queried and found not to be false positives; and updates to add elements that have not been queried yet. We may assume without loss of generality that the adversary never makes the first type of update, since doing so is never beneficial (it does not change the representation at all and decreases the number of errors the adversary has found).
 
@@ -134,7 +134,7 @@ Note that the choices of $\vv$ constructed by the $\HASHO_i$ oracles are indepen
 
 Because the adversary never guesses the salt, $\HASHO_1$ simply functions as a random oracle. Furthermore, we can assume the adversary never adds an element of $\col$ to $\col$ and never makes a $\QRYO$ call for an element which is already in $\col$, since neither of these provides any additional information and neither affects the rest of the experiment in any way.
 
-Now we move to the game~$\G_3$. Here each $\QRYO$ query also calls $\UPO$ to add that element to $\col$. Additionally, the penalty for adding known false positives is removed. To avoid penalizing the adversary by prematurely maxing out the number of elements in $\col$ because of added false positives, we also increase the maximum size of $\col$ from $n$ to $n+s$, where $s = \min(r,q_U)$. Because the adversary (without loss of generality) stops after accumulating $r$ errors, only $\min(r,q_U)$ false positives will be added to $\col$ and so a maximum size of $n+s$ is sufficient to produce no penalty for the adversary. Furthermore, each $\UPO$ call is preceded by a $\QRYO$ call. Neither of these changes can produce a worse result for the adversary, so $\Prob{\G_2(\advB) = 1} \le \Prob{\G_3(\advB) = 1}$. Now, however, there is no longer any distinction between $\QRYO$ and $\UPO$ calls. All calls to either oracle are independent of each other and produce the same effect, querying and then updating $\col$. Each of these queries for false positives is at most as successful as a query to a Bloom filter with $n+r$ elements, so the adversary's probability of finding a false positive on any query is bounded above by the standard success rate for a Bloom filter with those parameters. The adversary is required to produce $r$ errors over the course of $q_T+q_U$ queries, which by the binomial theorem gives an advantage bound of $\Prob{\G_3(\advB) = 1} \le \binom{q_T+q_U}{r}p(k, m, n+s)^r$.
+Now we move to the game~$\game_3$. Here each $\QRYO$ query also calls $\UPO$ to add that element to $\col$. Additionally, the penalty for adding known false positives is removed. To avoid penalizing the adversary by prematurely maxing out the number of elements in $\col$ because of added false positives, we also increase the maximum size of $\col$ from $n$ to $n+s$, where $s = \min(r,q_U)$. Because the adversary (without loss of generality) stops after accumulating $r$ errors, only $\min(r,q_U)$ false positives will be added to $\col$ and so a maximum size of $n+s$ is sufficient to produce no penalty for the adversary. Furthermore, each $\UPO$ call is preceded by a $\QRYO$ call. Neither of these changes can produce a worse result for the adversary, so $\Prob{\game_2(\advB) = 1} \le \Prob{\game_3(\advB) = 1}$. Now, however, there is no longer any distinction between $\QRYO$ and $\UPO$ calls. All calls to either oracle are independent of each other and produce the same effect, querying and then updating $\col$. Each of these queries for false positives is at most as successful as a query to a Bloom filter with $n+r$ elements, so the adversary's probability of finding a false positive on any query is bounded above by the standard success rate for a Bloom filter with those parameters. The adversary is required to produce $r$ errors over the course of $q_T+q_U$ queries, which by the binomial theorem gives an advantage bound of $\Prob{\game_3(\advB) = 1} \le \binom{q_T+q_U}{r}p(k, m, n+s)^r$.
 
 The full adversarial advantage is then
 $$\Adv{\erreps_1}_{\struct_s,r}(\advA) \le q_R \cdot \left(\frac{q_H}{2^\lambda} + \binom{q_T+q_U}{r}p(k, m, n+s)^r\right).$$
@@ -169,8 +169,8 @@ Despite the similarity of the bounds, the proof is somewhat different than in th
   \twoCols{0.50}
   {
     \vspace{-7.5pt}
-    \experimentv{$\G_0(\advA)$}
-                  \hfill\diffplus{$\G_1$}\;\diffminus{$\G_0$}\\[2pt]
+    \experimentv{$\game_0(\advA)$}
+                  \hfill\diffplus{$\game_1$}\;\diffminus{$\game_0$}\\[2pt]
       $\setI \getsr \setP_r([q_T])$;
       $\setZ, \setQ \gets \emptyset$\\
       $\err_0, \ct, \ct' \gets 0$;
@@ -209,7 +209,7 @@ Despite the similarity of the bounds, the proof is somewhat different than in th
     \hspace*{-4pt}\rule{1.049\textwidth}{.4pt}
     \\[2pt]
     \oraclev{$\REPO(\col)$}
-                            \hfill\diffplus{$\G_2$}\;\diffminus{$\G_1$}\hspace*{0pt}\\[2pt]
+                            \hfill\diffplus{$\game_2$}\;\diffminus{$\game_1$}\hspace*{0pt}\\[2pt]
       $\ct \gets \ct + 1$; $\err_\ct \gets 0$;
       $\col_\ct \gets \col$\\
       \diffminus{$\salt \getsr \bits^\lambda$}
@@ -221,7 +221,7 @@ Despite the similarity of the bounds, the proof is somewhat different than in th
   {
     \vspace{-7.5pt}
     \oraclev{$\REPO(\col)$}
-                    \hfill\diffplus{$\G_3$}\;\diffminus{$\G_2$}\hspace*{0pt}\\[2pt]
+                    \hfill\diffplus{$\game_3$}\;\diffminus{$\game_2$}\hspace*{0pt}\\[2pt]
       $\ct \gets \ct + 1$; $\err_\ct \gets 0$;
       $\col_\ct \gets \col$\\
       $\salt \getsr \bits^\lambda \setminus \setZ$;
@@ -260,7 +260,7 @@ Despite the similarity of the bounds, the proof is somewhat different than in th
     \\[3pt]
     \hspace*{-4pt}\rule{1.049\textwidth}{.4pt}
     \\[2pt]
-    \oraclev{$\QRYO(i, \qry_x)$},\hfill\diffplus{$\G_5$}\;{$\G_4$}\hspace*{0pt}\\[2pt]
+    \oraclev{$\QRYO(i, \qry_x)$},\hfill\diffplus{$\game_5$}\;{$\game_4$}\hspace*{0pt}\\[2pt]
       $\ct' \gets \ct' + 1$\\
       \foreach{j}{1}{\ct}\\
       \tab $a_j \gets \Qryx[\Rnd](\pub_j, \qry)$\\
@@ -281,17 +281,17 @@ Despite the similarity of the bounds, the proof is somewhat different than in th
 
 \begin{proof}We define algorithms $\Repx[f]: \bits^* \times \bits^\lambda \to \bits^*$, $\Qryx[f]: \bits^* \times \mathcal{Q} \to \mathcal{R}$, and $\Upx[f]: \bits^* \times \mathcal{U} \to \bits^*$ for arbitrary functions $f: \bits^* \to [m]$. The algorithm $\Repx[f]$ takes a set and salt, returning a representation of the Bloom filter constructed as usual using the given salt, but with calls to $F_K$ replaced with calls to $f$. Note that the salt is included in the output representation. Similarly, $\Qryx[f]$ and $\Upx[f]$ perform queries and updates on representations using $f$. in place of $F_K$.
 
-First we move to the game~$\G_0$, which does not change the semantics of the usual correctness experiment. We assume without loss of generality that the adversary does not make the same query twice between updates, so there is no need to keep track of $\col$. We instead have sets $\setI$, $\setZ$, $\setQ$ not defined in the normal game. As yet these sets have no effect on the game. Instead of $\Rep_K(\cdot)$, the game uses $\Repx[F_K](\cdot,\salt)$ for freshly-sampled $\salt$, but these algorithms have identical behavior.
+First we move to the game~$\game_0$, which does not change the semantics of the usual correctness experiment. We assume without loss of generality that the adversary does not make the same query twice between updates, so there is no need to keep track of $\col$. We instead have sets $\setI$, $\setZ$, $\setQ$ not defined in the normal game. As yet these sets have no effect on the game. Instead of $\Rep_K(\cdot)$, the game uses $\Repx[F_K](\cdot,\salt)$ for freshly-sampled $\salt$, but these algorithms have identical behavior.
 
-Next consider the game~$\G_1$. Here we replace $F_K$ entirely with a true random function $\Rnd$ which is lazily evaluated as necessary when $\REPO$, $\QRYO$, and $\UPO$ are called. The advantage of the adversary is then $\Adv{\errep}_{\struct_\prfbloom,r}(\advA) = \Adv{\prf}_F(\advB) + \Prob{\G_1(\advA)=1}$.
+Next consider the game~$\game_1$. Here we replace $F_K$ entirely with a true random function $\Rnd$ which is lazily evaluated as necessary when $\REPO$, $\QRYO$, and $\UPO$ are called. The advantage of the adversary is then $\Adv{\errep}_{\struct_\prfbloom,r}(\advA) = \Adv{\prf}_F(\advB) + \Prob{\game_1(\advA)=1}$.
 
-We want to ensure that salts do not repeat, so~$\G_2$ provides a game where the $\salt$ is randomly chosen exclusively from salts which have not been previously used. The game is idenitcal to~$\G_1$ until a salt repeats, which using the birthday bound will occur with probability $q_R^22^{-\lambda}$. Therefore $\Adv{\errep}_{\struct_\prfbloom,r}(\advA) \le \Adv{\prf}_F(\advB) + q_R^22^{-\lambda} + \Prob{\G_2(\advA)=1}$.
+We want to ensure that salts do not repeat, so~$\game_2$ provides a game where the $\salt$ is randomly chosen exclusively from salts which have not been previously used. The game is idenitcal to~$\game_1$ until a salt repeats, which using the birthday bound will occur with probability $q_R^22^{-\lambda}$. Therefore $\Adv{\errep}_{\struct_\prfbloom,r}(\advA) \le \Adv{\prf}_F(\advB) + q_R^22^{-\lambda} + \Prob{\game_2(\advA)=1}$.
 
-We then revise the game to~$\G_3$, where the adversary gets credit for queries $\QRYO(i,\qry)$ which are false positives for any $\pub_j$, regardless of the actual argument $i$ given to $\QRYO$. The oracle simply iterates through all representations the adversary has created and increments $\err_j$ for any $j$ where $\qry(\col_j)$ disagrees with $\Qryx[\Rnd](\pub_j,\qry)$. The adversary's view does not change as a result of this modification, and its advantage may only increase as additional opportunities to increment each $\err_i$ occur, so that $\Adv{\errep}_{\struct_\prfbloom,r}(\advA) \le \Adv{\prf}_F(\advB) + q_R^22^{-\lambda} + \Prob{\G_3(\advA)=1}$.
+We then revise the game to~$\game_3$, where the adversary gets credit for queries $\QRYO(i,\qry)$ which are false positives for any $\pub_j$, regardless of the actual argument $i$ given to $\QRYO$. The oracle simply iterates through all representations the adversary has created and increments $\err_j$ for any $j$ where $\qry(\col_j)$ disagrees with $\Qryx[\Rnd](\pub_j,\qry)$. The adversary's view does not change as a result of this modification, and its advantage may only increase as additional opportunities to increment each $\err_i$ occur, so that $\Adv{\errep}_{\struct_\prfbloom,r}(\advA) \le \Adv{\prf}_F(\advB) + q_R^22^{-\lambda} + \Prob{\game_3(\advA)=1}$.
 
-Next, in~$\G_4$ we modify $\QRYO$ and $\UPO$ to perform the same function. Each one tests the given element for false positive status across all extant representations, and then updates only the queried representation with that element. As in the case of the salted Bloom filter, we must remove the penalty for adding a false positive and increase the maximum size of the filter from $n$ to $n+r$ so that this change can never reduce the adversary's chances of success.  Because all queries are independent of each other, adding a known non-false-positive is again the optimal choice for the adversary under any circumstance. Furthermore, note that while the adversary may not be aware of its score in each representation, we can assume without loss of generality that it halts if it has sent several $\QRYO$ calls to the same representation and $r$ of those have returned a false positive. This means that no more than $r$ false positives will be added to any single representation. Then $\Adv{\errep}_{\struct_\prfbloom,r}(\advA) \le \Adv{\prf}_F(\advB) + q_R^22^{-\lambda} + \Prob{\G_4(\advA)=1}$.
+Next, in~$\game_4$ we modify $\QRYO$ and $\UPO$ to perform the same function. Each one tests the given element for false positive status across all extant representations, and then updates only the queried representation with that element. As in the case of the salted Bloom filter, we must remove the penalty for adding a false positive and increase the maximum size of the filter from $n$ to $n+r$ so that this change can never reduce the adversary's chances of success.  Because all queries are independent of each other, adding a known non-false-positive is again the optimal choice for the adversary under any circumstance. Furthermore, note that while the adversary may not be aware of its score in each representation, we can assume without loss of generality that it halts if it has sent several $\QRYO$ calls to the same representation and $r$ of those have returned a false positive. This means that no more than $r$ false positives will be added to any single representation. Then $\Adv{\errep}_{\struct_\prfbloom,r}(\advA) \le \Adv{\prf}_F(\advB) + q_R^22^{-\lambda} + \Prob{\game_4(\advA)=1}$.
 
-Finally, in~$\G_5$ we keep track of how many $\QRYO$ calls have previously been made, and use $\setQ$ to keep track of those queries with indices in $\setI$. Only these $r$ queries can increment the error counters, but they do so if they cause an error in any of the currently-existing $\pub_j$. To win, the adversary must therefore return an $i$ so that all queries in $\setQ$ produce errors when directed at $\pub_i$. Assuming without loss of generality that the adversary does not add any elements to the set which it knows to be false positives, this condition is sufficient as well as necessary. Given that an adversary is successful in~$\G_3$, it is successful in~$\G_4$ with probability at least $\binom{q_T+q_U}{r}^{-1}$ since that is the chance of randomly selecting $r$ successful queries from the total collection of $q_T+q_U$ queries. Then we have $\Adv{\errep}_{\struct_\prfbloom,r}(\advA) \le \Adv{\prf}_F(\advB) + q_R^22^{-\lambda} + \binom{q_T+q_U}{r}\Prob{\G_4(\advA)=1}$. But since the salts are unique for each representation, the probability of winning in each representation is independent of the probability of winning in the others, and the so $\Prob{\G_4(\advA)=1}$ is just $q_R$ times the standard (non-adpative) Bloom filter bound, yielding the final result of:
+Finally, in~$\game_5$ we keep track of how many $\QRYO$ calls have previously been made, and use $\setQ$ to keep track of those queries with indices in $\setI$. Only these $r$ queries can increment the error counters, but they do so if they cause an error in any of the currently-existing $\pub_j$. To win, the adversary must therefore return an $i$ so that all queries in $\setQ$ produce errors when directed at $\pub_i$. Assuming without loss of generality that the adversary does not add any elements to the set which it knows to be false positives, this condition is sufficient as well as necessary. Given that an adversary is successful in~$\game_3$, it is successful in~$\game_4$ with probability at least $\binom{q_T+q_U}{r}^{-1}$ since that is the chance of randomly selecting $r$ successful queries from the total collection of $q_T+q_U$ queries. Then we have $\Adv{\errep}_{\struct_\prfbloom,r}(\advA) \le \Adv{\prf}_F(\advB) + q_R^22^{-\lambda} + \binom{q_T+q_U}{r}\Prob{\game_4(\advA)=1}$. But since the salts are unique for each representation, the probability of winning in each representation is independent of the probability of winning in the others, and the so $\Prob{\game_4(\advA)=1}$ is just $q_R$ times the standard (non-adpative) Bloom filter bound, yielding the final result of:
 $$\Adv{\errep}_{\struct_\prfbloom,r}(\advA) \le \Adv{\prf}_F(\advB) + \frac{q_R^2}{2^\lambda} + q_R\binom{q_T+q_U}{r}p(k, m, n+r)^r.$$
 \missingqed
 \end{proof}
