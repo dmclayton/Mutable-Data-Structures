@@ -41,19 +41,19 @@ For example, count-min sketches are invertible, by consequence of being determin
           & \parbox[c]{3.5cm}{Multisets\\ $\col \in \Func(\mathcal{X},\N)$}
           & $\qry_x(\col) = [\col(x) > 0]$
           & \parbox[c][10ex]{4cm}{$\up_{x,0}(\col)(x) = \col(x)+1$ \\ $\up_{x,1}(\col)(x) = \col(x)-1$ \\ $\up_{x,b}(\col)(y) = \col(y)$ for $x \neq y$}
-          & \parbox[c]{3cm}{\dctodo{fill in}}
+          & \parbox[c]{3cm}{$n$, max $|\col|$\\$k$, no.\ hash functions\\$m$, array size (counters)}
          \\ \hline
     Cuckoo filter
           & \parbox[c]{3.5cm}{Multisets\\ $\col \in \Func(\mathcal{X},\N)$}
           & $\qry_x(\col) = [\col(x) > 0]$
           & \parbox[c][10ex]{4cm}{$\up_{x,0}(\col)(x) = \col(x)+1$ \\ $\up_{x,1}(\col)(x) = \col(x)-1$ \\ $\up_{x,b}(\col)(y) = \col(y)$ for $x \neq y$}
-          & \parbox[c]{3cm}{\dctodo{fill in}}
+          & \parbox[c]{3cm}{$n$, max $|\col|$\\$m$, no.\ buckets\\$b$, bucket size (entries)\\$f$, fingerprint size (bits)}
           \\ \hline
      Count-min sketch
           & \parbox[c]{3.5cm}{Multisets\\ $\col \in \Func(\mathcal{X},\N)$}
           & $\qry_x(\col) = \col(x)$
           & \parbox[c][10ex]{4cm}{$\up_{x,0}(\col)(x) = \col(x)+1$ \\ $\up_{x,1}(\col)(x) = \col(x)-1$ \\ $\up_{x,b}(\col)(y) = \col(y)$ for $x \neq y$}
-          & \parbox[c]{3cm}{\dctodo{fill in}}
+          & \parbox[c]{3cm}{$n$, max $|\col|$\\$k$, no.\ rows\\$m$, no.\ bits per row}
           \\ \hline
    
   \end{tabular}
