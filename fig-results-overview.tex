@@ -38,41 +38,41 @@ Bloom filter
 & \atk %pub, empty
 & \atk %pub, salt
 & \atk %pub, key
-& \dontknow %pub, salt and key
+& \secres{2} %pub, salt and key
 & \atk %priv, empty
 & \secres{1} %priv, salt
 & \atk %priv, key
-& \secres{2} %priv, salt and key 
+& \cmark %priv, salt and key 
 \\ \hline
 Counting filter 
 & \atk %pub, empty
-&  %pub, salt
-&  %pub, key
-&  %pub, salt and key
-&  %priv, empty
-&  %priv, salt
-&  %priv, key
-&  %priv, salt and key 
+& \atk %pub, salt
+& \atk %pub, key
+& \cmark %pub, salt and key
+& \cmark %priv, empty
+& \secres{3} %priv, salt
+& \cmark %priv, key
+& \cmark %priv, salt and key 
 \\ \hline
 Cuckoo filter 
 & \atk %pub, empty
-&  %pub, salt
-&  %pub, key
-&  %pub, salt and key
-&  %priv, empty
-&  %priv, salt
-&  %priv, key
-&  %priv, salt and key 
+& \dontknow %pub, salt
+& \dontknow %pub, key
+& \dontknow %pub, salt and key
+& \dontknow %priv, empty
+& \secres{4} %priv, salt
+& \dontknow %priv, key
+& \cmark %priv, salt and key 
 \\ \hline
 Count-min sketch 
 & \atk %pub, empty
-&  %pub, salt
-&  %pub, key
-&  %pub, salt and key
-&  %priv, empty
-&  %priv, salt
-&  %priv, key
-&  %priv, salt and key 
+& \atk %pub, salt
+& \atk %pub, key
+& \dontknow %pub, salt and key
+& \atk %priv, empty
+& \secres{5} %priv, salt
+& \atk %priv, key
+& \cmark %priv, salt and key 
 \\ \hline
 \end{tabular}
 \caption{Summary of results.  An entry of `\xmark' means there is a
