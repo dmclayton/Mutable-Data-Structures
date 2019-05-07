@@ -2,7 +2,7 @@
 \newcommand{\atk}{\xmark}
 \newcommand{\noatk}{\cmark}
 \newcommand{\secres}[1]{Thm #1}
-\newcommand{\dontknow}{\?}
+\newcommand{\dontknow}{?}
 \begin{figure}
 \small
 \centering
@@ -20,7 +20,9 @@
 } \hline
 &\multicolumn{4}{c||}{\bf Public Rep} & \multicolumn{4}{c|}{\bf Private Rep} \\
   \cline{2-5}\cline{6-9}
-&$\emptyset$ &salt &key &salt+key& $\emptyset$ &salt &key &salt+key\\ \hline
+&$\emptyset$ &{salt} &{key} &{salt+key}
+&$\emptyset$ &{salt} &{key} &{salt+key} \\ \hline
+%%%
 (static) Bloom filter 
 & \atk %pub, empty
 &  %pub, salt
@@ -33,13 +35,13 @@
 \\ \hline
 Bloom filter 
 & \atk %pub, empty
-&  %pub, salt
-&  %pub, key
-&  %pub, salt and key
-&  %priv, empty
-& \secres{$nn$} %priv, salt
-& \secres{$nn$}%priv, key
-& \secres{$nn$} %priv, salt and key 
+& \atk %pub, salt
+& \atk %pub, key
+&  ? %pub, salt and key
+& \atk %priv, empty
+& \secres{1} %priv, salt
+& \atk %priv, key
+& \secres{2} %priv, salt and key 
 \\ \hline
 Counting filter 
 & \atk %pub, empty
@@ -74,9 +76,10 @@ Count-min sketch
 \end{tabular}
 \caption{Summary of results.  An entry of `\xmark' means there is a
   (query efficient) attack, which we discuss in the body.  
-  An entry of `\secres{$nn$}' means that we
-  explicitly prove a security bound for the structure in Theorem $nn$. 
+  An entry of `\secres{$n$}' means that we
+  explicitly prove a security bound for the structure in Theorem $n$. 
   An entry of `\cmark'  means that the structure is secure, but we do
-  not give an explicit result in this submission.}
+  not give an explicit result in this submission. An entry of
+  `\dontknow' means we do not address this case.}
 \label{fig:results-overview}
 \end{figure}
