@@ -15,28 +15,22 @@ Naor and Yogev (NY) formalized a notion of adversarial correctness for
 Bloom-filter-like structures. (Recall that
 a Bloom filter provides a compact representation of a set~$\col$, and supports
 set-membership queries.)
-%Bloom filters are
-%ubiquitous in distributed computing, including web caches (e.g., Squid) and hash
-%tables (e.g., BigTable and Hadoop), resource and packet routing, and network
-%measurement. (We refer the reader to the
-%surveys~\cite{broder2004network,tarkoma2012theory} for a comprehensive list of
-%applications.) 
-In the NY notion, the adversary must choose~$\col$ all at once,
+In their notion, the adversary must choose~$\col$ all at once,
 and then adaptively queries the data structure in order to induce
-erroneous responses.  In the case of Bloom filters, the only possible
-type of error is a false-positive.
+erroneous responses. 
 %
 But many modern applications require data structures to (compactly) represent \emph{streams} of
 data, not static collections (typicallly, sets) whose size is bounded by some number that is
 fixed \emph{a priori}.  
-
+%
 For example, the count-min
 sketch structure~\cite{xxx} is used to compactly represent the number
-of times a particular datum has appeared, so far, in the input
-stream.  Additionally, some applications require the ability to
-add\emph{and remove} elements from effective~$\col$ that is
-represented.  The count-min sketch, and a variety of other
-space-efficient structures, support this.
+of times a particular object~$x$ has appeared, so far, in the input
+stream.  This is done by incrementing a collection of counters that
+are associated with~$x$ (deterministically, via hash functions) each
+time~$x$ is seen.  Some applications require the ability to
+add \emph{and remove} elements from effective~$\col$ that the structure
+represents.  
 
 As such, we significantly expand upon NY to consider data structure
 correctness in the presense of adversaries that adaptively create and
@@ -53,51 +47,58 @@ per-representation randomness), secret keys (so that the mapping
 from~$\col$ to representation is unpredictable, even if the
 representation of one or more closely related~$\col'$ are known), or both.
 
-Note that the notion of query-response error becomes considerably more
-general in our setting.   Counting filters ---~loosely, Bloom filters
+The notion of query-response error becomes considerably more
+general in our setting.   The ubiquitous Bloom filter, designed to
+compactly represent a fixed set~$\col$ and to provide approximately
+correct responses to set-membership queries, suffers only
+false-positive errors, i.e., saying that $y \in \col$ when it isn't.
+Counting filters ---~loosely, Bloom filters
 with an array of counters rather than single bits~--- support updates
 of the form \emph{remove~$x$ from the representation of~$\col$}.  If
 $x \in \col$ when this update is processed, then the appropriate
 counters are decremented.  If $x \not\in \col$, however, counters will
 be erroneously decremented, leading to the possibility of
-false-negative errors when set-membership queries are made for some $y
-\in \col$.
-%
+false-\emph{negative} errors when set-membership queries are made for some $y
+\in \col$.  False-positive errors remain, too.
 More generally, the count-min sketch supports queries of the
 form \emph{how many times has~$x$ appeared, so far?}  One could define
 error in an absolute sense, i.e., the data structure errs if its
 response is not exactly correct.  But even in the non-adaptive
 setting, traditional analyses guarantee only that the response will be
 \emph{close} to the exact number, with some probability that is close
-to one.  
-
-\tsnote{OLD INTRO follows}
-In support of this, we give a precise syntax for data structures as an abstract
-primitive.  Our syntax captures a wide variety of structures used in practice;
+to one.  Thus, our security notions are parameterized by a
+error-cost function~$d$: if the correct response to a query is~$a$ and
+the data structure responds with~$a'$, the cost of the error is
+$d(a,a') \geq 0$.  
 %
-to focus the exposition, we will mostly concentrate on the heavily
-used Bloom filter~\cite{bloom1970space} and some important variants. 
+They are also parameterized by an total-cost threshold, and
+the adversary is considered to win if the total cost of induced
+errors is greater than this value.  As we will see, calculating the
+total cost is not straightforward; in particular, determining whether
+or not the cost of a given error should be carried across (adaptive,
+adversarial) updates to~$\col$ and its representation.
 
-%
+\tsnote{old stuff below here}
+
+\ignore{ %possibly move elsewhere in the intro, or the opening to the
+         %bloom filter section
+Bloom filters are
+ubiquitous in distributed computing, including web caches (e.g., Squid) and hash
+tables (e.g., BigTable and Hadoop), resource and packet routing, and network
+measurement. (We refer the reader to the
+surveys~\cite{broder2004network,tarkoma2012theory} for a comprehensive list of
+applications.) 
 Bloom filters have also been modified and co-opted for security-critical
 applications; perhaps unsurprisingly, things go wrong. Schnell
 \etal~\cite{schnell2011novel} proposed using secretly-keyed Bloom filters in
 order to enable privacy-preserving record linkage (PPRL) across data sets.  This
 was deployed in medical-data applications in Australia, Brazil, Germany, and
-Switzerland~\cite{niedermeyer2014cryptanalysis}. As one exercise of our
-notions, we study their proposal in detail. % in Section~\ref{sec:bf-bigram}.
+Switzerland~\cite{niedermeyer2014cryptanalysis}. 
+%As one exercise of our
+%notions, we study their proposal in detail. % in Section~\ref{sec:bf-bigram}.
 %
+}
 
-We do not focus exclusively on Bloom filters, nor on data structures
-that support only set-membership queries.  To hint at the broader scope of our formalisms, we analyze the
-so-called ``Bloomier filter''~\cite{chazelle2004bloomier}, which provides a
-compact representation of a \emph{dictionary} data structure.\footnote{Despite the
-name, the Bloom filter data structure and the Bloomier filter data structure are
-\emph{very} different primitives.}
-
-\if{0}{
-  We give a bit more detail about our syntax, our notions, and our findings.
-}\fi
 
 \heading{Data structures and their correctness.}
 %
