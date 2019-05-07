@@ -1,0 +1,86 @@
+\newcommand{\cellsize}{1.2cm}
+\newcommand{\atk}{\xmark}
+\newcommand{\noatk}{\cmark}
+\newcommand{\secres}[1]{Thm #1}
+\newcommand{\dontknow}{\textbf{?}}
+\begin{figure*}
+\small
+\centering
+%\begin{tabular}{|r | *{4}{>{\centering} m{\cellsize} |} 
+%                            | *{4}{>{\centering} m{\cellsize} |} }\hline
+\begin{tabular}{| r | 
+  >{\centering} m{\cellsize} | 
+  >{\centering} m{\cellsize} | 
+  >{\centering} m{\cellsize} | 
+  >{\centering} m{\cellsize} || 
+  >{\centering} m{\cellsize} | 
+  >{\centering} m{\cellsize} | 
+  >{\centering} m{\cellsize} | 
+  >{\centering\arraybackslash} m{\cellsize} | 
+} \hline
+&\multicolumn{4}{c||}{\bf Public Representation} 
+& \multicolumn{4}{c|}{\bf Private Representation} \\
+  \cline{2-5}\cline{6-9}
+&$\emptyset$ &{salt} &{key} &{salt+key}
+&$\emptyset$ &{salt} &{key} &{salt+key} \\ \hline
+%%%
+(static) Bloom filter 
+& \atk %pub, empty
+&  %pub, salt
+&  %pub, key
+&  %pub, salt and key
+&  %priv, empty
+&  %priv, salt
+&  %priv, key
+&  %priv, salt and key 
+\\ \hline
+Bloom filter 
+& \atk %pub, empty
+& \atk %pub, salt
+& \atk %pub, key
+& \dontknow %pub, salt and key
+& \atk %priv, empty
+& \secres{1} %priv, salt
+& \atk %priv, key
+& \secres{2} %priv, salt and key 
+\\ \hline
+Counting filter 
+& \atk %pub, empty
+&  %pub, salt
+&  %pub, key
+&  %pub, salt and key
+&  %priv, empty
+&  %priv, salt
+&  %priv, key
+&  %priv, salt and key 
+\\ \hline
+Cuckoo filter 
+& \atk %pub, empty
+&  %pub, salt
+&  %pub, key
+&  %pub, salt and key
+&  %priv, empty
+&  %priv, salt
+&  %priv, key
+&  %priv, salt and key 
+\\ \hline
+Count-min sketch 
+& \atk %pub, empty
+&  %pub, salt
+&  %pub, key
+&  %pub, salt and key
+&  %priv, empty
+&  %priv, salt
+&  %priv, key
+&  %priv, salt and key 
+\\ \hline
+\end{tabular}
+\caption{Summary of results.  An entry of `\xmark' means there is a
+  (query efficient) attack, which we discuss in the body.  
+  An entry of `\secres{$n$}' means that we
+  explicitly prove a security bound for the structure in Theorem $n$. 
+  An entry of `\cmark'  means that the structure is secure, but we do
+  not give an explicit result in this submission. An entry of
+  `\dontknow' means we do not address this case.}
+\label{fig:results-overview}
+\end{figure*}

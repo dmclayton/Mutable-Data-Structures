@@ -29,7 +29,7 @@ Given the experiments defined here, we define the advantage of an adversary $\ad
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{Generic results}
-First, we note that any structure which is insecure in the immutable case is also insecure in the mutable case. Any adversary in the immutable case is identical to a corresponding adversary in the mutable case which simply never makes use of the $\UPO$ oracle. From this we know that standard (unsalted, unkeyed) Bloom filters cannot ensure correctness in the mutable case. 
+First, we note that any structure which is insecure in the immutable case is also insecure in the mutable case. Any adversary in the immutable case is identical to a corresponding adversary in the mutable case which simply never makes use of the $\UPO$ oracle. From this we know that standard (unsalted, unkeyed) Bloom filters cannot ensure correctness in the mutable case. \tsnote{This is supported by a result that doesn't appear here.  We should port over relevant results from the previous draft paper.}
 
 
 \heading{Keyless structures.}
@@ -165,7 +165,7 @@ Another obvious alternative is to simply use the Euclidean distance metric, so t
 % the adversary can: query for a previously-tested element, query for an untested element, insert an unknown element, insert a known correct element, insert a known overestimated element, insert a known underestimated element, delete an unknown element, delete a known correct element, delete a known overestimated element, or delete a known underestimated element
 
 % inserting an unknown element can increase the number of overestimated elements, and can increase the amount they are overestimated by; it can also decrease the number of underestimaged elements, and can decrease the amount they are underestimated by; it does not affect the estimate of the inserted element
-% inserting a known correct element does the same tne hing, and also does not affect the estimate of the inserted element, so this is equivalent to inserting an unknown element
+% inserting a known correct element does the same thing, and also does not affect the estimate of the inserted element, so this is equivalent to inserting an unknown element
 
 % inserting any element can increase the number of overestimated elements, and can increase the amount they are overestimated by; it can also decrease the number of underestimaged elements, and can decrease the amount they are underestimated by; it does not affect the estimate of the inserted element; the estimate of the element itself remains unchanged
 % the opposite is true for deletion
@@ -179,3 +179,58 @@ Another obvious alternative is to simply use the Euclidean distance metric, so t
 %We need a salt, since otherwise the adversary can ask for two representations and reveal one to see what the other looks like.
 
 %In fact, we need independent random representations. Once we have this, seeing representations does not help the adversary. What benefit can there be, then? Suppose an adversary wants to select for representations with certain properties, and ignore others. Since the representation is private, these properties can only be determined by $\QRYO$ calls.
+
+\subsection{Query Independence}
+
+There are two immediate distinctions that can be made between different security games. First, we can ask whether it is possible for the adversary to predict the representations ahead of time, in which case the $\REPO$ and $\UPO$ oracles are largely unnecessary. Second, we can ask whether it is possible for the adversary, given its knowledge of the representations, to predict the outputs of $\QRYO$ ahead of time.
+
+We use simulation-based definitions for these two notions. In particular, we say a data structure has independent representations up to some leakage $\textsf{lk}\colon\mathcal{D}\to\bits^*$ if there is a simulator consisting of two functions $\textsf{Sim}_d\colon\bits^*\to\mathcal{D}$ and $\textsf{Sim}_u\colon\mathcal{D}\times\bits^*\to\mathcal{U}$, such that $\textsf{Sim}_d(\textsf{lk}(\col))$ produces a set whose representation is indistinguishable from $\col$ and $\textsf{Sim}_u(\col',\textsf{lk}(\col))$ produces an update $\up'$ such that $\up'(\col')$ is indistinguishable from $\col$.
+
+%
+
+\begin{figure*}[t]
+  \twoCols{0.25}
+  {
+     \raisebox{-5pt}{\experimentv{$\Exp{\mathrm{indqry}}_{\struct}(\advA)$}}\\[2pt]
+      $\key \getsr \keys$\\
+      $r \getsr \mathcal{R}$\\
+      $\col \getsr \mathcal{D}$\\
+      $\pub \getsr \Rep_K(\col)$\\
+      $\qry \getsr \textsf{Sim}(\textsf{lk}(\pub),r)$\\
+      if $\Qry_K(\pub,\qry) \neq r$ return 1\\
+      $i \gets 0$\\
+      $r' \getsr \advA^{\REPO(\cdot),\UPO(\cdot,\cdot)}(\pub,\qry)$\\
+      return $[r = r']$
+ }
+ {
+      \oraclev{$\REPO(\col)$}\\[2pt]
+      $i \gets i + 1$\\
+      $\pub_i \getsr \Rep_\key(\col)$\\
+      return $\pub_i$
+      \\[4pt]
+      \oraclev{$\UPO(i,\up)$}\\[2pt]
+      $\pub_i \getsr \Up_\key(\pub_i,\up)$\\
+      return $\pub_i$\\
+ }
+  %\caption{Two notions of adversarial correctness. The $\errep$ notion captures correctness when the representation is always known to the adversary, while the $\erreps$ notion captures correctness when the representation is secret.}
+  %\vspace{6pt}\hrule
+  \label{fig:privacy}
+\end{figure*}
+
+In the case that the adversary can predict representations ahead of time and can predict query responses based on that representation, the structure is inherently insecure because the adversary need not rely on any of the oracles in the experiment. Instead, it can simulate $\REPO$, $\UPO$, and $\QRYO$ itself and search for a representation which produces a large number of errors. Once this is found, the adversary can call $\REPO$ to construct this representation and call $\QRYO$ for each of the errors it has found until it surpasses the error threshold $r$ and wins. Assuming the minimum size of an error is 1, this requires only the resources $q_R = 1$ and $q_T = r$, which is the minimum necessary for any attacker to succeed. Furthermore, it always succeeds unless $r$ is so large as to be unachievable for the given structure with the given parameters.
+
+%
+
+If the adversary cannot guess representations but can predict query responses given representations, there are still limits on how secure the structure can be. An example of this occurs with keyed but unsalted Bloom filters. Even if the adversary cannot guess the secret key, knowing the representation of a singleton $\{x\}$ allows them to determine with certainty whether any other filter has $x$ as an element by checking whether all the bits set to 1 in the representation of $\{x\}$ are also set in the other representations.
+
+%
+
+Finally, if both representations and queries are unpredictable by the adversary, we can intuitively say that the adversary should not be able to do any better than random guessing, which would mean that the adversary cannot do any better than the non-adaptive case.
+
+We can show this formally by moving to an alternate game where $\REPO$ ignores the specific elements given as input and instead creates a representation of a randomly-generated structure with the same leakage, where $\UPO$ performs a randomly-generated update that has the same leakage as the real updated set would have, and where $\QRYO$ returns a random result that is consistent with the adversary's knowledge of the underlying set. By independence of representations, this produces a representation which is indistinguishable from the true representation. Furthermore, by independence of queries, $\QRYO$ behaves indistinguishably (from the adversary's perspective) from $\Qry$ on the true representation. Any adversary therefore has an equal probability of succeeding in this game as in the original game. However, since the queries are being answered randomly, the adversary's choice of inputs to the query oracle are irrelevant: they effectively are guessing randomly.
+
+The best the adversary can hope to do, then, is to create a structure with maximum error rate and then make as many arbitrary $\QRYO$ calls as possible. Extra $\REPO$ and $\UPO$ calls are worthless because, by query independence, seeing additional representations does not provide the adversary with any additional information about what the responses to queries will be. The probability of getting an error with a random call to $\QRYO$ is in each case given by the nonadaptive error bound for that data structure. If this error probability is $p$, and the adversary is attempting to accumulate $r$ errors over $q_T$ trials, the binomial distribution provides a bound on the adversary's advantage in the game. Expressed in terms of the regularized incomplete beta function, we have $\Adv{\errep}_{\struct,r}(\advA) \le I_p(r, q_T-r+1)$.
+
+%
+
+In the data structures we consider, it is never the case that representations and queries are completely unpredictable. However, if we can show that the probability of making accurate predictions is bounded by some small probability, we can add that probability into the error bound and move to a game with ideal, unpredictable operations.

@@ -1,10 +1,10 @@
 % header.tex
 %
 % Formatting and common macros for crypto papers. Include this first.
-%\usepackage{graphics}
-%\usepackage[font={small}]{caption}
-%\usepackage{hyperref}
-%\usepackage{xspace}
+\usepackage{graphics}
+\usepackage[font={small}]{caption}
+\usepackage{hyperref}
+\usepackage{xspace}
 %\iffull
 %\usepackage{amsthm}
 %\newtheorem{lemma}{Lemma}
@@ -19,9 +19,12 @@
 %\documentclass[runningheads]{llncs}
 \newcommand{\missingqed}{\hfill\qed}
 %\fi
-%\usepackage{amsmath}
-%\usepackage{amsfonts}
-%\usepackage{parskip}
+\usepackage{amsmath}
+\usepackage{pifont}
+\usepackage{amsfonts}
+\usepackage{parskip}
+\usepackage{multirow}
+\usepackage{array}
 %\usepackage{framed}
 
 \hypersetup{
@@ -351,3 +354,5 @@
 \newcommand{\oldstuff}[1]{\textcolor{gray}{#1}}
 
 \newcommand{\Func}{\mathrm{Func}}
+\newcommand{\cmark}{\ding{51}}
+\newcommand{\xmark}{\ding{55}}

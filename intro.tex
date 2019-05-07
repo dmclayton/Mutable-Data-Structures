@@ -1,100 +1,104 @@
-\ignore{
-  \begin{figure}
-  \end{figure}
-}
-\label{sec:intro}
+\input{fig-results-overview}
 %
-\tsnote{Intro structure, thoughts...}
-\begin{itemize}
-\item Point to NY, quickly pivot to mutable DS
-\item Our syntax and what it captures
-\item Our correctness and what it captures (don't forget: immutability as an
-  adversarial restriction, not a syntactic one) 
-\item Loosely speaking, what the results say (see picture of
-  chalkboard) --~rough ``structure'' of all results: non-adaptive
-  term, plus ``(informed) guessing'' term)
-\item Data structures we consider: BF, counting filter, cuckoo filter,
-  CMS,... what about Bloomier filter results from old paper?
-\item future directions
-\end{itemize}
-
-\tsnote{OLD INTRO follows}
 Data structures are fundamental to essentially all areas of computer science.  
-%The analysis of data structures, in particular 
 The traditional approach to analyzing the correctness of a data structure 
-%Typically, when
-%the performance of a data structure is studied (i.e., its running time, space
-%efficiency, or error probability) the analysis 
 is to assume that all inputs, and all queries, 
-%to the data structure are chosen
-%non-adversarially and, in particular, 
 are independent of any internal randomness used to construct it. 
-But as recently highlighted by Naor and
+But as highlighted by Naor and
 Yogev~\cite{naor2015bloom}, there are important use-cases in which the inputs and queries
 may be chosen \emph{adversarially} and \emph{adaptively}, based on partial
 information and prior observations about the data structure. Attacks of this
 sort can be used to dramatically degrade the performance of real systems
 \cite{crosby2003denial,gerbet2015power,lipton1993clocked}.
 
-Standard treatments of data structures also assume that any party in
-possession of (information about) a data structure is trusted, and so privacy
-concerns do not arise.  But when a data structure is built from
-sensitive data, as is sometimes the case in practice, it
-is important to understand what information it leaks to adversarial parties.
-% TODO(cjp) Why is it important?
+Naor and Yogev (NY) formalized a notion of adversarial correctness for
+Bloom-filter-like structures. (Recall that
+a Bloom filter provides a compact representation of a set~$\col$, and supports
+set-membership queries.)
+In their notion, the adversary must choose~$\col$ all at once,
+and then adaptively queries the data structure in order to induce
+erroneous responses. 
 %
-%A variety of such structures have been proposed, but their design is often
-%\emph{ad-hoc} and their security often misunderstood. This paper will explore
-%one such case in detail~\cite{schnell2011novel}.
-
-\ignore{\tsnote{The next two paragraphs are newly hacked.  In the first, I'm
-keeping it short and sweet -- this is our motivation, and this is what we
-actually treat, in terms of security notions.  In the second paragraph, I'm
-spinning the story that our syntax is broadly applicable.  We \emph{choose} to
-focus on a very important real-world data structure, and dig in.  To evidence a
-bit of breadth, we consider something quite different.  Implicitly, I want to
-give the message that one could write a paper that touches on a lot of different
-data structures, all conforming to our syntax, but you couldn't also go deep in
-one paper.  So we made a choice to look deeply at something real, leaving room
-for future researchers to build on our foundation.} }
-
-These real-world concerns motivate a careful and formal treatment of data
-structures in an adversarial setting.  In this work, we define and study notions
-of \emph{correctness} and \emph{privacy}.
-
-% NOTE(cjp) Seems to me don't need this line here.
-In support of this, we give a precise syntax for data structures as an abstract
-primitive.  Our syntax captures a wide variety of structures used in practice;
+But many modern applications require data structures to (compactly) represent \emph{streams} of
+data, not static collections (typicallly, sets) whose size is bounded by some number that is
+fixed \emph{a priori}.  
 %
-to focus the exposition, we will mostly concentrate on the heavily
-used Bloom filter~\cite{bloom1970space} and some important variants. Recall that
-a Bloom filter provides a compact representation of a set, and supports
-set-membership queries while admitting some false positives. Bloom filters are
+For example, the count-min
+sketch structure~\cite{xxx} is used to compactly represent the number
+of times a particular object~$x$ has appeared, so far, in the input
+stream.  This is done by incrementing a collection of counters that
+are associated with~$x$ (deterministically, via hash functions) each
+time~$x$ is seen.  Some applications require the ability to
+add \emph{and remove} elements from effective~$\col$ that the structure
+represents.  
+
+As such, we significantly expand upon NY to consider data structure
+correctness in the presense of adversaries that adaptively create and
+mutate~$\col$, in an effort to induce query-response errors.  We
+define a syntax for mutable data structures, formalize two notions of
+correctness (capturing settings in which representations
+are public/private, respectively), and exercise these by
+considering a collection of real-world data structures: Bloom
+filters~\cite{xxx}, counting filters~\cite{xxx}, cuckoo
+filters~\cite{xxx}, and count-min sketches~\cite{xxx}. \tsnote{Update
+  if we add more.}  In addition to the basic version of these, we
+explore variations that allow for ``salted'' representations (i.e.,
+per-representation randomness), secret keys (so that the mapping
+from~$\col$ to representation is unpredictable, even if the
+representation of one or more closely related~$\col'$ are known), or both.
+
+The notion of query-response error becomes considerably more
+general in our setting.   The ubiquitous Bloom filter, designed to
+compactly represent a fixed set~$\col$ and to provide approximately
+correct responses to set-membership queries, suffers only
+false-positive errors, i.e., saying that $y \in \col$ when it isn't.
+Counting filters ---~loosely, Bloom filters
+with an array of counters rather than single bits~--- support updates
+of the form \emph{remove~$x$ from the representation of~$\col$}.  If
+$x \in \col$ when this update is processed, then the appropriate
+counters are decremented.  If $x \not\in \col$, however, counters will
+be erroneously decremented, leading to the possibility of
+false-\emph{negative} errors when set-membership queries are made for some $y
+\in \col$.  False-positive errors remain, too.
+More generally, the count-min sketch supports queries of the
+form \emph{how many times has~$x$ appeared, so far?}  One could define
+error in an absolute sense, i.e., the data structure errs if its
+response is not exactly correct.  But even in the non-adaptive
+setting, traditional analyses guarantee only that the response will be
+\emph{close} to the exact number, with some probability that is close
+to one.  Thus, our security notions are parameterized by a
+error-cost function~$d$: if the correct response to a query is~$a$ and
+the data structure responds with~$a'$, the cost of the error is
+$d(a,a') \geq 0$.  
+%
+They are also parameterized by an total-cost threshold, and
+the adversary is considered to win if the total cost of induced
+errors is greater than this value.  As we will see, calculating the
+total cost is not straightforward; in particular, determining whether
+or not the cost of a given error should be carried across (adaptive,
+adversarial) updates to~$\col$ and its representation.
+
+\tsnote{old stuff below here}
+
+\ignore{ %possibly move elsewhere in the intro, or the opening to the
+         %bloom filter section
+Bloom filters are
 ubiquitous in distributed computing, including web caches (e.g., Squid) and hash
 tables (e.g., BigTable and Hadoop), resource and packet routing, and network
 measurement. (We refer the reader to the
 surveys~\cite{broder2004network,tarkoma2012theory} for a comprehensive list of
-applications.)
-%
+applications.) 
 Bloom filters have also been modified and co-opted for security-critical
 applications; perhaps unsurprisingly, things go wrong. Schnell
 \etal~\cite{schnell2011novel} proposed using secretly-keyed Bloom filters in
 order to enable privacy-preserving record linkage (PPRL) across data sets.  This
 was deployed in medical-data applications in Australia, Brazil, Germany, and
-Switzerland~\cite{niedermeyer2014cryptanalysis}. As one exercise of our
-notions, we study their proposal in detail. % in Section~\ref{sec:bf-bigram}.
+Switzerland~\cite{niedermeyer2014cryptanalysis}. 
+%As one exercise of our
+%notions, we study their proposal in detail. % in Section~\ref{sec:bf-bigram}.
 %
+}
 
-We do not focus exclusively on Bloom filters, nor on data structures
-that support only set-membership queries.  To hint at the broader scope of our formalisms, we analyze the
-so-called ``Bloomier filter''~\cite{chazelle2004bloomier}, which provides a
-compact representation of a \emph{dictionary} data structure.\footnote{Despite the
-name, the Bloom filter data structure and the Bloomier filter data structure are
-\emph{very} different primitives.}
-
-\if{0}{
-  We give a bit more detail about our syntax, our notions, and our findings.
-}\fi
 
 \heading{Data structures and their correctness.}
 %

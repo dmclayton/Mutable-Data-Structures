@@ -131,7 +131,19 @@
 
 \newcommand{\emptystring}{\varepsilon}
 
-%\input{abstract}
+\tsnote{Intro structure, thoughts...}
+\begin{itemize}
+\item Point to NY, quickly pivot to mutable DS
+\item Our syntax and what it captures
+\item Our correctness and what it captures (don't forget: immutability as an
+  adversarial restriction, not a syntactic one) 
+\item Loosely speaking, what the results say (see picture of
+  chalkboard) --~rough ``structure'' of all results: non-adaptive
+  term, plus ``(informed) guessing'' term)
+\item Data structures we consider: BF, counting filter, cuckoo filter,
+  CMS,... what about Bloomier filter results from old paper?
+\item future directions
+\end{itemize}
 
 \section{Introduction}
 \input{intro}
@@ -139,10 +151,6 @@
 \section{Syntax}
 \label{sec:syntax}
 \input{syntax}
-
-\section{Concrete Data Structures}
-\label{sec:structures}
-\input{structures}
 
 \section{Notions of Adversarial Correctness}
 \label{sec:correctness}
@@ -163,6 +171,14 @@
 \section{Count-Min Sketch Results}
 \label{cms}
 \input{cms}
+
+\section{Concrete Data Structures}
+\dctodo{This text needs to be broken up and massaged in to appropriate
+  places in the document, e.g., in the sections on specific
+  structures.  Some of it I will lift to the intro for future work,
+  limitations of our formalisms.}
+\label{sec:structures}
+\input{structures}
 
 %\section{Privacy}
 %\label{sec:privacy}
