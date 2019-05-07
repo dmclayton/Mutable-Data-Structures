@@ -1,12 +1,14 @@
-\newcommand{\cellsize}{1cm}
+\newcommand{\cellsize}{1.2cm}
 \newcommand{\atk}{\xmark}
 \newcommand{\noatk}{\cmark}
+\newcommand{\secres}[1]{Thm #1}
+\newcommand{\dontknow}{\?}
 \begin{figure}
 \small
 \centering
 %\begin{tabular}{|r | *{4}{>{\centering} m{\cellsize} |} 
 %                            | *{4}{>{\centering} m{\cellsize} |} }\hline
-\begin{tabular}{|r | 
+\begin{tabular}{| r | 
   >{\centering} m{\cellsize} | 
   >{\centering} m{\cellsize} | 
   >{\centering} m{\cellsize} | 
@@ -16,15 +18,65 @@
   >{\centering} m{\cellsize} | 
   >{\centering\arraybackslash} m{\cellsize} | 
 } \hline
-&\multicolumn{4}{c||}{Public Rep} & \multicolumn{4}{c|}{Private Rep} \\
+&\multicolumn{4}{c||}{\bf Public Rep} & \multicolumn{4}{c|}{\bf Private Rep} \\
   \cline{2-5}\cline{6-9}
 &$\emptyset$ &salt &key &salt+key& $\emptyset$ &salt &key &salt+key\\ \hline
-(Immutable) Bloom filter & \atk & & & & & & & \\ \hline
-Bloom filter & \atk & & & & & & \noatk & \noatk \\ \hline
-Counting filter  & & & & & & & & \\ \hline
-Cuckoo filter & & & & & & & & \\ \hline
-Count-min sketch & & & & & & & & \\ \hline
+(static) Bloom filter 
+& \atk %pub, empty
+&  %pub, salt
+&  %pub, key
+&  %pub, salt and key
+&  %priv, empty
+&  %priv, salt
+&  %priv, key
+&  %priv, salt and key 
+\\ \hline
+Bloom filter 
+& \atk %pub, empty
+&  %pub, salt
+&  %pub, key
+&  %pub, salt and key
+&  %priv, empty
+& \secres{$nn$} %priv, salt
+& \secres{$nn$}%priv, key
+& \secres{$nn$} %priv, salt and key 
+\\ \hline
+Counting filter 
+& \atk %pub, empty
+&  %pub, salt
+&  %pub, key
+&  %pub, salt and key
+&  %priv, empty
+&  %priv, salt
+&  %priv, key
+&  %priv, salt and key 
+\\ \hline
+Cuckoo filter 
+& \atk %pub, empty
+&  %pub, salt
+&  %pub, key
+&  %pub, salt and key
+&  %priv, empty
+&  %priv, salt
+&  %priv, key
+&  %priv, salt and key 
+\\ \hline
+Count-min sketch 
+& \atk %pub, empty
+&  %pub, salt
+&  %pub, key
+&  %pub, salt and key
+&  %priv, empty
+&  %priv, salt
+&  %priv, key
+&  %priv, salt and key 
+\\ \hline
 \end{tabular}
-\caption{}
+\caption{Summary of results.  An entry of `\xmark' means there is a
+  (query efficient) attack, which we discuss in the body.  
+  An entry of `\secres{$nn$}' means that we
+  explicitly prove a security bound for the structure in Theorem $nn$. 
+  An entry of `\cmark'  means that the structure is secure, but we do
+  not give an explicit result in this submission.}
 \label{fig:results-overview}
 \end{figure}
