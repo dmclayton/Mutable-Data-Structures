@@ -2,7 +2,7 @@
 \newcommand{\atk}{\xmark}
 \newcommand{\noatk}{\cmark}
 \newcommand{\secres}[1]{Thm #1}
-\newcommand{\dontknow}{?}
+\newcommand{\dontknow}{\textbf{?}}
 \begin{figure}
 \small
 \centering
@@ -18,7 +18,8 @@
   >{\centering} m{\cellsize} | 
   >{\centering\arraybackslash} m{\cellsize} | 
 } \hline
-&\multicolumn{4}{c||}{\bf Public Rep} & \multicolumn{4}{c|}{\bf Private Rep} \\
+&\multicolumn{4}{c||}{\bf Public Representation} 
+& \multicolumn{4}{c|}{\bf Private Representation} \\
   \cline{2-5}\cline{6-9}
 &$\emptyset$ &{salt} &{key} &{salt+key}
 &$\emptyset$ &{salt} &{key} &{salt+key} \\ \hline
@@ -37,7 +38,7 @@ Bloom filter
 & \atk %pub, empty
 & \atk %pub, salt
 & \atk %pub, key
-&  ? %pub, salt and key
+& \dontknow %pub, salt and key
 & \atk %priv, empty
 & \secres{1} %priv, salt
 & \atk %priv, key
