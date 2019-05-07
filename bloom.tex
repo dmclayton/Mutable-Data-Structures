@@ -1,7 +1,7 @@
 %\subsection{Bloom filter lower bounds}
 
 %\input{bf-summary-tab}
-
+\todo{DC (lead)}{Explain away all cases except the one(s) for which we give security (upperbound) theorems.}
 The standard Bloom filter shows a variety of different behaviors depending on its exact implementation. If the hash functions used are chosen beforehand and potentially known to the adversary, this public information allows offline attacks to be mounted against the data structure which can produce potentially damaging false positives. In the case of immutable Bloom filters, making use of a per-representation salt is sufficient to prevent these attacks, though depending on the use case the use of non-fixed per-representation randomness may or may not be feasible. Furthermore, in the case of mutable Bloom filters there are additional difficulties with offline attacks due to adversarially-chosen updates. To guarantee correctness in this case we must additionally guarantee that representations can be kept private from the adversary.
 
 A generic attack against unsalted, unkeyed data structures handling set membership queries is for the adversary to choose a large set $\col$ of potential filter elements and simulate $\REPO$ to produce representations for $\{x\}$ for each $x \in \col$. Given these, it can perform offline computations to determine disjoint $\setT$, $\setR \subseteq \col$ such that the elements of $\setR$ all produce errors when queried for membership in $\REPO(\setT)$. After a sufficiently large $\setR$ has been found, the adversary makes a single $\REPO$ call on $\setT$ and makes one $\QRYO$ call per element of $\setR$, resulting in guaranteed success for the adversary with only a minimal number of queries performed.
@@ -15,7 +15,7 @@ The opposite of this, using a private key without a salt, does weaken the attack
 % ...
 
 Using a salted Bloom filter in the private representation setting, however, does provide some security. At the time a representation is created, the structure chooses a salt $\salt$ which it will use for all further queries and updates. In order for maximum security to be guaranteed, we must ensure that the representation, and in particular the salt, is kept secret from the adversary. We define this structure $\SBF[H,k,m,n,\lambda]$ as the Bloom filter structure that uses $H(s) = (h_1(s),\ldots,h_k(s))$ for hashing inputs to $k$ values in $[m]$. Furthermore, each call of $\Rep$ first involves picking a salt $\salt$ from the salt space $\bits^\lambda$, and all hashes made to insert or query for an element $x$ are determined using $H(x \Vert \salt)$. Finally, the parameter $n$ means that any attempts to represent sets with more than $n$ elements fail.
-
+\todo{DC lead}{Specify what exactly is being analyzed.  What are the updates?}
 \begin{theorem}[Correctness Bound for Private-Representation Salted Bloom Filters]\label{thm:bf-priv-salt-bound}
 Fix integers $k, m, n, \lambda, r\geq 0$, let $H \colon \bits^* \to [m]$ be a function, and let $\struct_s = \SBF[H,k,m,n,\lambda]$.
   For every $t, q_R, q_T, q_U, q_H \geq 0$, it holds that
