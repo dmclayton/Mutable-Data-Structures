@@ -1,13 +1,26 @@
 \newcommand{\cellsize}{1cm}
+\newcommand{\atk}{\xmark}
+\newcommand{\noatk}{\cmark}
 \begin{figure}
 \small
 \centering
-\begin{tabular}{|r | >{\centering}*{4}{m{\cellsize} |} | >{\centering}*{4}{m{\cellsize} |} }\hline
+%\begin{tabular}{|r | *{4}{>{\centering} m{\cellsize} |} 
+%                            | *{4}{>{\centering} m{\cellsize} |} }\hline
+\begin{tabular}{|r | 
+  >{\centering} m{\cellsize} | 
+  >{\centering} m{\cellsize} | 
+  >{\centering} m{\cellsize} | 
+  >{\centering} m{\cellsize} || 
+  >{\centering} m{\cellsize} | 
+  >{\centering} m{\cellsize} | 
+  >{\centering} m{\cellsize} | 
+  >{\centering\arraybackslash} m{\cellsize} | 
+} \hline
 &\multicolumn{4}{c||}{Public Rep} & \multicolumn{4}{c|}{Private Rep} \\
   \cline{2-5}\cline{6-9}
 &$\emptyset$ &salt &key &salt+key& $\emptyset$ &salt &key &salt+key\\ \hline
-(Immutable) Bloom filter & & & & & & & & \\ \hline
-Bloom filter & & & & & & & & \\ \hline
+(Immutable) Bloom filter & \atk & & & & & & & \\ \hline
+Bloom filter & \atk & & & & & & \noatk & \noatk \\ \hline
 Counting filter  & & & & & & & & \\ \hline
 Cuckoo filter & & & & & & & & \\ \hline
 Count-min sketch & & & & & & & & \\ \hline
