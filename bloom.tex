@@ -5,35 +5,51 @@
   \oneCol{0.46}
   {
     \underline{$\Rep^R(\col)$}\\[2pt]
-    $\salt \getsr \bits^\lambda$;
-    $M \gets \bigvee_{x \in \col} B_m(R(x))$;
-    if $w(M) > t$ then return $\bot$\\
-    return $\langle M, \salt \rangle$
+      $\salt \getsr \bits^\lambda$;
+      $M \gets \bigvee_{x \in \col} \bmap_m(R(x))$;
+      if $\hw(M) > t$ then return $\bot$\\
+      return $\langle M, \salt \rangle$
     \\[6pt]
     \underline{$\Qry^R(\langle M, \salt \rangle,x)$}\\[2pt]
-    return $[w(B_m(R(x)) \wedge M) = k]$
+      return $[w(\bmap_m(R(x)) \wedge M) = k]$
     \\[6pt]
     \underline{$\Up^R(\langle M, \salt \rangle,x)$}\\[2pt]
-    $U \gets M \vee B_m(R(x))$;
-    if $w(U) > t$ then return $\bot$\\
-    return $U$
+      $U \gets M \vee \bmap_m(R(x))$;
+      if $\hw(U) > t$ then return $\bot$\\
+      return $U$
   }
-  \caption{The formal definition of $\BF[R,t,\lambda] = (\Rep^R,\Qry^R,\Up^R)$
-  for function $R: \bits^* \to [m]^k$ and natural numbers $t, \lambda$. Here,
-  $\hw$ is the Hamming weight and $\bmap_m$ is the bitmap function taking a list
-  of indices in $[m]$ and producing the string of length $m$ where exactly those
-  bits are set to 1.}
+  \caption{A keyless structure $\bloom[R,t,\lambda] = (\Rep^R,\Qry^R,\Up^R)$
+  used to define Bloom filter variants. It ``compiles'' a function $R: \bits^*
+  \to [m]^k$ (either a hash function or keyed PRF), thershold $t\geq0$, and salt
+  length $\lambda\geq0$ into a concrete scheme. Functions~$\hw$ and~$\bmap_m$
+  are defined in Section~\ref{sec:prelims}.
+  }
   \label{fig:bf-def}
 \end{figure}
 
-he formal Bloom filter construction is given in~\ref{fig:bf-def}. From this
-general construction we specify three specific structures to focus on. The first
-is the `bad' unsalted and unkeyed Bloom filter $\BF[H,t]$ for some hash
-function $H: \bits^* \to [m]^k$, which is defined as $\BF[H,t,0]$. The `salted'
-Bloom filter is the same except for allowing a nontrivial salt, so that
-$\SBF[H,t,\lambda]$ for a hash function $H$ is just $\BF[H,t,\lambda]$. Finally,
-the `keyed' bloom filter $\SKBF[F_K,t,\lambda]$ is $\BF[F_K,t,\lambda]$, where
-$F: \keys \times \bits^* \to [m]^k$ is a pseudorandom function with thev same key space as the data structure.
+The formal Bloom filter construction is given in~\ref{fig:bf-def}. From this
+general construction we specify three specific structures to focus on.
+%
+Let $H:\bits^*\to[m]^k$ be a hash function and let $t, \lambda\geq0$ be
+integers.
+%
+The standard Bloom filter is the structure $\BF[H,t] = \bloom[H,t,0]$, which we will
+term the \emph{basic} Bloom filter. It has no key and does not employ a salt.
+%
+The \emph{salted} Bloom filter $\SBF[H,t,\lambda] = \bloom[H,t,\lambda]$ is the same except that
+it allows a nontrivial salt.
+%
+Note that the key space for both~$\BF$ and~$\SBF$ is $\{\emptystr\}$.
+%
+Finally, we also consider a salted variant that uses a PRF instead of a hash
+function. Let $F:\keys\by\bits^*\to[m]^k$ be a PRF. The \emph{keyed} Bloom
+filter $\KBF[F,t,\lambda]$ is defined as follows. On input of $(K,\setS)$, the
+representation algorithm returns $\Rep^{F_K}(\setS)$; on input of
+$(K, \pub, x)$, the query-evaluation algorithm returns
+$\Qry^{F_K}(\pub, x)$; and on input of $(\pub, x)$, the update algorithm
+returns $\Up^{F_K}(\pub, x)$.
+%
+Note that the keyed BF has key space~$\keys$.
 
 \todo{DC (lead)}{Rewrite this so that it is summary of the results of this
 section: unsalted is bad; salted is OK for immutable filters; salted, secret rep
@@ -53,7 +69,7 @@ that representations can be kept private from the adversary.
 
 \heading{Bitstring operations}
 %
-\todo{Any}{This should be moved to prelims.}
+\todo{Any}{This should be moved to Section~\ref{sec:prelims}.}
 %
 For all $m\geq0$ define~$\bmap_m$ as the following function.
 For all $\v.x\in[m]^*$ let $\bmap_m(\v.x) = X$, where
@@ -68,34 +84,13 @@ bitwise-XOR. Let $\NOT X = 1^{|X|} \xor X$.
 Finally, let $\hw(X)$ denote the Hamming wieght of (i.e., the number of 1s in)~$X$.
 
 \subsection{Insecurity of unsalted BFs}
-Let $H:\bits^*\to[m]^k$ be a function and consider the following unkeyed
-structure constructed from~$H$. Its data objects, supported queries, and
-supported updates are as defined in top row of
-Figure~\ref{fig:structures-summary}.
-%
-On input of $\setS\subseteq\bits^*$, the representation algorithm computes
-%
-\[
-  \Rep^H(\setS) = \bigor_{x\in\setS} \bmap_m(H(x)) \,.
-\]
-%
-On input $x\in\bits^*$, the query-evaluation algorithm computes $\Qry^H(M,x) =
-[\hw(M \AND \bmap_m(H(x))) = k]$.
-%
-Lastly, on input of $(M, x) \in \bits^m\by\bits^*$, the update algorithm computes
-%
-\[
-  \Up^H(M,x)= M \OR \bmap_m(H(x)) \,.
-\]
-%
-Let $\BF[H] = (\Rep^H, \Qry^H, \Up^H)$.
-%
-
+Let $H:\bits^*\to[m]^k$ be a function, $t\geq0$, and define structure $\BF[H,t] =
+\bloom[H,t,0]$ as specified in Figure~\ref{fig:bf-def}.
 
 \heading{Pollution attacks}
 %
 Suppose the adversary is interacting with a system representing a dataset with
-$\BF[H]$ and that it is able to choose some fraction of the input data.
+$\BF[H,t]$ and that it is able to choose some fraction of the input data.
 %
 \todo{DC (lead)}{Pick a concrete attack setting, like a CDN. ``For example
 ...''.}
@@ -118,6 +113,9 @@ controlled by the adversary.
 pollution attacks.}
 
 \heading{Target-set coverage attacks}
+%
+\cpnote{This attack only applies when $t=\infty$; I don't know how effective it
+would be if $t$ were fixed.}
 %
 Of course, exhibiting a high false positive rate is not the only way a Bloom
 filter might fail to be correct. In particular, it would be undesirable if the
