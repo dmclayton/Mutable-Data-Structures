@@ -5,6 +5,7 @@
 \usepackage[font={small}]{caption}
 \usepackage{hyperref}
 \usepackage{xspace}
+\usepackage{sidecap}
 %\iffull
 %\usepackage{amsthm}
 %\newtheorem{lemma}{Lemma}
@@ -54,7 +55,7 @@
 \newcommand{\viceversa}{{vice versa}\xspace}
 
 % Fonts for various types
-\newcommand{\notionfont}[1]{\textnormal{#1}\xspace}
+\newcommand{\notionfont}[1]{{#1}}
 % FIXME(cjpatton) I added the "\xspace" because it's supposed to add a space
 % after the macro in text mode. But this doesn't seem to be working!
 \newcommand{\varfont}[1]{\textit{#1}}
