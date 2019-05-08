@@ -1,4 +1,4 @@
-proj = ccs-template 
+proj = ccs19
 
 pdf: $(proj).pdf
 
