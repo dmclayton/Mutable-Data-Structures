@@ -1,28 +1,34 @@
-Next, we consider the case of a counting Bloom filter. These are similar to
-standard Bloom filters, but the underlying data objects are multisets rather
-than sets. The queries are still set membership queries, which in the case of
-multisets means that a query for an element $x$ should return 1 if $x$ is in the
-multiset at least once and 0 if $x$ is not in the multiset. The structures used
-to represent these multisets are identical to those for Bloom filters except
-that each bit in the filter is replaced with a counter. In practice these
-counters would have some upper bound, but in this paper we assume there is no
-upper bound on the counters.
+\begin{figure}
+  \oneCol{0.46}
+  {
+    \underline{$\Rep^R(\col)$}\\[2pt]
+    $\salt \getsr \bits^\lambda$;
+    $M \gets \sum_{x \in \col} \cmap_m(R(x))$;
+    if $w(M) > t$ then return $\bot$\\
+    return $\langle M, \salt \rangle$
+    \\[6pt]
+    \underline{$\Qry^R(\langle M, \salt \rangle,x)$}\\[2pt]
+    return $[w(B_m(R(x)) \wedge M) = k]$
+    \\[6pt]
+    \underline{$\Up^R(\langle M, \salt \rangle,x)$}\\[2pt]
+    if $\hw(M) > t$ then return $\bot$\\
+    return $M + \cmap_m(R(x))$
+  }
+  \caption{The formal definition of $\BF[R,t,\lambda] = (\Rep^R,\Qry^R,\Up^R)$
+  for function $R: \bits^* \to [m]^k$ and natural numbers $t, \lambda$. Here,
+  $\hw$ is a function counting the number of nonzero counters and $\cmap_m$ is a function taking a list $L$
+  of indices in $[m]$ and producing an array $A$ of length $m$ such that $A[i]$ counts the number of times $i$ appears in $L$.}
+  \label{fig:bcf-def}
+\end{figure}
 
-As in the case of Bloom filters, the algorithms rely on a hash function
-$H: \bits^* \to [m]^k$ to operate. Inserting an element $x$, whether during an
-update or during the creation of the original representation, is performed by
-evaluating $H(\key \Vert x)$, as in the case of Bloom filters, and incrementing
-each of the counters with those indices by 1. Unlike standard Bloom filters,
-counting filters also support deletion updates. These are performed by
-evaluating $H(\key \Vert x)$ to choose $k$ counters, checking that all of those
-counters is nonzero, and (if so) decrementing them by 1. Note that a counting
-filter does not allow for negative counter values.
-
-As in the case of a Bloom filter, we can modify this definition to support a
-per-representation random salt of some fixed size $\lambda$. In this case,
-$\Rep$ initially samples $\salt \gets \bits^\lambda$, and then each hash
-computation is evaluated as $H(\key \Vert \salt \Vert x)$ instead of
-$H(\key \Vert x)$.
+A modification of the Bloom filter construction known as the counting filter is given in~\ref{fig:cbf-def}. Once again we can consider different variants depending on whether or not a salt and/or key is present. From this
+general construction we specify three specific structures to focus on. The first
+is the `bad' unsalted and unkeyed Bloom filter $\BF[H,t]$ for some hash
+function $H: \bits^* \to [m]^k$, which is defined as $\BF[H,t,0]$. The `salted'
+Bloom filter is the same except for allowing a nontrivial salt, so that
+$\SBF[H,t,\lambda]$ for a hash function $H$ is just $\BF[H,t,\lambda]$. Finally,
+the `keyed' bloom filter $\SKBF[F_K,t,\lambda]$ is $\BF[F_K,t,\lambda]$, where
+$F: \keys \times \bits^* \to [m]^k$ is a pseudorandom function with thev same key space as the data structure.
 
 Because a counting filter without deletion behaves identically (in terms of
 responding to queries) to a standard Bloom filter, any attack on a Bloom filter

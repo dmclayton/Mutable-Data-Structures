@@ -14,9 +14,8 @@
       return $[w(\bmap_m(R(x)) \wedge M) = k]$
     \\[6pt]
     \underline{$\Up^R(\langle M, \salt \rangle,x)$}\\[2pt]
-      $U \gets M \vee \bmap_m(R(x))$;
-      if $\hw(U) > t$ then return $\bot$\\
-      return $U$
+      if $\hw(M) > t$ then return $\bot$\\
+      return $M \vee \bmap_m(R(x))$
   }
   \caption{A keyless structure $\bloom[R,t,\lambda] = (\Rep^R,\Qry^R,\Up^R)$
   used to define Bloom filter variants. It ``compiles'' a function $R: \bits^*
