@@ -16,19 +16,47 @@ are additional difficulties with offline attacks due to adversarially-chosen
 updates. To guarantee correctness in this case we must additionally guarantee
 that representations can be kept private from the adversary.
 
-\subsection{Insecurity of unsalted BFs}
+\medskip
+\heading{Bit-string operations.}
 %
+\cpnote{This should be moved to prelims.}
+%
+For all $m\geq0$ define~$\bmap_m$ as the following function.
+For all $\v.x\in[m]^*$ let $\bmap_m(\v.x) = X$, where
+$|X|=m$ and $X_v=1$ if and only if $\v.x_i = v$ for some $i\in[|\v.x|]$
+%
+We call $\bmap_m(\v.x)$ the \emph{bitmap} of~$\v.x$.
+%
+Let~$X$ and~$Y$ be equal-length bitstrings. We write $X \OR Y$ for their
+bitwise-OR, $X \AND Y$ for their bitwise-AND, and $X \XOR Y$ for their
+bitwise-XOR. Let $\NOT X = 1^{|X|} \xor X$.
+%
+Finally, let $\hw(X)$ denote the Hamming wieght of (i.e., the number of 1s in)~$X$.
+
+\subsection{Insecurity of unsalted BFs}
 Let $H:\bits^*\to[m]^k$ be a function and consider the following unkeyed
-structure $\BF[H] = (\Rep, \Qry, \Up)$. Its data objects, supported queries, and
+structure constructed from~$H$. Its data objects, supported queries, and
 supported updates are as defined in top row of
 Figure~\ref{fig:structures-summary}.
 %
-On input of $\setS\subseteq\bits^*$
+On input of $\setS\subseteq\bits^*$, the representation algorithm computes
 %
+\[
+  \Rep^H(\setS) = \bigor_{x\in\setS} \bmap_m(H(x)) \,.
+\]
+%
+On input $x\in\bits^*$, the query-evaluation algorithm computes $\Qry^H(M,x) =
+[\hw(M \AND \bmap_m(H(x))) = k]$.
+%
+Lastly, on input of $(M, x) \in \bits^m\by\bits^*$, the update algorithm computes
+%
+\[
+  \Up^H(M,x)= M \OR \bmap_m(H(x)) \,.
+\]
+%
+Let $\BF[H] = (\Rep^H, \Qry^H, \Up^H)$.
+
 \cpnote{WIP}
-
-
-
 
 
 \ignore{
