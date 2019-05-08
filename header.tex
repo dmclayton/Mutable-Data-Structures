@@ -63,16 +63,17 @@
 \newcommand{\vectorfont}[1]{\vec{#1}}
 \newcommand{\oraclefont}[1]{\cryptofont{#1}}
 \newcommand{\schemefont}[1]{\textnormal{\textsc{#1}}}
+\newcommand{\expfont}[1]{{{\tiny\MakeLowercase{\textnormal{#1}}}}}
 \newcommand{\procfont}[1]{\mathsf{#1}}
 \newcommand{\algorithmfont}[1]{\mathcal{#1}}
 \newcommand{\adversaryfont}[1]{\mathit{#1}}
 \newcommand{\setfont}[1]{\mathcal{#1}}
-\newcommand{\cryptofont}[1]{\mathbf{#1}\hspace{0.5pt}}
+\newcommand{\cryptofont}[1]{\textup{\textbf{#1}}\hspace{0.5pt}}
 \newcommand{\capgreekfont}[1]{\mathrm{#1}}
 
 % Crypto functions
-\newcommand{\Exp}[1]{\cryptofont{Exp}^{{\tiny \MakeLowercase{#1}}}}
-\newcommand{\Adv}[1]{\cryptofont{Adv}^{{\tiny \MakeLowercase{#1}}}}
+\newcommand{\Exp}[1]{\cryptofont{Exp}^{\expfont{#1}}}
+\newcommand{\Adv}[1]{\cryptofont{Adv}^{\expfont{#1}}}
 
 % Math
 \DeclareMathAlphabet\mathbfcal{OMS}{cmsy}{b}{n}

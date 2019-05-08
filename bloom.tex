@@ -85,8 +85,8 @@ bitwise-XOR. Let $\NOT X = 1^{|X|} \xor X$.
 Finally, let $\hw(X)$ denote the Hamming wieght of (i.e., the number of 1s in)~$X$.
 
 \subsection{Insecurity of unsalted BFs}
-Let $H:\bits^*\to[m]^k$ be a function, $t\geq0$, and define structure $\BF[H,t] =
-\bloom[H,t,0]$ as specified in Figure~\ref{fig:bf-def}.
+Fix $H:\bits^*\to[m]^k$ and integers $\ell,n\geq0$ and let $\BF[H,\ell,n] = (\Rep^H, \Qry^H,
+\Up^H)$ as defined above.
 
 \heading{Pollution attacks}
 %
@@ -121,7 +121,7 @@ filter were consistently incorrect on a \emph{particular set of inputs}. Rather
 than pollute the filter, the adversary's goal might be to craft a set of
 legitimate looking inputs that cover some disjoint target set of inputs.
 %
-This type of attack is nicely captured by the \erreps1 game.
+This type of attack is nicely captured by our adversarial model.
 %
 In a \emph{target-set coverage attack}, the adversary has a small target set
 $\setT\subseteq\bits^*$ of and searches for a cover set $\setR\subseteq\bits^*$
@@ -132,7 +132,7 @@ for each $x\in\setT$, it asks $\Qry(x)$, achieving a score of \todo{DC
 (lead)}{Compute the adversary's score for whatever the score function is. Before
 getting here, the error function should be defined}.
 
-This attack succeeds with probability~$1$ assuming a covering set can be found.
+This \erreps1 attack succeeds with probability~$1$ assuming a covering set can be found.
 Such a set certainly exists, but finding it may be computationally infeasible
 depending on the size of the cover set, the size of the target set, and the
 parameters of the Bloom filter.
@@ -155,15 +155,37 @@ section, we examine ways of enhancing the basic BF structure so that it avoids
 this pitfall.
 
 \subsection{Salted BFs in the (im)mutable setting}
+%
+Here we consider the correctness of Bloom filters when the hashed input is
+prepended with a salt.
+%
+Fix function $H:\bits^*\to[m]^k$ and integers $\ell,n,\lambda\geq0$ and let
+$\Pi = \SBF[H,\ell,n,\lambda] = (\Rep^H, \Qry^H, \Up^H)$ as defined above.
 
-The use of a salt without a private key in the public representation setting is
-insufficient to defeat this attack. In this setting, the adversary need only
+The security of this structure depends upon how it is used.
+%
+\todo{DC (lead)}{As concisely as you can, articulate the \errep\ attack against~$\Pi$.
+Remember that the adversarial model (i.e., the security experiment) is supposed
+to reflect how the primitive is supposed to be used. So when giving attacks, try
+to make it clear what the attack is. You should answer the following questions:
+What is the sequence of queries made by the adversary?
+How efficient is the attack?
+Is the attack devastating? Is it a real attack, or is it more theoretical?
+What about the scheme and setting make it possible?
+%
+Note that I've left your text in a ignore\{\} so that you can lift from it as
+needed.
+}\ignore{
+The use of a salt without a private key in the \errep\ setting is
+insufficient to defeat [the attacka above]. In this setting, the adversary need only
 make its $\REPO$ query for $\setT$ in advance, at which point it will receive
 both the representation $\pub$ and the salt $\salt$ used to construct it. Using
 this known salt, the adversary is still able to simulate $\REPO$ for arbitrary
 singleton representations. The previous attack therefore still works with the
 same (minimal) number of $\QRYO$ calls at the very end of the experiment, after
 it has determined $\setR$ using offline computations.
+\cpnote{I don't think this is true, since each $\ROPO$ query returns a filter
+with a different, independently generated salt.}
 
 The opposite of this, using a private key without a salt, does weaken the attack
 somewhat. Even with public representations, the adversary cannot locally
@@ -175,8 +197,9 @@ $\setR \subseteq \col$ such that the elements of $\setR$ are false positives for
 the representation of $\setT$ (which can be computed from the representations of
 the singleton subsets of $\setT$). The adversary wins if there is a partition
 where $\setR$ produces at least $r$ errors on $\REPO(\setT)$.
-
-% ...
+\cpnote{This might be the case, but I don't think it's worth spending too much
+time on. We're going to have other reasons for needing to add salt even when
+there's a key.}
 
 Using a salted Bloom filter in the private representation setting, however, does
 provide some security. At the time a representation is created, the structure
@@ -190,6 +213,23 @@ from the salt space $\bits^\lambda$, and all hashes made to insert or query for
 an element $x$ are determined using $H(x \Vert \salt)$. Finally, the parameter
 $n$ means that any attempts to represent sets with more than $n$ elements fail.
 \todo{DC lead}{Specify what exactly is being analyzed.  What are the updates?}
+}
+
+The above attack exploits the mutability of~$\Pi$ in a crucial way.
+%
+\todo{DC (lead)}{Verify this, and remind the reader of what that ``crucial''
+thing is.}
+%
+Indeed, when restrict ourselves to the immutable setting, we can prove the
+following.
+%
+\begin{theorem}[\errep1 security of salted BFs]\label{thm:sbf-errep1}
+  For every $t, q_R, q_T, q_H \geq 0$ it holds that
+  \begin{equation*}
+    \Adv{\errep1}
+  \end{equation*}
+  where $H$ is modeled as a random oracle.
+\end{theorem}
 
 \begin{theorem}[Correctness Bound for Private-Representation Salted Bloom Filters]\label{thm:bf-priv-salt-bound}
 Fix integers $k, m, n, \lambda, r\geq 0$, let $H \colon \bits^* \to [m]$ be a function, and let $\struct_s = \SBF[H,k,m,n,\lambda]$.
@@ -381,7 +421,7 @@ that each call the adversary makes to the $\HASHO_i$ oracle is independent of
 all previous calls. We therefore have a $q_2/2^\lambda$ chance of the adversary
 guessing the salt during this phase, for a total chance of $q_H/2^\lambda$
 chance of the adversary guessing the salt at some point during the experiment.
-Then $\Adv{\erreps_1}_{\struct_s,r}(\advA) \le \Prob{\game_2(\advB) = 1} +
+Then $\Adv{\erreps}_{\struct_s,r}(\advA) \le \Prob{\game_2(\advB) = 1} +
 q_H/2^\lambda$. Having taken this into account, we may now assume the adversary
 never guesses the salt.
 
@@ -434,7 +474,7 @@ the binomial theorem gives an advantage bound of $\Prob{\game_3(\advB) = 1} \le
 \binom{q_T+q_U}{r}p(k, m, n+s)^r$.
 
 The full adversarial advantage is then
-$$\Adv{\erreps_1}_{\struct_s,r}(\advA) \le q_R \cdot \left(\frac{q_H}{2^\lambda} + \binom{q_T+q_U}{r}p(k, m, n+s)^r\right).$$
+$$\Adv{\erreps}_{\struct_s,r}(\advA) \le q_R \cdot \left(\frac{q_H}{2^\lambda} + \binom{q_T+q_U}{r}p(k, m, n+s)^r\right).$$
 
 %\missingqed
 \end{proof}
