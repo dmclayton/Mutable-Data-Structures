@@ -5,20 +5,20 @@
 \usepackage[font={small}]{caption}
 \usepackage{hyperref}
 \usepackage{xspace}
-\iffull
-\usepackage{amsthm}
-\newtheorem{lemma}{Lemma}
-\newtheorem{theorem}{Theorem}
-\newtheorem{corollary}{Corollary}
-\newtheorem{definition}{Definition}
-\theoremstyle{remark}
+%\iffull
+%\usepackage{amsthm}
+%\newtheorem{lemma}{Lemma}
+%\newtheorem{theorem}{Theorem}
+%\newtheorem{corollary}{Corollary}
+%\newtheorem{definition}{Definition}
+%\theoremstyle{remark}
 %\newtheorem*{remark}{Remark}
-\newtheorem{remark}{Remark}
-\newcommand{\missingqed}{}
-\else
-\documentclass[runningheads]{llncs}
+%\newtheorem{remark}{Remark}
+%\newcommand{\missingqed}{}
+%\else
+%\documentclass[runningheads]{llncs}
 \newcommand{\missingqed}{\hfill\qed}
-\fi
+%\fi
 \usepackage{amsmath}
 \usepackage{pifont}
 \usepackage{amsfonts}
@@ -104,7 +104,7 @@
 \def\str(#1){\procfont{set}\left(#1\right)}
 \def\bydef{\stackrel{\rm def}{=}}
 
-\newcommand{\undef}{\mathtt{undefined}}
+\newcommand{\undefn}{\mathtt{undefined}}
 
 % - String operations
 \newcommand{\emptystr}{\varepsilon}
@@ -135,7 +135,7 @@
 % Games
 \newcommand{\halt}{\bot}
 \newcommand{\game}{\cryptofont{G}}
-\newcommand{\G}{\game}
+%\newcommand{\G}{\game}
 \newcommand{\foreach}[3]{$\text{for }#1 \gets #2\text{ to }#3\text{ do}$}
 \newcommand{\tab}{\hspace*{10pt}}
 \newcommand{\outputs}{=}
@@ -152,7 +152,7 @@
 
 % - Inline comment
 \definecolor{CommentColor}{RGB}{125,175,230}
-\newcommand{\comment}[1]{\textcolor{CommentColor}{\,\textbf{\#}\,#1}}
+%\newcommand{\comment}[1]{\textcolor{CommentColor}{\,\textbf{\#}\,#1}}
 
 \newcommand{\gamesfontsize}{\footnotesize}
 \newcommand{\gamespadleft}{\hskip 1pt}
@@ -338,11 +338,11 @@
 % Uncomment to mute notes.
 %\renewcommand{\basenote}[4]{\ignorespaces}
 
-\iffull
+%\iffull
 \newcommand{\note}[3]{\basenote{#1}{#2}{says}{#3}}
-\else
-\renewcommand{\note}[3]{\basenote{#1}{#2}{says}{#3}}
-\fi
+%\else
+%\renewcommand{\note}[3]{\basenote{#1}{#2}{says}{#3}}
+%\fi
 
 \newcommand{\todo}[2]{\basenote{red}{#1}{to-do}{#2}}
 \newcommand{\tsnote}[1]{\note{cyan}{TS}{#1}}
