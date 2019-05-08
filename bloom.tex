@@ -559,7 +559,10 @@ adversary cannot distinguish the PRF from a random function and provided that
 the per-representation salt never repeats (the probability of which is on the
 order of $q_R^2/2^\lambda$ by the birthday bound), the adversary cannot
 distinguish this from the original game. By a conditioning argument, then, we
-have $\Adv{\game_0}_{\struct,r}(\advA) \le \Adv{\prf}(F) + q_R^2/2^\lambda + \Adv{\game_1}_{\struct,r}(\advA)$.
+have 
+%
+\todo{DC (lead)}{This doesn't make sense.}
+%$\Adv{\game_0}_{\struct,r}(\advA) \le \Adv{\prf}(F) + q_R^2/2^\lambda + \Adv{\game_1}_{\struct,r}(\advA)$.
 
 Next, since it never benefits the adversary to re-query an element instead of
 querying a new one, and because false negatives do not occur in Bloom filters,
@@ -575,7 +578,11 @@ is provided. We can then move from $\game_1$ to $\game_2$, which ignores the
 query given as input and instead makes a random query to a previously-untested
 element. Since the outputs of the $\QRYO$ oracle are indistinguishable from
 those in $\game_1$ and there are no other changes, we have
-$\Adv{\game_1}_{\struct,r}(\advA) = \Adv{\game_2}_{\struct,r}(\advA)$. But now
+%
+\todo{DC (lead)}{This doesn't make sense.}
+%$\Adv{\game_1}_{\struct,r}(\advA) = \Adv{\game_2}_{\struct,r}(\advA)$.
+%
+But now
 that the queries are random, the adversary cannot possibly do better than
 producing a representation with maximal (non-adaptive) false-positive
 probability and making as many arbitrary queries as possible. Given a threshold
