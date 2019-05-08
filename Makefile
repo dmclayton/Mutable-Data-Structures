@@ -1,4 +1,4 @@
-proj = mutable 
+proj = ccs-template 
 
 pdf: $(proj).pdf
 
