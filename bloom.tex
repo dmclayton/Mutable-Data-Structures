@@ -1,8 +1,9 @@
 %\subsection{Bloom filter lower bounds}
 
 %\input{bf-summary-tab}
-\todo{DC (lead)}{Explain away all cases except the one(s) for which we give
-security (upperbound) theorems.}
+\todo{DC (lead)}{Rewrite this so that it is summary of the results of this
+section: unsalted is bad; salted is OK for immutable filters; salted, secret rep
+is OK for mutable filters; and ...}
 %
 The standard Bloom filter shows a variety of different behaviors depending on
 its exact implementation. If the hash functions used are chosen beforehand and
@@ -16,10 +17,9 @@ are additional difficulties with offline attacks due to adversarially-chosen
 updates. To guarantee correctness in this case we must additionally guarantee
 that representations can be kept private from the adversary.
 
-\medskip
-\heading{Bit-string operations.}
+\heading{Bitstring operations}
 %
-\cpnote{This should be moved to prelims.}
+\todo{Any}{This should be moved to prelims.}
 %
 For all $m\geq0$ define~$\bmap_m$ as the following function.
 For all $\v.x\in[m]^*$ let $\bmap_m(\v.x) = X$, where
@@ -55,34 +55,74 @@ Lastly, on input of $(M, x) \in \bits^m\by\bits^*$, the update algorithm compute
 \]
 %
 Let $\BF[H] = (\Rep^H, \Qry^H, \Up^H)$.
+%
 
-\cpnote{WIP}
 
+\heading{Pollution attacks}
+%
+Suppose the adversary is interacting with a system representing a dataset with
+$\BF[H]$ and that it is able to choose some fraction of the input data.
+%
+\todo{DC (lead)}{Pick a concrete attack setting, like a CDN. ``For example
+...''.}
+%
+The goal of the attacks pointed out by Gerbet \etal~~\cite{gerbet2015power} is
+to pollute the filter such that the ``average'' set-membership query yields a
+false positive with high probability. The attack works by choosing a set of
+inputs that maximize the number of 1s in the filter. This strategy is especially
+effective when the structure of the hash function can be exploited.
+%
+\todo{DC (lead)}{Add a brief summary of attacks of Gerbet \etal that exploit bad
+choices of hash functions. What fraction of the inputs does the adversary need
+to control for the attack to be effective?}
+%
+Pollution attacks can even even be damaging for ``good'' choices of hash
+functions, but their effectiveness depends crucially on the fraction of inputs
+controlled by the adversary.
+%
+\todo{DC (lead}{Verify this claim. and discuss Gerbet \etal's mitigations of
+pollution attacks.}
 
-\ignore{
-A generic attack against unsalted, unkeyed data structures handling set
-membership queries is for the adversary to choose a large set $\col$ of
-potential filter elements and simulate $\REPO$ to produce representations for
-$\{x\}$ for each $x \in \col$. Given these, it can perform offline computations
-to determine disjoint $\setT$, $\setR \subseteq \col$ such that the elements of
-$\setR$ all produce errors when queried for membership in $\REPO(\setT)$. After
-a sufficiently large $\setR$ has been found, the adversary makes a single
-$\REPO$ call on $\setT$ and makes one $\QRYO$ call per element of $\setR$,
-resulting in guaranteed success for the adversary with only a minimal number of
-queries performed.
+\heading{Target-set coverage attacks}
+%
+Of course, exhibiting a high false positive rate is not the only way a Bloom
+filter might fail to be correct. In particular, it would be undesirable if the
+filter were consistently incorrect on a \emph{particular set of inputs}. Rather
+than pollute the filter, the adversary's goal might be to craft a set of
+legitimate looking inputs that cover some disjoint target set of inputs.
+%
+This type of attack is nicely captured by the \erreps1 game.
+%
+In a \emph{target-set coverage attack}, the adversary has a small target set
+$\setT\subseteq\bits^*$ of and searches for a cover set $\setR\subseteq\bits^*$
+such that $\Qry^H(\Rep^H(\setR),x)=1$ for each $x\in\setT$.
+%
+Once a suitable cover set is found, the adversary queries $\Rep(\setR)$. Then
+for each $x\in\setT$, it asks $\Qry(x)$, achieving a score of \todo{DC
+(lead)}{Compute the adversary's score for whatever the score function is. Before
+getting here, the error function should be defined}.
 
-In general, such an attack may not be computationally feasible in the real
-world. However, because the attack is entirely offline, many structures with
-non-negligible error probabilities are vulnerable to these attacks. For example,
-consider a Bloom filter with false positive probability $10^{-5}$ with an
-adversary wishing to construct $r = 10$ false positives. The adversary can fix
-$\setT$ in advance and perform somewhere on the order of a million hash queries
-to random elements in order to construct a $\setR$ of size 10, and then perform
-only a single $\REPO$ calls and ten $\QRYO$ calls to the service hosting the
-Bloom filter. This is likely to be much more feasible for the adversary than
-performing on the order of a million $\QRYO$ calls in an online attack which
-randomly guesses elements until it accumulates 10 false positives.
-K}
+This attack succeeds with probability~$1$ assuming a covering set can be found.
+Such a set certainly exists, but finding it may be computationally infeasible
+depending on the size of the cover set, the size of the target set, and the
+parameters of the Bloom filter.
+%
+In Appendix~\ref{app:unsalted-attack} we demonstrate that target-set coverage
+attacks are feasible for practical BF parameters. We do so by simulating the
+attack when~$H$ is a random function (i.e., for each distinct input we choose
+$k$ integers from $[m]$ at random) for typical choices of $k$, $m$, and the
+number of elements in the set.
+%
+\todo{CP}{Add simulation to appendix.}
+
+\todo{DS (lead)}{Double check that Gerbet \etal don't suggest anything like this
+attack. If they do it's not a big deal; we just need to ensure, to the best of
+our ability, that we give credit where credit is due.}
+
+The key to this attack and the attacks of Gerbet \etal is that the adversary
+can compute the representation of the set on its own. In the remainder of this
+section, we examine ways of enhancing the basic BF structure so that it avoids
+this pitfall.
 
 \subsection{Salted BFs in the (im)mutable setting}
 
