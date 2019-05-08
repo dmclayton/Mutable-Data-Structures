@@ -1,0 +1,34 @@
+\begin{figure*}[tp]
+\begin{center}
+\small
+  \begin{tabular}{ |p{1.75cm} | p{2.5cm} | p{2.95cm} | p{4cm} | p{3.7cm}|}
+    \hline
+    {\bf Structure} & {\bf Data Objects} & {\bf Supported Queries} & {\bf Supported Updates} & {\bf Parameters} \\ \hline
+    \parbox[c]{1.5cm}{Bloom\\ filter} 
+          & \parbox[c][6ex]{2cm}{Sets\\$\col\subseteq \mathcal{X}$} %, or\\ $\col \in \Func(\mathcal{X},\{0,1\})$} 
+          & $\qry_x(\col) = [x \in \col]$
+          &  $\up_x(\col) = \col \cup \{x\}$ 
+          & \parbox[c]{4cm}{$n$, max $|\col|$\\$k$, \# hash functions\\$m$, array size (bits)} 
+          \\\hline
+    \parbox[c]{1.5cm}{Counting\\ filter} 
+          & \parbox[c]{2.5cm}{Multisets\\ $\col \in \Func(\mathcal{X},\N)$}
+          & $\qry_x(\col) = [\col(x) > 0]$
+          & \parbox[c][10ex]{4cm}{$\up_{x,0}(\col)(x) = \col(x)+1$ \\ $\up_{x,1}(\col)(x) = \col(x)-1$ \\ $\up_{x,b}(\col)(y) = \col(y)$ for $x \neq y$}
+          & \parbox[c]{3.5cm}{$n$, max $|\col|$\\$k$, \# hash functions\\$m$, array size (counters)\\ $d$, bits per counter}
+         \\ \hline
+    \parbox[c]{1.5cm}{Cuckoo\\ filter}
+          & \parbox[c]{2.5cm}{Multisets\\ $\col \in \Func(\mathcal{X},\N)$}
+          & $\qry_x(\col) = [\col(x) > 0]$
+          & \parbox[c][10ex]{4cm}{$\up_{x,0}(\col)(x) = \col(x)+1$ \\ $\up_{x,1}(\col)(x) = \col(x)-1$ \\ $\up_{x,b}(\col)(y) = \col(y)$ for $x \neq y$}
+          & \parbox[c]{3.5cm}{$n$, max $|\col|$\\$m$, \# buckets\\$b$, bucket size (entries)\\$f$, fingerprint size (bits)}
+          \\ \hline
+     \parbox[c]{2cm}{Count-min\\ sketch}
+          & \parbox[c]{2.5cm}{Multisets\\ $\col \in \Func(\mathcal{X},\N)$}
+          & $\qry_x(\col) = \col(x)$
+          & \parbox[c][10ex]{4cm}{$\up_{x,0}(\col)(x) = \col(x)+1$ \\ $\up_{x,1}(\col)(x) = \col(x)-1$ \\ $\up_{x,b}(\col)(y) = \col(y)$ for $x \neq y$}
+          & \parbox[c]{3.75cm}{$n$, max $|\col|$\\$k$, \# hash functions and arrays\\$m$, array size (counters)\\$d$, bits per counter}
+          \\ \hline
+  \end{tabular}
+\caption{The data structrues that we consider.  The set~$\mathcal{X}$ is some understood universe of base objects.  Each data structure yields a space-efficient representation of its input data object and, in the presense of non-adaptive attacks, provides approximately correct responses to the supported queries.  For counting filters, cuckoo filters, and count-min sketch, typical implementations prevent updates that would cause $\col(x)-1 < 0$.}
+\end{center}
+\end{figure*}

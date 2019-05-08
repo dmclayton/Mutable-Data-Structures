@@ -15,7 +15,7 @@
       if $\pub = \bot$ return $\bot$\\
       $\ct\gets\ct+1$ \\
       $\pub_\ct \gets \pub$\\
-      $\setC_\ct \gets \emptyset$\\
+      %$\setC_\ct \gets \emptyset$\\
       $\col_\ct \gets \col$\\
       $\mathrm{rv} \gets \pub_\ct$ \highlight{;\mathrm{rv} \gets \top} \\
       return $\mathrm{rv}$
@@ -29,7 +29,7 @@
       $X \gets \col_i$ \\
       $\col_i \gets \up(X)$\\
       $\pub_i \getsr \pub$\\
-      $\setC_i \gets \emptyset$\\
+%      $\setC_i \gets \emptyset$\\
       for $\qry$ in $\err_i$ do\\
       \tab $a \gets \Qry_K(\pub_i, \qry)$\\
       \tab if $\err_i[\qry] > d(a,\qry(\col_i))$ then\\
@@ -41,7 +41,7 @@
 {
     \oraclev{$\QRYO(i, \qry)$}\\[2pt]
       if $\qry \in \setC_i$ then return $\bot$\\
-      $\setC_i \gets \setC \union \{\qry\}$\\
+%      $\setC_i \gets \setC \union \{\qry\}$\\
       $a \gets \Qry_K(\pub_i, \qry)$\\
       if $\err_i[\qry] < d(a,\qry(\col_i))$ then\\
       \tab$\err_i[\qry] \gets d(a,\qry(\col_i))$\\
@@ -58,3 +58,30 @@
   \vspace{6pt}\hrule
   \label{fig:security}
 \end{figure*}
+
+
+\newcommand{\oneColCCS}[2]{
+  \makebox[.3\textwidth]{
+    \begin{tabular}{|@{\gamespadleft}l@{\gamespad}|}
+    \hline
+    \rule{0pt}{1\normalbaselineskip}
+    \begin{minipage}[t]{#1\textwidth}\gamesfontsize
+      #2 \vspace{6pt}
+    \end{minipage} \\
+    \hline
+  \end{tabular}
+  }
+}
+
+\begin{figure}[t]
+\oneColCCS{0.25}
+{
+\oraclev{$H(X)$}\\[2pt]
+$V \getsr \mathcal{V}$\\
+if $\mathrm{T}[X] \neq \undefn$ then $V \gets \mathrm{T}[X]$\\
+$\mathrm{T}[X]\gets V$\\
+return~$V$
+}
+\caption{Pseudocode for a Random Oracle~$H$ with outputs in set $\mathcal{V}$}
+\label{fig:ROM}
+\end{figure}
