@@ -20,7 +20,7 @@
   }
   \caption{A keyless structure $\bloom[R,t,n,\lambda] = (\Rep^R,\Qry^R,\Up^R)$
   used to define Bloom filter variants. It ``compiles'' a function $R: \bits^*
-  \to [m]^k$ (either a hash function or keyed PRF), threshold $t\geq0$, and salt
+  \to [m]^k$ (either a hash function or keyed PRF), thresholds $n, t\geq0$, and salt
   length $\lambda\geq0$ into a concrete scheme. Functions~$\hw$ and~$\bmap_m$
   are defined in Section~\ref{sec:prelims}.
   }
@@ -30,7 +30,7 @@
 The formal Bloom filter construction is given in~\ref{fig:bf-def}. From this
 general construction we specify three specific structures to focus on.
 %
-Let $H:\bits^*\to[m]^k$ be a hash function and let $t, \lambda\geq0$ be
+Let $H:\bits^*\to[m]^k$ be a hash function and let $t, n, \lambda\geq0$ be
 integers.
 %
 The standard Bloom filter is the structure $\BF[H,t,n] = \bloom[H,t,n,0]$, which we will
