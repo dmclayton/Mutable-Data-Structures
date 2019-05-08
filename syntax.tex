@@ -6,6 +6,7 @@ Fix non-empty sets $\mathcal{D}, \mathcal{R}, \keys$ of \emph{data objects}, \em
 $\mathcal{U} \subseteq \Func(\mathcal{D},\mathcal{D})$ be a set of allowed data-object \emph{updates}. 
 A {\em data structure} is a tuple $\Pi = (\Rep,\Qry,\Up)$, where:
 
+\cpnote{DAvid and I are treating $\setQ$ as a subset of $\bits^*$.}
 \begin{itemize}
   \item $\Rep\colon \keys \times \mathcal{D} \to \{0,1\}^* \cup \{\bot\}$ is a randomized {\em representation algorithm}, taking as input a key $\key \in \keys$ and data object $\col \in \mathcal{D}$, and outputting the representation $\pub \in \{0,1\}^*$ of $D$, or $\bot$ in the case of a failure. We write this as $\pub \getsr \Rep_\key(\col)$.
 %
