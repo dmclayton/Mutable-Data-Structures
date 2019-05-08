@@ -221,15 +221,25 @@ The above attack exploits the mutability of~$\Pi$ in a crucial way.
 thing is.}
 %
 Indeed, when restrict ourselves to the immutable setting, we can prove the
-following.
+following. Let $\delta:\bits^2\to\N$ be the error function defined by
+$\delta(a,b) = |a-b|$.
 %
 \begin{theorem}[\errep1 security of salted BFs]\label{thm:sbf-errep1}
-  For every $t, q_R, q_T, q_H \geq 0$ it holds that
+  For integers $q_R, q_T, q_H, r, t \geq 0$ it holds that.
   \begin{equation*}
-    \Adv{\errep1}
+    \begin{aligned}
+      \Adv{\errep1}_{\Pi,\delta,r}(t, q_R,q_T,Q_H) &\leq \\
+      \hspace{20pt}
+        \text{some cool bound} \,,
+    \end{aligned}
   \end{equation*}
   where $H$ is modeled as a random oracle.
+  %
+  \cpnote{I'm not sure if this advantage function is defined.}
 \end{theorem}
+\begin{proof}
+  \input{proof/sbf-errep1}
+\end{proof}
 
 \begin{theorem}[Correctness Bound for Private-Representation Salted Bloom Filters]\label{thm:bf-priv-salt-bound}
 Fix integers $k, m, n, \lambda, r\geq 0$, let $H \colon \bits^* \to [m]$ be a function, and let $\struct_s = \SBF[H,k,m,n,\lambda]$.
