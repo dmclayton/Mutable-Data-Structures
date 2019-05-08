@@ -356,19 +356,76 @@ Fix integers $k, m, \lambda, r\geq 0$ and a threshold $p \in [0,1]$, let $\Pi$ b
 where $I$ is the regularized incomplete beta function.
 \end{theorem}
 
+\begin{figure*}
+  \boxThmBFSaltCorrect{0.48}
+  {
+    \underline{$\game_0(\advA)$}\\[2pt]
+      $\key \getsr \keys$\\; $i \gets 0$\\
+      $\bot \getsr \advA^{\HASHO,\REPO,\QRYO,\UPO}$\\
+      return $[\sum \err \geq r]$
+    \\[6pt]
+    \oraclev{$\REPO(\col)$}\\[2pt]
+      $i \gets i + 1$\\
+      $\col_i \gets \col$\\
+      $\pub_i \gets \Rep_K[\HASHO](\col)$\\
+      return $\pub_i$
+    \\[6pt]
+    \oraclev{$\QRYO(i,\qry_x)$}\\[2pt]
+      $a \gets \Qry[\HASHO](\pub_i, \qry_x)$\\
+      if $a \neq \qry_x(\col)$ then $\err_i[x] \gets 1$\\
+      return~$a$
+    \\[6pt]
+    \oraclev{$\UPO(i,\up_x)$}\\[2pt]
+      $a \gets \Qry[\HASHO](\pub_i, \qry_x)$\\
+      if $\err_i[x] = 1$ then $\err_i \gets 0$\\
+      $\col_i \gets \col_i \union \{x\}$\\
+      $\pub_i \gets \Up[\HASHO](\pub_i,\up_x)$\\
+      return~$\pub_i$
+    \\[4pt]
+    \oraclev{$\HASHO(x)$}\\[2pt]
+      return $H(x)$
+    %\hspace*{-4pt}\rule{1.043\textwidth}{.4pt}
+  }
+  {
+  \underline{$\game_1(\advB)$}\\[2pt]\\
+    \oraclev{$\HASHO(i,x)$}\\
+      if $T[i, x]$ is $\undefn$ then $T[i, x] \getsr [m]^k$\\
+      return $T[i, x]$
+    \\[6pt]
+    \underline{$\game_2(\advB)$}\\[2pt]\\
+      $\key \getsr \keys$\\; $i \gets 0$\\; $\setC \gets \emptyset$\\
+      $\bot \getsr \advA^{\HASHO,\REPO,\QRYO,\UPO}$\\
+      return $[\sum \err \geq r]$
+    \\[6pt]
+    \oraclev{$\QRYO(\qry_x)$}\\[2pt]
+      do\\
+      $\tab y \getsr \mathcal{X}$\\
+      while $y \in \col \cup \setC$\\
+      $a \gets \Qry[\HASHO](\pub_i, \qry_y)$\\
+      if $a \neq \qry_y(\col)$ then $\err_i[y] \gets 1$\\
+      return~$a$
+  }
+  {
+  }
+  {
+  }
+  \caption{Games 0--2 for proof of Theorem~\ref{thm:bf-priv-key-bound}.}
+  \label{fig:bf-priv-salt-bound}
+\end{figure*}
+
 \begin{proof}
 
 The key to the proof is that seeing the representation of a salted, keyed Bloom
 filter does nothing to tell the adversary about what the responses to $\QRYO$
-will be. Using a conditioning argument, we move from the standard game $\game_0$
-to the alternate $\game_1$ that uses a lazily-evaluated random function in place
-of the PRF $F$ for hashing, with the random function being different for each
-representation. Provided that the adversary cannot distinguish the PRF from a
-random function and provided that the per-representation salt never repeats (the
-probability of which is on the order of $q_R^2/2^\lambda$ by the birthday
-bound), the adversary cannot distinguish this from the original game. By a
-conditioning argument, then, we have
-$\Adv{\game_0}_{\struct,r}(\advA) \le \Adv{\prf}(F) + q_R^2/2^\lambda + \Adv{\game_1}_{\struct,r}(\advA)$.
+will be. Using a conditioning argument, we move from $\game_0$, which is
+equivalent to the standard $\errep$ game, to the alternate $\game_1$ that uses a
+lazily-evaluated random function in place of the PRF $F$ for hashing, with the
+random function being different for each representation. Provided that the
+adversary cannot distinguish the PRF from a random function and provided that
+the per-representation salt never repeats (the probability of which is on the
+order of $q_R^2/2^\lambda$ by the birthday bound), the adversary cannot
+distinguish this from the original game. By a conditioning argument, then, we
+have $\Adv{\game_0}_{\struct,r}(\advA) \le \Adv{\prf}(F) + q_R^2/2^\lambda + \Adv{\game_1}_{\struct,r}(\advA)$.
 
 Next, since it never benefits the adversary to re-query an element instead of
 querying a new one, and because false negatives do not occur in Bloom filters,
@@ -396,13 +453,13 @@ $$\Adv{\errep}_{\struct,r,d}(\advA) \le \Adv{\prf}(F) + I_{p^k}(r, q_T-r+1)$$
 
 \end{proof}
 
-We can use this final and best bound to demonstrate some of the possible bounds
-with various parameter settings. Figure ? shows the upper bound for a various
-combination of parameters, starting from the default parameters of $k = 4$, $m =
-1024$, $n = 100$, $r = 10$, $q_R = 1$, $q_T = 100$, and $q_U = 100$. The most
-significant factor in the adversarial advantage is $q_R$, with even small
-increases producing a drastic increase in the adversarial advantage. Since this
-is the only part of the error bound that is not clearly associated with an
-attack, it is possible that this term could be reduced or eliminated.
+%We can use this final and best bound to demonstrate some of the possible bounds
+%with various parameter settings. Figure ? shows the upper bound for a various
+%combination of parameters, starting from the default parameters of $k = 4$, $m =
+%1024$, $n = 100$, $r = 10$, $q_R = 1$, $q_T = 100$, and $q_U = 100$. The most
+%significant factor in the adversarial advantage is $q_R$, with even small
+%increases producing a drastic increase in the adversarial advantage. Since this
+%is the only part of the error bound that is not clearly associated with an
+%attack, it is possible that this term could be reduced or eliminated.
 
 %\includegraphics[scale=0.75]{BF_Fig}
