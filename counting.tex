@@ -20,7 +20,7 @@ filter does not allow for negative counter values.
 
 As in the case of a Bloom filter, we can modify this definition to support a
 per-representation random salt of some fixed size $\lambda$. In this case,
-$\Rep$ initially samples $\salt \get \bits^\lambda$, and then each hash
+$\Rep$ initially samples $\salt \gets \bits^\lambda$, and then each hash
 computation is evaluated as $H(\key \Vert \salt \Vert x)$ instead of
 $H(\key \Vert x)$.
 
@@ -35,25 +35,16 @@ This lower bound is not tight, however, since there are some attacks which
 exploit the more powerful $\UPO$ oracle provided to the adversary in the case of
 a counting filter. For example, while a salted and keyed Bloom filter is secure even in the public representation case, a salted and keyed counting filter is not secure in the same setting. The attack against a keyed but unsalted Bloom filter can be modified to work in this setting. That attack involved calling $\REPO$ several times to determine representations of singletons from some set $\setT$, from which the adversary could determine for itself what the representation of any subset of $\setT$ would look like. While the presence of a salt prevents this attack from working, in the case of a counting Bloom filter we can modify the attack to work even if a salt is used. Specifically, instead of calling $\REPO$ several times to determine the singleton representations, the adversary calls $\REPO$ only once to get an empty representation, and then uses pairs of $\UPO$ calls to insert and then delete the elements of $\setT$. In this way, the adversary will be able to see the representation of each singleton subset of $\setT$, and then perform offline computations to find subsets $\setR, \setS \subset \setT$ such that the elements of $\setR$ produce errors when queried for in the representation of $\setS$. Once the adversary has determined this, it can use $\UPO$ to insert the elements of $\setS$ and query the elements of $\setR$ in order to win the game. The use of a salt is irrelevant to this attack since only a single representation is ever used, and only $2|\setT|+|\setS|$ calls to $\UPO$ and $|\setR|$ calls to $\QRYO$ are used.
 
-Because of this, using a private representation is necessary to obtain good bounds for a counting filter.
+Because of this, using a private representation is necessary to obtain good bounds for a counting filter. In order to prevent possible pollution attacks, where the adversary inserts elements in such a way as to minimize the number of nonzero counters, we also use a thresholding assumption. This introduces an additional parameter $p \in [0,1]$, such that we reject any update that would cause the proportion of nonzero counters in the filter to exceed $p$. Using these two assumptions, we can derive a
+false positive bound similar to that of a salted standard Bloom filter.
 
-Furthermore, in order to achieve good security for a counting filter, it is necessary to use
-the thresholding assumption that insertions are rejected when the proportion of
-nonzero counters in the filter reaches some limit $p$. Without this assumption,
-the adversary can attempt to optimize the number of nonzero counters while
-keeping the size of the filter (in terms of the number of elements stored in the
-underlying set) below some constant maximum value. For example, if some $x$ is
-known to be a false positive for two different sets $\col_1$ and $\col_2$, this
-increases the probability that elements of $\col_1$ are false positives for the
-filter representation of $\col_2$ and vice versa. However, using the assumption
-that there is a limit on the allowed number of nonzero counters, we can derive a
-false positive bound similar to that of a standard Bloom filter.
+Unlike with a standard Bloom filter, the choice of error function is nontrivial. While we are assuming that $d(x,x)$ is always 0, so that the adversary does not get credit for a correct query, it is possible that $d(0,1)$ (the weight of a false negative) may be different than $d(1,0)$ (the weight of a false positive).
 
 \begin{theorem}[Correctness Bound for Counting Filters]\label{thm:count-bf-bound}
-Fix integers $k, m, n, \lambda, r\geq 0$, a threshold ratio $p \in [0,1]$, and an error function $d$.
+Fix integers $k, m, n, \lambda, r\geq 0$ and an error function $d$, and let $\Pi$ be a .
   For every $t, q_R, q_T, q_U, q_H \geq 0$, it holds that
   \begin{eqnarray*}
-    \Adv{\erreps}_{\struct_\saltybloom,r}(t,&q_R,& q_T, q_U, q_H) \leq \\ && q_R \cdot \left[\frac{q_H}{2^\lambda} + \binom{q_T}{\mu}\left(p+\frac{k\mu}{m}\right)^{k\mu}\right] \,,
+    \Adv{\erreps}_{\struct,r}(t,&q_R,& q_T, q_U, q_H) \leq \\ && q_R \cdot \left[\frac{q_H}{2^\lambda} + \binom{q_T}{\mu}\left(p+\frac{k\mu}{m}\right)^{k\mu}\right] \,,
 \end{eqnarray*}
 where $\mu = \lceil r/\max(k \cdot d(0,1), d(1,0)) \rceil$
 \end{theorem}
