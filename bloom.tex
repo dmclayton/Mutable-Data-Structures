@@ -2,19 +2,36 @@
 
 %\input{bf-summary-tab}
 \todo{DC (lead)}{Explain away all cases except the one(s) for which we give
-security (upperbound) theorems.} The standard Bloom filter shows a variety of
-different behaviors depending on its exact implementation. If the hash functions
-used are chosen beforehand and potentially known to the adversary, this public
-information allows offline attacks to be mounted against the data structure
-which can produce potentially damaging false positives. In the case of immutable
-Bloom filters, making use of a per-representation salt is sufficient to prevent
-these attacks, though depending on the use case the use of non-fixed
-per-representation randomness may or may not be feasible. Furthermore, in the
-case of mutable Bloom filters there are additional difficulties with offline
-attacks due to adversarially-chosen updates. To guarantee correctness in this
-case we must additionally guarantee that representations can be kept private
-from the adversary.
+security (upperbound) theorems.}
+%
+The standard Bloom filter shows a variety of different behaviors depending on
+its exact implementation. If the hash functions used are chosen beforehand and
+potentially known to the adversary, this public information allows offline
+attacks to be mounted against the data structure which can produce potentially
+damaging false positives. In the case of immutable Bloom filters, making use of
+a per-representation salt is sufficient to prevent these attacks, though
+depending on the use case the use of non-fixed per-representation randomness may
+or may not be feasible. Furthermore, in the case of mutable Bloom filters there
+are additional difficulties with offline attacks due to adversarially-chosen
+updates. To guarantee correctness in this case we must additionally guarantee
+that representations can be kept private from the adversary.
 
+\subsection{Insecurity of unsalted BFs}
+%
+Let $H:\bits^*\to[m]^k$ be a function and consider the following unkeyed
+structure $\BF[H] = (\Rep, \Qry, \Up)$. Its data objects, supported queries, and
+supported updates are as defined in top row of
+Figure~\ref{fig:structures-summary}.
+%
+On input of $\setS\subseteq\bits^*$
+%
+\cpnote{WIP}
+
+
+
+
+
+\ignore{
 A generic attack against unsalted, unkeyed data structures handling set
 membership queries is for the adversary to choose a large set $\col$ of
 potential filter elements and simulate $\REPO$ to produce representations for
@@ -37,6 +54,9 @@ only a single $\REPO$ calls and ten $\QRYO$ calls to the service hosting the
 Bloom filter. This is likely to be much more feasible for the adversary than
 performing on the order of a million $\QRYO$ calls in an online attack which
 randomly guesses elements until it accumulates 10 false positives.
+K}
+
+\subsection{Salted BFs in the (im)mutable setting}
 
 The use of a salt without a private key in the public representation setting is
 insufficient to defeat this attack. In this setting, the adversary need only
