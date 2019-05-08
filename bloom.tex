@@ -358,9 +358,40 @@ where $I$ is the regularized incomplete beta function.
 
 \begin{proof}
 
-The key to the proof is that seeing the representation of a salted, keyed Bloom filter does nothing to tell the adversary about what the responses to $\QRYO$ will be. Using a conditioning argument, we move from the standard game $\game_0$ to the alternate $\game_1$ that uses a lazily-evaluated random function in place of the PRF $F$ for hashing, with the random function being different for each representation. Provided that the adversary cannot distinguish the PRF from a random function and provided that the per-representation salt never repeats (the probability of which is on the order of $q_R^2/2^\lambda$ by the birthday bound), the adversary cannot distinguish this from the original game. By a conditioning argument, then, we have $\Adv{\game_0}_{\struct,r}(\advA) \le \Adv{\prf}(F) + q_R^2/2^\lambda + \Adv{\game_1}_{\struct,r}(\advA)$.
+The key to the proof is that seeing the representation of a salted, keyed Bloom
+filter does nothing to tell the adversary about what the responses to $\QRYO$
+will be. Using a conditioning argument, we move from the standard game $\game_0$
+to the alternate $\game_1$ that uses a lazily-evaluated random function in place
+of the PRF $F$ for hashing, with the random function being different for each
+representation. Provided that the adversary cannot distinguish the PRF from a
+random function and provided that the per-representation salt never repeats (the
+probability of which is on the order of $q_R^2/2^\lambda$ by the birthday
+bound), the adversary cannot distinguish this from the original game. By a
+conditioning argument, then, we have
+$\Adv{\game_0}_{\struct,r}(\advA) \le \Adv{\prf}(F) + q_R^2/2^\lambda + \Adv{\game_1}_{\struct,r}(\advA)$.
 
-Next, since it never benefits the adversary to re-query an element instead of querying a new one, and because false negatives do not occur in Bloom filters, we can assume without loss of generality that the adversary only makes queries to previously-unqueried elements which are not in the underlying set. But if an element is not in the underlying set, it must not have been included in the original $\col$ sent to $\REPO$, and it must never have been inserted with $\UPO$ since Bloom filters do not support deletion. Furthermore, since it has not been queried before, it has not been tested with $\QRYO$ either. This means that each element being queried is a new input to the random function used for hashing, and its output is therefore indistinguishable from any other input that is provided. We can then move from $\game_1$ to $\game_2$, which ignores the query given as input and instead makes a random query to a previously-untested element. Since the outputs of the $\QRYO$ oracle are indistinguishable from those in $\game_1$ and there are no other changes, we have $\Adv{\game_1}_{\struct,r}(\advA) = \Adv{\game_2}_{\struct,r}(\advA)$. But now that the queries are random, the adversary cannot possibly do better than producing a representation with maximal (non-adaptive) false-positive probability and making as many arbitrary queries as possible. Given a threshold where the proportion of 1 bits is capped at $p$, the false positive probability for each query is bounded by $p^k$. By the properties of the binomial distribution, the probability of accumulating at least $r$ errors given $q_T$ queries is
+Next, since it never benefits the adversary to re-query an element instead of
+querying a new one, and because false negatives do not occur in Bloom filters,
+we can assume without loss of generality that the adversary only makes queries
+to previously-unqueried elements which are not in the underlying set. But if an
+element is not in the underlying set, it must not have been included in the
+original $\col$ sent to $\REPO$, and it must never have been inserted with
+$\UPO$ since Bloom filters do not support deletion. Furthermore, since it has
+not been queried before, it has not been tested with $\QRYO$ either. This means
+that each element being queried is a new input to the random function used for
+hashing, and its output is therefore indistinguishable from any other input that
+is provided. We can then move from $\game_1$ to $\game_2$, which ignores the
+query given as input and instead makes a random query to a previously-untested
+element. Since the outputs of the $\QRYO$ oracle are indistinguishable from
+those in $\game_1$ and there are no other changes, we have
+$\Adv{\game_1}_{\struct,r}(\advA) = \Adv{\game_2}_{\struct,r}(\advA)$. But now
+that the queries are random, the adversary cannot possibly do better than
+producing a representation with maximal (non-adaptive) false-positive
+probability and making as many arbitrary queries as possible. Given a threshold
+where the proportion of 1 bits is capped at $p$, the false positive probability
+for each query is bounded by $p^k$. By the properties of the binomial
+distribution, the probability of accumulating at least $r$ errors given $q_T$
+queries is
 $$\Adv{\errep}_{\struct,r,d}(\advA) \le \Adv{\prf}(F) + I_{p^k}(r, q_T-r+1)$$
 
 \end{proof}
