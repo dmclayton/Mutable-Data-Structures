@@ -5,9 +5,9 @@
   \oneCol{0.46}
   {
     \underline{$\Rep^R(\col)$}\\[2pt]
+      if $|\col| > n$ return $\bot$;
       $\salt \getsr \bits^\lambda$;
       $M \gets \bigvee_{x \in \col} \bmap_m(R(x))$;
-      if $\hw(M) > t$ then return $\bot$\\
       return $\langle M, \salt \rangle$
     \\[6pt]
     \underline{$\Qry^R(\langle M, \salt \rangle,x)$}\\[2pt]
@@ -17,7 +17,7 @@
       if $\hw(M) > t$ then return $\bot$\\
       return $M \vee \bmap_m(R(x))$
   }
-  \caption{A keyless structure $\bloom[R,t,\lambda] = (\Rep^R,\Qry^R,\Up^R)$
+  \caption{A keyless structure $\bloom[R,t,n,\lambda] = (\Rep^R,\Qry^R,\Up^R)$
   used to define Bloom filter variants. It ``compiles'' a function $R: \bits^*
   \to [m]^k$ (either a hash function or keyed PRF), thershold $t\geq0$, and salt
   length $\lambda\geq0$ into a concrete scheme. Functions~$\hw$ and~$\bmap_m$
@@ -32,17 +32,17 @@ general construction we specify three specific structures to focus on.
 Let $H:\bits^*\to[m]^k$ be a hash function and let $t, \lambda\geq0$ be
 integers.
 %
-The standard Bloom filter is the structure $\BF[H,t] = \bloom[H,t,0]$, which we will
+The standard Bloom filter is the structure $\BF[H,t,n] = \bloom[H,t,n,0]$, which we will
 term the \emph{basic} Bloom filter. It has no key and does not employ a salt.
 %
-The \emph{salted} Bloom filter $\SBF[H,t,\lambda] = \bloom[H,t,\lambda]$ is the same except that
+The \emph{salted} Bloom filter $\SBF[H,t,n,\lambda] = \bloom[H,t,n,\lambda]$ is the same except that
 it allows a nontrivial salt.
 %
 Note that the key space for both~$\BF$ and~$\SBF$ is $\{\emptystr\}$.
 %
 Finally, we also consider a salted variant that uses a PRF instead of a hash
 function. Let $F:\keys\by\bits^*\to[m]^k$ be a PRF. The \emph{keyed} Bloom
-filter $\KBF[F,t,\lambda]$ is defined as follows. On input of $(K,\setS)$, the
+filter $\KBF[F,t,n,\lambda]$ is defined as follows. On input of $(K,\setS)$, the
 representation algorithm returns $\Rep^{F_K}(\setS)$; on input of
 $(K, \pub, x)$, the query-evaluation algorithm returns
 $\Qry^{F_K}(\pub, x)$; and on input of $(\pub, x)$, the update algorithm
