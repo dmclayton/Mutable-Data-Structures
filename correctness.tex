@@ -8,27 +8,18 @@ In the first correctness notion, the representations of the true data are public
 
 While many potential errors may exist for a given representation of a set, in the form of queries $\qry$ that would return an inaccurate answer when sent to $\QRYO$, we want an experiment that forces the adversary to actually find specific erroneous queries. In particular, we only give the adersary credit when they actually make a $\QRYO$ call that produces an error.
 
-Both experiments aim to capture the total weight of the errors caused by the adversary, at any point in time, with respect to the current data objects $\col_i$ and their representations $\pub_i$.  Because we consider mutable data objects and representations, the notion of ``current'' is defined by calls to the $\REPO$ and $\UPO$ oracles.  
-%
-\ignore{Specifically, for each~$\col_i$, both experiments maintain a set~$\setC_i$ that is initially set to empty (when~$\col_i$ is first assigned via a~$\REPO$-query), and it is reset to empty whenever~$\col_i$ is updated via an $\UPO$-query.  This is capturing the fact that applying a non-empty update function~$\up$ to~$\col_i$ produces a new data object.}
-%
+Both experiments aim to capture the total weight of the errors caused by the adversary, at any point in time, with respect to the current data objects $\col_i$ and their representations $\pub_i$.  Because we consider mutable data objects and representations, the notion of ``current'' is defined by calls to the $\REPO$ and $\UPO$ oracles.  Specifically, for each~$\col_i$, both experiments maintain a set~$\setC_i$ that is initially set to empty (when~$\col_i$ is first assigned via a~$\REPO$-query), and it is reset to empty whenever~$\col_i$ is updated via an $\UPO$-query.  This is capturing the fact that applying a non-empty update function~$\up$ to~$\col_i$ produces a new data object.
+
 To track errors, both experiments maintain an array $\err_i[]$ for every data object~$\col_i$ that has been defined.   Initially, $\err_i[]$ is implicitly assigned the value of~$\undefn$ at every index.  For purposes of value comparison, we adopt the convention that $\undefn < n$ for all $n \in \mathbb{R}$.
 %
-Now, the array~$\err_i$ is indexed by query functions~$\qry$, and the value of $\err_i[\qry]$ is the ``cost'' of the error caused by~$\qry$, with respect to the \emph{current} data object~$\col_i$ and \emph{current} representation~$\pub_i$ (of~$\col_i$).  
+Now, the array~$\err_i$ is indexed by query functions~$\qry$, and the value of $\err_i[\qry]$ is the ``weight'' of the error caused by~$\qry$, with respect to the \emph{current} data object~$\col_i$ and \emph{current} representation~$\pub_i$ (of~$\col_i$).  
 %
 The value of~$\err_i[\qry]$ is updated within the $\QRYO$- and $\UPO$-oracles, but observe that $\err_i[\qry] = \undefn$ until $(i,\qry)$ is queried to the $\QRYO$-oracle.  Intuitively, a representation~$\pub_i$ of data object~$\col_i$ cannot surface errors until it is queried.
 
-When~$\QRYO(i,\qry)$ executes, the value in $\err_i[\qry]$ is overwritten iff the error caused by~$\qry$ is larger than the existing value of $\err_i[\qry]$.  The first time $(i,\qry)$ is queried to~$\QRYO$ this is guaranteed, since the minimum possible value of $d$ is 0.  
-\ignore{
-Since the set $\setC_i$ is used to prevent (WLOG) the adversary from repeating a query~$\QRYO(i,\qry)$ for a given~$\col_i$, 
-}
-Note that increases to the value of $\err_i[\qry]$ may only be made ``across'' updates to~$\col_i$.  This may seem to be overly conservative, as an error-heavy~$\col_i$ may become less so after an update.  But we account for this within the $\UPO$-oracle.
+When~$\QRYO(i,\qry)$ executes, the value in $\err_i[\qry]$ is overwritten iff the error caused by~$\qry$ is larger than the existing value of $\err_i[\qry]$.  The first time $(i,\qry)$ is queried to~$\QRYO$ this is guaranteed, since the minimum possible value of $d$ is 0.  Since the set $\setC_i$ is used to prevent (WLOG) the adversary from repeating a query~$\QRYO(i,\qry)$ for a given~$\col_i$, increases to the value of $\err_i[\qry]$ may only be made ``across'' updates to~$\col_i$.  This may seem to be overly conservative, as an error-heavy~$\col_i$ may become less so after an update.  But we account for this within the $\UPO$-oracle.
 In particular, calls to the $\UPO$-oracle may only \emph{decrease} the value of~$\err_i[\qry]$.  
 
-When a query $\UPO(i,\up)$ is made, the oracle first updates the data object~$\col_i$ and its corresponding representation.  
-%
-\ignore{The set~$\setC_i$ is reset to empty, because the data object~$\col_i$ is ``new'' again.
-}
+When a query $\UPO(i,\up)$ is made, the oracle first updates the data object~$\col_i$ and its corresponding representation.  The set~$\setC_i$ is reset to empty, because the data object~$\col_i$ is ``new'' again.
 %
 Now, for each defined value~$\err_i[\qry]$, we reevaluate the error that \emph{would} be caused by the previously asked~$\qry$ w.r.t. the newly updated $\col_i$ and $\pub_i$.  If the existing value of $\err_i[\qry]$ is larger than the error that~$\qry$ would cause to w.r.t. the newly updated~$\col_i$ and $\pub_i$, then we overwrite $\err_i[\qry]$ with the smaller value.  Doing so insures that the array~$\err_i$ does not overcredit the attacker for errors against the current data object and representation.
 
@@ -51,7 +42,7 @@ In many cases, it is easier to reason about an adversary which only has the chan
 
 %\input{correctness-experiment-1}
 
-Note that in the $\erreps1$ scenario we need not provide the adversary with a $\REVO$ oracle. If the adversary uses only a single representation, may assume without loss of generality that they make no call to $\REVO$, since doing so would prevent the adversary from having any possibility of winning. Since the case of a single $\REPO$ query is considerably simpler to handle, the first step in each of our proofs will be to reduce $\errep$ and $\erreps$ to $\errep1$ and $\erreps1$ respectively. In addition to this, we wish to move from actual hash functions to true random functions. Using the following lemmas, we may reduce the case of $\errep$ for any structure using a salted hash to the case of $\errep1$ using a true random function, and we may reduce $\erreps$ for a structure using a secret-keyed hash to the case of $\erreps1$ using a true random function.
+Note that in the $\erreps1$ scenario we need not provide the adversary with a $\REVO$ oracle. If the adversary uses only a single representation, may assume without loss of generality that they make no call to $\REVO$, since doing so would prevent the adversary from having any possibility of winning. Since the case of a single $\REPO$ query is considerably simpler to handle, the first step in each of our proofs will be to reduce $\errep$ and $\erreps$ to $\errep1$ and $\erreps1$ respectively.% In addition to this, we wish to move from actual hash functions to true random functions. Using the following lemmas, we may reduce the case of $\errep$ for any structure using a salted hash to the case of $\errep1$ using a true random function, and we may reduce $\erreps$ for a structure using a secret-keyed hash to the case of $\erreps1$ using a true random function.
 
 \begin{lemma}[\errep1 and \erreps1 imply \errep and \erreps for keyless structures]\label{lemma:errep}
   Let $\struct = (\Rep, \Qry, \Up)$ be a data structure with key
@@ -189,9 +180,16 @@ Another obvious alternative is to simply use the Euclidean distance metric, so t
 
 %In fact, we need independent random representations. Once we have this, seeing representations does not help the adversary. What benefit can there be, then? Suppose an adversary wants to select for representations with certain properties, and ignore others. Since the representation is private, these properties can only be determined by $\QRYO$ calls.
 
+
 \subsection{Query Independence}
 
-There are two immediate distinctions that can be made between different security games. First, we can ask whether it is possible for the adversary to predict the representations ahead of time, in which case the $\REPO$ and $\UPO$ oracles are largely unnecessary. Second, we can ask whether it is possible for the adversary, given its knowledge of the representations, to predict the outputs of $\QRYO$ ahead of time.
+One way to guarantee good security is to have a structure where we can demonstrate that the adversary, even given its knowledge of the representations of data structures, cannot predict the outputs of $\Qry$ on those structures ahead of time.
+
+% Difference: in a counting filter, $\UPO$ can be used to determine the answer to queries; in a Bloom filter, this can still be done, but the update cannot be undone afterwards, and so the chance of finding a false positive using this method is 0
+% can we capture the CBF version using just `each $\UPO$ call counts as a $\QRYO$'?
+% no; adding elements, querying, removing all elements, adding different elements, and querying the same thing again provides information about the overlap between those two sets
+% however, that requires 2(|set1|+|set2|) updates; could they do something similar just with queries?
+% 'best case' for adversary: 
 
 We use simulation-based definitions for these two notions. In particular, we say a data structure has independent representations up to some leakage $\textsf{lk}\colon\mathcal{D}\to\bits^*$ if there is a simulator consisting of two functions $\textsf{Sim}_d\colon\bits^*\to\mathcal{D}$ and $\textsf{Sim}_u\colon\mathcal{D}\times\bits^*\to\mathcal{U}$, such that $\textsf{Sim}_d(\textsf{lk}(\col))$ produces a set whose representation is indistinguishable from $\col$ and $\textsf{Sim}_u(\col',\textsf{lk}(\col))$ produces an update $\up'$ such that $\up'(\col')$ is indistinguishable from $\col$.
 
@@ -242,4 +240,25 @@ The best the adversary can hope to do, then, is to create a structure with maxim
 
 %
 
+In an actual Bloom filter, even with salts and a secret key, it is not the case that 
+
 In the data structures we consider, it is never the case that representations and queries are completely unpredictable. However, if we can show that the probability of making accurate predictions is bounded by some small probability, we can add that probability into the error bound and move to a game with ideal, unpredictable operations.
+
+%
+
+For the salted and keyed case with a built-in threshold, we use the notion of query independence to demonstrate that, if a thresholding assumption is used to prevent the filter from becoming too full, we can attain a good error bound even in the public-representation case.
+
+%NOTE: n is the THRESHOLD here
+\begin{theorem}[Correctness Bound for Salted and Keyed Bloom Filters]\label{thm:bf-key-bound}
+Fix integers $k, m, n, \lambda, r\geq 0$, let $\Pi$ be the salted and keyed Bloom filter described above with PRF $F$, and let $d$ be the error function assigning a weight of 1 to a false positive and 0 to a correct response.
+  For every $t, q_R, q_T, q_U, q_H \geq 0$ such that $q_T \geq r$, it holds that
+  \begin{eqnarray*}
+    \Adv{\errep}_{\struct,r,d}(t,&q_R,& q_T, q_U, q_H) \leq \\ && I_{(n/m)^k}(r, q_T-r+1) \,.
+  \end{eqnarray*}
+where $I$ is the regularized incomplete beta function.
+\end{theorem}
+
+\begin{proof}
+In order to show that a salted, secretly-keyed Bloom filter is secure, we want to show that the structure has query independence up to leakage that is defined to be the number of bits in the filter which are set to 1. If the PRF $F$ is good, and the key is unknown to the adversary, the adversary cannot use the random oracle to predict what representations will look like ahead of time. In particular, by a straightforward conditioning argument, $\Adv{\game_0}_{\struct,r}(\advA) \le \Adv{\prf}(F) + \Adv{\game_1}_{\struct,r}(\advA)$, where $\game_1$ is the same game but with the pseudorandom function replaced by a lazily-evaluated random function. In this game, the adversary cannot possibly guess queries ahead of time with better than 50/50 odds, since the output of the query depends on the output of a true random function on an untested input. We can then immediately apply the independence lemma to see that $\Adv{\game_1}_{\struct,r}(\advA) \le I_p(r, q_T-r+1)$, where $p$ is the false positive probability. In a filter where $\textsf{lk}(\pub)$ out of $m$ bits are set to 1, this probability is simply $(\textsf{lk}(\pub)/m)^k$. The adversary can maximize this value by setting as many bits to 1 as possible. With a threshold of $n$ bits allowed to be set to 1, the overall advantage is then
+$$\Adv{\errep}_{\struct,r,d}(\advA) \le \Adv{\prf}(F) + I_{(n/m)^k}(r, q_T-r+1)$$
+\end{proof}
