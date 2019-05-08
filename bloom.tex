@@ -28,7 +28,23 @@
   \label{fig:bf-def}
 \end{figure}
 
-The formal Bloom filter construction is given in~\ref{fig:bf-def}. From this
+\heading{Bitstring operations}
+%
+\todo{Any}{This should be moved to Section~\ref{sec:prelims}.}
+%
+For all $m\geq0$ define~$\bmap_m$ as the following function.
+For all $\v.x\in[m]^*$ let $\bmap_m(\v.x) = X$, where
+$|X|=m$ and $X_v=1$ if and only if $\v.x_i = v$ for some $i\in[|\v.x|]$
+%
+We call $\bmap_m(\v.x)$ the \emph{bitmap} of~$\v.x$.
+%
+Let~$X$ and~$Y$ be equal-length bitstrings. We write $X \OR Y$ for their
+bitwise-OR, $X \AND Y$ for their bitwise-AND, and $X \XOR Y$ for their
+bitwise-XOR. Let $\NOT X = 1^{|X|} \xor X$.
+%
+Finally, let $\hw(X)$ denote the Hamming wieght of (i.e., the number of 1s in)~$X$.
+
+The formal Bloom filter construction is given in Figure~\ref{fig:bf-def}. From this
 general construction we specify three specific structures to focus on.
 %
 Let $H:\bits^*\to[m]^k$ be a hash function and let $\ell, n, \lambda\geq0$ be
@@ -52,10 +68,10 @@ returns $\Up^{F_K}(\pub, x)$.
 %
 Note that the keyed BF has key space~$\keys$.
 
-\todo{DC (lead)}{Rewrite this so that it is summary of the results of this
-section: unsalted is bad; salted is OK for immutable filters; salted, secret rep
-is OK for mutable filters; and ...}
-%
+\todo{DC (lead)}{Summarize the results of this section: unsalted is bad; salted
+is OK for immutable filters; salted, secret rep is OK for mutable filters; and
+...}
+\ignore{%
 The standard Bloom filter shows a variety of different behaviors depending on
 its exact implementation. If the hash functions used are chosen beforehand and
 potentially known to the adversary, this public information allows offline
@@ -67,22 +83,8 @@ or may not be feasible. Furthermore, in the case of mutable Bloom filters there
 are additional difficulties with offline attacks due to adversarially-chosen
 updates. To guarantee correctness in this case we must additionally guarantee
 that representations can be kept private from the adversary.
+}
 
-\heading{Bitstring operations}
-%
-\todo{Any}{This should be moved to Section~\ref{sec:prelims}.}
-%
-For all $m\geq0$ define~$\bmap_m$ as the following function.
-For all $\v.x\in[m]^*$ let $\bmap_m(\v.x) = X$, where
-$|X|=m$ and $X_v=1$ if and only if $\v.x_i = v$ for some $i\in[|\v.x|]$
-%
-We call $\bmap_m(\v.x)$ the \emph{bitmap} of~$\v.x$.
-%
-Let~$X$ and~$Y$ be equal-length bitstrings. We write $X \OR Y$ for their
-bitwise-OR, $X \AND Y$ for their bitwise-AND, and $X \XOR Y$ for their
-bitwise-XOR. Let $\NOT X = 1^{|X|} \xor X$.
-%
-Finally, let $\hw(X)$ denote the Hamming wieght of (i.e., the number of 1s in)~$X$.
 
 \subsection{Insecurity of unsalted BFs}
 Fix $H:\bits^*\to[m]^k$ and integers $\ell,n\geq0$ and let $\BF[H,\ell,n] = (\Rep^H, \Qry^H,
