@@ -20,9 +20,10 @@
   }
   \caption{A keyless structure $\bloom[R,t,n,\lambda] = (\Rep^R,\Qry^R,\Up^R)$
   used to define Bloom filter variants. It ``compiles'' a function $R: \bits^*
-  \to [m]^k$ (either a hash function or keyed PRF), thresholds $n, t\geq0$, and salt
-  length $\lambda\geq0$ into a concrete scheme. Functions~$\hw$ and~$\bmap_m$
-  are defined in Section~\ref{sec:prelims}.
+  \to [m]^k$ (either a hash function or keyed PRF), initial threshold $n\geq0$,
+  update threshold $t\geq0$, and salt length $\lambda\geq0$ into a concrete
+  scheme. Functions~$\hw$ and~$\bmap_m$ are defined in
+  Section~\ref{sec:prelims}.
   }
   \label{fig:bf-def}
 \end{figure}
