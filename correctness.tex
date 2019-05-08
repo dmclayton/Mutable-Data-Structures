@@ -65,17 +65,6 @@ $$\Adv{\errep}_{\struct,r}(t, q_R, q_T, q_U, q_H) \leq q_R\cdot\Adv{\errep1}_{\s
 Note that $B$ makes at most $q_T$ queries to $\QRYO$ and $q_H$ queries to its RO. Since $A$ runs in $t$ time steps and writing a bit takes 1 time step, the input length to any $\Rep$, $\Qry$, or $\Up$ evaluated by $B$ is at most $t$ bits. Hence, adversary $B$ runs in time $O(t+(q_R-1)\ticks(\Rep,t)+q_T\ticks(\Qry,t)+q_U\ticks(\Up,t))$.\missingqed
 \end{proof}
 
-\begin{lemma}[In the ROM, salted hashing is almost as good as distinct random functions in \errep1]\label{lemma:salttorand}
-  Let $\struct = (\Rep, \Qry, \Up)$ be a data structure with key space $\{\emptystr\}$ and salt space $\bits^\lambda$, and let $\struct'$ be the same structure using true random functions in place of salted hash functions. For every $t, q_R, q_T, q_U, q_H, r \geq 0$, it holds that
-  \[
-    \Adv{\errep1}_{\struct,r}(t, q_R, q_T, q_U, q_H) \leq \frac{q_H}{2^\lambda} + \Adv{\errep1}_{\struct',r}(t, q_R, q_T, q_U, q_H)
-  \]
-\end{lemma}
-
-\begin{proof}
-Let $\game_0$ be the standard $\errep1$ game for the structure $\struct$, and let $\game_1$ be the same game for $\struct'$. There exists an adversary $\advB$ such that $\Prob{\game_0(\advA) = 1} \le \Prob{\game_1(\advB) = 1} + q_H/2^\lambda$. This adversary initializes an empty table $R$ and simulates $\advA$. When a query $w$ is sent to $\HASHO$, $\advB$ returns $R[w]$ if this entry in the table is defined. Otherwise, if $w = \langle\salt, x\rangle$ for some $\salt \in \bits^\lambda$ and $x \in \bits^*$, forward $(\salt, x)$ to $\HASHO$, store the result in $R[w]$, and return this value. Finally, if $R[w]$ is not defined and $w$ is not of this form, sample $r$ uniformly from the range of the hash function, store the result in $R[w]$ and return that result. Queries to all other oracles are simply forwarded to $\advB$'s oracle. Assuming the output of the hash function is uniformly distributed, this simulation is perfect unless $\advA$ guesses the salt correctly, which happens with probability $q_H/2^\lambda$.\missingqed
-\end{proof}
-
 \heading{Keyed structures.}
 
 As in the keyless case, we can reduce the case of $\erreps$ for a secretly-keyed hash to the case of $\erreps1$ using a true random function. Though the proof is different, we achieve a similar bound as in the unkeyed private-representation case. Despite the similar-looking bounds, the secret-keyed case is preferable in practice because the $q_R$ $\REPO$ queries are `online' while the $q_H$ $\HASHO$ queries are `offline', limited only by the computational capabilities of the adversary.

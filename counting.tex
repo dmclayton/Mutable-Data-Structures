@@ -1,39 +1,43 @@
-Next, we consider the case of a counting Bloom filter. In this setting, an
-update to add an element increments each of the counters mapped to by the hash
-functions, with some maximum ceiling $c$ above which the counter cannot
-increase. A Bloom filter would then just be a counting Bloom filter with a
-maximum counter value of 1, but we make the additional change that a counting
-Bloom filter can perform delete operations which work by hashing the element and
-decrementing the counters at those indices.
+Next, we consider the case of a counting Bloom filter. These are similar to
+standard Bloom filters, but the underlying data objects are multisets rather
+than sets. The queries are still set membership queries, which in the case of
+multisets means that a query for an element $x$ should return 1 if $x$ is in the
+multiset at least once and 0 if $x$ is not in the multiset. The structures used
+to represent these multisets are identical to those for Bloom filters except
+that each bit in the filter is replaced with a counter. In practice these
+counters would have some upper bound, but in this paper we assume there is no
+upper bound on the counters.
+
+As in the case of Bloom filters, the algorithms rely on a hash function
+$H: \bits^* \to [m]^k$ to operate. Inserting an element $x$, whether during an
+update or during the creation of the original representation, is performed by
+evaluating $H(\key \Vert x)$, as in the case of Bloom filters, and incrementing
+each of the counters with those indices by 1. Unlike standard Bloom filters,
+counting filters also support deletion updates. These are performed by
+evaluating $H(\key \Vert x)$ to choose $k$ counters, checking that all of those
+counters is nonzero, and (if so) decrementing them by 1. Note that a counting
+filter does not allow for negative counter values.
+
+As in the case of a Bloom filter, we can modify this definition to support a
+per-representation random salt of some fixed size $\lambda$. In this case,
+$\Rep$ initially samples $\salt \get \bits^\lambda$, and then each hash
+computation is evaluated as $H(\key \Vert \salt \Vert x)$ instead of
+$H(\key \Vert x)$.
 
 Because a counting filter without deletion behaves identically (in terms of
 responding to queries) to a standard Bloom filter, any attack on a Bloom filter
-can be trivially converted into an attack against a counting filter simply by
-performing the exact same operations in the same order. This means that the
-adversarial advantage against a counting filter, under any of the correctness
-notions and using any parameters, is bounded below by the advantage against a
-Bloom filter with the same parameters.
+works equally well against a counting filter. This means that the adversarial
+advantage against a counting filter, under any of the correctness notions and
+using any parameters, is bounded below by the advantage against a Bloom filter
+with the same parameters.
 
 This lower bound is not tight, however, since there are some attacks which
 exploit the more powerful $\UPO$ oracle provided to the adversary in the case of
-a counting filter. Consider the public-representation case for an example, where
-we suppose the structure makes use of a per-representation salt. With a counting
-filter, the adversary is able to construct representations of arbitrary
-singleton sets using a single $\REPO$ call and multiple $\UPO$ calls. They begin
-the game by using $\REPO$ to initialize an empty filter. Then, for some each
-element $x_1, \ldots, x_{|\col|}$ that the adversary wishes to test, they may
-first use $\UPO$ to insert the element and then use a second $\UPO$ call to
-delete the element, returning again to an empty filter. After determining the
-representation of each singleton subset of $\col$, they can again find $\setT$,
-$\setR \subseteq \col$ offline computations, where each element of $\setR$ is a
-false positive for the representation of $\setT$. Since there is only a single
-representation being manipulated, the salt is in fact constant across the entire
-experiment. This attack requires a single $\REPO$ call to initialize the filter,
-$2|\col|$ calls to $\UPO$ to test the elements plus an additional $|\setT|$
-calls to $\UPO$ to reinsert the elements found to produce false positives, and
-$|\setR|$ calls to $\QRYO$ to win the experiment.
+a counting filter. For example, while a salted and keyed Bloom filter is secure even in the public representation case, a salted and keyed counting filter is not secure in the same setting. The attack against a keyed but unsalted Bloom filter can be modified to work in this setting. That attack involved calling $\REPO$ several times to determine representations of singletons from some set $\setT$, from which the adversary could determine for itself what the representation of any subset of $\setT$ would look like. While the presence of a salt prevents this attack from working, in the case of a counting Bloom filter we can modify the attack to work even if a salt is used. Specifically, instead of calling $\REPO$ several times to determine the singleton representations, the adversary calls $\REPO$ only once to get an empty representation, and then uses pairs of $\UPO$ calls to insert and then delete the elements of $\setT$. In this way, the adversary will be able to see the representation of each singleton subset of $\setT$, and then perform offline computations to find subsets $\setR, \setS \subset \setT$ such that the elements of $\setR$ produce errors when queried for in the representation of $\setS$. Once the adversary has determined this, it can use $\UPO$ to insert the elements of $\setS$ and query the elements of $\setR$ in order to win the game. The use of a salt is irrelevant to this attack since only a single representation is ever used, and only $2|\setT|+|\setS|$ calls to $\UPO$ and $|\setR|$ calls to $\QRYO$ are used.
 
-In order to achieve good security for a counting filter, it is necessary to use
+Because of this, using a private representation is necessary to obtain good bounds for a counting filter.
+
+Furthermore, in order to achieve good security for a counting filter, it is necessary to use
 the thresholding assumption that insertions are rejected when the proportion of
 nonzero counters in the filter reaches some limit $p$. Without this assumption,
 the adversary can attempt to optimize the number of nonzero counters while

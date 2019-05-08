@@ -161,6 +161,30 @@ probability of a false positive from any one of these queries is bounded above
 by the probability of a false positive on the final maximally-sized filter, a
 probability which is given by the Kirsch and Mitzenmacher bound.
 
+\begin{lemma}[In the ROM, salted hashing is almost as good as distinct random functions in \errep1]\label{lemma:salttorand}
+  Let $\struct = (\Rep, \Qry, \Up)$ be a data structure with key space $\{\emptystr\}$ and salt space $\bits^\lambda$, and let $\struct'$ be the same structure using true random functions in place of salted hash functions. For every $t, q_R, q_T, q_U, q_H, r \geq 0$, it holds that
+  \[
+    \Adv{\errep1}_{\struct,r}(t, q_R, q_T, q_U, q_H) \leq \frac{q_H}{2^\lambda} + \Adv{\errep1}_{\struct',r}(t, q_R, q_T, q_U, q_H)
+  \]
+\end{lemma}
+
+\begin{proof}
+Let $\game_0$ be the standard $\errep1$ game for the structure $\struct$, and
+let $\game_1$ be the same game for $\struct'$. There exists an adversary $\advB$
+such that $\Prob{\game_0(\advA) = 1} \le \Prob{\game_1(\advB) = 1} + q_H/2^\lambda$.
+This adversary initializes an empty table $R$ and simulates $\advA$. When a
+query $w$ is sent to $\HASHO$, $\advB$ returns $R[w]$ if this entry in the table
+is defined. Otherwise, if $w = \langle\salt, x\rangle$ for some
+$\salt \in \bits^\lambda$ and $x \in \bits^*$, forward $(\salt, x)$ to $\HASHO$,
+store the result in $R[w]$, and return this value. Finally, if $R[w]$ is not
+defined and $w$ is not of this form, sample $r$ uniformly from the range of the
+hash function, store the result in $R[w]$ and return that result. Queries to all
+other oracles are simply forwarded to $\advB$'s oracle. Assuming the output of
+the hash function is uniformly distributed, this simulation is perfect unless
+$\advA$ guesses the salt correctly, which happens with probability
+$q_H/2^\lambda$.
+\end{proof}
+
 \begin{figure*}
   \boxThmBFSaltCorrect{0.48}
   {
