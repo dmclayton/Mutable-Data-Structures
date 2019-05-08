@@ -228,7 +228,7 @@ $\delta(a,b) = |a-b|$.
   For integers $q_R, q_T, q_H, r, t \geq 0$ it holds that.
   \begin{equation*}
     \begin{aligned}
-      \Adv{\errep1}_{\Pi,\delta,r}(t, q_R,q_T,Q_H) &\leq \\
+      \Adv{\errep1}_{\Pi,\delta,r}(t, q_R,q_T,q_H) &\leq \\
       \hspace{20pt}
         \text{some cool bound} \,,
     \end{aligned}
@@ -240,6 +240,13 @@ $\delta(a,b) = |a-b|$.
 \begin{proof}
   \input{proof/sbf-errep1}
 \end{proof}
+
+Security of $\Pi$ is achievable in the mutable setting if the filter under
+attack is unknown to the adversary.
+%
+\todo{DC (lead)}{Add segway text.}
+
+\cpnote{Got here, 5/8.}
 
 \begin{theorem}[Correctness Bound for Private-Representation Salted Bloom Filters]\label{thm:bf-priv-salt-bound}
 Fix integers $k, m, n, \lambda, r\geq 0$, let $H \colon \bits^* \to [m]$ be a function, and let $\struct_s = \SBF[H,k,m,n,\lambda]$.
