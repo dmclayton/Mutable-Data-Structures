@@ -345,49 +345,25 @@ $$\Adv{\erreps_1}_{\struct_s,r}(\advA) \le q_R \cdot \left(\frac{q_H}{2^\lambda}
 %\missingqed
 \end{proof}
 
-%Without `thresholding', where the addition to a filter fails if a certain proportion of bits are set to 1, the bound improves somewhat.
+If we use both a salt and a key together with a built-in threshold, we can attain a good error bound even in the public-representation case. In particular, this proof eliminates the need for a factor of $q_R$.
 
-%Once we have reduced to the case of $\HASHO_1$ functioning as a random oracle and $\QRYO$ calls only being made to distinct elements not in $\col$, the adversary has only three ways of interacting with the filter: querying an element not in $\col$ which has not yet been queried, inserting a new element into $\col$ which has not yet been queried, and inserting a new element into $\col$ which has been queried and was found to not be a false positive. In the non-threshold case, the last of these is exploitable, since an element which is confirmed not to be a false positive will necessarily flip at least one bit when inserted into the representation. However, when a maximum proportion $p$ of the bits are allowed to be set to 1, adding known non-false-positives rather than unqueried elements only causes the threshold to be reached faster, without providing any additional benefit to the adversary. In any case the adversary can do no better than setting exactly $pm$ bits to 1, in which case the false positive rate will be exactly $p^k$ and the adversarial advantage will be
-
-%$$\Adv{\erreps_1}_{\struct_s,r}(\advA) \le q_R \cdot \left(\frac{q_H}{2^\lambda} + \binom{q_T}{r}p^{kr}\right).$$
-
-For the salted and keyed case with a built-in threshold, we use the notion of query independence to demonstrate that, if a thresholding assumption is used to prevent the filter from becoming too full, we can attain a good error bound even in the public-representation case.
-
-%NOTE: n is the THRESHOLD here
 \begin{theorem}[Correctness Bound for Salted and Keyed Bloom Filters]\label{thm:bf-key-bound}
-Fix integers $k, m, n, \lambda, r\geq 0$, let $\Pi$ be the salted and keyed Bloom filter described above with PRF $F$, and let $d$ be the error function assigning a weight of 1 to a false positive and 0 to a correct response.
+Fix integers $k, m, \lambda, r\geq 0$ and a threshold $p \in [0,1]$, let $\Pi$ be the salted and keyed Bloom filter described above with PRF $F$, and let $d$ be the error function assigning a weight of 1 to a false positive and 0 to a correct response.
   For every $t, q_R, q_T, q_U, q_H \geq 0$ such that $q_T \geq r$, it holds that
   \begin{eqnarray*}
-    \Adv{\errep}_{\struct,r,d}(t,&q_R,& q_T, q_U, q_H) \leq \\ && I_{(n/m)^k}(r, q_T-r+1) \,.
+    \Adv{\errep}_{\struct,r,d}(t,&q_R,& q_T, q_U, q_H) \leq \\ && \Adv{\prf}(F) + q_R^2/2^\lambda + I_{(n/m)^k}(r, q_T-r+1) \,.
   \end{eqnarray*}
 where $I$ is the regularized incomplete beta function.
 \end{theorem}
 
 \begin{proof}
-In order to show that a salted, secretly-keyed Bloom filter is secure, we want
-to show that the structure has query independence up to leakage that is defined
-to be the number of bits in the filter which are set to 1. If the PRF $F$ is
-good, and the key is unknown to the adversary, the adversary cannot use the
-random oracle to predict what representations will look like ahead of time. In
-particular, by a straightforward conditioning argument,
-$\Adv{\game_0}_{\struct,r}(\advA) \le \Adv{\prf}(F) +
-\Adv{\game_1}_{\struct,r}(\advA)$, where $\game_1$ is the same game but with the
-pseudorandom function replaced by a lazily-evaluated random function. In this
-game, the adversary cannot possibly guess queries ahead of time with better than
-50/50 odds, since the output of the query depends on the output of a true random
-function on an untested input. We can then immediately apply the independence
-lemma to see that $\Adv{\game_1}_{\struct,r}(\advA) \le I_p(r, q_T-r+1)$, where
-$p$ is the false positive probability. In a filter where $\textsf{lk}(\pub)$ out
-of $m$ bits are set to 1, this probability is simply $(\textsf{lk}(\pub)/m)^k$.
-The adversary can maximize this value by setting as many bits to 1 as possible.
-With a threshold of $n$ bits allowed to be set to 1, the overall advantage is
-then
-$$\Adv{\errep}_{\struct,r,d}(\advA) \le \Adv{\prf}(F) + I_{(n/m)^k}(r, q_T-r+1)$$
+
+The key to the proof is that seeing the representation of a salted, keyed Bloom filter does nothing to tell the adversary about what the responses to $\QRYO$ will be. Using a conditioning argument, we move from the standard game $\game_0$ to the alternate $\game_1$ that uses a lazily-evaluated random function in place of the PRF $F$ for hashing, with the random function being different for each representation. Provided that the adversary cannot distinguish the PRF from a random function and provided that the per-representation salt never repeats (the probability of which is on the order of $q_R^2/2^\lambda$ by the birthday bound), the adversary cannot distinguish this from the original game. By a conditioning argument, then, we have $\Adv{\game_0}_{\struct,r}(\advA) \le \Adv{\prf}(F) + q_R^2/2^\lambda + \Adv{\game_1}_{\struct,r}(\advA)$.
+
+Next, since it never benefits the adversary to re-query an element instead of querying a new one, and because false negatives do not occur in Bloom filters, we can assume without loss of generality that the adversary only makes queries to previously-unqueried elements which are not in the underlying set. But if an element is not in the underlying set, it must not have been included in the original $\col$ sent to $\REPO$, and it must never have been inserted with $\UPO$ since Bloom filters do not support deletion. Furthermore, since it has not been queried before, it has not been tested with $\QRYO$ either. This means that each element being queried is a new input to the random function used for hashing, and its output is therefore indistinguishable from any other input that is provided. We can then move from $\game_1$ to $\game_2$, which ignores the query given as input and instead makes a random query to a previously-untested element. Since the outputs of the $\QRYO$ oracle are indistinguishable from those in $\game_1$ and there are no other changes, we have $\Adv{\game_1}_{\struct,r}(\advA) = \Adv{\game_2}_{\struct,r}(\advA)$. But now that the queries are random, the adversary cannot possibly do better than producing a representation with maximal (non-adaptive) false-positive probability and making as many arbitrary queries as possible. Given a threshold where the proportion of 1 bits is capped at $p$, the false positive probability for each query is bounded by $p^k$. By the properties of the binomial distribution, the probability of accumulating at least $r$ errors given $q_T$ queries is
+$$\Adv{\errep}_{\struct,r,d}(\advA) \le \Adv{\prf}(F) + I_{p^k}(r, q_T-r+1)$$
+
 \end{proof}
-
-%The case of a Bloom filter whose representations are always public but which uses a private key in addition to a salt is almost identical. In practice the bound is actually somewhat stronger: the instance of $q_H$ in the bound is replaced with $q_R$, which means that the adversary which attempts to guess the salt must rely entirely on `online' queries as opposed to `offline' queries to $q_H$.
-
-%These two theorems together show that in order to guarantee maximal correctness in the streaming setting, one must ensure that representations are kept private from potential adversaries, and possibly use a secret key in addition to a salt when implementing a Bloom filter. In either case, the hidden information is necessary to protect the filter from an adversary.
 
 We can use this final and best bound to demonstrate some of the possible bounds
 with various parameter settings. Figure ? shows the upper bound for a various
