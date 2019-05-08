@@ -2,24 +2,25 @@
 
 %\input{bf-summary-tab}
 \begin{figure}
-  \oneCol{0.46}
+  \twoColsNoDivide{0.22}
   {
     \underline{$\Rep^R(\col)$}\\[2pt]
-      if $|\col| > n$ return $\bot$;
-      $\salt \getsr \bits^\lambda$;
-      $M \gets \bigvee_{x \in \col} \bmap_m(R(x))$;
+      if $|\col| > n$ return $\bot$\\
+      $\salt \getsr \bits^\lambda$\\
+      $M \gets \bigvee_{x \in \col} \bmap_m(R(x))$\\
       return $\langle M, \salt \rangle$
-    \\[6pt]
+  }
+  {
     \underline{$\Qry^R(\langle M, \salt \rangle,x)$}\\[2pt]
       return $[w(\bmap_m(R(x)) \wedge M) = k]$
     \\[6pt]
     \underline{$\Up^R(\langle M, \salt \rangle,x)$}\\[2pt]
       if $\hw(M) > t$ then return $\bot$\\
-      return $M \vee \bmap_m(R(x))$
+      return $\langle M \vee \bmap_m(R(x)), Z \rangle$
   }
   \caption{A keyless structure $\bloom[R,t,n,\lambda] = (\Rep^R,\Qry^R,\Up^R)$
   used to define Bloom filter variants. It ``compiles'' a function $R: \bits^*
-  \to [m]^k$ (either a hash function or keyed PRF), thershold $t\geq0$, and salt
+  \to [m]^k$ (either a hash function or keyed PRF), threshold $t\geq0$, and salt
   length $\lambda\geq0$ into a concrete scheme. Functions~$\hw$ and~$\bmap_m$
   are defined in Section~\ref{sec:prelims}.
   }
@@ -112,9 +113,6 @@ controlled by the adversary.
 pollution attacks.}
 
 \heading{Target-set coverage attacks}
-%
-\cpnote{This attack only applies when $t=\infty$; I don't know how effective it
-would be if $t$ were fixed.}
 %
 Of course, exhibiting a high false positive rate is not the only way a Bloom
 filter might fail to be correct. In particular, it would be undesirable if the
