@@ -1,21 +1,78 @@
 %\subsection{Bloom filter lower bounds}
 
 %\input{bf-summary-tab}
-\todo{DC (lead)}{Explain away all cases except the one(s) for which we give security (upperbound) theorems.}
-The standard Bloom filter shows a variety of different behaviors depending on its exact implementation. If the hash functions used are chosen beforehand and potentially known to the adversary, this public information allows offline attacks to be mounted against the data structure which can produce potentially damaging false positives. In the case of immutable Bloom filters, making use of a per-representation salt is sufficient to prevent these attacks, though depending on the use case the use of non-fixed per-representation randomness may or may not be feasible. Furthermore, in the case of mutable Bloom filters there are additional difficulties with offline attacks due to adversarially-chosen updates. To guarantee correctness in this case we must additionally guarantee that representations can be kept private from the adversary.
+\todo{DC (lead)}{Explain away all cases except the one(s) for which we give
+security (upperbound) theorems.} The standard Bloom filter shows a variety of
+different behaviors depending on its exact implementation. If the hash functions
+used are chosen beforehand and potentially known to the adversary, this public
+information allows offline attacks to be mounted against the data structure
+which can produce potentially damaging false positives. In the case of immutable
+Bloom filters, making use of a per-representation salt is sufficient to prevent
+these attacks, though depending on the use case the use of non-fixed
+per-representation randomness may or may not be feasible. Furthermore, in the
+case of mutable Bloom filters there are additional difficulties with offline
+attacks due to adversarially-chosen updates. To guarantee correctness in this
+case we must additionally guarantee that representations can be kept private
+from the adversary.
 
-A generic attack against unsalted, unkeyed data structures handling set membership queries is for the adversary to choose a large set $\col$ of potential filter elements and simulate $\REPO$ to produce representations for $\{x\}$ for each $x \in \col$. Given these, it can perform offline computations to determine disjoint $\setT$, $\setR \subseteq \col$ such that the elements of $\setR$ all produce errors when queried for membership in $\REPO(\setT)$. After a sufficiently large $\setR$ has been found, the adversary makes a single $\REPO$ call on $\setT$ and makes one $\QRYO$ call per element of $\setR$, resulting in guaranteed success for the adversary with only a minimal number of queries performed.
+A generic attack against unsalted, unkeyed data structures handling set
+membership queries is for the adversary to choose a large set $\col$ of
+potential filter elements and simulate $\REPO$ to produce representations for
+$\{x\}$ for each $x \in \col$. Given these, it can perform offline computations
+to determine disjoint $\setT$, $\setR \subseteq \col$ such that the elements of
+$\setR$ all produce errors when queried for membership in $\REPO(\setT)$. After
+a sufficiently large $\setR$ has been found, the adversary makes a single
+$\REPO$ call on $\setT$ and makes one $\QRYO$ call per element of $\setR$,
+resulting in guaranteed success for the adversary with only a minimal number of
+queries performed.
 
-In general, such an attack may not be computationally feasible in the real world. However, because the attack is entirely offline, many structures with non-negligible error probabilities are vulnerable to these attacks. For example, consider a Bloom filter with false positive probability $10^{-5}$ with an adversary wishing to construct $r = 10$ false positives. The adversary can fix $\setT$ in advance and perform somewhere on the order of a million hash queries to random elements in order to construct a $\setR$ of size 10, and then perform only a single $\REPO$ calls and ten $\QRYO$ calls to the service hosting the Bloom filter. This is likely to be much more feasible for the adversary than performing on the order of a million $\QRYO$ calls in an online attack which randomly guesses elements until it accumulates 10 false positives.
+In general, such an attack may not be computationally feasible in the real
+world. However, because the attack is entirely offline, many structures with
+non-negligible error probabilities are vulnerable to these attacks. For example,
+consider a Bloom filter with false positive probability $10^{-5}$ with an
+adversary wishing to construct $r = 10$ false positives. The adversary can fix
+$\setT$ in advance and perform somewhere on the order of a million hash queries
+to random elements in order to construct a $\setR$ of size 10, and then perform
+only a single $\REPO$ calls and ten $\QRYO$ calls to the service hosting the
+Bloom filter. This is likely to be much more feasible for the adversary than
+performing on the order of a million $\QRYO$ calls in an online attack which
+randomly guesses elements until it accumulates 10 false positives.
 
-The use of a salt without a private key in the public representation setting is insufficient to defeat this attack. In this setting, the adversary need only make its $\REPO$ query for $\setT$ in advance, at which point it will receive both the representation $\pub$ and the salt $\salt$ used to construct it. Using this known salt, the adversary is still able to simulate $\REPO$ for arbitrary singleton representations. The previous attack therefore still works with the same (minimal) number of $\QRYO$ calls at the very end of the experiment, after it has determined $\setR$ using offline computations.
+The use of a salt without a private key in the public representation setting is
+insufficient to defeat this attack. In this setting, the adversary need only
+make its $\REPO$ query for $\setT$ in advance, at which point it will receive
+both the representation $\pub$ and the salt $\salt$ used to construct it. Using
+this known salt, the adversary is still able to simulate $\REPO$ for arbitrary
+singleton representations. The previous attack therefore still works with the
+same (minimal) number of $\QRYO$ calls at the very end of the experiment, after
+it has determined $\setR$ using offline computations.
 
-The opposite of this, using a private key without a salt, does weaken the attack somewhat. Even with public representations, the adversary cannot locally simulate $\REPO$ without guessing the private key. However, they can still outperform random $\QRYO$ calls by making $\REPO$ queries for singleton elements without fixing any $\setT$ in advance. After selecting a random set $\col$ of size $q_R-1$, the adversary performs offline computations to find $\setT$, $\setR \subseteq \col$ such that the elements of $\setR$ are false positives for the representation of $\setT$ (which can be computed from the representations of the singleton subsets of $\setT$). The adversary wins if there is a partition where $\setR$ produces at least $r$ errors on $\REPO(\setT)$.
+The opposite of this, using a private key without a salt, does weaken the attack
+somewhat. Even with public representations, the adversary cannot locally
+simulate $\REPO$ without guessing the private key. However, they can still
+outperform random $\QRYO$ calls by making $\REPO$ queries for singleton elements
+without fixing any $\setT$ in advance. After selecting a random set $\col$ of
+size $q_R-1$, the adversary performs offline computations to find $\setT$,
+$\setR \subseteq \col$ such that the elements of $\setR$ are false positives for
+the representation of $\setT$ (which can be computed from the representations of
+the singleton subsets of $\setT$). The adversary wins if there is a partition
+where $\setR$ produces at least $r$ errors on $\REPO(\setT)$.
 
 % ...
 
-Using a salted Bloom filter in the private representation setting, however, does provide some security. At the time a representation is created, the structure chooses a salt $\salt$ which it will use for all further queries and updates. In order for maximum security to be guaranteed, we must ensure that the representation, and in particular the salt, is kept secret from the adversary. We define this structure $\SBF[H,k,m,n,\lambda]$ as the Bloom filter structure that uses $H(s) = (h_1(s),\ldots,h_k(s))$ for hashing inputs to $k$ values in $[m]$. Furthermore, each call of $\Rep$ first involves picking a salt $\salt$ from the salt space $\bits^\lambda$, and all hashes made to insert or query for an element $x$ are determined using $H(x \Vert \salt)$. Finally, the parameter $n$ means that any attempts to represent sets with more than $n$ elements fail.
+Using a salted Bloom filter in the private representation setting, however, does
+provide some security. At the time a representation is created, the structure
+chooses a salt $\salt$ which it will use for all further queries and updates. In
+order for maximum security to be guaranteed, we must ensure that the
+representation, and in particular the salt, is kept secret from the adversary.
+We define this structure $\SBF[H,k,m,n,\lambda]$ as the Bloom filter structure
+that uses $H(s) = (h_1(s),\ldots,h_k(s))$ for hashing inputs to $k$ values in
+$[m]$. Furthermore, each call of $\Rep$ first involves picking a salt $\salt$
+from the salt space $\bits^\lambda$, and all hashes made to insert or query for
+an element $x$ are determined using $H(x \Vert \salt)$. Finally, the parameter
+$n$ means that any attempts to represent sets with more than $n$ elements fail.
 \todo{DC lead}{Specify what exactly is being analyzed.  What are the updates?}
+
 \begin{theorem}[Correctness Bound for Private-Representation Salted Bloom Filters]\label{thm:bf-priv-salt-bound}
 Fix integers $k, m, n, \lambda, r\geq 0$, let $H \colon \bits^* \to [m]$ be a function, and let $\struct_s = \SBF[H,k,m,n,\lambda]$.
   For every $t, q_R, q_T, q_U, q_H \geq 0$, it holds that
@@ -29,7 +86,32 @@ Fix integers $k, m, n, \lambda, r\geq 0$, let $H \colon \bits^* \to [m]$ be a fu
 where $s$ is defined to be $\min(r,q_U)$, $H$ is modeled as a random oracle, and $p(k, m, n+s)$ is the standard, non-adaptive false-positive probability on a Bloom filter with the given parameters.
 \end{theorem}
 
-This proof first reduces to the single-representation case, which as shown in lemma~\ref{lemma:errep} will reduce the adversary's advantage by at most a factor of $q_R$. The main idea behind the proof is to remove the adversary's adaptivity a step at a time. We isolate the possibility of the adversary guessing the salt, which would allow it to mount its own offline attack on the filter without relying on the $\QRYO$ oracle. If the adversary does not guess the salt, the outputs of the $\REPO$, $\QRYO$, and $\UPO$ oracles are unpredictable to the adversary, producing uniformly randomly distributed bits to set (for $\REPO$ and $\UPO$) or to check (for $\QRYO$). Under the assumption that the adversary does not predict the salt, queries made to distinct elements are independent of each other. The only remaining issue is that the adversary can potentially gain an advantage by testing whether some object $x$ is a false positive for the filter, and then updating the filter to include $x$ only if the test query returned `false'. An analysis shows that this is now (once imperfect pseudorandom functions and salt collisions have been dealt with) the only way for the adversary to gain an advantage over making queries to an immutable Bloom filter. Because this adaptive strategy introduces tricky conditional possibilities, we cannot compute an exact value for the adversary's advantage. Instead, we move to an alternate scenario where each $\QRYO$ also produces a free update and every $\UPO$ first performs a free query. This makes $\QRYO$ and $\UPO$ calls indistinguishable, so that the adversary is effectively making a series of independent random queries that each have a chance to increment the error counter. Because the number of 1s in the filter can only increase, the probability of a false positive from any one of these queries is bounded above by the probability of a false positive on the final maximally-sized filter, a probability which is given by the Kirsch and Mitzenmacher bound.
+This proof first reduces to the single-representation case, which as shown in
+lemma~\ref{lemma:errep} will reduce the adversary's advantage by at most a
+factor of $q_R$. The main idea behind the proof is to remove the adversary's
+adaptivity a step at a time. We isolate the possibility of the adversary
+guessing the salt, which would allow it to mount its own offline attack on the
+filter without relying on the $\QRYO$ oracle. If the adversary does not guess
+the salt, the outputs of the $\REPO$, $\QRYO$, and $\UPO$ oracles are
+unpredictable to the adversary, producing uniformly randomly distributed bits to
+set (for $\REPO$ and $\UPO$) or to check (for $\QRYO$). Under the assumption
+that the adversary does not predict the salt, queries made to distinct elements
+are independent of each other. The only remaining issue is that the adversary
+can potentially gain an advantage by testing whether some object $x$ is a false
+positive for the filter, and then updating the filter to include $x$ only if the
+test query returned `false'. An analysis shows that this is now (once imperfect
+pseudorandom functions and salt collisions have been dealt with) the only way
+for the adversary to gain an advantage over making queries to an immutable Bloom
+filter. Because this adaptive strategy introduces tricky conditional
+possibilities, we cannot compute an exact value for the adversary's advantage.
+Instead, we move to an alternate scenario where each $\QRYO$ also produces a
+free update and every $\UPO$ first performs a free query. This makes $\QRYO$ and
+$\UPO$ calls indistinguishable, so that the adversary is effectively making a
+series of independent random queries that each have a chance to increment the
+error counter. Because the number of 1s in the filter can only increase, the
+probability of a false positive from any one of these queries is bounded above
+by the probability of a false positive on the final maximally-sized filter, a
+probability which is given by the Kirsch and Mitzenmacher bound.
 
 \begin{figure*}
   \boxThmBFSaltCorrect{0.48}
@@ -124,20 +206,94 @@ This proof first reduces to the single-representation case, which as shown in le
   \label{fig:bf-priv-salt-bound}
 \end{figure*}
 
-\begin{proof} We first reduce from the $\erreps$ case to the $\erreps1$ case, which by lemma~\ref{lemma:errep} may scale the adversary's advantage only by a factor of $q_R$. The game~$\game_0$ is exactly equivalent to the $\erreps1$ experiment, so $\Adv{\errep1}_{\struct_s,r}(\advA) = \Prob{\game_0(\advA) = 1}$. In~$\game_1$ we split the hash oracle into three, giving the adversary access $\HASHO_1$ in both stages of the game, while $\HASHO_2$ is reserved for oracular use by $\Repx$, $\QRYO$, and $\UPO$. For any $\advA$ for~$\game_0$, there is $\advB$ for~$\game_1$ which produces the same advantage by simulating $\advA$. This adversary first creates its own table $R$ with all values initially undefined. When $\advA$ makes a query $w$ to $H$, $\advB$ returns $R[w]$ if that entry in the table is defined. Otherwise, if there are $\salt \in \bits^\lambda$, $j \in [k]$, and $x \in \bits^*$ such that $w = \langle\salt, j, x\rangle$, forward $(\salt,x)$ to $\HASHO_1$. For each $j \in [k]$, set $R[\langle\salt, j, x\rangle] = \vv_j$, where $\vv$ is the output of the $\HASHO_1$ oracle. If there is no such triple $\langle\salt, j, x\rangle$, just sample $r$ from $[m]$ uniformly and set $R[w] = r$. In either case, return $R[w]$ to $\advA$. When $\advA$ outputs its collection $\col$, $\advB$ outputs $\col$ as well. Any queries by $\advA$ to $\QRYO$ or $\UPO$ are forwarded to $\advB$'s corresponding oracle. The simulation is perfect because $\Rep[H](\col)$ and $\Up[H](\col,\up)$ are identically distributed to $\Rep[\HASHO_2](\col)$ and $\Up[\HASHO_2](\col,\up)$. Because we have a perfect simulation, $\Adv{\erreps1}_{\struct_s,r}(\advA) = \Prob{\game_1(\advA) = 1}$.
+\begin{proof}
 
-The game~$\game_2$ is the same as~$\game_1$ until $\bad_1$ is set, which occurs exactly when $\advB$ sends $(\salt^*,x)$ to $\HASHO_1$ for some $x$. In the first phase, there is again a $q_1/2^\lambda$ chance of the adversary guessing the salt. In the second phase, the random sampling used by $\HASHO_i$ ensures that each call the adversary makes to the $\HASHO_i$ oracle is independent of all previous calls. We therefore have a $q_2/2^\lambda$ chance of the adversary guessing the salt during this phase, for a total chance of $q_H/2^\lambda$ chance of the adversary guessing the salt at some point during the experiment. Then $\Adv{\erreps_1}_{\struct_s,r}(\advA) \le \Prob{\game_2(\advB) = 1} + q_H/2^\lambda$. Having taken this into account, we may now assume the adversary never guesses the salt.
+We first reduce from the $\erreps$ case to the $\erreps1$ case, which by
+lemma~\ref{lemma:errep} may scale the adversary's advantage only by a factor of
+$q_R$. The game~$\game_0$ is exactly equivalent to the $\erreps1$ experiment, so
+$\Adv{\errep1}_{\struct_s,r}(\advA) = \Prob{\game_0(\advA) = 1}$. In~$\game_1$
+we split the hash oracle into three, giving the adversary access $\HASHO_1$ in
+both stages of the game, while $\HASHO_2$ is reserved for oracular use by
+$\Repx$, $\QRYO$, and $\UPO$. For any $\advA$ for~$\game_0$, there is $\advB$
+for~$\game_1$ which produces the same advantage by simulating $\advA$. This
+adversary first creates its own table $R$ with all values initially undefined.
+When $\advA$ makes a query $w$ to $H$, $\advB$ returns $R[w]$ if that entry in
+the table is defined. Otherwise, if there are $\salt \in \bits^\lambda$, $j \in
+[k]$, and $x \in \bits^*$ such that $w = \langle\salt, j, x\rangle$, forward
+$(\salt,x)$ to $\HASHO_1$. For each $j \in [k]$, set $R[\langle\salt, j,
+x\rangle] = \vv_j$, where $\vv$ is the output of the $\HASHO_1$ oracle. If there
+is no such triple $\langle\salt, j, x\rangle$, just sample $r$ from $[m]$
+uniformly and set $R[w] = r$. In either case, return $R[w]$ to $\advA$. When
+$\advA$ outputs its collection $\col$, $\advB$ outputs $\col$ as well. Any
+queries by $\advA$ to $\QRYO$ or $\UPO$ are forwarded to $\advB$'s corresponding
+oracle. The simulation is perfect because $\Rep[H](\col)$ and $\Up[H](\col,\up)$
+are identically distributed to $\Rep[\HASHO_2](\col)$ and
+$\Up[\HASHO_2](\col,\up)$. Because we have a perfect simulation,
+$\Adv{\erreps1}_{\struct_s,r}(\advA) = \Prob{\game_1(\advA) = 1}$.
 
-We want to show that alternating between sequences of queries and sequences of updates is no better than making one long series of updates and then one long sequence of queries. There are three types of updates the adversary can make: updates to add elements that have been queried and found to be false positives; updates to add elements that have been queried and found not to be false positives; and updates to add elements that have not been queried yet. We may assume without loss of generality that the adversary never makes the first type of update, since doing so is never beneficial (it does not change the representation at all and decreases the number of errors the adversary has found).
+The game~$\game_2$ is the same as~$\game_1$ until $\bad_1$ is set, which occurs
+exactly when $\advB$ sends $(\salt^*,x)$ to $\HASHO_1$ for some $x$. In the
+first phase, there is again a $q_1/2^\lambda$ chance of the adversary guessing
+the salt. In the second phase, the random sampling used by $\HASHO_i$ ensures
+that each call the adversary makes to the $\HASHO_i$ oracle is independent of
+all previous calls. We therefore have a $q_2/2^\lambda$ chance of the adversary
+guessing the salt during this phase, for a total chance of $q_H/2^\lambda$
+chance of the adversary guessing the salt at some point during the experiment.
+Then $\Adv{\erreps_1}_{\struct_s,r}(\advA) \le \Prob{\game_2(\advB) = 1} +
+q_H/2^\lambda$. Having taken this into account, we may now assume the adversary
+never guesses the salt.
 
-Note that the choices of $\vv$ constructed by the $\HASHO_i$ oracles are independent of all previous queries. Because of this, any update of type 3 is equivalent to any other update of type 3; the probability of any bit being flipped by one update is the same as the probability of the bit being flipped by the other update. Similarly, any update of type 2 is equivalent to any other update of type 2, but is not the same as type 3 since the probability is conditioned on $\vv$ not being a false positive. We assume the worst case, namely that all updates are type 2 (i.e. at least one bit is flipped by each update).
+We want to show that alternating between sequences of queries and sequences of
+updates is no better than making one long series of updates and then one long
+sequence of queries. There are three types of updates the adversary can make:
+updates to add elements that have been queried and found to be false positives;
+updates to add elements that have been queried and found not to be false
+positives; and updates to add elements that have not been queried yet. We may
+assume without loss of generality that the adversary never makes the first type
+of update, since doing so is never beneficial (it does not change the
+representation at all and decreases the number of errors the adversary has
+found).
 
-Because the adversary never guesses the salt, $\HASHO_1$ simply functions as a random oracle. Furthermore, we can assume the adversary never adds an element of $\col$ to $\col$ and never makes a $\QRYO$ call for an element which is already in $\col$, since neither of these provides any additional information and neither affects the rest of the experiment in any way.
+Note that the choices of $\vv$ constructed by the $\HASHO_i$ oracles are
+independent of all previous queries. Because of this, any update of type 3 is
+equivalent to any other update of type 3; the probability of any bit being
+flipped by one update is the same as the probability of the bit being flipped by
+the other update. Similarly, any update of type 2 is equivalent to any other
+update of type 2, but is not the same as type 3 since the probability is
+conditioned on $\vv$ not being a false positive. We assume the worst case,
+namely that all updates are type 2 (i.e. at least one bit is flipped by each
+update).
 
-Now we move to the game~$\game_3$. Here each $\QRYO$ query also calls $\UPO$ to add that element to $\col$. Additionally, the penalty for adding known false positives is removed. To avoid penalizing the adversary by prematurely maxing out the number of elements in $\col$ because of added false positives, we also increase the maximum size of $\col$ from $n$ to $n+s$, where $s = \min(r,q_U)$. Because the adversary (without loss of generality) stops after accumulating $r$ errors, only $\min(r,q_U)$ false positives will be added to $\col$ and so a maximum size of $n+s$ is sufficient to produce no penalty for the adversary. Furthermore, each $\UPO$ call is preceded by a $\QRYO$ call. Neither of these changes can produce a worse result for the adversary, so $\Prob{\game_2(\advB) = 1} \le \Prob{\game_3(\advB) = 1}$. Now, however, there is no longer any distinction between $\QRYO$ and $\UPO$ calls. All calls to either oracle are independent of each other and produce the same effect, querying and then updating $\col$. Each of these queries for false positives is at most as successful as a query to a Bloom filter with $n+r$ elements, so the adversary's probability of finding a false positive on any query is bounded above by the standard success rate for a Bloom filter with those parameters. The adversary is required to produce $r$ errors over the course of $q_T+q_U$ queries, which by the binomial theorem gives an advantage bound of $\Prob{\game_3(\advB) = 1} \le \binom{q_T+q_U}{r}p(k, m, n+s)^r$.
+Because the adversary never guesses the salt, $\HASHO_1$ simply functions as a
+random oracle. Furthermore, we can assume the adversary never adds an element of
+$\col$ to $\col$ and never makes a $\QRYO$ call for an element which is already
+in $\col$, since neither of these provides any additional information and
+neither affects the rest of the experiment in any way.
+
+Now we move to the game~$\game_3$. Here each $\QRYO$ query also calls $\UPO$ to
+add that element to $\col$. Additionally, the penalty for adding known false
+positives is removed. To avoid penalizing the adversary by prematurely maxing
+out the number of elements in $\col$ because of added false positives, we also
+increase the maximum size of $\col$ from $n$ to $n+s$, where $s = \min(r,q_U)$.
+Because the adversary (without loss of generality) stops after accumulating $r$
+errors, only $\min(r,q_U)$ false positives will be added to $\col$ and so a
+maximum size of $n+s$ is sufficient to produce no penalty for the adversary.
+Furthermore, each $\UPO$ call is preceded by a $\QRYO$ call. Neither of these
+changes can produce a worse result for the adversary, so $\Prob{\game_2(\advB) =
+1} \le \Prob{\game_3(\advB) = 1}$. Now, however, there is no longer any
+distinction between $\QRYO$ and $\UPO$ calls. All calls to either oracle are
+independent of each other and produce the same effect, querying and then
+updating $\col$. Each of these queries for false positives is at most as
+successful as a query to a Bloom filter with $n+r$ elements, so the adversary's
+probability of finding a false positive on any query is bounded above by the
+standard success rate for a Bloom filter with those parameters. The adversary is
+required to produce $r$ errors over the course of $q_T+q_U$ queries, which by
+the binomial theorem gives an advantage bound of $\Prob{\game_3(\advB) = 1} \le
+\binom{q_T+q_U}{r}p(k, m, n+s)^r$.
 
 The full adversarial advantage is then
 $$\Adv{\erreps_1}_{\struct_s,r}(\advA) \le q_R \cdot \left(\frac{q_H}{2^\lambda} + \binom{q_T+q_U}{r}p(k, m, n+s)^r\right).$$
+
 \missingqed
 \end{proof}
 
@@ -160,7 +316,24 @@ where $I$ is the regularized incomplete beta function.
 \end{theorem}
 
 \begin{proof}
-In order to show that a salted, secretly-keyed Bloom filter is secure, we want to show that the structure has query independence up to leakage that is defined to be the number of bits in the filter which are set to 1. If the PRF $F$ is good, and the key is unknown to the adversary, the adversary cannot use the random oracle to predict what representations will look like ahead of time. In particular, by a straightforward conditioning argument, $\Adv{\game_0}_{\struct,r}(\advA) \le \Adv{\prf}(F) + \Adv{\game_1}_{\struct,r}(\advA)$, where $\game_1$ is the same game but with the pseudorandom function replaced by a lazily-evaluated random function. In this game, the adversary cannot possibly guess queries ahead of time with better than 50/50 odds, since the output of the query depends on the output of a true random function on an untested input. We can then immediately apply the independence lemma to see that $\Adv{\game_1}_{\struct,r}(\advA) \le I_p(r, q_T-r+1)$, where $p$ is the false positive probability. In a filter where $\textsf{lk}(\pub)$ out of $m$ bits are set to 1, this probability is simply $(\textsf{lk}(\pub)/m)^k$. The adversary can maximize this value by setting as many bits to 1 as possible. With a threshold of $n$ bits allowed to be set to 1, the overall advantage is then
+In order to show that a salted, secretly-keyed Bloom filter is secure, we want
+to show that the structure has query independence up to leakage that is defined
+to be the number of bits in the filter which are set to 1. If the PRF $F$ is
+good, and the key is unknown to the adversary, the adversary cannot use the
+random oracle to predict what representations will look like ahead of time. In
+particular, by a straightforward conditioning argument,
+$\Adv{\game_0}_{\struct,r}(\advA) \le \Adv{\prf}(F) +
+\Adv{\game_1}_{\struct,r}(\advA)$, where $\game_1$ is the same game but with the
+pseudorandom function replaced by a lazily-evaluated random function. In this
+game, the adversary cannot possibly guess queries ahead of time with better than
+50/50 odds, since the output of the query depends on the output of a true random
+function on an untested input. We can then immediately apply the independence
+lemma to see that $\Adv{\game_1}_{\struct,r}(\advA) \le I_p(r, q_T-r+1)$, where
+$p$ is the false positive probability. In a filter where $\textsf{lk}(\pub)$ out
+of $m$ bits are set to 1, this probability is simply $(\textsf{lk}(\pub)/m)^k$.
+The adversary can maximize this value by setting as many bits to 1 as possible.
+With a threshold of $n$ bits allowed to be set to 1, the overall advantage is
+then
 $$\Adv{\errep}_{\struct,r,d}(\advA) \le \Adv{\prf}(F) + I_{(n/m)^k}(r, q_T-r+1)$$
 \end{proof}
 
@@ -168,6 +341,13 @@ $$\Adv{\errep}_{\struct,r,d}(\advA) \le \Adv{\prf}(F) + I_{(n/m)^k}(r, q_T-r+1)$
 
 %These two theorems together show that in order to guarantee maximal correctness in the streaming setting, one must ensure that representations are kept private from potential adversaries, and possibly use a secret key in addition to a salt when implementing a Bloom filter. In either case, the hidden information is necessary to protect the filter from an adversary.
 
-We can use this final and best bound to demonstrate some of the possible bounds with various parameter settings. Figure ? shows the upper bound for a various combination of parameters, starting from the default parameters of $k = 4$, $m = 1024$, $n = 100$, $r = 10$, $q_R = 1$, $q_T = 100$, and $q_U = 100$. The most significant factor in the adversarial advantage is $q_R$, with even small increases producing a drastic increase in the adversarial advantage. Since this is the only part of the error bound that is not clearly associated with an attack, it is possible that this term could be reduced or eliminated.
+We can use this final and best bound to demonstrate some of the possible bounds
+with various parameter settings. Figure ? shows the upper bound for a various
+combination of parameters, starting from the default parameters of $k = 4$, $m =
+1024$, $n = 100$, $r = 10$, $q_R = 1$, $q_T = 100$, and $q_U = 100$. The most
+significant factor in the adversarial advantage is $q_R$, with even small
+increases producing a drastic increase in the adversarial advantage. Since this
+is the only part of the error bound that is not clearly associated with an
+attack, it is possible that this term could be reduced or eliminated.
 
-\includegraphics[scale=0.75]{BF_Fig}
+%\includegraphics[scale=0.75]{BF_Fig}
