@@ -449,7 +449,7 @@ where the proportion of 1 bits is capped at $p$, the false positive probability
 for each query is bounded by $p^k$. By the properties of the binomial
 distribution, the probability of accumulating at least $r$ errors given $q_T$
 queries is
-$$\Adv{\errep}_{\struct,r,d}(\advA) \le \Adv{\prf}(F) + I_{p^k}(r, q_T-r+1)$$
+$$\Adv{\errep}_{\struct,r,d}(\advA) \le \Adv{\prf}(F) + q_R^2/2^\lambda + I_{p^k}(r, q_T-r+1)$$
 
 \end{proof}
 
