@@ -160,18 +160,20 @@
 \newcommand{\gamespadleft}{\hskip 1pt}
 \newcommand{\gamespad}{\hskip 4pt}
 
-% - One game
+
 \newcommand{\oneCol}[2]{
-  \makebox[\textwidth][c]{
-    \begin{tabular}{|@{\gamespadleft}l@{\gamespad}|}
-    \hline
-    \rule{0pt}{1\normalbaselineskip}
-    \begin{minipage}[t]{#1\textwidth}\gamesfontsize
-      #2 \vspace{6pt}
-    \end{minipage} \\
-    \hline
-  \end{tabular}
-  }
+  \begin{center}
+    \makebox[\textwidth][l]{
+      \begin{tabular}{|@{\gamespadleft}l@{\gamespad}@{}|}
+      \hline
+      \rule{0pt}{1\normalbaselineskip}
+      \begin{minipage}[t]{#1\textwidth}\gamesfontsize
+        #2 \vspace{6pt}
+      \end{minipage} \\
+      \hline
+    \end{tabular}
+    }
+  \end{center}
 }
 
 \newcommand{\twoCols}[3]{

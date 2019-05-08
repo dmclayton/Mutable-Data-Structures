@@ -1,7 +1,8 @@
 %\subsection{Bloom filter lower bounds}
 
 %\input{bf-summary-tab}
-\begin{figure}\oneCol{0.96}
+\begin{figure}
+  \oneCol{0.46}
   {
     \underline{$\Rep^R(\col)$}\\[2pt]
     $\salt \getsr \bits^\lambda$;
@@ -17,11 +18,22 @@
     if $w(U) > t$ then return $\bot$\\
     return $U$
   }
-  \caption{The formal definition of $\BF[R,t,\lambda] = (\Rep^R,\Qry^R,\Up^R)$ for function $R: \bits^* \to [m]^k$ and natural numbers $t, \lambda$. Here, $\hw$ is the Hamming weight and $\bmap_m$ is the bitmap function taking a list of indices in $[m]$ and producing the string of length $m$ where exactly those bits are set to 1.}
+  \caption{The formal definition of $\BF[R,t,\lambda] = (\Rep^R,\Qry^R,\Up^R)$
+  for function $R: \bits^* \to [m]^k$ and natural numbers $t, \lambda$. Here,
+  $\hw$ is the Hamming weight and $\bmap_m$ is the bitmap function taking a list
+  of indices in $[m]$ and producing the string of length $m$ where exactly those
+  bits are set to 1.}
   \label{fig:bf-def}
 \end{figure}
 
-The formal Bloom filter construction is given in~\ref{fig:bf-def}. From this general construction we specify three specific structures to focus on. The first is the `bad' unsalted and unkeyed Bloom filter $\BBF[H,t]$ for some hash function $H: \bits^* \to [m]^k$, which is defined as $\BF[H,t,0]$. The `salted' Bloom filter is the same except for allowing a nontrivial salt, so that $\SBF[H,t,\lambda]$ for a hash function $H$ is just $\BF[H,t,\lambda]$. Finally, the `keyed' bloom filter $\SKBF[F_K,t,\lambda]$ is $\BF[F_K,t,\lambda]$, where $F: \keys \times \bits^* \to [m]^k$ is a pseudorandom function with the same key space as the data structure.
+he formal Bloom filter construction is given in~\ref{fig:bf-def}. From this
+general construction we specify three specific structures to focus on. The first
+is the `bad' unsalted and unkeyed Bloom filter $\BF[H,t]$ for some hash
+function $H: \bits^* \to [m]^k$, which is defined as $\BF[H,t,0]$. The `salted'
+Bloom filter is the same except for allowing a nontrivial salt, so that
+$\SBF[H,t,\lambda]$ for a hash function $H$ is just $\BF[H,t,\lambda]$. Finally,
+the `keyed' bloom filter $\SKBF[F_K,t,\lambda]$ is $\BF[F_K,t,\lambda]$, where
+$F: \keys \times \bits^* \to [m]^k$ is a pseudorandom function with thev same key space as the data structure.
 
 \todo{DC (lead)}{Rewrite this so that it is summary of the results of this
 section: unsalted is bad; salted is OK for immutable filters; salted, secret rep
