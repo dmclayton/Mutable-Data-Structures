@@ -192,6 +192,19 @@ Hence, the probability that~$\advB$ succeeds is binomially distributed:
      \sum_{i=r}^{q} \binom{q}{i}p^i(1-p)^{q-i} \,,
 \end{equation}
 %
-where $q \leq q_H + q_T$ and $p = \Pr[T(x)=1]$.
+where $q \leq q_H + q_T$ and $p = \Pr[T(x)=1]$. If we define
+$\alpha = \frac{r}{pq}$, then as long as $\alpha > 1$ we can apply a standard
+Chernoff bound to simplify this to
+\begin{equation}
+  \Prob{ |\setT| \geq r } <
+     \left(\frac{e^{\alpha-1}}{\alpha^\alpha}\right)^{pq} \,.
+\end{equation}
+
+Substituting this value back in for $\Prob{\game_2(\advB)=1}$, we get our final
+bound of
+\begin{equation}
+  \Adv{\errep}_{\Pi,\delta,r}(\advA) < q_R \cdot \left(\frac{q_H}{2^\lambda} + \left(\frac{e^{\alpha-1}}{\alpha^\alpha}\right)^{pq}\right) \,.
+\end{equation}
+
 %
 \todo{DC (lead)}{Apply Lemma~\ref{thm:lemma1} and finish the bound.}
