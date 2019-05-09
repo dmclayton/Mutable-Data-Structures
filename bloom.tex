@@ -93,22 +93,35 @@ updates. To guarantee correctness in this case we must additionally guarantee
 that representations can be kept private from the adversary.
 }
 
+\heading{Error function for set-mempership queries}
+%
+\todo{DC (lead)}{Decide if this is a sutiable function.}
+%
+Throughout this section we will use the error function $\delta:\bits^2\to\N$
+defined as
+\begin{equation*}
+  \delta(a, b) =
+  \begin{cases}
+    1 & \text{if}\ a=b \\
+    0 & \text{otherwise.}
+  \end{cases}
+\end{equation*}
 
 \subsection{Insecurity of unsalted BFs}
-Fix $H:\bits^*\to[m]^k$ and integers $\ell,n\geq0$ and let $\BF[H,\ell,n] = (\Rep^H, \Qry^H,
-\Up^H)$ as defined above.
-
-\heading{Pollution attacks}
+Fix a hash function $H:\bits^*\to[m]^k$ and integers $\ell,n\geq0$ and let $\Pi
+= \BF[H,\ell,n] = (\Rep^H, \Qry^H, \Up^H)$.
 %
-Suppose the adversary is interacting with a system representing a dataset with
-$\BF[H,t]$ and that it is able to choose some fraction of the input data.
+Suppose the adversary is interacting with a system representing a dataset
+with~$\Pi$ and that it is able to choose some fraction of the input data.
 %
 \todo{DC (lead)}{Pick a concrete attack setting, like a CDN. ``For example
 ...''.}
+
+\heading{Pollution attacks}
 %
 The goal of the attacks pointed out by Gerbet \etal~~\cite{gerbet2015power} is
 to pollute the filter such that the ``average'' set-membership query yields a
-false positive with high probability. The attack works by choosing a set of
+false positive with high probability; to do so, the attacker chooses a set of
 inputs that maximize the number of 1s in the filter. This strategy is especially
 effective when the structure of the hash function can be exploited.
 %
@@ -133,25 +146,22 @@ legitimate looking inputs that cover some disjoint target set of inputs.
 %
 This type of attack is nicely captured by our adversarial model.
 %
-In a \emph{target-set coverage attack}, the adversary has a small target set
-$\setT\subseteq\bits^*$ of and searches for a cover set $\setR\subseteq\bits^*$
+In a \emph{target-set coverage attack}, the adversary is given a small target set
+$\setT\subseteq\bits^*$ and searches for a cover set $\setR\subseteq\bits^*$
 such that $\Qry^H(\Rep^H(\setR),x)=1$ for each $x\in\setT$.
 %
 Once a suitable cover set is found, the adversary queries $\Rep(\setR)$. Then
-for each $x\in\setT$, it asks $\Qry(x)$, achieving a score of \todo{DC
-(lead)}{Compute the adversary's score for whatever the score function is. Before
-getting here, the error function should be defined}.
+for each $x\in\setT$, it asks $\Qry(x)$, achieving a score of $r = |\setT|$.
 
-This \erreps1 attack succeeds with probability~$1$ assuming a covering set can be found.
-Such a set certainly exists, but finding it may be computationally infeasible
-depending on the size of the cover set, the size of the target set, and the
-parameters of the Bloom filter.
+This \erreps1 attack succeeds with probability~$1$ assuming a covering set can
+be found.  If $|\setT| \leq |\setR|$, then such a set exists; but finding it may be
+computationally infeasible, depending on the size of the cover set, the size of
+the target set, and the parameters of the Bloom filter.
 %
 In Appendix~\ref{app:unsalted-attack} we demonstrate that target-set coverage
 attacks are feasible for practical BF parameters. We do so by simulating the
 attack when~$H$ is a random function (i.e., for each distinct input we choose
-$k$ integers from $[m]$ at random) for typical choices of $k$, $m$, and the
-number of elements in the set.
+$k$ integers from $[m]$ at random) for typical choices of $k$, $m$, and~$n$.
 %
 \todo{CP}{Add simulation to appendix.}
 
@@ -159,17 +169,17 @@ number of elements in the set.
 attack. If they do it's not a big deal; we just need to ensure, to the best of
 our ability, that we give credit where credit is due.}
 
-The key to this attack and the attacks of Gerbet \etal is that the adversary
-can compute the representation of the set on its own. In the remainder of this
-section, we examine ways of enhancing the basic BF structure so that it avoids
-this pitfall.
+The key to pollution attacks and target-set coverage attacks is that the
+adversary can compute the representation of the set on its own. In the remainder
+of this section, we examine ways of enhancing the basic BF structure so that it
+avoids this pitfall.
 
 \subsection{Salted BFs in the (im)mutable setting}
 %
 Here we consider the correctness of Bloom filters when the hashed input is
 prepended with a salt.
 %
-Fix function $H:\bits^*\to[m]^k$ and integers $\ell,n,\lambda\geq0$ and let
+Fix $H:\bits^*\to[m]^k$, $\ell,n,\lambda\geq0$, and let
 $\Pi = \SBF[H,\ell,n,\lambda] = (\Rep^H, \Qry^H, \Up^H)$ as defined above.
 
 The security of this structure depends upon how it is used.
@@ -231,8 +241,7 @@ The above attack exploits the mutability of~$\Pi$ in a crucial way.
 thing is.}
 %
 Indeed, when restrict ourselves to the immutable setting, we can prove the
-following. Let $\delta:\bits^2\to\N$ be the error function defined by
-$\delta(a,b) = |a-b|$.
+following.
 %
 \begin{theorem}[\errep1 security of salted BFs]\label{thm:sbf-errep1}
   For integers $q_R, q_T, q_H, r, t \geq 0$ it holds that.
