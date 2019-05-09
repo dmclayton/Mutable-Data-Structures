@@ -66,7 +66,10 @@
 \label{fig:sbf-errep1/games}
 \end{figure*}
 
-We will use the following lemma for keyless structures.
+We will use the following lemma for keyless structures. We use $\errep1$ and
+$\erreps1$ to denote the public-representation and private-representation
+experiments where the adversary makes a single $\REPO$ query. In writing the
+advantage for these games we omit the $q_R$ parameter since it is fixed at 1.
 %
 \todo{DC (lead)}{Prove this in the appendix.}
 
@@ -78,18 +81,17 @@ We will use the following lemma for keyless structures.
     q_R\Adv{\errep1}_{\Gamma,\delta,r}(O(f(t)), q_T, q_U, q_H) \,,
   \end{equation*}
   where $f(t) = t + (q_R-1)\ticks(\Rep,t) + q_T\ticks(\Qry,t) + q_U\ticks(\Up,t)$.
-  \todo{Any}{Define $\Adv{\errep1}_{\cdot,\cdot,\cdot}(\cdots)$.}
 \end{lemma}
 %
 %
 \noindent
-The proof is by a fairly straight-forward hybrid argument. Because~$\Gamma$ is
-keyless, in the reduction we simulate $q_R-1$ $\REPO$-queries experiment and use
-our own oracles for the remaining query. The best we can do with this strategy
-is to ``guess'' which representation the \errep\ adversary will use in its
-attack, which results in the~$q_R$ factor in the bound.
+The proof is by a fairly straightforward hybrid argument. Because~$\Gamma$ is
+keyless, in the reduction we simulate $q_R-1$ of the calls to $\REPO$ experiment
+and use our own oracles for the remaining query. The best we can do with this
+strategy is to ``guess'' which representation the \errep\ adversary will use in
+its attack, which results in the~$q_R$ factor in the bound.
 %
-We defer the full details to Appendix~\ref{app:iproof/lemma1}.
+We defer the full details to Appendix~\ref{app:iproof/lemma-keyless}.
 
 Let $\advA$ be an \errep\ adversary making~$1$ query to~$\REPO$, $q_T$ queries
 to $\QRYO$, $0$ queries to $\UPO$, and $q_H$ queries to the random
