@@ -322,6 +322,16 @@ we restrict ourselves to the immutable setting, we can prove the following.
   \input{proof/sbf-errep1}
 \end{proof}
 
+\todo{DC (lead)}{Add interpretation of the bound.
+\begin{enumerate}
+  \item Recall the Kirsch-Mitzenmacher bound~\cite{kirsch2006less}.
+    I.e., explain this thing: $(1 - e^{-kn/m})^k + O(1/m)$.
+  \item Plot the bound for ``reasonable'' values of $p$, $q_H$, $q_T$, and~$r$.
+  \item Figure out how to write the bound down.
+\end{enumerate}
+}
+
+
 Recall that the attack against mutable salted filters exploited the fact that
 the adversary learned the salt as soon as the filter was created, and that from
 this it could compute the hash function on its own. Even if the filter is
