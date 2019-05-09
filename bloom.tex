@@ -104,6 +104,9 @@ updates. To guarantee correctness in this case we must additionally guarantee
 that representations can be kept private from the adversary.
 }
 
+\todo{DC}{Recall the Kirsch-Mitzenmacher bound~\cite{kirsch2006less}.  I.e.,
+explain this thing: $(1 - e^{-kn/m})^k + O(1/m)$.}
+
 \heading{Error function for set-mempership queries}
 %
 Throughout this section we will use the error function $\delta:\bits^2\to\N$
@@ -320,18 +323,14 @@ we restrict ourselves to the immutable setting, we can prove the following.
   %
   \cpnote{I'm not sure if this advantage function is defined.}
 \end{theorem}
-\begin{proof}
+\todo{DC}{Add interpretation of the bound. It will look like nonsense to most
+readers, so help them out. For what parameters is it comparable to the
+non-adaptive false-positive probability? We'll want to plot this for reasonable
+values of $k, m, n, q_H, q_T, r$.}
+\begin{proof}[Proof of Theorem~\ref{thm:sbf-errep-immutable}]
   \input{proof/sbf-errep-immutable}
 \end{proof}
 
-\todo{DC (lead)}{Add interpretation of the bound.
-\begin{enumerate}
-  \item Recall the Kirsch-Mitzenmacher bound~\cite{kirsch2006less}.
-    I.e., explain this thing: $(1 - e^{-kn/m})^k + O(1/m)$.
-  \item Plot the bound for ``reasonable'' values of $p$, $q_H$, $q_T$, and~$r$.
-  \item Figure out how to write the bound down.
-\end{enumerate}
-}
 
 
 Recall that the attack against mutable salted filters exploited the fact that
@@ -341,7 +340,7 @@ mutable, we can prevent this attack from working as long as we require that the
 filter under attack be kept secret from adversaries. In fact, we can attain the
 following \erreps\ bound.
 
-\begin{theorem}[\erreps1 security of salted BFs]\label{thm:sbf-erreps}
+\begin{theorem}[\erreps\ security of salted BFs]\label{thm:sbf-erreps}
   For every $q_R, q_T, q_U, q_H, t, r\geq 0$, it holds that
   \begin{eqnarray*}
     \begin{aligned}
