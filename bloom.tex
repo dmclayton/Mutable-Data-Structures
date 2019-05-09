@@ -138,13 +138,17 @@ The goal of the attacks pointed out by Gerbet \etal~~\cite{gerbet2015power} is
 to pollute the filter such that the ``average'' set-membership query yields a
 false positive with high probability; to do so, the attacker chooses a set of
 inputs that maximize the number of 1s in the filter. This strategy is especially
-effective when the structure of the hash function can be exploited.
+effective when the structure of the hash function is known to the adversary. In
+particular, if a secretly-keyed cryptographically-secure function is not used,
+the adversary can compute the hash function on its own in order to determine
+which choices will set the maximum number of bits to 1, or which choices will
+set certain target bits to 1 in order to cause specific false positives. They
+show that with some reasonable parameter choices, the adversary can double the
+false positive rate if they control a third of the inputs to the filter.
 %
-\todo{DC (lead)}{Add a brief summary of attacks of Gerbet \etal that exploit bad
-choices of hash functions. What fraction of the inputs does the adversary need
-to control for the attack to be effective?}
-
-
+%\todo{DC (lead)}{Add a brief summary of attacks of Gerbet \etal that exploit bad
+%choices of hash functions. What fraction of the inputs does the adversary need
+%to control for the attack to be effective?}
 
 %
 Pollution attacks can even even be damaging for ``good'' choices of hash
