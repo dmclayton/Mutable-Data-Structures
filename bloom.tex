@@ -305,8 +305,8 @@ Without this exploitation of mutability, and in particular the ability to insert
 elements even after the salt has been seen, the above attack fails. Indeed, when
 we restrict ourselves to the immutable setting, we can prove the following.
 %
-\begin{theorem}[\errep1 security of salted BFs]\label{thm:sbf-errep1}
-  For integers $q_R, q_T, q_H, r, t \geq 0$ it holds that.
+\begin{theorem}[Immutable \errep\ security of salted BFs]\label{thm:sbf-errep}
+  For all integers $q_R, q_T, q_H, r, t \geq 0$ it holds that.
   \begin{equation*}
     \begin{aligned}
       \Adv{\errep}_{\Pi,\delta,r}(t, q_R,q_T,0,q_H) &\leq \\
@@ -321,7 +321,7 @@ we restrict ourselves to the immutable setting, we can prove the following.
   \cpnote{I'm not sure if this advantage function is defined.}
 \end{theorem}
 \begin{proof}
-  \input{proof/sbf-errep1}
+  \input{proof/sbf-errep-immutable}
 \end{proof}
 
 \todo{DC (lead)}{Add interpretation of the bound.
@@ -353,7 +353,7 @@ where $H$ is modeled as a random oracle
 \end{theorem}
 
 \todo{DC (lead)}{Turn this into a short summary of what's different from
-Theorem~\ref{thm:sbf-errep1}. In an earlier iteration this was the first result
+Theorem~\ref{thm:sbf-errep-immutable}. In an earlier iteration this was the first result
 in the paper, hence the length. But now it's the second result.}
 %
 The main idea behind the proof is to remove the adversary's
@@ -389,7 +389,7 @@ Mitzenmacher bound.
 \cpnote{I muted a ``In the ROM, salted hashing is almost as good as distinct
 random functions'' lemma that appeared. As stated, I don't think it cleanly
 isolates the part of the proof you're attempting to isolate. This is the
-$\game_0$ to $\game_1$ transition in Theorem~\ref{thm:sbf-errep1}. I think it's
+$\game_0$ to $\game_1$ transition in Theorem~\ref{thm:sbf-errep-immutable}. I think it's
 better to leave this argument in-line in the proof.}
 \ignore{
 \begin{lemma}[In the ROM, salted hashing is almost as good as distinct random
