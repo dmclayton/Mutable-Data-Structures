@@ -86,7 +86,7 @@ We will use the following lemma for keyless structures.
 The proof is by a fairly straight-forward hybrid argument. Because~$\Gamma$ is
 keyless, in the reduction we simulate $q_R-1$ $\REPO$-queries experiment and use
 our own oracles for the remaining query. The best we can do with this strategy
-is to ``guess'' which representation the \errep\ adversary willl use in its
+is to ``guess'' which representation the \errep\ adversary will use in its
 attack, which results in the~$q_R$ factor in the bound.
 %
 We defer the full details to Appendix~\ref{app:iproof/lemma1}.
@@ -115,7 +115,7 @@ final bound via applicaition of Lemma~\ref{thm:lemma1}.
 \cpnote{Here's the proof sketch.}
 %
 The high-level goal is to rewrite the game so that the probability that one
-of~$\advA$'s queries runs up the score is is precisely the false positive
+of~$\advA$'s queries runs up the score is precisely the false positive
 probability for Bloom filters in the usual analytical
 setting~\cite{kirsch2006less}. In other words, our goal is transistion into a
 setting in which the Bloom filter output by~$\REPO$ is independent of the
@@ -158,7 +158,7 @@ In game $\game_2$ the $\HASHO$ and $\QRYO$ oracles have been rewritten so that
 the winning-condition is computed by $\HASHO$ instead of $\QRYO$. The former
 oracle maintains a set~$\Ans$ such that $\Ans[x] = \Qry^{\HASHO_3}(M^*, x)$ for
 each query $\salt^* \cat x$; on input of $\qry_x$, oracle~$\QRYO$ simply runs
-$\HASHO_3(\salt^* \cat x$ and returns $\Ans[x]$.
+$\HASHO_3(\salt^* \cat x)$ and returns $\Ans[x]$.
 %
 We are effectively giving the adverseary credit for RO queries that result in
 false positives for the representation of~$\setS^*$, but which it does not
