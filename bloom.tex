@@ -309,20 +309,34 @@ elements even after the salt has been seen, the above attack fails. Indeed, when
 we restrict ourselves to the immutable setting, we can prove the following.
 %
 \begin{theorem}[Immutable \errep\ security of salted BFs]\label{thm:sbf-errep-immutable}
-  For all integers $q_R, q_T, q_H, r, t \geq 0$ it holds that.
+Let $p$ be the standard (non-adaptive) false positive probability for a Bloom
+filter with the chosen parameters. For all integers $q_R, q_T, q_H, r, t \geq 0$
+and for $q = q_T + q_H$, if $r > pq$, then it holds that
   \begin{equation*}
     \begin{aligned}
-      \Adv{\errep}_{\Pi,\delta,r}(t, q_R,q_T,0,q_H) &\leq \\
+      \Adv{\errep}_{\Pi,\delta,r}(t, q_R,q_T,0,q_H) &< \\
       \hspace{20pt}
-        q_R \cdot \left(\frac{q_H}{2^\lambda} + \left(\frac{e^{\alpha-1}}{\alpha^\alpha}\right)^{pq}\right) \,,
+        q_R \cdot \left(\frac{q_H}{2^\lambda} + \left(\frac{pq}{r}\right)^re^{r-pq}\right) \,,
     \end{aligned}
   \end{equation*}
-  where $H$ is modeled as a random oracle, $q = q_H + q_T$, $p$ is the standard
-  (non-adaptive) false positive probability for a Bloom filter with the chosen
-  parameters, and $\alpha = \frac{r}{pq}$.
-  %
+  where $H$ is modeled as a random oracle.  %
   \cpnote{I'm not sure if this advantage function is defined.}
 \end{theorem}
+We consider only the case of $r > pq$ because $pq$ is the expected number of
+false positives obtained by an adversary that simply uses its knowledge of the
+salt (after the representation is created) to guess as many random elements as
+possible.
+
+Once we have reduced the adversary to randomly guessing queries, an attack can
+be modeled using the binomial distribution. Each guess has a fixed chance $p$ of
+producing a false positive, and the adversary succeeds if it accumulates at
+least $r$ successes over the course of $q$ attempts. The bound given in the
+theorem statement can then be found using a standard Chernoff bound on Poisson
+distributions, namely
+\[
+  \Prob{X \ge (1+\delta)\mu} < \left(\frac{e^\delta}{(1+\delta)^{1+\delta}}\right)^\mu
+\]
+
 \todo{DC}{Add interpretation of the bound. It will look like nonsense to most
 readers, so help them out. For what parameters is it comparable to the
 non-adaptive false-positive probability? We'll want to plot this for reasonable
@@ -330,7 +344,6 @@ values of $k, m, n, q_H, q_T, r$.}
 \begin{proof}[Proof of Theorem~\ref{thm:sbf-errep-immutable}]
   \input{proof/sbf-errep-immutable}
 \end{proof}
-
 
 
 Recall that the attack against mutable salted filters exploited the fact that
