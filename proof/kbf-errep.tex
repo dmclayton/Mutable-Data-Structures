@@ -1,0 +1,128 @@
+\begin{figure*}
+  \cpnote{As above, these games need to be revised. There's no $\HASHO$ oracle
+  here, since we're in the standard model!}
+  \boxThmBFSaltCorrect{0.48}
+  {
+    \underline{$\game_0(\advA)$}\\[2pt]
+      $\key \getsr \keys$; $i \gets 0$\\
+      $\bot \getsr \advA^{\HASHO,\REPO,\QRYO,\UPO}$\\
+      return $[\sum \err \geq r]$
+    \\[6pt]
+    \oraclev{$\REPO(\col)$}\\[2pt]
+      $i \gets i + 1$\\
+      $\col_i \gets \col$\\
+      $\pub_i \gets \Rep_K[\HASHO](\col)$\\
+      return $\pub_i$
+    \\[6pt]
+    \oraclev{$\QRYO(i,\qry_x)$}\\[2pt]
+      $a \gets \Qry[\HASHO](\pub_i, \qry_x)$\\
+      if $a \neq \qry_x(\col)$ then $\err_i[x] \gets 1$\\
+      return~$a$
+    \\[6pt]
+    \oraclev{$\UPO(i,\up_x)$}\\[2pt]
+      $a \gets \Qry[\HASHO](\pub_i, \qry_x)$\\
+      if $\err_i[x] = 1$ then $\err_i \gets 0$\\
+      $\col_i \gets \col_i \union \{x\}$\\
+      $\pub_i \gets \Up[\HASHO](\pub_i,\up_x)$\\
+      return~$\pub_i$
+    \\[4pt]
+    \oraclev{$\HASHO(x)$}\\[2pt]
+      return $H(x)$
+    %\hspace*{-4pt}\rule{1.043\textwidth}{.4pt}
+  }
+  {
+  \underline{$\game_1(\advB)$}\\[2pt]\\
+    \oraclev{$\HASHO(i,x)$}\\
+      if $T[i, x]$ is $\undefn$ then $T[i, x] \getsr [m]^k$\\
+      return $T[i, x]$
+    \\[6pt]
+    \underline{$\game_2(\advB)$}\\[2pt]\\
+      $\key \getsr \keys$; $i \gets 0$; $\setC \gets \emptyset$\\
+      $\bot \getsr \advA^{\HASHO,\REPO,\QRYO,\UPO}$\\
+      return $[\sum \err \geq r]$
+    \\[6pt]
+    \oraclev{$\QRYO(\qry_x)$}\\[2pt]
+      do\\
+      $\tab y \getsr \mathcal{X}$\\
+      while $y \in \col \cup \setC$\\
+      $a \gets \Qry[\HASHO](\pub_i, \qry_y)$\\
+      if $a \neq \qry_y(\col)$ then $\err_i[y] \gets 1$\\
+      return~$a$
+  }
+  {
+  }
+  {
+  }
+  \caption{Games 0--2 for proof of Theorem~\ref{thm:bf-priv-key-bound}.}
+  \label{fig:bf-priv-salt-bound}
+\end{figure*}
+
+\cpnote{In general, the same notes as above apply here. I can sort of see how
+the argument works, but the lack of sufficient detail makes it difficult for me
+to decide whether you're right.}
+
+\cpnote{Tip: When beginning a proof, be very, VERY, \underline{\textbf{VERY!}}
+clear about the initial game ($\game_0$). In this case, it should be essentiall
+\errep\ with the given experiment paremeters $(\delta, r)$, the given adversary,
+and the given scheme. Then you can start simplifyingi $\game_0$ in preparation
+for the next step in the proof. As a rule of thumb, the simpler the transition
+the better.  Sometimes that's hard to do, but you need to explain what changes
+you're making between the games.}
+
+\cpnote{As usual, start by naming an adversary that you're going to use in the
+PRF reduction.}
+
+The main observation is that seeing the representation of a salted, keyed Bloom
+filter does nothing to tell the adversary about what the responses to $\QRYO$
+will be. Using a conditioning argument, we move from $\game_0$, which is
+equivalent to the standard \errep\ game, to the alternate $\game_1$ that uses a
+lazily-evaluated random function in place of the PRF $F$ for hashing, with the
+random function being different for each representation.
+%
+Provided that the adversary cannot distinguish the PRF from a random function
+and provided that the per-representation salt never repeats (the probability of
+which is on the order of $q_R^2/2^\lambda$ by the birthday bound \cpnote{change
+``on the order of'' to ``at most''}), the adversary
+cannot distinguish this from the original game.
+%
+\cpnote{Great start. This is a good the ``sketch'', but bear in mind you haven't
+proven anything yet. In particular, you need to \emph{exhibit} a PRF adversary
+whose advantage upper bounds the probability of~$\advA$ distngusihing between
+$\game_0$ and $\game_1$. (This is the usual ``game-playing''
+argument~\cite{bellare2006triple}.}
+
+Next,\cpnote{Again, you haven't proven anything yet} since it never benefits the
+adversary to re-query an element instead of querying a new one, and because
+false negatives do not occur in Bloom filters, we can assume without loss of
+generality that the adversary only makes queries to previously-unqueried
+elements which are not in the underlying set. But if an element is not in the
+underlying set, it must not have been included in the original $\col$ sent to
+$\REPO$, and it must never have been inserted with $\UPO$ since Bloom filters do
+not support deletion. Furthermore, since it has not been queried before, it has
+not been tested with $\QRYO$ either. This means that each element being queried
+is a new input to the random function used for hashing, and its output is
+therefore indistinguishable from any other input that is provided. We can then
+move from $\game_1$ to $\game_2$, which ignores the query given as input and
+instead makes a random query to a previously-untested element. Since the outputs
+of the $\QRYO$ oracle are indistinguishable from those in $\game_1$ and there
+are no other changes, we have
+%
+%\todo{DC (lead)}{This doesn't make sense.}
+%$\Adv{\game_1}_{\struct,r}(\advA) = \Adv{\game_2}_{\struct,r}(\advA)$.
+%
+But now
+that the queries are random, the adversary cannot possibly do better than
+producing a representation with maximal (non-adaptive) false-positive
+probability and making as many arbitrary queries as possible. Given a threshold
+where the proportion of 1 bits is capped at $p$, \cpnote{What's $p$? You mean
+$\ell/m$?} the false positive probability for each query is bounded by $p^k$.
+%
+\cpnote{I'm not clear how you got that.}
+%
+By the properties of the binomial distribution, the probability of accumulating
+at
+least $r$ errors given $q_T$ queries is
+%$$\Adv{\errep}_{\struct,r,d}(\advA) \le \Adv{\prf}(F) + q_R^2/2^\lambda + I_{p^k}(r, q_T-r+1)$$
+\todo{DC}{Complete the bound. Bear in mind that $\Adv{\prf}(F)$ is not a
+well-defined quantity! What you mean is $\Adv{\prf}_F(\advB)$, where $\advB$ is
+a PRF adversary that you define.}

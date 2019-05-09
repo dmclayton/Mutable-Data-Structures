@@ -314,7 +314,9 @@ we restrict ourselves to the immutable setting, we can prove the following.
         q_R \cdot \left(\frac{q_H}{2^\lambda} + \left(\frac{e^{\alpha-1}}{\alpha^\alpha}\right)^{pq}\right) \,,
     \end{aligned}
   \end{equation*}
-  where $H$ is modeled as a random oracle, $q = q_H + q_T$, $p$ is the standard (non-adaptive) false positive probability for a Bloom filter with the chosen parameters, and $\alpha = \frac{r}{pq}$.
+  where $H$ is modeled as a random oracle, $q = q_H + q_T$, $p$ is the standard
+  (non-adaptive) false positive probability for a Bloom filter with the chosen
+  parameters, and $\alpha = \frac{r}{pq}$.
   %
   \cpnote{I'm not sure if this advantage function is defined.}
 \end{theorem}
@@ -338,8 +340,6 @@ this it could compute the hash function on its own. Even if the filter is
 mutable, we can prevent this attack from working as long as we require that the
 filter under attack be kept secret from adversaries. In fact, we can attain the
 following \erreps\ bound.
-
-\cpnote{Got here, 5/8.}
 
 \begin{theorem}[\erreps1 security of salted BFs]\label{thm:sbf-erreps}
   For every $q_R, q_T, q_U, q_H, t, r\geq 0$, it holds that
@@ -426,119 +426,38 @@ $q_H/2^\lambda$.
   \input{proof/sbf-erreps}
 \end{proof}
 
-If we use both a salt and a key together with a built-in threshold, we can attain a good error bound even in the public-representation case. In particular, this proof eliminates the need for a factor of $q_R$.
+\subsection{Keyed BFs}
 
-\begin{theorem}[Correctness Bound for Salted and Keyed Bloom Filters]\label{thm:bf-key-bound}
-Fix integers $k, m, \lambda, r\geq 0$ and a threshold $p \in [0,1]$, let $\Pi$ be the salted and keyed Bloom filter described above with PRF $F$, and let $d$ be the error function assigning a weight of 1 to a false positive and 0 to a correct response.
-  For every $t, q_R, q_T, q_U, q_H \geq 0$ such that $q_T \geq r$, it holds that
-  \begin{eqnarray*}
-    \Adv{\errep}_{\struct,r,d}(t,&q_R,& q_T, q_U, q_H) \leq \\ && \Adv{\prf}(F) + q_R^2/2^\lambda + I_{(n/m)^k}(r, q_T-r+1) \,.
-  \end{eqnarray*}
-where $I$ is the regularized incomplete beta function.
+Salted BFs are secure in the immutable setting \emph{or} the private
+representation setting, but not both. Our argument for the \erreps\ security of
+salted Bloom filters is made possible by virtue of the structure under attack
+not being revealed to the adversary. While this is realistic in many settings,
+it may be desirable for the Bloom filter to be public \emph{and} updatable.
+%
+Here we show that building a Bloom filter from a PRF suffices for security in
+this setting.
+%
+So far our bounds have lost a factor of~$q_R$ in order to move from the \errep1\
+to the \errep\ setting; as a bonus, here we show that it is possible to do
+better.
+%
+Let $F:\keys\by\bits^*\to[m]^k$ be a function and fix
+integers~$\ell,n,\lambda\geq0$.
+%
+Let $\Pi = \KBF[F,\ell,n,\lambda] = (\Rep^F, \Qry^F, \Up^H)$ as defined in
+Figure~\ref{fig:bf-def}.
+
+\begin{theorem}[\errep\ security of keyed BFs]\label{thm:bf-key-bound}
+  For integers $q_R, q_T, q_H, r, t \geq 0$ it holds that.
+  \begin{equation*}
+    \begin{aligned}
+      \Adv{\errep}_{\Pi,\delta,r}(t, q_R,q_T,q_U,q_H) &\leq \\
+        \Adv{\prf}_{F}(\cdots) + \text{some cool bound} \,.
+    \end{aligned}
+  \end{equation*}
 \end{theorem}
-
-\begin{figure*}
-  \boxThmBFSaltCorrect{0.48}
-  {
-    \underline{$\game_0(\advA)$}\\[2pt]
-      $\key \getsr \keys$; $i \gets 0$\\
-      $\bot \getsr \advA^{\HASHO,\REPO,\QRYO,\UPO}$\\
-      return $[\sum \err \geq r]$
-    \\[6pt]
-    \oraclev{$\REPO(\col)$}\\[2pt]
-      $i \gets i + 1$\\
-      $\col_i \gets \col$\\
-      $\pub_i \gets \Rep_K[\HASHO](\col)$\\
-      return $\pub_i$
-    \\[6pt]
-    \oraclev{$\QRYO(i,\qry_x)$}\\[2pt]
-      $a \gets \Qry[\HASHO](\pub_i, \qry_x)$\\
-      if $a \neq \qry_x(\col)$ then $\err_i[x] \gets 1$\\
-      return~$a$
-    \\[6pt]
-    \oraclev{$\UPO(i,\up_x)$}\\[2pt]
-      $a \gets \Qry[\HASHO](\pub_i, \qry_x)$\\
-      if $\err_i[x] = 1$ then $\err_i \gets 0$\\
-      $\col_i \gets \col_i \union \{x\}$\\
-      $\pub_i \gets \Up[\HASHO](\pub_i,\up_x)$\\
-      return~$\pub_i$
-    \\[4pt]
-    \oraclev{$\HASHO(x)$}\\[2pt]
-      return $H(x)$
-    %\hspace*{-4pt}\rule{1.043\textwidth}{.4pt}
-  }
-  {
-  \underline{$\game_1(\advB)$}\\[2pt]\\
-    \oraclev{$\HASHO(i,x)$}\\
-      if $T[i, x]$ is $\undefn$ then $T[i, x] \getsr [m]^k$\\
-      return $T[i, x]$
-    \\[6pt]
-    \underline{$\game_2(\advB)$}\\[2pt]\\
-      $\key \getsr \keys$; $i \gets 0$; $\setC \gets \emptyset$\\
-      $\bot \getsr \advA^{\HASHO,\REPO,\QRYO,\UPO}$\\
-      return $[\sum \err \geq r]$
-    \\[6pt]
-    \oraclev{$\QRYO(\qry_x)$}\\[2pt]
-      do\\
-      $\tab y \getsr \mathcal{X}$\\
-      while $y \in \col \cup \setC$\\
-      $a \gets \Qry[\HASHO](\pub_i, \qry_y)$\\
-      if $a \neq \qry_y(\col)$ then $\err_i[y] \gets 1$\\
-      return~$a$
-  }
-  {
-  }
-  {
-  }
-  \caption{Games 0--2 for proof of Theorem~\ref{thm:bf-priv-key-bound}.}
-  \label{fig:bf-priv-salt-bound}
-\end{figure*}
-
 \begin{proof}
-
-The key to the proof is that seeing the representation of a salted, keyed Bloom
-filter does nothing to tell the adversary about what the responses to $\QRYO$
-will be. Using a conditioning argument, we move from $\game_0$, which is
-equivalent to the standard $\errep$ game, to the alternate $\game_1$ that uses a
-lazily-evaluated random function in place of the PRF $F$ for hashing, with the
-random function being different for each representation. Provided that the
-adversary cannot distinguish the PRF from a random function and provided that
-the per-representation salt never repeats (the probability of which is on the
-order of $q_R^2/2^\lambda$ by the birthday bound), the adversary cannot
-distinguish this from the original game. By a conditioning argument, then, we
-have 
-%
-\todo{DC (lead)}{This doesn't make sense.}
-%$\Adv{\game_0}_{\struct,r}(\advA) \le \Adv{\prf}(F) + q_R^2/2^\lambda + \Adv{\game_1}_{\struct,r}(\advA)$.
-
-Next, since it never benefits the adversary to re-query an element instead of
-querying a new one, and because false negatives do not occur in Bloom filters,
-we can assume without loss of generality that the adversary only makes queries
-to previously-unqueried elements which are not in the underlying set. But if an
-element is not in the underlying set, it must not have been included in the
-original $\col$ sent to $\REPO$, and it must never have been inserted with
-$\UPO$ since Bloom filters do not support deletion. Furthermore, since it has
-not been queried before, it has not been tested with $\QRYO$ either. This means
-that each element being queried is a new input to the random function used for
-hashing, and its output is therefore indistinguishable from any other input that
-is provided. We can then move from $\game_1$ to $\game_2$, which ignores the
-query given as input and instead makes a random query to a previously-untested
-element. Since the outputs of the $\QRYO$ oracle are indistinguishable from
-those in $\game_1$ and there are no other changes, we have
-%
-\todo{DC (lead)}{This doesn't make sense.}
-%$\Adv{\game_1}_{\struct,r}(\advA) = \Adv{\game_2}_{\struct,r}(\advA)$.
-%
-But now
-that the queries are random, the adversary cannot possibly do better than
-producing a representation with maximal (non-adaptive) false-positive
-probability and making as many arbitrary queries as possible. Given a threshold
-where the proportion of 1 bits is capped at $p$, the false positive probability
-for each query is bounded by $p^k$. By the properties of the binomial
-distribution, the probability of accumulating at least $r$ errors given $q_T$
-queries is
-$$\Adv{\errep}_{\struct,r,d}(\advA) \le \Adv{\prf}(F) + q_R^2/2^\lambda + I_{p^k}(r, q_T-r+1)$$
-
+  \input{proof/kbf-errep}
 \end{proof}
 
 %We can use this final and best bound to demonstrate some of the possible bounds
