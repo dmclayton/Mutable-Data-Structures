@@ -1,36 +1,35 @@
-%\subsection{Bloom filter lower bounds}
-
-%\input{bf-summary-tab}
+\newcommand{\id}{\schemefont{id}}
 \begin{figure}
   \twoColsNoDivide{0.22}
   {
-    \underline{$\Rep^R(\col)$}\\[2pt]
+    \underline{$\Rep^R_K(\col)$}\\[2pt]
       if $|\col| > n$ return $\bot$\\
       $\salt \getsr \bits^\lambda$\\
-      $M \gets \bigvee_{x \in \col} \bmap_m(R(x))$\\
+      $M \gets \bigvee_{x \in \col} \bmap_m(R_K(Z \cat x))$\\
       return $\langle M, \salt \rangle$
   }
   {
-    \underline{$\Qry^R(\langle M, \salt \rangle,x)$}\\[2pt]
-      return $[w(\bmap_m(R(x)) \wedge M) = k]$
+    \underline{$\Qry^R_K(\langle M, \salt \rangle,x)$}\\[2pt]
+      $X \gets B_m(R_K(Z \cat x))$\\
+      return $M \AND X = X$
     \\[6pt]
-    \underline{$\Up^R(\langle M, \salt \rangle,x)$}\\[2pt]
+    \underline{$\Up^R_K(\langle M, \salt \rangle,x)$}\\[2pt]
       if $\hw(M) > \ell$ then return $\bot$\\
-      return $\langle M \vee \bmap_m(R(x)), Z \rangle$
+      return $\langle M \vee \bmap_m(R_K(Z \cat x)), Z \rangle$
   }
-  \caption{A keyless structure $\bloom[R,\ell,n,\lambda] = (\Rep^R,\Qry^R,\Up^R)$
-  used to define Bloom filter variants. It ``compiles'' a function $R: \bits^*
-  \to [m]^k$ (either a hash function or keyed PRF), initial threshold $n\geq0$,
-  update threshold $\ell\geq0$, and salt length $\lambda\geq0$ into a concrete
-  scheme. Functions~$\hw$ and~$\bmap_m$ are defined in
+  \caption{The keyless structure $\bloom[R,\ell,n,\lambda]$ given by
+  $(\Rep^R,\Qry^R,\Up^R)$ is used to define Bloom filter variants. The
+  parameters are a function $R: \keys\by\bits^* \to [m]^k$ and intgers $\ell, n,
+  \lambda \geq0$. A concrete scheme is given by a particular choice of
+  parameters.  Functions~$\hw$ and~$\bmap_m$ are defined in
   Section~\ref{sec:prelims}.
   }
   \label{fig:bf-def}
 \end{figure}
 
-\heading{Bitstring operations}
-%
 \todo{Any}{This should be moved to Section~\ref{sec:prelims}.}
+
+\heading{Bitstring operations}
 %
 For all $m\geq0$ define~$\bmap_m$ as the following function.
 For all $\v.x\in[m]^*$ let $\bmap_m(\v.x) = X$, where
@@ -44,29 +43,38 @@ bitwise-XOR. Let $\NOT X = 1^{|X|} \xor X$.
 %
 Finally, let $\hw(X)$ denote the Hamming wieght of (i.e., the number of 1s in)~$X$.
 
-The formal Bloom filter construction is given in Figure~\ref{fig:bf-def}. From this
-general construction we specify three specific structures to focus on.
+\heading{More prliminaries}
+%
+For every function~$f$, define function $\id^f$ so that
+$\id^f(\emptystr, x) = f(x)$ for all $x$ in the domain of~$f$.
+
+\medskip
+We specify three Bloom filter variants using the keyed structure
+$\bloom[R,\ell,n,\lambda] = (\Rep^R,\Qry^R,\Up^R)$ specified in
+Figure~\ref{fig:bf-def}.
+%
+The construction has four paraemters: a function~$R:\keys\by\bits^*\to[m]^k$, the
+\emph{update threshold} $\ell\geq0$, the \emph{initial threshold} $n\geq0$, and
+the \emph{salt length}~$\lambda\geq0$.
 %
 Let $H:\bits^*\to[m]^k$ be a hash function and let $\ell, n, \lambda\geq0$ be
 integers.
 %
-The standard Bloom filter is the structure $\BF[H,\ell,n] = \bloom[H,\ell,n,0]$, which we will
-term the \emph{basic} Bloom filter. It has no key and does not employ a salt.
+The standard Bloom filter is the structure $\BF[H,\ell,n] =
+\bloom[\id^H,\ell,n,0]$, which we will term the \emph{basic} Bloom filter. It
+has no key (the key sapce of $\id^H$ is $\{\emptystr\}$, see
+Section~\ref{sec:prelims}) and does not use a salt.
 %
-The \emph{salted} Bloom filter $\SBF[H,\ell,n,\lambda] = \bloom[H,\ell,n,\lambda]$ is the same except that
-it allows a nontrivial salt.
-%
-Note that the key space for both~$\BF$ and~$\SBF$ is $\{\emptystr\}$.
+The \emph{salted} Bloom filter $\SBF[H,\ell,n,\lambda] =
+\bloom[\id^H,\ell,n,\lambda]$ is the same except that it allows a nonempty salt.
 %
 Finally, we also consider a salted variant that uses a PRF instead of a hash
-function. Let $F:\keys\by\bits^*\to[m]^k$ be a PRF. The \emph{keyed} Bloom
-filter $\KBF[F,\ell,n,\lambda]$ is defined as follows. On input of $(K,\setS)$, the
-representation algorithm returns $\Rep^{F_K}(\setS)$; on input of
-$(K, \pub, x)$, the query-evaluation algorithm returns
-$\Qry^{F_K}(\pub, x)$; and on input of $(\pub, x)$, the update algorithm
-returns $\Up^{F_K}(\pub, x)$.
+function. The \emph{keyed} Bloom filter $\KBF[F,\ell,n,\lambda]$ is the
+structure $\bloom[F,\ell,n,\lambda]$, where $F:\keys\by\bits^*\to[m]^k$ is a
+PRF.
 %
-Note that the keyed BF has key space~$\keys$.
+Note that the basic and salted BFs have key spaces $\{\emptystr\}$ and the keyed
+BF has key space~$\keys$.
 
 \todo{DC (lead)}{Summarize the results of this section: unsalted is bad; salted
 is OK for immutable filters; salted, secret rep is OK for mutable filters; and
