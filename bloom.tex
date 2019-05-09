@@ -15,7 +15,7 @@
     \\[6pt]
     \underline{$\Up^R_K(\langle M, \salt \rangle,\qry_x)$}\\[2pt]
       if $\hw(M) > \ell$ then return $\bot$\\
-      return $\langle M \vee \bmap_m(R_K(Z \cat x)), \salt \rangle$
+      return $\langle M \vee \bmap_m(R_K(\salt \cat x)), \salt \rangle$
   }
   \caption{The keyless structure $\bloom[R,\ell,n,\lambda]$ given by
   $(\Rep^R,\Qry^R,\Up^R)$ is used to define Bloom filter variants. The
@@ -79,9 +79,17 @@ PRF.
 Note that the basic and salted BFs have key spaces $\{\emptystr\}$ and the keyed
 BF has key space~$\keys$.
 
-\todo{DC (lead)}{Summarize the results of this section: unsalted is bad; salted
-is OK for immutable filters; salted, secret rep is OK for mutable filters; and
-...}
+In this section, we will show that the basic Bloom filter construction
+$\BF[H,\ell,n]$ is flawed, allowing the adversary to make an offline attack that
+has a high probability of success while using a minimal number of queries. In
+the immutable setting, where the adversary is constrained to never use the
+$\UPO$ oracle, it suffices to use the $\SBF$ construction in order to provide a
+good security guarantee in either the public-representation or
+private-representation settings. However, in the case where the adversary is
+allowed to make updates, we will find that $\SBF$ is not secure in the
+public-representation setting, and that $\KBF$ must be used to guarantee
+security.
+
 \ignore{%
 The standard Bloom filter shows a variety of different behaviors depending on
 its exact implementation. If the hash functions used are chosen beforehand and
@@ -98,15 +106,13 @@ that representations can be kept private from the adversary.
 
 \heading{Error function for set-mempership queries}
 %
-\todo{DC (lead)}{Decide if this is a sutiable function.}
-%
 Throughout this section we will use the error function $\delta:\bits^2\to\N$
 defined as
 \begin{equation*}
   \delta(a, b) =
   \begin{cases}
-    1 & \text{if}\ a=b \\
-    0 & \text{otherwise.}
+    0 & \text{if}\ a=b \\
+    1 & \text{otherwise.}
   \end{cases}
 \end{equation*}
 
