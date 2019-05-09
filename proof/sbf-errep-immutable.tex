@@ -142,7 +142,7 @@ if~$\advB$ asks $\HASHO_1(\salt^* \cat x)$, where~$\salt^*$ is the salt generate
 at the beginning of the game, and it has not yet called $\QRYO$ (i.e.,
 $M^*=\bot$).
 %
-By the Fundamental Lemma of Geame Playing~\cite{bellare2006triple} it follows
+By the Fundamental Lemma of Game Playing~\cite{bellare2006triple} it follows
 that
 %
 \begin{eqnarray}
@@ -202,8 +202,9 @@ Chernoff bound to simplify this to
      \left(\frac{e^{\alpha-1}}{\alpha^\alpha}\right)^{pq} \,.
 \end{equation}
 
-Substituting this value back in for $\Prob{\game_2(\advB)=1}$, we get our final
-bound of
+Substituting this value back in for $\Prob{\game_2(\advB)=1}$ and applying
+Lemma~\ref{thm:lemma1} to move from the single-representation case to the
+general case, we get our final bound of
 \begin{equation}
   \Adv{\errep}_{\Pi,\delta,r}(\advA) < q_R \cdot \left(\frac{q_H}{2^\lambda} + \left(\frac{e^{\alpha-1}}{\alpha^\alpha}\right)^{pq}\right) \,.
 \end{equation}
