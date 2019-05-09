@@ -1,0 +1,32 @@
+\heading{Keyless structures}
+
+In a keyless structure, we assume all details of the algorithm used are known beforehand by the adversary, except any which might be generated `on the fly' as representations are created and modified. For example, many of these structures will assume the use of a random salt which is picked at the time the representation is created. A structure with neither randomization nor a private key is usually vulnerable to pre-computation and offline attacks, where the adversary can search for errors to produce without having to interact with the structure itself.
+
+In many cases, it is easier to reason about an adversary which only has the chance to create and manipulate a single representation, rather than being able to call a $\REPO$ oracle as many times as it likes. Fortunately, in the case of keyless structures we can show that the adversary's advantage in a single-representation case is bounded above by a multiple of the advantage in the general case. We use $\errep1$ and $\erreps1$ to denote the public-representation and private-representation experiments where the adversary makes a single $\REPO$ query. In writing the advantage for these games we omit the $q_R$ parameter since it is fixed at 1.
+
+%There are two equivalent ways of defining the $\errep1$ experiment. First, we may define it as a modified version of $\errep$ in which the adversary is constrained to make no more than one call to $\REPO$. We may equivalently define it as a two-stage adversary in the experiment below.
+
+%\input{correctness-experiment-1}
+
+Note that in the $\erreps1$ scenario we need not provide the adversary with a $\REVO$ oracle. If the adversary uses only a single representation, may assume without loss of generality that they make no call to $\REVO$, since doing so would prevent the adversary from having any possibility of winning. Since the case of a single $\REPO$ query is considerably simpler to handle, the first step in each of our proofs will be to reduce $\errep$ and $\erreps$ to $\errep1$ and $\erreps1$ respectively.% In addition to this, we wish to move from actual hash functions to true random functions. Using the following lemmas, we may reduce the case of $\errep$ for any structure using a salted hash to the case of $\errep1$ using a true random function, and we may reduce $\erreps$ for a structure using a secret-keyed hash to the case of $\erreps1$ using a true random function.
+
+\begin{lemma}[\errep1 and \erreps1 imply \errep and \erreps for keyless structures]\label{lemma:errep}
+  Let $\struct = (\Rep, \Qry, \Up)$ be a data structure with key
+  space $\{\emptystr\}$. For every $t, q_R, q_T, q_U, q_H, r\geq 0$, it holds that
+  \[
+    \Adv{\errep}_{\struct,r}(t, q_R, q_T, q_U, q_H) \leq
+    q_R\cdot\Adv{\errep1}_{\struct,r}(O(f(t)), q_T, q_U, q_H) \,,
+  \]
+  where $f(t) = t + (q_R-1)\ticks(\Rep,t) + q_T\ticks(\Qry,t) + q_U\ticks(\Up,t)$.
+\end{lemma}
+
+\begin{proof}For a fixed $r \ge 0$, let $\advA$ be an $\errep$ or $\erreps$ adversary which runs in $t$ time steps and makes $q_R$ $\REPO$ queries, $q_T$ $\QRYO$ queries, $q_U$ $\UPO$ queries, and $q_H$ RO queries. We construct an adversary $B$ for $\errep1$ or $\erreps1$, respectively, as follows.
+
+First, $\advB$ initializes a counter $ct \gets 0$ and a set $\setC \gets \emptyset$, and samples $q \getsr [q_R]$. Next $\advB$ executes $\advA$, simulating the answers to its oracle queries as follows. When $\advA$ asks the query $\REPO(\col)$, $\advB$ sets $ct \gets ct + 1$ and stores $\col_{ct} \gets \col$. Then, if $ct = q$, $B$ forwards $\col$ to its own $\REPO$ oracle, returning the resulting value ($\pub$ in the public-representation case, or $\top$ in the private-representation case) to $\advA$. Otherwise, $\advB$ computes $\pub_{ct} \getsr \Rep(\col)$ and returns either $\pub_{ct}$ or $\top$. When $\advA$ asks for the query $\QRYO(i,\qry)$, $\advB$ first checks if $(i,\qry) \in \setC$ and returns $\bot$ if this condition holds. Otherwise $\advB$ forwards $(i,\qry)$ to its $\QRYO$ oracle and returns $a$ if $i = q$, and reutrns $\Qry(\pub_i,\qry)$ otherwise. Similarly, when $\advA$ makes an $\UPO(i,\up)$ query, $\advB$ forwards $(i,\up)$ to its $\UPO$ oracle if $i = q$ and evaluates $\Up(\pub_i,\up)$ otherwise. Finally, queries from $\advA$ to its RO are simply forwarded to $\advB$'s RO. When $\advA$ halts and outputs $j$, $\advB$ does the same.
+
+If $j = q$, then $B$ wins if $A$ does, since all queries from $A$ to $\pub_j$ were forwarded to $B$'s $\QRYO$ oracle. Given that $q$ is sampled uniformly from the range $[q_R]$, it follows that
+
+$$\Adv{\errep}_{\struct,r}(t, q_R, q_T, q_U, q_H) \leq q_R\cdot\Adv{\errep1}_{\struct,r}(O(f(t)), q_T, q_H).$$
+
+Note that $B$ makes at most $q_T$ queries to $\QRYO$ and $q_H$ queries to its RO. Since $A$ runs in $t$ time steps and writing a bit takes 1 time step, the input length to any $\Rep$, $\Qry$, or $\Up$ evaluated by $B$ is at most $t$ bits. Hence, adversary $B$ runs in time $O(t+(q_R-1)\ticks(\Rep,t)+q_T\ticks(\Qry,t)+q_U\ticks(\Up,t))$.
+\end{proof}
