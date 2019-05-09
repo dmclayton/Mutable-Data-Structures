@@ -223,6 +223,31 @@ prepended with a salt.
 Fix $H:\bits^*\to[m]^k$, $\ell,n,\lambda\geq0$, and let
 $\Pi = \SBF[H,\ell,n,\lambda] = (\Rep^H, \Qry^H, \Up^H)$ as defined above.
 
+In the mutable setting, where the adversary is allowed to make $\UPO$ queries,
+we can perform an $\errep$ attack against~$\Pi$ as follows. First, the adversary
+calls $\REPO(\emptyset)$, receiving an empty filter and the salt. Now that the
+adversary has the salt, it performs the exact same pollution attack as in the
+unsalted case, with any evaluations of $H(x)$ replaced with evaluations of
+$H(\salt \cat x)$. After a pollution set is found that sets many bits to 1, the
+adversary calls $\UPO$ repeatedly to insert these elements into the filter. This
+attack succeeds whenever the original pollution attack succeeds against an
+unsalted filter.
+
+%
+
+The attack succeeds because the adversary can search for false positives on its
+own as soon as it learns the salt. An adversary in the real world may not be
+able to perform this exact attack, since even in the streaming setting it is
+possible that the salt is not immediately revealed to the adversary. However, as
+soon as the adversary does learn the salt, it can immediately launch a pollution
+attack against the filter, without having to make any queries directly to the
+filter. Just as in the immutable setting the adversary can exploit its knowledge
+of the hash functions to find false positives without needing to make queries,
+in the mutable and public-representation setting the adversary can identically
+exploit its knowledge of the hash functions \textit{and salt} to find false
+positives without needing to make queries.
+
+\ignore{
 The security of this structure depends upon how it is used.
 %
 \todo{DC (lead)}{As concisely as you can, articulate the \errep\ attack against~$\Pi$.
@@ -236,7 +261,7 @@ What about the scheme and setting make it possible?
 %
 Note that I've left your text in a ignore\{\} so that you can lift from it as
 needed.
-}\ignore{
+}
 The use of a salt without a private key in the \errep\ setting is
 insufficient to defeat [the attacka above]. In this setting, the adversary need only
 make its $\REPO$ query for $\setT$ in advance, at which point it will receive
@@ -276,13 +301,9 @@ $n$ means that any attempts to represent sets with more than $n$ elements fail.
 \todo{DC lead}{Specify what exactly is being analyzed.  What are the updates?}
 }
 
-The above attack exploits the mutability of~$\Pi$ in a crucial way.
-%
-\todo{DC (lead)}{Verify this, and remind the reader of what that ``crucial''
-thing is.}
-%
-Indeed, when restrict ourselves to the immutable setting, we can prove the
-following.
+Without this exploitation of mutability, and in particular the ability to insert
+elements even after the salt has been seen, the above attack fails. Indeed, when
+we restrict ourselves to the immutable setting, we can prove the following.
 %
 \begin{theorem}[\errep1 security of salted BFs]\label{thm:sbf-errep1}
   For integers $q_R, q_T, q_H, r, t \geq 0$ it holds that.
@@ -301,10 +322,12 @@ following.
   \input{proof/sbf-errep1}
 \end{proof}
 
-Security of $\Pi$ is achievable in the mutable setting if the filter under
-attack is unknown to the adversary.
-%
-\todo{DC (lead)}{Add segway text.}
+Recall that the attack against mutable salted filters exploited the fact that
+the adversary learned the salt as soon as the filter was created, and that from
+this it could compute the hash function on its own. Even if the filter is
+mutable, we can prevent this attack from working as long as we require that the
+filter under attack be kept secret from adversaries. In fact, we can attain the
+following $\erreps$ security bound for $\SBF$ in the mutable case.
 
 \cpnote{Got here, 5/8.}
 
