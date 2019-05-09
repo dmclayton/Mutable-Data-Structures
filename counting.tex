@@ -1,18 +1,21 @@
 \begin{figure}
-  \oneCol{0.46}
+  \twoColsNoDivide{0.22}
   {
-    \underline{$\Rep^R(\col)$}\\[2pt]
-    $\salt \getsr \bits^\lambda$;
-    $M \gets \sum_{x \in \col} \cmap_m(R(x))$;
-    if $w(M) > t$ then return $\bot$\\
-    return $\langle M, \salt \rangle$
+    \underline{$\Rep^R_K(\col)$}\\[2pt]
+      if $\sum_{x \in \col} \col(x) > n$ return $\bot$\\
+      $\salt \getsr \bits^\lambda$\\
+      $M \gets \sum_{x \in \col} \cmap_m(R_K(\salt \cat x))$\\
+      return $\langle M, \salt \rangle$
+  }
+  {
+    \underline{$\Qry^R_K(\langle M, \salt \rangle,x)$}\\[2pt]
+      $L \gets R_K(\salt \cat x)$\\
+      return $\bigwedge_{i=1}^k [M[L[i]] > 0]$
     \\[6pt]
-    \underline{$\Qry^R(\langle M, \salt \rangle,x)$}\\[2pt]
-    return $[w(B_m(R(x)) \wedge M) = k]$
-    \\[6pt]
-    \underline{$\Up^R(\langle M, \salt \rangle,x)$}\\[2pt]
-    if $\hw(M) > t$ then return $\bot$\\
-    return $M + \cmap_m(R(x))$
+    \underline{$\Up^R_K(\langle M, \salt \rangle,\langle x, b \rangle)$}\\[2pt]
+      if $\hw(M) > \ell$ then return $\bot$\\
+      if $b = 1$ return 
+      return $M + \cmap_m(R(x))$
   }
   \caption{The formal definition of $\BF[R,t,\lambda] = (\Rep^R,\Qry^R,\Up^R)$
   for function $R: \bits^* \to [m]^k$ and natural numbers $t, \lambda$. Here,

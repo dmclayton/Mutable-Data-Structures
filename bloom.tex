@@ -5,12 +5,12 @@
     \underline{$\Rep^R_K(\col)$}\\[2pt]
       if $|\col| > n$ return $\bot$\\
       $\salt \getsr \bits^\lambda$\\
-      $M \gets \bigvee_{x \in \col} \bmap_m(R_K(Z \cat x))$\\
+      $M \gets \bigvee_{x \in \col} \bmap_m(R_K(\salt \cat x))$\\
       return $\langle M, \salt \rangle$
   }
   {
     \underline{$\Qry^R_K(\langle M, \salt \rangle,x)$}\\[2pt]
-      $X \gets B_m(R_K(Z \cat x))$\\
+      $X \gets \bmap_m(R_K(\salt \cat x))$\\
       return $M \AND X = X$
     \\[6pt]
     \underline{$\Up^R_K(\langle M, \salt \rangle,x)$}\\[2pt]
