@@ -122,9 +122,15 @@ Fix a hash function $H:\bits^*\to[m]^k$ and integers $\ell,n\geq0$ and let $\Pi
 %
 Suppose the adversary is interacting with a system representing a dataset
 with~$\Pi$ and that it is able to choose some fraction of the input data.
-%
-\todo{DC (lead)}{Pick a concrete attack setting, like a CDN. ``For example
-...''.}
+For example, some web spiders use Bloom filters to store the set of webpages
+which have already been visited during a crawl. Suppose the adversary controls
+at least one such webpage and wishes to deny the spider access to a different
+webpage, the `target webpage'. The adversary can choose the links present on its
+own webpage, which will cause the spider to visit the chosen webpages and set
+the corresponding bits of its Bloom filter to 1. If those links are chosen in
+such a way that they produce a false positive for the target webpage, the spider
+will then erroneously believe it has already visited the target webpage. The
+target webpage will therefore never be visited during the spider's crawl.
 
 \heading{Pollution attacks}
 %
@@ -137,13 +143,35 @@ effective when the structure of the hash function can be exploited.
 \todo{DC (lead)}{Add a brief summary of attacks of Gerbet \etal that exploit bad
 choices of hash functions. What fraction of the inputs does the adversary need
 to control for the attack to be effective?}
+
+
+
 %
 Pollution attacks can even even be damaging for ``good'' choices of hash
 functions, but their effectiveness depends crucially on the fraction of inputs
-controlled by the adversary.
+controlled by the adversary. Because the attack involves setting as many bits in
+the filter as possible to 1, an adversary that controls only a small fraction of
+the inputs can cause only a correspondingly small false positive probability. In
+order to have 
 %
-\todo{DC (lead}{Verify this claim. and discuss Gerbet \etal's mitigations of
-pollution attacks.}
+
+Gerbet \etal discuss multiple ways to mitigate pollution attacks, including
+using alternate data structures besides Bloom filters or choosing the parameters
+of the filter pesimistically, so that even if a pollution attack occurs, the
+false positive rate is kept below some threshold of acceptability. Both of these
+possibilities are potentially viable, but can significantly increase the amount
+of memory required to store the data structure. Since Bloom filters are designed
+to store large amounts of data compactly, these solutions may be unnaceptable in
+practice. The authors also discuss the possibility of using a secretly-keyed
+hash function. Since they assume that the filter itself is kept entirely
+private, with no potential for long-term leakage or other phenomena modeled by
+our $\REVO$ oracle, this does not fall prey to the attacks against keyed but
+unsalted filters that occur in our model. In this paper we consider the
+possibility that the structure may not be secret, either in the sense that it
+may eventually be recovered (in the private-representation setting) or that it
+is publicly available to potential adversaries (in the public-representation
+setting). Simply using a MAC with a long-term secret key does not suffice to
+secure a Bloom filter in these scenarios.
 
 \heading{Target-set coverage attacks}
 %
@@ -174,9 +202,9 @@ $k$ integers from $[m]$ at random) for typical choices of $k$, $m$, and~$n$.
 %
 \todo{CP}{Add simulation to appendix.}
 
-\todo{DS (lead)}{Double check that Gerbet \etal don't suggest anything like this
-attack. If they do it's not a big deal; we just need to ensure, to the best of
-our ability, that we give credit where credit is due.}
+%\todo{DS (lead)}{Double check that Gerbet \etal don't suggest anything like this
+%attack. If they do it's not a big deal; we just need to ensure, to the best of
+%our ability, that we give credit where credit is due.}
 
 The key to pollution attacks and target-set coverage attacks is that the
 adversary can compute the representation of the set on its own. In the remainder
