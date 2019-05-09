@@ -1,6 +1,6 @@
 We will use the following lemma for keyless structures.
 %
-\todo{DC (lead)}{Prove this,}
+\todo{DC (lead)}{Prove this in the appendix.}
 
 \begin{lemma}\label{thm:lemma1}
   For every $q_R, q_T, q_U, q_H, r, t \geq 0$ and keyless structure~$\Gamma$ it
@@ -40,6 +40,8 @@ otherwise~$\REPO$ outputs~$\bot$ and~$\advA$ gets no advantage.
 
 Fourth, we assume that all of~$\advA$'s $\HASHO$ queries are of the form $Z\cat
 x$, where $|Z| = \lambda$.
+%
+finally, we assume that~$\advA$'s $\QRYO$ queries are all distinct.
 
 We begin with a game-playing argument~\cite{bellare2006triple}, then obtain the
 final bound via applicaition of Lemma~\ref{thm:lemma1}.
@@ -64,29 +66,58 @@ and~$\advB$ has the same query resources as~$\advA$.
 %
 Adversary~$\advB$ executes~$\advA$, forwarding~$\advA$'s oracle queries
 to its own oracles in the natural way.
+
+Observe that in game~$\game_0$ the salt used for the representation of~$\setS^*$
+is generated prior to executing~$\advB$. Game~$\game_1$ is identical
+to~$\game_0$ until the flag~$\bad_1$ gets set by oracle~$\HASHO$. This occurs
+if~$\advB$ asks $\HASHO_1(\salt^* \cat x)$, where~$\salt^*$ is the salt generated
+at the beginning of the game.
 %
-\cpnote{WIP}
+By the Fundamental Lemma of Geame Playing~\cite{bellare2006triple} it follows
+that
+%
+\begin{eqnarray}
+  \Prob{\game_0(\advB)=1} &\leq&
+    \Prob{\game_1(\advB)=1} + \Prob{\game_1(\advB) \sets \bad_1}\\
+  &\leq&
+    \Prob{\game_1(\advB)=1} + q_H/2^\lambda \,.
+\end{eqnarray}
+%
+Note that in $\game_1$, the value of~$M^*$ is independent of~$\advB$'s
+$\HASHO_1$ queries.
+
 
 \begin{figure*}
-\twoCols{0.48}
+\threeColsUnbalanced{0.40}{0.27}{0.27}
 {
-  \experimentv{$\game_{0}(\advB)$}\\[2pt]
+  \vspace{-7pt}
+  \experimentv{$\game_{0}(\advB)$}
+      \hfill \diffplus{$\game_1(\advB)$}\\[2pt]
     $\salt^* \getsr \bits^\lambda$;
-    $\advB^{\REPO,\QRYO,\HASHO}$;
+    $\advB^{\REPO,\QRYO,\HASHO_1}$;
     return $\big[\sum_x \err[x] \geq r\big]$
   \\[6pt]
   \oraclev{$\REPO(\col)$}\\[2pt]
-    $M^* \gets \bigvee_{x \in \col} \bmap_m(\HASHO(\salt^* \cat x))$\\
+    $M^* \gets \bigvee_{x \in \col} \bmap_m(\HASHO_2(\salt^* \cat x))$;
     $\setS^* \gets \col$;
     return $\langle M^*, Z^* \rangle$
   \\[6pt]
   \oraclev{$\QRYO(i, \qry_x)$}\\[2pt]
-    $X \gets \bmap_m(\HASHO(\salt^* \cat x))$;
+    $X \gets \bmap_m(\HASHO_3(\salt^* \cat x))$;
     $a \gets X = M^* \AND X$\\
-    if $\err[x] < \delta(a,\qry(\col^*))$ then;
-          $\err[x] \gets \delta(a,\qry(\col^*))$\\
-    \cpnote{Hmm ... it seems $\err[x] \leq 1$ is an inveriant.}\\
+    if $\err[x] < \delta(a,\qry_x(\col^*))$ then;
+          $\err[x] \gets \delta(a,\qry_x(\col^*))$\\
     return $a$
+  \\[6pt]
+  \oraclev{$\HASHO_c(\salt \cat x)$}\\[2pt]
+    $\vv \getsr [m]^k$\\
+    if $\salt=\salt^*$ and $c=1$ then \com{Caller is~$\advB$}\\
+    \tab $\bad_1 \gets 1$; \diffplus{return $\vv$}\\
+    if $T[Z,x] = \bot$ then $\vv \gets T[Z,z]$\\
+    $T[Z,x] \gets \vv$; return $\vv$
+}
+{
+  hella
 }
 {
   cool
@@ -94,7 +125,6 @@ to its own oracles in the natural way.
 \caption{Games for proof of Theorem~\ref{thm:sbf-errep1}.}
 \label{fig:sbf-errep1/games}
 \end{figure*}
-
 
 \ignore{
 \begin{figure*}
