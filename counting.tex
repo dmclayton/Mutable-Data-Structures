@@ -6,22 +6,25 @@
       $\salt \getsr \bits^\lambda$\\
       $M \gets \sum_{x \in \col} \cmap_m(R_K(\salt \cat x))$\\
       return $\langle M, \salt \rangle$
-  }
-  {
-    \underline{$\Qry^R_K(\langle M, \salt \rangle,x)$}\\[2pt]
+    \\[6pt]
+      \underline{$\Qry^R_K(\langle M, \salt \rangle,x)$}\\[2pt]
       $L \gets R_K(\salt \cat x)$\\
       return $\bigwedge_{i=1}^k [M[L[i]] > 0]$
-    \\[6pt]
-    \underline{$\Up^R_K(\langle M, \salt \rangle,\langle x, b \rangle)$}\\[2pt]
-      if $\hw(M) > \ell$ then return $\bot$\\
-      if $b = 1$ return 
-      return $M + \cmap_m(R(x))$
   }
-  \caption{The formal definition of $\BF[R,t,\lambda] = (\Rep^R,\Qry^R,\Up^R)$
-  for function $R: \bits^* \to [m]^k$ and natural numbers $t, \lambda$. Here,
-  $\hw$ is a function counting the number of nonzero counters and $\cmap_m$ is a function taking a list $L$
-  of indices in $[m]$ and producing an array $A$ of length $m$ such that $A[i]$ counts the number of times $i$ appears in $L$.}
-  \label{fig:bcf-def}
+  {
+    \underline{$\Up^R_K(\langle M, \salt \rangle,\langle x, b \rangle)$}\\[2pt]
+      if $\sum_{i=1}^m [M[i] > 0] > \ell$ then return $\bot$\\
+      if $b = 1$ then return $\langle M + \cmap_m(R(\salt \cat x)), \salt \rangle$\\
+      if $\Qry^R_K(\langle M, \salt \rangle, x)$ then return $\langle M - \cmap_m(R(\salt \cat x)), \salt \rangle$\\
+      return $\langle M, \salt \rangle$
+  }
+  \caption{The keyless structure $\countbloom[R,\ell,n,\lambda]$ given by
+  $(\Rep^R,\Qry^R,\Up^R)$ is used to define Bloom filter variants. The
+  parameters are a function $R: \keys\by\bits^* \to [m]^k$ and intgers $\ell, n,
+  \lambda \geq0$. A concrete scheme is given by a particular choice of
+  parameters.  The function~$\cmap_m$ is defined in
+  Section~\ref{sec:prelims}.}
+  \label{fig:cbf-def}
 \end{figure}
 
 A modification of the Bloom filter construction known as the counting filter is given in~\ref{fig:cbf-def}. Once again we can consider different variants depending on whether or not a salt and/or key is present. From this
