@@ -311,10 +311,10 @@ we restrict ourselves to the immutable setting, we can prove the following.
     \begin{aligned}
       \Adv{\errep}_{\Pi,\delta,r}(t, q_R,q_T,0,q_H) &\leq \\
       \hspace{20pt}
-        \text{some cool bound} \,,
+        q_R \cdot \left(\frac{q_H}{2^\lambda} + \left(\frac{e^{\alpha-1}}{\alpha^\alpha}\right)^{pq}\right) \,,
     \end{aligned}
   \end{equation*}
-  where $H$ is modeled as a random oracle.
+  where $H$ is modeled as a random oracle, $q = q_H + q_T$, $p$ is the standard (non-adaptive) false positive probability for a Bloom filter with the chosen parameters, and $\alpha = \frac{r}{pq}$.
   %
   \cpnote{I'm not sure if this advantage function is defined.}
 \end{theorem}
