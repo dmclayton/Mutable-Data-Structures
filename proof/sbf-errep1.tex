@@ -179,4 +179,19 @@ $|\setX| \leq q_H + q_T$.
 %
 Hence, the probability that~$\game_2(\advB)=1$ is equal to the probability
 that~$|\setT| \geq r$.
-\cpnote{WIP}
+
+For each $x\in\setX$, let $T(x)$ denote the event that $x\in\setT$
+%
+In the random oracle model for~$H$, the set of random random variables $T(x)$
+for each $x\in X$ are independently and identically distributed.
+%
+Hence, the probability that~$\advB$ succeeds is binomially distributed:
+%
+\begin{equation}
+  \Prob{ |\setT| \geq r } =
+     \sum_{i=r}^{q} \binom{q}{i}p^i(1-p)^{q-i} \,,
+\end{equation}
+%
+where $q \leq q_H + q_T$ and $p = \Pr[T(x)=1]$.
+%
+\todo{DC (lead)}{Apply Lemma~\ref{thm:lemma1} and finish the bound.}
