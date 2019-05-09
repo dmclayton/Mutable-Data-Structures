@@ -9,11 +9,11 @@
       return $\langle M, \salt \rangle$
   }
   {
-    \underline{$\Qry^R_K(\langle M, \salt \rangle,x)$}\\[2pt]
+    \underline{$\Qry^R_K(\langle M, \salt \rangle,\qry_x)$}\\[2pt]
       $X \gets \bmap_m(R_K(\salt \cat x))$\\
       return $M \AND X = X$
     \\[6pt]
-    \underline{$\Up^R_K(\langle M, \salt \rangle,x)$}\\[2pt]
+    \underline{$\Up^R_K(\langle M, \salt \rangle,\qry_x)$}\\[2pt]
       if $\hw(M) > \ell$ then return $\bot$\\
       return $\langle M \vee \bmap_m(R_K(Z \cat x)), \salt \rangle$
   }
