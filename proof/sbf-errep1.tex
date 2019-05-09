@@ -1,1 +1,31 @@
-\todo{CP}{Recall the proof from the old paper.}
+We will use the following lemma for keyless structures.
+%
+\todo{DC (lead)}{Prove this,}
+
+\begin{lemma}\label{thm:lemma1}
+  For every $q_R, q_T, q_U, q_H, r, t \geq 0$ and keyless structure~$\Gamma$ it
+  holds that
+  \begin{equation*}
+    \Adv{\errep}_{\Gamma,\delta,r}(t, q_R, q_T, q_U, q_H) \leq
+    q_R\Adv{\errep1}_{\Gamma,\delta,r}(O(f(t)), q_T, q_U, q_H) \,,
+  \end{equation*}
+  where $f(t) = t + (q_R-1)\ticks(\Rep,t) + q_T\ticks(\Qry,t) + q_U\ticks(\Up,t)$.
+  \todo{Any}{Define $\Adv{\errep1}_{\cdot,\cdot,\cdot}(\cdots)$.}
+\end{lemma}
+%
+%
+\noindent
+The proof is by a fairly straight-forward hybrid argument. Because~$\Gamma$ is
+keyless, in the reduction we simulate $q_R-1$ $\REPO$-queries experiment and use
+our own oracles for the remaining query. The best we can do with this strategy
+is to ``guess'' which representation the \errep\ adversary willl use in its
+attack, which results in the~$q_R$ factor in the bound.
+%
+We defer the full details to Appendix~\ref{app:iproof/lemma1}.
+
+Let $\advA$ be an \errep\ adversary making~$1$ query to~$\REPO$, $q_T$ queries
+to $\QRYO$, $0$ queries to $\UPO$, and $q_H$ queries to the random
+oracle~$\HASHO$.
+%
+The proof is by a game-playing argument~\cite{bellare2006triple}.
+\cpnote{WIP}

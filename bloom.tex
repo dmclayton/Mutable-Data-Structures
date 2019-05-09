@@ -47,6 +47,9 @@ Finally, let $\hw(X)$ denote the Hamming wieght of (i.e., the number of 1s in)~$
 %
 For every function~$f$, define function $\id^f$ so that
 $\id^f(\emptystr, x) = f(x)$ for all $x$ in the domain of~$f$.
+%
+\todo{Any}{Define function $\ticks(A,\cdot)$ for algorithm~$A$. Do we need big-O
+notation in bounds?}
 
 \medskip
 We specify three Bloom filter variants using the keyed structure
@@ -247,7 +250,7 @@ following.
   For integers $q_R, q_T, q_H, r, t \geq 0$ it holds that.
   \begin{equation*}
     \begin{aligned}
-      \Adv{\errep1}_{\Pi,\delta,r}(t, q_R,q_T,q_H) &\leq \\
+      \Adv{\errep}_{\Pi,\delta,r}(t, q_R,q_T,0,q_H) &\leq \\
       \hspace{20pt}
         \text{some cool bound} \,,
     \end{aligned}
