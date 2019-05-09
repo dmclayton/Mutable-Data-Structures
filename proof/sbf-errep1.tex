@@ -27,36 +27,76 @@ Let $\advA$ be an \errep\ adversary making~$1$ query to~$\REPO$, $q_T$ queries
 to $\QRYO$, $0$ queries to $\UPO$, and $q_H$ queries to the random
 oracle~$\HASHO$.
 %
-We assume, without loss of generality, that all of~$\advA$'s $\QRYO$ queries
-proceed its $\REPO$ query, for each query $\qry_x$ to  
+We make the following assumptions, all of which are without loss of generality.
+%
+First, all of~$\advA$'s $\QRYO$ queries proceed its $\REPO$ query.
+%
+Second, we assume that $x\not\in\setS$ for all queries $\qry_x$ to $\QRYO$,
+where~$\setS$ was the input to~$\advA$'s $\REPO$ query. This is without loss
+because Bloom filtersadmit false positives, but not false negatives
+%
+Third, we we assume that $|\setS| \leq n$; this is without loss because
+otherwise~$\REPO$ outputs~$\bot$ and~$\advA$ gets no advantage.
+
+Fourth, we assume that all of~$\advA$'s $\HASHO$ queries are of the form $Z\cat
+x$, where $|Z| = \lambda$.
+
+We begin with a game-playing argument~\cite{bellare2006triple}, then obtain the
+final bound via applicaition of Lemma~\ref{thm:lemma1}.
+%
+\cpnote{Here's the proof sketch.}
+%
+The high-level goal is to rewrite the game so that the probability that one
+of~$\advA$'s queries runs up the score is is precisely the false positive
+probability for Bloom filters in the usual analytical
+setting~\cite{kirsch2006less}. In other words, our goal is transistion into a
+setting in which the Bloom filter output by~$\REPO$ is independent of the
+outcome of~$\advA$'s other queries.
+
+We begin with the game~$\game_0(\advB)$ defined in
+Figure~\ref{fig:sbf-errep1/games}. It is similar to the \errep\ experiment when
+executed with~$\advA$, $\Pi$, $\delta$, and~$r$. Indeed, it is not difficult to
+see that for every~$\advA$ there exists an adversary~$\advB$ such that
+\begin{equation}
+  \Adv{\errep}_{\Pi,\delta,r}(\advA) \leq \Prob{\game_0(\advB) = 1}
+\end{equation}
+and~$\advB$ has the same query resources as~$\advA$.
+%
+Adversary~$\advB$ executes~$\advA$, forwarding~$\advA$'s oracle queries
+to its own oracles in the natural way.
+%
+\cpnote{WIP}
+
+\begin{figure*}
+\twoCols{0.48}
+{
+  \experimentv{$\game_{0}(\advB)$}\\[2pt]
+    $\salt^* \getsr \bits^\lambda$;
+    $\advB^{\REPO,\QRYO,\HASHO}$;
+    return $\big[\sum_x \err[x] \geq r\big]$
+  \\[6pt]
+  \oraclev{$\REPO(\col)$}\\[2pt]
+    $M^* \gets \bigvee_{x \in \col} \bmap_m(\HASHO(\salt^* \cat x))$\\
+    $\setS^* \gets \col$;
+    return $\langle M^*, Z^* \rangle$
+  \\[6pt]
+  \oraclev{$\QRYO(i, \qry_x)$}\\[2pt]
+    $X \gets \bmap_m(\HASHO(\salt^* \cat x))$;
+    $a \gets X = M^* \AND X$\\
+    if $\err[x] < \delta(a,\qry(\col^*))$ then;
+          $\err[x] \gets \delta(a,\qry(\col^*))$\\
+    \cpnote{Hmm ... it seems $\err[x] \leq 1$ is an inveriant.}\\
+    return $a$
+}
+{
+  cool
+}
+\caption{Games for proof of Theorem~\ref{thm:sbf-errep1}.}
+\label{fig:sbf-errep1/games}
+\end{figure*}
+
 
 \ignore{
-
-The proof is by a game-playing argument~\cite{bellare2006triple}.
-
-Let $\struct_\saltybloom = (\Rep, \Qry)$.
-%
-We define a deterministic algorithm, $\Repx$, that on input of a
-collection~$\col$ and salt~$\salt$ computes the Bloom filter
-representation of~$\col$ and outputs~$\str(M, \salt)$.
-%
-(Then running $\salt \getsr \bits^\lambda$ followed by $\pub \gets
-\Repx^H(\col, \salt)$ is equivalent to running $\pub \getsr \Rep^H(\col)$.)
-%
-Define the function~$\fff$ from $[m]^2$ to $[m]^k$ as $\fff(\hh)=\vv$, where
-$\vv_j = 1 + (\hh_1 + j\cdot\hh_2 \mod m)$ for each $j\in[k]$.
-%
-Let~$\advA$ be an \errepone adversary. Let~$q_1$ denote the number of
-queries~$\advA$ makes to~$H$ during its first stage, let $q_2$ denote the number
-of queries during its second stage, and let~$q_T$ denote the number of queries
-to~$\QRYO$.
-%
-We assume that none of the adversary's queries coincide with the collection,
-meaning for every query~$\qry_x$ that~$\advA$ asks of its~$\QRYO$ oracle,
-it holds that~$x \not\in \col$. This is without loss of generality; since
-Bloom filters never have false negatives, the adversary can compute the result
-of these queries without interacting with its oracle.
-
 \begin{figure*}
   \boxThmBFSaltCorrect{0.48}
   {
