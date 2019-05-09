@@ -1,3 +1,71 @@
+\begin{figure*}
+\threeColsOneDivideUnbalanced{0.40}{0.27}{0.27}
+{
+  \vspace{-7pt}
+  \experimentv{$\game_{0}(\advB)$}
+      \hfill \diffplus{$\game_1$}\\[2pt]
+    $M^* \gets \bot$;
+    $\salt^* \getsr \bits^\lambda$\\
+    $\advB^{\REPO,\QRYO,\HASHO_1}$;
+    return $\big[\sum_x \err[x] \geq r\big]$
+  \\[6pt]
+  \oraclev{$\REPO(\col)$}\\[2pt]
+    $M^* \gets \bigvee_{x \in \col} \bmap_m(\HASHO_2(\salt^* \cat x))$;
+    $\setS^* \gets \col$;
+    return $\langle M^*, Z^* \rangle$
+  \\[6pt]
+  \oraclev{$\QRYO(\qry_x)$}\\[2pt]
+    $X \gets \bmap_m(\HASHO_3(\salt^* \cat x))$;
+    $a \gets X = M^* \AND X$\\
+    if $\err[x] < \delta(a,\qry_x(\col^*))$ then
+          $\err[x] \gets \delta(a,\qry_x(\col^*))$\\
+    return $a$
+  \\[6pt]
+  \oraclev{$\HASHO_c(\salt \cat x)$}\\[2pt]
+    $\vv \getsr [m]^k$\\
+    if $M^*=\bot$ and $\salt=\salt^*$ and $c=1$ then \com{Caller is~$\advB$}\\
+    \tab $\bad_1 \gets 1$; \diffplus{return $\vv$}\\
+    if $T[Z,x] = \bot$ then $\vv \gets T[Z,z]$\\
+    $T[Z,x] \gets \vv$; return $\vv$
+}
+{
+  \vspace{-2pt}
+  \oraclev{$\HASHO_c(\salt \cat x)$}\\[2pt]
+    $\vv \getsr [m]^k$\\
+    if $M^*=\bot$ and $\salt=\salt^*$ and $c=1$ then\\
+    \tab $\bad_1 \gets 1$; return $\vv$\\
+    if $T[Z,x] = \bot$ then $\vv \gets T[Z,z]$\\
+    $T[Z,x] \gets \vv$\\[2pt]
+    \diffplusbox{
+    \com{Caller is~$\advB$ or $\QRYO$}\\
+    if $c=1$ or $c=3$ then\\
+    \tab if $\salt \ne \salt^*$  then return $\vv$\\
+    \tab $\Ans[x] \gets \bmap_m(\vv) = M^* \AND \bmap_m(\vv)$\\
+    \tab if $\err[x] < \delta(\Ans[x],\qry_x(\col^*))$ then
+    \tab\tab $\err[x] \gets \delta(\Ans[x],\qry_x(\col^*))$
+    }
+    return $\vv$
+}
+{
+  \vspace{-7pt}
+  \oraclev{$\QRYO(\qry_x)$}\
+      \hfill \diffminus{$\game_1$} \diffplus{$\game_2$}\\[2pt]
+    \diffminusbox{%
+      $X \gets \bmap_m(\HASHO_3(\salt^* \cat x))$\\
+      $a \gets X = M^* \AND X$\\
+      if $\err[x] < \delta(a,\qry_x(\col^*))$ then\\
+      \tab $\err[x] \gets \delta(a,\qry_x(\col^*))$
+    }\\[2pt]
+    \diffplusbox{
+      $\HASHO_3(Z^* \cat x)$\\
+      $a \gets \Ans[x]$
+    }
+    return $a$
+}
+\caption{Games 0, 1, and 2 for proof of Theorem~\ref{thm:sbf-errep1}.}
+\label{fig:sbf-errep1/games}
+\end{figure*}
+
 We will use the following lemma for keyless structures.
 %
 \todo{DC (lead)}{Prove this in the appendix.}
@@ -40,8 +108,6 @@ otherwise~$\REPO$ outputs~$\bot$ and~$\advA$ gets no advantage.
 
 Fourth, we assume that all of~$\advA$'s $\HASHO$ queries are of the form $Z\cat
 x$, where $|Z| = \lambda$.
-%
-finally, we assume that~$\advA$'s $\QRYO$ queries are all distinct.
 
 We begin with a game-playing argument~\cite{bellare2006triple}, then obtain the
 final bound via applicaition of Lemma~\ref{thm:lemma1}.
@@ -71,7 +137,8 @@ Observe that in game~$\game_0$ the salt used for the representation of~$\setS^*$
 is generated prior to executing~$\advB$. Game~$\game_1$ is identical
 to~$\game_0$ until the flag~$\bad_1$ gets set by oracle~$\HASHO$. This occurs
 if~$\advB$ asks $\HASHO_1(\salt^* \cat x)$, where~$\salt^*$ is the salt generated
-at the beginning of the game.
+at the beginning of the game, and it has not yet called $\QRYO$ (i.e.,
+$M^*=\bot$).
 %
 By the Fundamental Lemma of Geame Playing~\cite{bellare2006triple} it follows
 that
@@ -84,251 +151,32 @@ that
 \end{eqnarray}
 %
 Note that in $\game_1$, the value of~$M^*$ is independent of~$\advB$'s
-$\HASHO_1$ queries.
+$\HASHO_1$ queries. In particular, the probability that some bit of~$M^*$ is set
+is independent of the choices of~$\advB$.
 
+In game $\game_2$ the $\HASHO$ and $\QRYO$ oracles have been rewritten so that
+the winning-condition is computed by $\HASHO$ instead of $\QRYO$. The former
+oracle maintains a set~$\Ans$ such that $\Ans[x] = \Qry^{\HASHO_3}(M^*, x)$ for
+each query $\salt^* \cat x$; on input of $\qry_x$, oracle~$\QRYO$ simply runs
+$\HASHO_3(\salt^* \cat x$ and returns $\Ans[x]$.
+%
+We are effectively giving the adverseary credit for RO queries that result in
+false positives for the representation of~$\setS^*$, but which it does not
+explicitly ask of the~$\QRYO$. Clearly, for every~$\advB$ it holds that
+%
+\begin{equation}
+  \Prob{\game_1(\advB)=1} \leq \Prob{\game_2(\advB)=1} \,.
+\end{equation}
 
-\begin{figure*}
-\threeColsUnbalanced{0.40}{0.27}{0.27}
-{
-  \vspace{-7pt}
-  \experimentv{$\game_{0}(\advB)$}
-      \hfill \diffplus{$\game_1(\advB)$}\\[2pt]
-    $\salt^* \getsr \bits^\lambda$;
-    $\advB^{\REPO,\QRYO,\HASHO_1}$;
-    return $\big[\sum_x \err[x] \geq r\big]$
-  \\[6pt]
-  \oraclev{$\REPO(\col)$}\\[2pt]
-    $M^* \gets \bigvee_{x \in \col} \bmap_m(\HASHO_2(\salt^* \cat x))$;
-    $\setS^* \gets \col$;
-    return $\langle M^*, Z^* \rangle$
-  \\[6pt]
-  \oraclev{$\QRYO(i, \qry_x)$}\\[2pt]
-    $X \gets \bmap_m(\HASHO_3(\salt^* \cat x))$;
-    $a \gets X = M^* \AND X$\\
-    if $\err[x] < \delta(a,\qry_x(\col^*))$ then;
-          $\err[x] \gets \delta(a,\qry_x(\col^*))$\\
-    return $a$
-  \\[6pt]
-  \oraclev{$\HASHO_c(\salt \cat x)$}\\[2pt]
-    $\vv \getsr [m]^k$\\
-    if $\salt=\salt^*$ and $c=1$ then \com{Caller is~$\advB$}\\
-    \tab $\bad_1 \gets 1$; \diffplus{return $\vv$}\\
-    if $T[Z,x] = \bot$ then $\vv \gets T[Z,z]$\\
-    $T[Z,x] \gets \vv$; return $\vv$
-}
-{
-  hella
-}
-{
-  cool
-}
-\caption{Games for proof of Theorem~\ref{thm:sbf-errep1}.}
-\label{fig:sbf-errep1/games}
-\end{figure*}
-
-\ignore{
-\begin{figure*}
-  \boxThmBFSaltCorrect{0.48}
-  {
-    \underline{$\game_0(\advA)$}\\[2pt]
-      $\col \getsr \advA^H$; $\setC \gets \emptyset$; $\err \gets 0$\\
-      $\pub \getsr \Rep[\hashbf[H]](\col)$\\
-      $\bot \getsr \advA^{H,\QRYO}(\pub)$;
-      return $(\err \geq r)$
-    \\[6pt]
-    \oraclev{$\QRYO(\qry_x)$}\\[2pt]
-      if $\qry_x \in \mathcal{C}$ then return $\bot$\\
-      $\setC \gets \setC \union \{\qry_x\}$\\
-      $a \gets \Qry[\hashbf[H]](\pub, \qry_x)$\\
-      if $a \neq \qry_x(\col)$ then $\err \gets \err + 1$\\
-      return~$a$
-    \\[4pt]
-    \hspace*{-4pt}\rule{1.043\textwidth}{.4pt}
-    \\[5pt]
-    \oraclev{$\HASHO_1(\salt,x)$} \hfill\diffplus{$\game_2$}\;{$\game_1$}\hspace*{3pt}\\
-      $\hh \getsr [m]^2$; $\vv \gets \fff(\hh$)\\
-      if $\salt = \salt^*$ then\\
-      \tab $\bad_1 \gets 1$; \diffplus{return $\vv$}\\
-      if $T[\salt,x]$ is defined then $\vv \gets T[\salt,x]$\\
-      $T[\salt,x] \gets \vv$;
-      return $\vv$
-  }
-  { % New RO semantics
-    % Change of hashing scheme (iid since inputs are distinct)
-    \underline{$\game_1(\advB)$}\\[2pt]
-      $\salt^* \getsr \bits^\lambda$;
-      $\col \getsr \advB^{\HASHO_1}$\\
-      $\pub \gets \Repx[\HASHO_2](\col, \salt^*)$\\
-      $\setC \gets \emptyset$;
-      $\err \gets 0$\\
-      $\bot \getsr \advB^{\HASHO_3,\QRYO}(\pub)$;
-      return $(\err \geq r)$
-    \\[6pt]
-    \oraclev{$\QRYO(\qry_x)$}\\[2pt]
-      if $\qry_x \in \mathcal{C}$ then return $\bot$\\
-      $\setC \gets \setC \cup \{\qry_x\}$\\
-      $a \gets \Qry[\HASHO_3](\pub, \qry_x)$\\
-      if $a \neq \qry_x(\col)$ then $\err \gets \err + 1$\\
-      return~$a$
-    \\[6pt]
-    \oraclev{$\HASHO_i(\salt,x)$}\\[2pt]
-      $\hh \getsr [m]^2$; $\vv \gets \fff(\hh$)\\
-      if $\salt = \salt^*$ then $\bad_i \gets 1$\\
-      if $T[\salt,x]$ is defined then\\
-      \tab $\vv \gets T[\salt,x]$\\
-      $T[\salt,x] \gets \vv$;
-      return $\vv$
-  }
-  {
-    \underline{$\game_3(\advB)$}\\[2pt]
-      $\salt^* \getsr \bits^\lambda$;
-      $\col \getsr \advB^{\HASHO_1}$\\
-      $\pub \gets \Repx[\HASHO_2](\col, \salt^*)$\\
-      $\setC \gets \emptyset$;
-      $\err \gets 0$\\
-      $\bot \getsr \advB^{\HASHO_3,\QRYO}(\pub)$;
-      return $(\err \geq r)$
-    \\[9pt]
-    \oraclev{$\QRYO(\qry_x)$}\\[2pt]
-      if $\qry_x \in \setC$ then return $\bot$\\
-      $\setC \gets \setC \union \{\qry_x\}$\\
-      if $\Ans[x]$ is undefined then\\
-      \tab $\vv \gets \HASHO_3(\salt^*,x)$\\
-      return $\Ans[x]$
-  }
-  {
-    \oraclev{$\HASHO_3(\salt,x)$}\\[2pt]
-      $\hh \getsr [m]^2$; $\vv \gets \fff(\hh$)\\
-      if $T[\salt,x]$ is defined then\\
-      \tab $\vv \gets T[\salt,x]$\\
-      $T[\salt,x] \gets \vv$\\
-      if $\salt \ne \salt^*$ or $\qry_x \in \setC$ then return~$\vv$\\
-      $\setC \gets \setC \union \{\qry_x\}$\\
-      $\Ans[x] \gets 1$;
-      for $j \gets 1$ to $k$ do\\
-      \tab\tab if $M[\vv_j] \neq 1$ then $\Ans[x] \gets 0$\\
-      if $\Ans[x] \ne \qry_x(\col)$ then\\
-      \tab $\err \gets \err + 1$\\
-      return $\vv$
-  }
-  \caption{Games 0--3 for proof of Theorem~\ref{thm:bf-salt-correct}.}
-  \label{fig:bf-salt-correct}
-  %\vspace{6pt}
-  %\hrule
-\end{figure*}
-
-The proof is by a game-playing argument; see Figure~\ref{fig:bf-salt-correct}.
+We now consider $\Prob{\game_2(\advB)=1}$.
 %
-Game~$\game_0$ is precisely the \errepone game with~$\struct_\saltybloom$,
-adversary~$\advA$, and error parameter~$r$, and so
-$\Adv{\errepone}_{\struct_\saltybloom,r}(\advA) = \Prob{\game_0(\advA)=1}$.
+Let $\setX$ be the set $\{ x \in \bits^* : \Ans[x] \ne \bot \}$ and $\setT = \{x
+\in\setX: \Ans[x] = 1\}$, where $\Ans$ is at is defined when~$\advB$ halts. We
+will call~$\setX$ the set of attempts and~$\setT$ the set of false positives.
 %
-Next, $\game_1$ differs from~$\game_0$ in three important ways.
+Note that $\setX\intersection\setS^*=\emptyset$ by construction, and that
+$|\setX| \leq q_H + q_T$.
 %
-First, the random oracle~$H$ is replaced with three oracles: $\HASHO_1$ is
-given to the adversary's first stage, $\HASHO_2$ is used to compute the
-representation, and $\HASHO_3$ is given to the adversary's second stage and
-is also used by~$\Qry$ to answer the $\QRYO$ queries.  All of them
-populate the same table~$T$ mapping inputs to random values, thereby simulating
-a single random oracle via lazy evaluation.
-%
-Second, whereas~$H$ maps strings to $[m]$, oracles $\HASHO_1$,
-$\HASHO_2$, and $\HASHO_3$ map elements of $\bits^\lambda \cross
-\bits^*$ to $[m]^k$.
-%
-Third, the salt~$\salt^*$ corresponding to the representation of~$\col$
-is generated before~$\advA$ selects~$\col$.
-
-There exists an adversary~$\advB$ such that $\Prob{\game_0(\advA)=1} =
-\Prob{\game_1(\advB)=1}$.
-%
-Adversary~$\advB$ maintains a table~$R$, initially empty.
-%
-In its first stage, $\advB$ executes~$\advA$ in its first stage, answering each
-query~$w$ to~$H$ as follows:
-%
-Check if $R[w]$ is defined; if so, then return $R[w]$ to~$\advA$.
-%
-Otherwise, if $w = \str(\salt, j, x)$ for some $\salt \in \bits^\lambda$, $j \in
-[k]$, and $x \in \bits^*$, then ask $(\salt, x)$ of $\HASHO_1$, getting~$\vv$ in
-return, and let $R[\str(\salt,j,x)] = \vv_j$ for each $j\in[k]$.
-%
-Otherwise, sample~$r$ uniformly from $[m]$ and let $R[w] = r$.
-%
-Finally, return~$R[w]$ to~$\advA$.
-%
-When~$\advA$ outputs~$\col$, output~$\col$.
-%
-In its second stage, $\advB$ executes $\advA$ in its second stage, answering
-its~$H$ queries as above (except using~$\HASHO_3$), and answering each
-query~$\QRYO$ query using its own oracle.
-%
-Adversary~$\advB$'s simulation is perfect because the outputs of
-$\Rep[\hashbf[H]](\col)$ and $\Rep[\HASHO_2](\col)$ are
-identically distributed.
-
-Next, games~$\game_2$ and~$\game_1$ are identical until the flag~$\bad_1$ gets set.
-This occurs if~$\advB$ queries~$\HASHO_1$ on a point $(\salt^*,x)$. If this
-occurs, the revised oracle samples~$\hh$ uniformly from $[m]^2$, computes $\vv
-\gets \fff(\hh)$, and immediately returns~$\vv$, without updating the table by
-setting $T[\salt^*, x] = \vv$.
-%
-Since $\salt^*$ is sampled uniformly from~$\bits^\lambda$, and~$\advB$ makes at
-at most $q_1$ distinct queries to~$\HASHO_1$ in its first stage, we have
-that $\Prob{\game_1(\advB) \sets \bad_1} \leq q_1/2^{\lambda}$, and
-\begin{equation*}
-\Adv{\errepone}_{\struct_\saltybloom,r}(\advA) \leq \Prob{\game_2(\advB)=1} + q_1/2^{\lambda} \,.
-\end{equation*}
-At this point, the representation $\pub$ is independent of~$\advB$'s stage-1
-queries.
-
-Finally, $\game_3$ is semantically the same as~$\game_2$ (that is, the adversary's
-view does not change), but the logic for checking if a~$\QRYO$ query
-causes a false positive is moved to the~$\HASHO_3$ oracle.
-%
-On input of $(\salt, x)$, $\HASHO_3$ makes sure that $T[\salt,x]$ is
-defined as usual. Note that if $\salt=\salt^*$, where~$\salt^*$ is the salt
-corresponding to the challenge representation $\pub = \str(M, \salt^*)$, it now
-checks to see if~$x$ is a false positive for~$\pub$; if so it lets~$\Ans[x]=1$;
-otherwise it lets $\Ans[x]=0$.
-%
-Note, too, that on input of $\qry_x$, $\QRYO$ simply looks up $\Ans[x]$; if it is
-undefined, then it asks $(\salt^*, x)$ of $\HASHO_3$.
-
-We now consider $\Prob{\game_3(\advB)=1}$.
-%
-Observe that $\game_3(\advB)$ outputs~$1$ only in the case that there are~$r$ calls to the
-$\HASHO_3$ oracle that increment~$\err$, i.e., queries $x \not\in
-\col$ such that $\bigwedge_{j=1}^{k} M[\vv_j]=1$.
-%
-By construction, for each of adversary~$\advB$'s queries $(\salt^*, x)$
-to~$\HASHO_3$ for which $x \not\in \col$, the value $T[\salt^*, x]$
-is undefined. Similarly, for each of~$\advB$'s queries $\qry_x$ to~$\QRYO$
-for which $x \not\in \col$, the value $T[\salt^*, x]$ is undefined.
-%
-Now, there are at most $q_T + q_2$ queries made to~$\HASHO_3$, either
-directly by~$\advB$ or indirectly by~$\advB$ calling~$\QRYO$, that are
-potentially false positives for the representation $\str(M, \salt^*)$ and would
-result in~$\err$ getting incremented. These are queries of the form~$(\salt^*,
-x)$, where $x \not\in \col$.
-%
-We can assume without loss of generality that~$\advB$ halts as soon as~$\err=r$
-(which it can easily track), so there are at most $\binom{q_T+q_2}{r}$ possible
-``winning'' query patterns to consider.
-%
-Moreover, as each error $\err$-incrementing event is independent of all previous
-choices made by~$\HASHO_3$, we need only consider the probability of a single
-error. As a corollary of Theorem~\ref{thm:mitz2} (Appendix~\ref{sec:mitz}),
-along with a union bound and the independence of $\err$-incrementing events, we
-can conclude that \[
-\Prob{\game_3(\advB)=1} \leq \dbinom{q_T + q_2}{r} \left( (1-e^{-kn/m})^k + O(1/n) \right)^r
-\]
-%so that the final bound becomes
-%\[
-%  \Adv{\errepone}_{\struct_\saltybloom,r}(\advB) \leq
-%    \frac{q_1}{2^\lambda} +
-%    {\dbinom{q_T + q_2}{r}} \left( (1-e^{-kn/m})^k + O(1/n) \right)^r\,.
-%\]
-%
-Letting $q_H = q_1 + q_2$, the claim follows.
-}
+Hence, the probability that~$\game_2(\advB)=1$ is equal to the probability
+that~$|\setT| \geq r$.
+\cpnote{WIP}
