@@ -66,12 +66,10 @@
 \label{fig:sbf-errep-immutable/games}
 \end{figure*}
 
-We will use the following lemma for keyless structures. We use $\errep1$ and
+We will use the following lemma for keyless structures, which is proved in appendix~\ref{sec:keyless-proof}. We use $\errep1$ and
 $\erreps1$ to denote the public-representation and private-representation
 experiments where the adversary makes a single $\REPO$ query. In writing the
 advantage for these games we omit the $q_R$ parameter since it is fixed at 1.
-%
-\todo{DC (lead)}{Prove this in the appendix.}
 
 \begin{lemma}\label{thm:lemma1}
   For every $q_R, q_T, q_U, q_H, r, t \geq 0$ and keyless structure~$\Gamma$ it
@@ -79,12 +77,11 @@ advantage for these games we omit the $q_R$ parameter since it is fixed at 1.
   \begin{eqnarray*}
     \begin{aligned}
       \Adv{\errep}_{\Gamma,\delta,r}(t, q_R, q_T, q_U, q_H) &\leq \\
-      q_R\Adv{\errep1}_{\Gamma,\delta,r}(O(f(t)), q_T, q_U, q_H) \,,
+      & q_R \cdot \Adv{\errep1}_{\Gamma,\delta,r}(O(f(t)), q_T, q_U, q_H) \,,
     \end{aligned}
   \end{eqnarray*}
   where $f(t) = t + (q_R-1)\ticks(\Rep,t) + q_T\ticks(\Qry,t) + q_U\ticks(\Up,t)$.
 \end{lemma}
-%
 %
 \noindent
 The proof is by a fairly straightforward hybrid argument. Because~$\Gamma$ is
