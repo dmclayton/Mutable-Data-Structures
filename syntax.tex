@@ -37,8 +37,8 @@ notation in bounds?}
 
 \heading{Pseudorandom functions}
 %
-For sets $\setX$ and $\setY$ and a keyspace $\keys$, we define a pseudorandom
-function to be a function $F: \keys \times \setX \to \setY$. The intent is for
+For sets $\setX$ and $\setY$ and a keyspace $\setK$, we define a pseudorandom
+function to be a function $F: \setK \times \setX \to \setY$. The intent is for
 the outputs of the function to appear random for a fixed choice of key, which is
 formally captured by the game described in Figure~\ref{fig:prf-def}. We define
 the advantage of an adversary $\advA$ to be
@@ -57,11 +57,11 @@ steps and making $q$ queries to the PRF oracle.
   {
     \oraclev{$\PRFO(x)$}\\[2pt]
       if $b = 1$ then return $F_\key(x)$\\
-      if $T[x]$ is defined then return $T[x]$\\
-      $T[x] \getsr Y$; return $T[x]$
+      if $T[x] \neq \bot$ then return $T[x]$\\
+      $T[x] \getsr \setY$; return $T[x]$
   }
-  \caption{The notion of PRF correctness, capturing indistinguishability from a
-  random function.
+  \caption{The PRF experiment used to define the pseudorandomness of function
+  $F$ with key space $\setK$.
   }
   \label{fig:prf-def}
 \end{figure}

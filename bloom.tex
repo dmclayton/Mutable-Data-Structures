@@ -80,8 +80,13 @@ updates. To guarantee correctness in this case we must additionally guarantee
 that representations can be kept private from the adversary.
 }
 
-\todo{DC}{Recall the Kirsch-Mitzenmacher bound~\cite{kirsch2006less}.  I.e.,
-explain this thing: $(1 - e^{-kn/m})^k + O(1/m)$.}
+In the non-adaptive setting, the false positive rate for a Bloom filter of $m$
+bits using $k$ hash functions and storing $n$ items can be closely approximated
+as $(1-e^{-kn/m})^k + O(1/m)$.~\cite{kirsch2006less} Over the course of $q_T$
+random evaluations of $\Qry$, we would then expect about
+$q_T((1-e^{-kn/m})^k + O(1/m))$ false positives to occur. Our goal is to
+minimize the probability that even an adaptive adversary can perform
+significantly better than this lower bound.
 
 \heading{Error function for set-mempership queries}
 %
@@ -290,7 +295,7 @@ filter with the chosen parameters. For all integers $q_R, q_T, q_H, r, t \geq 0$
 and for $q = q_T + q_H$, if $r > pq$, then it holds that
   \begin{equation*}
     \begin{aligned}
-      \Adv{\errep}_{\Pi,\delta,r}(t,\,&q_R,q_T,0,q_H) \leq \\
+            \Adv{\errep}_{\Pi,\delta,r}(t,\,&q_R,q_T,0,q_H) \leq \\
         & q_R \cdot \left(\frac{q_H}{2^\lambda} + \left(\frac{pq}{r}\right)^re^{r-pq}\right) \,,
     \end{aligned}
   \end{equation*}
@@ -315,6 +320,12 @@ distributions, namely
 readers, so help them out. For what parameters is it comparable to the
 non-adaptive false-positive probability? We'll want to plot this for reasonable
 values of $k, m, n, q_H, q_T, r$.}
+
+The bound given in the theorem statement is not directly comparable to the
+standard bounds for a Bloom filter, which are typically given in terms of the
+false positive probability per query rather than the probability of accumulating
+some target number of false positives over a larger number of queries.
+
 \begin{proof}[Proof of Theorem~\ref{thm:sbf-errep-immutable}]
   \input{proof/sbf-errep-immutable}
 \end{proof}
