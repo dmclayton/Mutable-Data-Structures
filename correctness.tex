@@ -109,9 +109,12 @@ We define the function
 $\Adv{\errep}_{\struct,\delta,r}(t,q_R,q_T,q_U,q_H)$ to be the maximum advantage
 attained by an adversary running in $t$ time steps and making $q_R$ calls to
 $\REPO$, $q_T$ calls to $\QRYO$, $q_U$ calls to $\UPO$, and $q_H$ calls
-to~$\HASHO$ in the ROM. (similarly for \erreps.) We sometimes use \errep1 to
-refer to the restriction of the \errep\ game to the case of $q_R = 1$, and
-define $\Adv{\errep1}_{\struct,\delta,r}(t,q_T,q_U,q_H) = \Adv{\errep}_{\struct,\delta,r}(t,1,q_T,q_U,q_H)$
+to~$\HASHO$ in the ROM. We define advantage similarly for \erreps\ except that
+we add an extra parameter $q_V$ representing the number of calls to $\REVO$. We
+sometimes use \errep1 or \erreps1 to refer to the restriction of the \errep\ or
+\erreps\ games to the case of $q_R = 1$, and define
+$\Adv{\errep1}_{\struct,\delta,r}(t,q_T,q_U,q_H) = \Adv{\errep}_{\struct,\delta,r}(t,1,q_T,q_U,q_H)$
+and $\Adv{\erreps1}_{\struct,\delta,r}(t,q_T,q_U,q_H) = \Adv{\erreps}_{\struct,\delta,r}(t,1,q_T,q_U,q_H)$
 for convenience.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -130,7 +133,43 @@ generic relationships. So far I've counted:
 
 \todo{DC}{State all relations as lemmas.}
 
-\heading{Keyed structures.}
+Here we state several basic results that hold for general data structures. In
+each case the proofs follow in a straightforward manner from the definitions.
+
+\begin{lemma}[\errep\ implies \erreps]\label{thm:errep-to-erreps}
+  For every structure~$\Gamma$ and error function $\delta$ and any parameters
+  $q_R, q_T, q_U, q_H, r, t \geq 0$, it holds that
+  \begin{eqnarray*}
+    \begin{aligned}
+      \Adv{\erreps}_{\Gamma,\delta,r}(t, q_R, q_T, q_U, q_H, q_V) &\leq \\
+      & \Adv{\errep}_{\Gamma,\delta,r}(t, q_R, q_T, q_U, q_H) \,,
+    \end{aligned}
+  \end{eqnarray*}
+  where $f(t) = t + (q_R-1)\ticks(\Rep,t) + q_T\ticks(\Qry,t) + q_U\ticks(\Up,t)$.
+\end{lemma}
+
+\begin{proof}
+Given an adversary $\advA$ for the \erreps\ game, we construct an adversary
+$\advB$ for \errep\ that obtains at least the same advantage. At the beginning
+of the experiment, $\advB$ initializes a list $L$ and integer $ct = 0$. It then
+begins simulating $\advA$, answering its oracle queries as follows. Whenever
+$\advA$ makes a $\REPO(\col)$ call, $\advB$ increments $ct$ and forwards the
+request to its own oracle, setting $L[ct] \getsr \REPO(\col)$ and returning
+$\top$ to $\advA$. Similarly, when $\advA$ makes an $\UPO(i,\up)$ call, $\advB$
+sets $L[i] \getsr \UPO(i,\up)$ and returns $\top$. Any $\QRYO(i,\qry)$ calls
+made by $\advA$ are directly forwarded to $\advB$'s own $\QRYO$ oracle, with the
+response returned to $\advA$. Finally, when $\advA$ makes a $\REVO(i)$ call,
+$\advB$ returns $L[i]$. When $\advA$ halts and returns $i$, $\advB$ does the
+same. Since $\advB$ knows the actual representations at all times, it is able
+to perfectly simulate the $\REVO$ oracle, and since all other oracle queries are
+handled by forwarding to $\advB$'s oracle, the simulation of $\advA$ is perfect.
+Then, because $\advB$ produces the exact same representations and makes the
+exact same queries that $\advA$ does and produces the same final output, $\advB$
+wins whenever $\advA$ wins.
+\end{proof}
+
+\ignore{
+\heading{Keyed structures}
 \cpnote{I'm not clear on what this means.}
 %
 As in the keyless case, we can reduce the case of \erreps\ for a secretly-keyed
@@ -267,182 +306,4 @@ adversaries' advantages are equal.
 \todo{DC}{Fix extra QED everywhere it appers.}
 \missingqed
 \end{proof}
-
-%\subsection{Immutabilization}
-
-%We say that a structure has `independent representations' if knowing the
-%representation of one set does not provide any additional information about the
-%representation of any other set. More formally, $\Pi$ has independent
-%representations if $\Prob{\Rep_K(\col) = \pub | \Rep_K(\col')}$
-
-%For example, the standard Bloom filter vacuously has independent
-%representations, since the adversary can perfectly predict the representation
-%of any set without needing to see the representation of other sets. A filter
-%which uses true random sampling in place of hash functions also has independent
-%representations, but a filter which uses a secret key need not have independent
-%representations.
-
-%In each of our example structures involving the use of a secret key, we
-%formalize the system using a pseudorandom function. In each correctness proof,
-%the first thing we do is always moving to a game where the pseudorandom
-%functions are replaced by true random functions, since this gives very similar
-%adversarial advantage (assuming the use of a good prf) while making the
-%behavior of the game much easier to reason about.
-
-%In the case of a structure with sufficiently `independent' representations, we
-%may assume without loss of generality that the adversary never calls the
-%$\REVO$ oracle, since doing so can only decrease their probability of success.
-
-%Note that most of the data structures we consider have some degree of
-%per-representation randomness, such as a salt chosen for hash functions. We
-%consider an alternate correctness game that forces this randomness to behave
-%the same across all representations constructed. In particular, any
-%randomly-chosen parameters which would be chosen during the computation of
-%$\REPO$ are selected at the beginning of the game, using the same random
-%distribution, before the adversary makes any oracle queries. The $\REPO$ oracle
-%then uses this fixed value for any random parameters in place of sampling a new
-%random value.
-
-%\begin{lemma}[]\label{lemma:immutabletomutable} Let $\struct = (\Rep, \Qry,
-%\Up)$ be a data structure, and $\struct'$ be the same structure except that any
-%per-representation random parameters are chosen once and fixed across
-%representations. For every $t, q_r, q_T, q_U, q_H, q_V, r \geq 0$, it holds
-%that \[ \Adv{\errep}_{\struct,\delta,r}(t, q_R, q_T, q_U, q_H, q_V) \leq
-%\Adv{\prf}_F(\advB) + \Adv{\errep}_{\struct',r}(O(t), q_R + q_U, q_T, 0, q_H,
-%0) \,, \] \end{lemma} \begin{proof} Given an adversary $\advA$ making queries
-%$(q_R, q_U, q_T, q_H)$, we can construct $\advB$ making queries $(q_R+q_U, 0,
-%q_T, q_H)$ which achieves the same advantage.
-
-%For a structure $\Pi$, we denote by $\Pi'$ the same structure with
-%pseudo-random functions replaced by true-random functions. Using conditional
-%probabilities, we have $\Adv{\errep}_{\struct,\delta,r}(\advA) \le \Adv{\prf}_F(\advB)
-%+ \Adv{\errep}_{\struct_1,r}(\advA)$.
-
-%In the truly random structure $\struct_1$, the representation of a set is
-%simply a randomly-chosen valid representation of that set. Revealing this
-%therefore reveals no new information about any other representations which have
-%been constructed, and so calling $\REVO$ can only decrease an adversary's
-%chance of success. We may now assume $\REVO$ is never called.
-
-%We next modify the structure to $\struct_2$, where all randomized parameters
-%are fixed across representations at the beginning of the experiment, but not
-%revealed to the adversary. We create an adversary $C$ for the correctness
-%experiment on $\struct_2$ which simulates $\advA$ as follows. The adversary $C$
-%keeps track of a counter $ct$ and list $L$ of indices and simulates $\advA$.
-%When $\advA$ calls $\REPO$, $C$ appends $ct$ to the end of $L$ and then
-%increments $ct$. When $\advA$ calls $\UPO(i,\up)$, $C$ calls
-%$\REPO(\up(\col_{I(i)}))$, sets $L(i) \gets ct$, and increments $ct$. Finally,
-%when $\advA$ calls $\QRYO(i,\qry)$, $C$ calls $\QRYO(L(i),\qry)$. Since $\REVO$
-%is never called, $C$ need not implement this oracle. Since all queries are
-%called on representations of the same sets, $C$ has the same probability of
-%success as $A$.  \end{proof}
-
-%If we raise the threshold for what counts as an error, it can only become more
-%difficult for the adversary to succeed, so in fact all error functions of the
-%form $\delta(x,y) = [|x - y| > c]$ for some constant $c$ also have this upper
-%bound.
-
-%Another obvious alternative is to simply use the Euclidean distance metric, so
-%that $\delta(x,y) = |x - y|$. Using this notion of error in fact turns out to
-%be at least as good for the adversary as the binary error metric. Any attack in
-%the correctness experiment with error function $d'(x,y) = [|x - y| \ge 1]$ and
-%$r' = r$ performs at least as well against a count-min sketch with error
-%function $\delta(x,y) = |x - y|$. Similarly, any attack in the game with error
-%function $d'(x,y) = [x - y > 2]$ and $r' = r/2$ performs at least as well in
-%the game with error function $\delta(x,y) = |x - y|$, and so on for any other
-%binary error function which gives some fixed credit for finding an error which
-%is off from the correct value by at least some minimum constant value. This
-%means that, if $d$ is the Euclidean distance error function and $d_k'$ is the
-%binary function $d_c'(x,y) = [|x - y| \ge c]$, we have
-%$\Adv{\erreps}_{\struct_s,r,d}(t, q_R, q_T, q_U, q_H) \le
-%\Adv{\erreps}_{\struct_s,r/c,d'}(t, q_R, q_T, q_U, q_H)$.
-
-%In fact, not only is the advantage for the Euclidean metric game bounded below
-%by that of the binary-error-function game, the bound is in some cases strict.
-%The fact that the Euclidean error function allows for unboundedly large errors
-%to be produced by a single query provides the adversary with new possible
-%attacks. For example, the adversary can pick a set $\col$ of size $\frac{n}{r}$
-%and use $\REPO$ to create a sketch containing each element of $\col$ exactly
-%$r$ times. They then use select several values $x \not\in \col$ and use $\QRYO$
-%to test each $x$'s membership in the representation. A single such mistake is
-%by definition sufficient for the adversary to win the experiment, so the
-%probability of adversarial victory is the same as the probability of an
-%adversary finding a single element that creates a hash collision in each of the
-%$k$ rows of the sketch. Each of the rows acts as a Bloom filter with a single
-%hash function, so the probability of a collision within a single row is on the
-%order of $(1-e^{-n/(rm)})$, and the probability of such a collision in each of
-%$k$ rows is $(1-e^{-n/(rm)})^k$. Over the course of $q_T$ calls to $\QRYO$, the
-%adversarial advantage is the probability that they find a collision in each row
-%for any value of $x$ tested, which is $1-(1-(1-e^{-n/(rm)})^k)^{q_T}$. When
-%$q_T$ is large but the other resource constraints are small, this may exceed
-%the bound for the binary error function given in the theorem above. For
-%example, if $k = 4$, $m = 1024$, $n = 100$, $r = 4$, $q_T = $, $q_R = 1$, and
-%$q_U = q_H = 0$, we find that the bound for the binary error function is _
-%while the advantage of this attack is about $3.4 \cdot 10^{-4}$.
-
-%
-
-%Depending on the choice of $d$, it is possible no such $c$ exists. One natural
-%choice of $d$ is the Euclidean metric, with $\delta(x,y) = |x-y|$, but an
-%alternative is to simply define $\delta(x,y)$ to be 1 if $|x-y| \ge n\epsilon$
-%and 0 otherwise, where $n$ is the maximum allowed stream size and $\epsilon$ is
-%one of the error parameters. The non-adaptive guarantee for count-min sketch is
-%that each point query has probability no more than $1-\delta$ of producing an
-%error.
-
-%What if the threshold for an error is 1? In other words, the adversary gets a
-%point for every `false positive'. Assuming the hash functions are independent,
-%the false positive probability in a count-min sketch is the same as the
-%probability of getting simultaneous false positives in each of $k$ Bloom
-%filters using a single hash function each, which is
-%$\left(1-e^{-n/m}\right)^k$.
-
-% Note that if there is a linear error function rather than a binary threshold,
-% it becomes even easier for the adversary to produce errors. After all,
-% anything that produces an error in the binary case will also produce an error
-% in the linear case, with the only difference being that the adversary may be
-% able to make the error even worse and get even more `credit' for it later on.
-% This means we have a linear ordering of correctness bounds, with
-% linear-error-function count-min sketches below binary-error-function count-min
-% sketches, which in turn are below counting filters.
-
-%Given that there is a binary error threshold, we can assume without loss of
-%generality that the adversary never adds an element multiple times, since doing
-%so cannot cause additional errors.
-
-% the adversary can: query for a previously-tested element, query for an
-% untested element, insert an unknown element, insert a known correct element,
-% insert a known overestimated element, insert a known underestimated element,
-% delete an unknown element, delete a known correct element, delete a known
-% overestimated element, or delete a known underestimated element
-
-% inserting an unknown element can increase the number of overestimated
-% elements, and can increase the amount they are overestimated by; it can also
-% decrease the number of underestimaged elements, and can decrease the amount
-% they are underestimated by; it does not affect the estimate of the inserted
-% element inserting a known correct element does the same thing, and also does
-% not affect the estimate of the inserted element, so this is equivalent to
-% inserting an unknown element
-
-% inserting any element can increase the number of overestimated elements, and
-% can increase the amount they are overestimated by; it can also decrease the
-% number of underestimaged elements, and can decrease the amount they are
-% underestimated by; it does not affect the estimate of the inserted element;
-% the estimate of the element itself remains unchanged the opposite is true for
-% deletion there is no upper bound on the number of errors that can be caused by
-% a single insertion or deletion(!) in particular, deleting an element
-% immediately causes all otherwise-correct elements that overlap at any point to
-% become off by 1 (too low)
-
-% provide the same $\INTO$ as for a counting filter
-
-%Getting rid of the $q_R$ bound in the salted private-representation case...
-
-%We need a salt, since otherwise the adversary can ask for two representations
-%and reveal one to see what the other looks like.
-
-%In fact, we need independent random representations. Once we have this, seeing
-%representations does not help the adversary. What benefit can there be, then?
-%Suppose an adversary wants to select for representations with certain
-%properties, and ignore others. Since the representation is private, these
-%properties can only be determined by $\QRYO$ calls.
+}
