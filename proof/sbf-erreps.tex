@@ -1,4 +1,100 @@
 \begin{figure*}
+\threeColsOneDivideUnbalanced{0.40}{0.27}{0.27}
+{
+  \vspace{-7pt}
+  \experimentv{$\game_{0}(\advB)$}
+      \hfill \diffplus{$\game_1$}\\[2pt]
+    $M^* \gets \bot$;
+    $\salt^* \getsr \bits^\lambda$\\
+    $\advB^{\REPO,\QRYO,\UPO,\HASHO_1}$;
+    return $\big[\sum_x \err[x] \geq r\big]$
+  \\[6pt]
+  \oraclev{$\REPO(\col)$}\\[2pt]
+    $M^* \gets \bigvee_{x \in \col} \bmap_m(\HASHO_2(\salt^* \cat x))$;
+    $\setS^* \gets \col$;
+    return $\top$
+  \\[6pt]
+  \oraclev{$\QRYO(\qry_x)$}\\[2pt]
+    $X \gets \bmap_m(\HASHO_3(\salt^* \cat x))$;
+    $a \gets X = M^* \AND X$\\
+    if $\err[x] < \delta(a,\qry_x(\col^*))$ then
+          $\err[x] \gets \delta(a,\qry_x(\col^*))$\\
+    return $a$
+  \\[6pt]
+  \oraclev{$\UPO(\up_x)$}\\[2pt]
+    $M^* \gets M^* \vee \bmap_m(\HASHO_2(\salt^* \cat x))$;
+    $\setS^* \gets \up_x(\setS)$;
+    return $\top$
+  \\[6pt]
+  \oraclev{$\HASHO_c(\salt \cat x)$}\\[2pt]
+    $\vv \getsr [m]^k$\\
+    if $\salt=\salt^*$ and $c = 1$ then \com{Caller is~$\advB$}\\
+    \tab $\bad_1 \gets 1$; \diffplus{return $\vv$}\\
+    if $T[Z,x] = \bot$ then $\vv \gets T[Z,z]$\\
+    $T[Z,x] \gets \vv$; return $\vv$
+}
+{
+  \vspace{-2pt}
+  \oraclev{$\HASHO_c(\salt \cat x)$}\\[2pt]
+    $\vv \getsr [m]^k$\\
+    if $M^*=\bot$ and $\salt=\salt^*$ and $c=1$ then\\
+    \tab $\bad_1 \gets 1$; return $\vv$\\
+    if $T[Z,x] = \bot$ then $\vv \gets T[Z,z]$\\
+    $T[Z,x] \gets \vv$\\[2pt]
+    \diffplusbox{
+    \com{Caller is~$\advB$ or $\QRYO$}\\
+    if $c = 1$ or $c = 3$ then\\
+    \tab if $\salt \ne \salt^*$  then return $\vv$\\
+    \tab $\Ans[x] \gets \bmap_m(\vv) = M^* \AND \bmap_m(\vv)$\\
+    \tab if $\err[x] < \delta(\Ans[x],\qry_x(\col^*))$ then
+    \tab\tab $\err[x] \gets \delta(\Ans[x],\qry_x(\col^*))$
+    }
+    return $\vv$
+}
+{
+  \vspace{-7pt}
+  \oraclev{$\QRYO(\qry_x)$}\
+      \hfill \diffminus{$\game_1$} \diffplus{$\game_2$}\\[2pt]
+    \diffminusbox{%
+      $X \gets \bmap_m(\HASHO_3(\salt^* \cat x))$\\
+      $a \gets X = M^* \AND X$\\
+      if $\err[x] < \delta(a,\qry_x(\col^*))$ then\\
+      \tab $\err[x] \gets \delta(a,\qry_x(\col^*))$
+    }\\[2pt]
+    \diffplusbox{
+      $\HASHO_3(Z^* \cat x)$\\
+      $a \gets \Ans[x]$
+    }
+    return $a$
+}
+\caption{Games 0, 1, and 2 for proof of Theorem~\ref{thm:sbf-errep-priv}.}
+\label{fig:sbf-errep-immutable/games}
+\end{figure*}
+
+This proof follows a similar structure to the previous one. The primary distinction is that in the final game, unless the adversary `gets lucky' and guesses the salt, they should only be able to produce errors with $q_T$ queries, as opposed to both $q_T$ and $q_H$ queries.
+%
+Just as in the proof of Theorem~\ref{thm:sbf-errep-immutable}, we will assume the adversary just makes a single call to $\REPO$ and use Lemma~\ref{thm:lemma1} to complete the bound. Let $\advA$ be an \erreps\ adversary making exactly 1 call to $\REPO$, $q_T$ calls to $\QRYO$, $q_U$ calls to $\UPO$, and $q_H$ calls to $\HASHO$. Because $\advA$ creates only a single representation, it will necessarily lose if it calls $\REVO$ on that representation. We may therefore assume without loss of generality that $\advA$ makes no calls to $\REVO$, and because of this we omit $\REVO$ from each of the games.
+
+We begin with a game~$\game_0(\advB)$ similar to the previous proof, as shown in Figure~\ref{fig:sbf-errep-immutable/games}. Again we observe that for every~$\advA$ there exists a~$\advB$  such that
+\begin{equation}
+  \Adv{\errep}_{\Pi,\delta,r}(\advA) \leq \Prob{\game_0(\advB) = 1}
+\end{equation}
+and~$\advB$ has the same query resources as~$\advA$.
+
+Since we are seeking a stronger bound, we now wish to isolate the possibility that the adversary \emph{ever} guesses the salt, as opposed to just guessing the salt before calling $\REPO$. This is no longer a trivial task for the adversary because the representations are private, and so $\REPO$ does not directly reveal the salt. We therefore set the~$\bad_1$ flag whenever the adversary manages to guess the salt, without the requirement that $M^* = \bot$. However, since the adversary is still limited to a total of $q_H$ $\HASHO$ queries, regardless of when the queries are made, we can follow nearly the same argument as in the previous proof to get the bound
+%
+\begin{eqnarray}
+  \Prob{\game_0(\advB)=1} &\leq&
+    \Prob{\game_1(\advB)=1} + \Prob{\game_1(\advB) \sets \bad_1}\\
+  &\leq&
+    \Prob{\game_1(\advB)=1} + q_H/2^\lambda \,.
+\end{eqnarray}
+%
+
+
+
+\ignore{
+\begin{figure*}
   \cpnote{I suggest re-doing this from scratch. The security experiment
   (\erreps) has changed and so has the construction. $\Repx$ and $\fff$ are not
   defined. Where's the $\REVO$ oracle?}
@@ -242,4 +338,4 @@ the binomial theorem gives an advantage bound of $\Prob{\game_3(\advB) = 1} \leq
 %
 \cpnote{What about~$q_H$?}
 
-\todo{DC (lead)}{Finish the bound by applying Lemma~\ref{thm:lemma1}.}
+\todo{DC (lead)}{Finish the bound by applying Lemma~\ref{thm:lemma1}.}}
