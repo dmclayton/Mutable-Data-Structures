@@ -1,33 +1,113 @@
 \input{correctness-experiment}
 
-%We will measure error with the help of an error function $d: \mathcal{R}^2 \to [0,\infty)$, which may depend on the application rather than being given by the specification of a data structure alone. The value $d(x,y)$ represents the `badness' of getting an erroneous result of $x$ from $\Qry$ when $y$ should actually have been returned. In general we require $d(x,x) = 0$, but otherwise place no restrictions on what the error function might look like.
+%We will measure error with the help of an error function $d: \mathcal{R}^2 \to
+%[0,\infty)$, which may depend on the application rather than being given by the
+%specification of a data structure alone. The value $d(x,y)$ represents the
+%`badness' of getting an erroneous result of $x$ from $\Qry$ when $y$ should
+%actually have been returned. In general we require $d(x,x) = 0$, but otherwise
+%place no restrictions on what the error function might look like.
 
-We define two adversarial notions of correctness given by a pair of related experiments for a mutable data structure $\struct$, error function $d: \mathcal{R}^2 \to [0,\infty)$, and error capacity $r$. The vales $d(x,y)$ of the error function represent the `badness' of getting an erroneous result of $x$ from $\Qry$ when $y$ should actually have been returned. In general we require $d(x,x) = 0$ for all $x$, but otherwise place no restrictions on what the error function might look like.
+We define two adversarial notions of correctness given by a pair of related
+experiments for a mutable data structure $\struct$, error function $d:
+\mathcal{R}^2 \to [0,\infty)$, and error capacity $r$. The vales $d(x,y)$ of the
+error function represent the `badness' of getting an erroneous result of $x$
+from $\Qry$ when $y$ should actually have been returned. In general we require
+$d(x,x) = 0$ for all $x$, but otherwise place no restrictions on what the error
+function might look like.
 
-The two correctness notions correspond to cases where the representations of the true data are public ($\errep$) and where they are private ($\erreps$). We will describe the former and then give a brief explanation of how the latter differs, as the two are closely related to each other.
+The two correctness notions correspond to cases where the representations of the
+true data are public ($\errep$) and where they are private ($\erreps$). We will
+describe the former and then give a brief explanation of how the latter differs,
+as the two are closely related to each other.
 
-While many potential errors may exist for a given representation of a set, in the form of queries $\qry$ that would return an inaccurate answer when sent to $\QRYO$, we want an experiment that forces the adversary to actually find specific erroneous queries. In particular, we only give the adersary credit when they actually make a $\QRYO$ call that produces an error.
+While many potential errors may exist for a given representation of a set, in
+the form of queries $\qry$ that would return an inaccurate answer when sent to
+$\QRYO$, we want an experiment that forces the adversary to actually find
+specific erroneous queries. In particular, we only give the adersary credit when
+they actually make a $\QRYO$ call that produces an error.
 
-Both experiments aim to capture the total weight of the errors caused by the adversary, at any point in time, with respect to the current data objects $\col_i$ and their representations $\pub_i$.  Because we consider mutable data objects and representations, the notion of ``current'' is defined by calls to the $\REPO$ and $\UPO$ oracles.  Specifically, for each~$\col_i$, both experiments maintain a set~$\setC_i$ that is initially set to empty (when~$\col_i$ is first assigned via a~$\REPO$-query), and it is reset to empty whenever~$\col_i$ is updated via an $\UPO$-query.  This is capturing the fact that applying a non-empty update function~$\up$ to~$\col_i$ produces a new data object.
+Both experiments aim to capture the total weight of the errors caused by the
+adversary, at any point in time, with respect to the current data objects
+$\col_i$ and their representations $\pub_i$.  Because we consider mutable data
+objects and representations, the notion of ``current'' is defined by calls to
+the $\REPO$ and $\UPO$ oracles.  Specifically, for each~$\col_i$, both
+experiments maintain a set~$\setC_i$ that is initially set to empty
+(when~$\col_i$ is first assigned via a~$\REPO$-query), and it is reset to empty
+whenever~$\col_i$ is updated via an $\UPO$-query.  This is capturing the fact
+that applying a non-empty update function~$\up$ to~$\col_i$ produces a new data
+object.
 
-To track errors, both experiments maintain an array $\err_i[]$ for every data object~$\col_i$ that has been defined.   Initially, $\err_i[]$ is implicitly assigned the value of~$\undefn$ at every index.  For purposes of value comparison, we adopt the convention that $\undefn < n$ for all $n \in \mathbb{R}$.
+To track errors, both experiments maintain an array $\err_i[]$ for every data
+object~$\col_i$ that has been defined.   Initially, $\err_i[]$ is implicitly
+assigned the value of~$\undefn$ at every index.  For purposes of value
+comparison, we adopt the convention that $\undefn < n$ for all $n \in
+\mathbb{R}$.
 %
-Now, the array~$\err_i$ is indexed by query functions~$\qry$, and the value of $\err_i[\qry]$ is the ``weight'' of the error caused by~$\qry$, with respect to the \emph{current} data object~$\col_i$ and \emph{current} representation~$\pub_i$ (of~$\col_i$).  
+Now, the array~$\err_i$ is indexed by query functions~$\qry$, and the value of
+$\err_i[\qry]$ is the ``weight'' of the error caused by~$\qry$, with respect to
+the \emph{current} data object~$\col_i$ and \emph{current}
+representation~$\pub_i$ (of~$\col_i$).
 %
-The value of~$\err_i[\qry]$ is updated within the $\QRYO$- and $\UPO$-oracles, but observe that $\err_i[\qry] = \undefn$ until $(i,\qry)$ is queried to the $\QRYO$-oracle.  Intuitively, a representation~$\pub_i$ of data object~$\col_i$ cannot surface errors until it is queried.
+The value of~$\err_i[\qry]$ is updated within the $\QRYO$- and $\UPO$-oracles,
+but observe that $\err_i[\qry] = \undefn$ until $(i,\qry)$ is queried to the
+$\QRYO$-oracle.  Intuitively, a representation~$\pub_i$ of data object~$\col_i$
+cannot surface errors until it is queried.
 
-When~$\QRYO(i,\qry)$ executes, the value in $\err_i[\qry]$ is overwritten iff the error caused by~$\qry$ is larger than the existing value of $\err_i[\qry]$.  The first time $(i,\qry)$ is queried to~$\QRYO$ this is guaranteed, since the minimum possible value of $d$ is 0.  Since the set $\setC_i$ is used to prevent (WLOG) the adversary from repeating a query~$\QRYO(i,\qry)$ for a given~$\col_i$, increases to the value of $\err_i[\qry]$ may only be made ``across'' updates to~$\col_i$.  This may seem to be overly conservative, as an error-heavy~$\col_i$ may become less so after an update.  But we account for this within the $\UPO$-oracle.
-In particular, calls to the $\UPO$-oracle may only \emph{decrease} the value of~$\err_i[\qry]$.  
+When~$\QRYO(i,\qry)$ executes, the value in $\err_i[\qry]$ is overwritten iff
+the error caused by~$\qry$ is larger than the existing value of $\err_i[\qry]$.
+The first time $(i,\qry)$ is queried to~$\QRYO$ this is guaranteed, since the
+minimum possible value of $d$ is 0.  Since the set $\setC_i$ is used to prevent
+(WLOG) the adversary from repeating a query~$\QRYO(i,\qry)$ for a
+given~$\col_i$, increases to the value of $\err_i[\qry]$ may only be made
+``across'' updates to~$\col_i$.  This may seem to be overly conservative, as an
+error-heavy~$\col_i$ may become less so after an update.  But we account for
+this within the $\UPO$-oracle.  In particular, calls to the $\UPO$-oracle may
+only \emph{decrease} the value of~$\err_i[\qry]$.
 
-When a query $\UPO(i,\up)$ is made, the oracle first updates the data object~$\col_i$ and its corresponding representation.  The set~$\setC_i$ is reset to empty, because the data object~$\col_i$ is ``new'' again.
+When a query $\UPO(i,\up)$ is made, the oracle first updates the data
+object~$\col_i$ and its corresponding representation.  The set~$\setC_i$ is
+reset to empty, because the data object~$\col_i$ is ``new'' again.
 %
-Now, for each defined value~$\err_i[\qry]$, we reevaluate the error that \emph{would} be caused by the previously asked~$\qry$ w.r.t. the newly updated $\col_i$ and $\pub_i$.  If the existing value of $\err_i[\qry]$ is larger than the error that~$\qry$ would cause to w.r.t. the newly updated~$\col_i$ and $\pub_i$, then we overwrite $\err_i[\qry]$ with the smaller value.  Doing so insures that the array~$\err_i$ does not overcredit the attacker for errors against the current data object and representation.
+Now, for each defined value~$\err_i[\qry]$, we reevaluate the error that
+\emph{would} be caused by the previously asked~$\qry$ w.r.t. the newly updated
+$\col_i$ and $\pub_i$.  If the existing value of $\err_i[\qry]$ is larger than
+the error that~$\qry$ would cause to w.r.t. the newly updated~$\col_i$ and
+$\pub_i$, then we overwrite $\err_i[\qry]$ with the smaller value.  Doing so
+insures that the array~$\err_i$ does not overcredit the attacker for errors
+against the current data object and representation.
 
-For a concrete example of why these choices are necessary, consider a representation~$\pub$ of the set~$\col = \{1,2,3\}$ in some structure that supports set membership queries. Suppose an adversary learns that~$4$ is a false-positive value for $\pub$. If the adversary later uses an $\UPO$ query to add~$4$ to~$\col$, this should no longer count as a false positive. Our definition ensures that these known false positives are checked for and no longer counted if added to the set.
+For a concrete example of why these choices are necessary, consider a
+representation~$\pub$ of the set~$\col = \{1,2,3\}$ in some structure that
+supports set membership queries. Suppose an adversary learns that~$4$ is a
+false-positive value for $\pub$. If the adversary later uses an $\UPO$ query to
+add~$4$ to~$\col$, this should no longer count as a false positive. Our
+definition ensures that these known false positives are checked for and no
+longer counted if added to the set.
 
-The private-representation case differs from the public-representation case only in that the $\REPO$ and $\UPO$ oracles do not reveal the representation to the adversary. This models the case where the data structure is stored privately, where the adversary can ask queries but not see the full representation. To model the possibility that information about a representation is eventually leaked, we also give the adversary a $\REVO$ oracle that reveals a given representation. However, to prevent this from being trivially equivalent to the public-representation case we do not allow the adversary to win by finding errors in a representation which has been revealed using $\REVO$. However, security in the private-representation case is implied by security in the public-representation case, since any attack in the private-representation setting also works in the public-representation setting.
+The private-representation case differs from the public-representation case only
+in that the $\REPO$ and $\UPO$ oracles do not reveal the representation to the
+adversary. This models the case where the data structure is stored privately,
+where the adversary can ask queries but not see the full representation. To
+model the possibility that information about a representation is eventually
+leaked, we also give the adversary a $\REVO$ oracle that reveals a given
+representation. However, to prevent this from being trivially equivalent to the
+public-representation case we do not allow the adversary to win by finding
+errors in a representation which has been revealed using $\REVO$. However,
+security in the private-representation case is implied by security in the
+public-representation case, since any attack in the private-representation
+setting also works in the public-representation setting.
 
-Given the experiments defined here, we define the advantage of an adversary $\advA$ as the probability it succeeds at the experiment, i.e. $\Adv{\errep}_{\struct,r}(\advA) = \Prob{\Exp{\errep}_{\struct,r}(\advA) = 1}$ in the public-representation case and $\Adv{\erreps}_{\struct,r}(\advA) = \Prob{\Exp{\erreps}_{\struct,r}(\advA) = 1}$ in the private-representation case. For constants $t$, $q_R$, $q_T$, $q_U$, $q_H$, we define $\Adv{\errep}_{\struct,r}(t,q_R,q_T,q_U,q_H)$ to be the maximum advantage attained by an adversary running in $t$ time steps and making $q_R$ calls to $\REPO$, $q_T$ calls to $\QRYO$, $q_U$ calls to $\UPO$, and $q_H$ calls to a random oracle. The advantage is defined analagously in the private-representation setting.
+Given the experiments defined here, we define the advantage of an adversary
+$\advA$ as the probability it succeeds at the experiment, i.e.
+$\Adv{\errep}_{\struct,r}(\advA) = \Prob{\Exp{\errep}_{\struct,r}(\advA) = 1}$
+in the public-representation case and $\Adv{\erreps}_{\struct,r}(\advA) =
+\Prob{\Exp{\erreps}_{\struct,r}(\advA) = 1}$ in the private-representation case.
+For constants $t$, $q_R$, $q_T$, $q_U$, $q_H$, we define
+$\Adv{\errep}_{\struct,r}(t,q_R,q_T,q_U,q_H)$ to be the maximum advantage
+attained by an adversary running in $t$ time steps and making $q_R$ calls to
+$\REPO$, $q_T$ calls to $\QRYO$, $q_U$ calls to $\UPO$, and $q_H$ calls to a
+random oracle. The advantage is defined analagously in the
+private-representation setting.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{Generic results}

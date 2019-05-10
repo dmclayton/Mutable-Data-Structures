@@ -1,14 +1,15 @@
 \begin{figure*}[t]
-  \fourColsOneDivide{0.25}{.2}{.275}{.25}
-  {
-     \raisebox{-5pt}{\experimentv{$\Exp{\errep}_{\struct,d,r}(\advA)$ {\colorbox{lightgray}{$\Exp{\erreps}_{\struct,r}(\advA)$}}}}\\[2pt]
-      $\setP \gets \emptyset$\\
-      $\ct \gets 0$ \\
-      $\key \getsr \keys$\\
-      $i \getsr \advA^{\REPO,\UPO,\QRYO\highlighto{,\REVO}}$\\
-      \colorbox{lightgray}{if $i \in \setP$ then return 0} \\[2.0pt]
-      return $[\sum_\qry \err_i[\qry] \geq r]$ 
- }
+\fourColsNoDivide{0.25}{.2}{.275}{.25}
+{
+  \raisebox{-5pt}{\experimentv{$\Exp{\errep}_{\struct,\delta,r}(\advA)$
+          \diffminus{$\Exp{\erreps}_{\struct,\delta,r}(\advA)$}}}\\[2pt]
+    $\setP \gets \emptyset$\\
+    $\ct \gets 0$ \\
+    $\key \getsr \keys$\\
+    $i \getsr \advA^{\REPO,\UPO,\QRYO\highlighto{,\REVO}}$\\
+    \colorbox{lightgray}{if $i \in \setP$ then return 0} \\[2.0pt]
+    return $[\sum_\qry \err_i[\qry] \geq r]$ 
+}
 {
     \oraclev{$\REPO(\col)$}\\[2pt]
       $\pub \getsr \Rep_\key(\col)$\\

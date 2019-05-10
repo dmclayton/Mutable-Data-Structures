@@ -307,6 +307,27 @@
   \end{tabular}
   }
 }
+\newcommand{\fourColsNoDivide}[8]{
+  \makebox[\textwidth][c]{
+    \begin{tabular}{|@{\gamespadleft}l@{\gamespad}@{}@{\gamespad}l@{\gamespad}@{}@{\gamespad}l@{\gamespad}@{}@{\gamespad}l@{\gamespad}|}
+    \hline
+    \rule{0pt}{1\normalbaselineskip}
+    \begin{minipage}[t]{#1\textwidth}\gamesfontsize
+      #5 \vspace{6pt}
+    \end{minipage} &
+    \begin{minipage}[t]{#2\textwidth}\gamesfontsize
+      #6 \vspace{6pt}
+    \end{minipage} &
+    \begin{minipage}[t]{#3\textwidth}\gamesfontsize
+      #7\vspace{6pt}
+    \end{minipage} &
+    \begin{minipage}[t]{#4\textwidth}\gamesfontsize
+      #8\vspace{6pt}
+    \end{minipage}\\
+    \hline
+  \end{tabular}
+  }
+}
 
 \newcommand{\fourColsOneDivide}[8]{
   \makebox[\textwidth][c]{
