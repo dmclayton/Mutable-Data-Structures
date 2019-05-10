@@ -34,7 +34,6 @@
     if $\pub = \bot$ return $\bot$\\
     $\col_i \gets \up(\col_i)$\\
     $\pub_i \gets \pub$\\
-    %$\setC_i \gets \emptyset$\\
     for $\qry$ in $\err_i$ do\\
     \tab $a \gets \Qry_K(\pub_i, \qry)$\\
     \tab if $\err_i[\qry] > \delta(a,\qry(\col_i))$ then\\
@@ -44,9 +43,6 @@
 }
 {
   \oraclev{$\QRYO(i, \qry)$}\\[2pt]
-    \cpnote{$\setC_i$ undefined and not used anywhere}\\
-    if $\qry \in \setC_i$ then return $\bot$\\
-    %$\setC_i \gets \setC \union \{\qry\}$\\
     $a \gets \Qry_K(\pub_i, \qry)$\\
     if $\err_i[\qry] < \delta(a,\qry(\col_i))$ then\\
     \tab$\err_i[\qry] \gets \delta(a,\qry(\col_i))$\\
