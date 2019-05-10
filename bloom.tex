@@ -284,7 +284,8 @@ and for $q = q_T + q_H$, if $r > pq$, then it holds that
   \begin{equation*}
     \begin{aligned}
             \Adv{\errep}_{\Pi,\delta,r}(t,\,&q_R,q_T,0,q_H) \leq \\
-        & q_R \cdot \left(\frac{q_H}{2^\lambda} + \left(\frac{pq}{r}\right)^re^{r-pq}\right) \,,
+        & q_R \cdot \left[\frac{q_H}{2^\lambda} +
+        \left(\frac{pq}{r}\right)^re^{r-pq}\right] \,,
     \end{aligned}
   \end{equation*}
   where $H$ is modeled as a random oracle.  %
@@ -300,12 +301,42 @@ This bound can be broken down into three main components. The external $q_R$
 term means that the security guarantee will be weak in the case that the
 adversary is able to view a large number of representations. The $q_H/2^\lambda$
 term corresponds to the probability of the adversary guessing the salt before
-the representation is constructed, but this will be small as long as $\lambda$
-is chosen to be sufficiently large. The final, messier term comes from applying
-a Chernoff bound to the non-adaptive adversary's probability of succeeding in
-the experiment given $q_H+q_T$ guesses. The Chernoff bound is reasonably tight,
-but unfortunately in practice the term $q_H$ may be very large, since it
-represents the adversary's ability to perform offline hash computations.
+the representation is constructed, but this will be negligibleas long as
+$\lambda$ is chosen to be sufficiently large (say, $\lambda=128$). The final,
+messier term comes from applying a Chernoff bound to the non-adaptive
+adversary's probability of succeeding in the experiment given $q = q_H+q_T$
+guesses.
+
+By way of clarifying the performance of our bound, we have plotted the last
+component for various parameters of interest. Let
+%
+\begin{equation}
+  \zeta_{k,m,n}(q,r) = \left(\frac{pq}{r}\right)^re^{r-pq}
+\end{equation}
+%
+and refer to Figure~\ref{fig:bf-bound}. This shows values
+of~$\zeta_{k,m,n}(q,r)$ for varying~$m$ (filter length in kilobytes). What this
+plot shows that, for a given error capacity~$r$, once a certain filter-length
+threshold is reached, the $\zeta$ value decreases quite quickly. Moreover, the
+rate at which~$\zeta$ decreases scales quite nicely with the error capacity. For
+example, if one is willing to tolerate up to~$r=10$ false positives when for a
+single filter (i.e., $q_R=1$) representing $n=100$ elements, then picking a
+filter length of $3$ kilobytes is sufficient to ensure that observing~$10$ false
+positives occurs with probability less than $2^{-17}$, even when the adversary
+can make~$2^{64}$ RO queries.
+
+
+\begin{figure}
+  \hspace*{-10pt}
+  \includegraphics{fig/bf-bound}
+  \vspace{-24pt}
+  \caption{
+    The value of $\zeta_{k,m,n}(q,r)$ for $q=2^{64}$, $k=16$, $n=100$, varying
+    values of~$r$ (one line per $r$-value) and filter length~$m$ (the x-axis).
+    Note the log-2 scale on the y-axis.
+  }
+  \label{fig:bf-bound}
+\end{figure}
 
 \begin{proof}[Proof of Theorem~\ref{thm:sbf-errep-immutable}]
   \input{proof/sbf-errep-immutable}
