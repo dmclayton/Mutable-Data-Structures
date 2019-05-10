@@ -34,15 +34,7 @@ Both experiments aim to capture the total \emph{weight} of the errors caused by 
 adversary, at any point in time, with respect to the current data objects
 $\col_i$ and their representations $\pub_i$.  Because we consider mutable data
 objects and representations, the notion of ``current'' is defined by calls to
-the $\REPO$ and $\UPO$ oracles.  Specifically, for each~$\col_i$, both
-experiments maintain a set~$\setC_i$ that is initially set to empty
-(when~$\col_i$ is first assigned via a~$\REPO$-query), and it is reset to empty
-whenever~$\col_i$ is updated via an $\UPO$-query.
-%
-\cpnote{This isn't true right now, since $setC_i$ is \textbf{undefined}.}
-%
-This is capturing the fact that applying a non-empty update function~$\up$
-to~$\col_i$ produces a new data object.
+the $\REPO$ and $\UPO$ oracles.
 
 To track errors, both experiments maintain an array $\err_i[]$ for every data
 object~$\col_i$ that has been defined.  Initially, $\err_i[]$ is implicitly
@@ -63,18 +55,13 @@ cannot surface errors until it is queried.
 When~$\QRYO(i,\qry)$ executes, the value in $\err_i[\qry]$ is overwritten iff
 the error caused by~$\qry$ is larger than the existing value of $\err_i[\qry]$.
 The first time $(i,\qry)$ is queried to~$\QRYO$ this is guaranteed, since the
-minimum possible value output by~$\delta$ is~$0$.  Since the set $\setC_i$
-\cpnote{\bf undefined}  is used to prevent (WLOG) the adversary from repeating a
-query~$\QRYO(i,\qry)$ for a given~$\col_i$, increases to the value of
-$\err_i[\qry]$ may only be made ``across'' updates to~$\col_i$.  This may seem
-to be overly conservative, as an error-heavy~$\col_i$ may become less so after
-an update.  But we account for this within the $\UPO$-oracle.  In particular,
-calls to the $\UPO$-oracle may only \emph{decrease} the value of~$\err_i[\qry]$.
+minimum possible value output by~$\delta$ is~$0$. After this, the adversary gets
+credit only for making a worse error than the one already found. This prevents
+the adversary from trivially winning by repeatedly sending the same
+error-producing query to $\QRYO$.
 
 When a query $\UPO(i,\up)$ is made, the oracle first updates the data
-object~$\col_i$ and its corresponding representation.  The set~$\setC_i$
-\cpnote{\bf undefined} is reset to empty, because the data object~$\col_i$ is
-``new'' again.
+object~$\col_i$ and its corresponding representation.
 %
 Now, for each defined value~$\err_i[\qry]$, we reevaluate the error that
 \emph{would} be caused by the previously asked~$\qry$ WRT the newly updated
@@ -122,12 +109,14 @@ We define the function
 $\Adv{\errep}_{\struct,\delta,r}(t,q_R,q_T,q_U,q_H)$ to be the maximum advantage
 attained by an adversary running in $t$ time steps and making $q_R$ calls to
 $\REPO$, $q_T$ calls to $\QRYO$, $q_U$ calls to $\UPO$, and $q_H$ calls
-to~$\HASHO$ in the ROM. (similarly for \erreps.)
-
-\todo{DC}{Define the $\Adv{\errep1}_{\struct,\delta,r}(\cdots)$ advantage function.}
+to~$\HASHO$ in the ROM. (similarly for \erreps.) We sometimes use \errep1 to
+refer to the restriction of the \errep\ game to the case of $q_R = 1$, and
+define $\Adv{\errep1}_{\struct,\delta,r}(t,q_T,q_U,q_H) = \Adv{\errep}_{\struct,\delta,r}(t,1,q_T,q_U,q_H)$
+for convenience.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{Generic results}
+
 \cpnote{Just stop we all agree on what are the things that are ``obviously
 true`` at data structures, let's state them all as lemmas here. We might end up
 removing them, but we at least need to have a picture in our heads of the
