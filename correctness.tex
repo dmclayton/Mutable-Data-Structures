@@ -88,16 +88,6 @@ that reveals a given representation. However, to prevent this from being
 trivially equivalent to the public-representation case we do not allow the
 adversary to win by finding errors in a representation which has been revealed
 using $\REVO$.
-%
-\cpnote{As far as I can tell, the $\REVO$ oracle does add any power to the
-adversary in any of our results. Is it really worth having in the game?}
-%
-Security in the private-representation case is implied by security in the
-public-representation case, since any attack in the private-representation
-setting also works in the public-representation setting.
-%
-\cpnote{Even though this seems trivial, we should at least state it as a
-Theorem.}
 
 Given the experiments defined here, we define the advantage of an adversary
 $\advA$ as the probability it succeeds at the experiment, i.e.,
