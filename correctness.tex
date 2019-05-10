@@ -10,12 +10,12 @@
 Let $\struct=(\Rep,\Up,\Qry)$ be a data structure with result space~$\results$.
 %
 We define two adversarial notions of correctness given by a pair of related
-experiments for~$\struct$, \emph{error function} $\delta:\results^2 \to \R^+$,
-and \emph{error capacity}~$r$. The values $\delta(x,y)$ of the error function represent
-the `badness' of getting an erroneous result of $x$ from $\Qry$ when $y$ should
-actually have been returned. In general we require $\delta(x,x) = 0$ for all
-$x$, but otherwise place no restrictions on what the error function might look
-like.
+experiments for~$\struct$, \emph{error function} $\delta:\results^2 \to \R$,
+and \emph{error capacity}~$r$. The values $\delta(x,y)$ of the error function
+represent the `badness' of getting an erroneous result of $x$ from $\Qry$ when
+$y$ should actually have been returned. In general we require
+$\delta(x,y) \geq 0$ and $\delta(x,x) = 0$ for all $x$ and $y$, but otherwise
+place no restrictions on what the error function might look like.
 
 The two correctness notions are given by the experiments in
 Figure~\ref{fig:security}. One corresponds to cases where the representations of
@@ -23,18 +23,13 @@ the true data are public (\errep) and the other to where they are private
 (\erreps). We will describe the former and then give a brief explanation of how
 the latter differs, as the two are closely related to each other.
 
-\cpnote{Awkward.}
-While many potential errors may exist for a given representation of a set, in
-the form of queries $\qry$ that would return an inaccurate answer when sent to
-$\QRYO$, we want an experiment that forces the adversary to actually find
-specific erroneous queries. In particular, we only give the adersary credit when
-they actually make a $\QRYO$ call that produces an error.
-
-Both experiments aim to capture the total \emph{weight} of the errors caused by the
-adversary, at any point in time, with respect to the current data objects
-$\col_i$ and their representations $\pub_i$.  Because we consider mutable data
-objects and representations, the notion of ``current'' is defined by calls to
-the $\REPO$ and $\UPO$ oracles.
+Both experiments aim to capture the total \emph{weight} of the errors caused by
+the adversary's queries. However, because we consider mutable data objects and
+representations, we only give the adversary credit for $\QRYO$ calls that
+produce errors in the ``current'' data objects $\col_i$ and their
+representations $\pub_i$. Because we consider mutable data objects and
+representations, the notion of ``current'' is defined by calls to the $\REPO$
+and $\UPO$ oracles.
 
 To track errors, both experiments maintain an array $\err_i[]$ for every data
 object~$\col_i$ that has been defined.  Initially, $\err_i[]$ is implicitly

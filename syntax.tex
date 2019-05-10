@@ -106,10 +106,8 @@ Both~$\Rep$ and the~$\Up$ algorithm can be viewed (informally) as mapping data
 objects to representations ---~explicitly so in the case of~$\Rep$, and
 implicitly in the case of~$\Up$~--- so we allow~$\Up$ to make per-call random
 choices, too.  Many common data structures do not have randomized representation
-updates, but some do, e.g. the Cuckoo filter~\cite{xxx} and the Stable Bloom
-filter~\cite{xxx}.
-%
-\todo{DC}{Add citations.}
+updates, but some do, e.g. the Cuckoo filter~\cite{fan2014cuckoo} and the stable
+Bloom filter~\cite{deng2006approximately}.
 
 The query algorithm $\Qry$ is formalized as deterministic.  This reflects the
 overwhelming behavior of data structures in practice, in particular those with
