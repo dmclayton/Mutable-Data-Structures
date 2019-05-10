@@ -290,13 +290,11 @@ filter with the chosen parameters. For all integers $q_R, q_T, q_H, r, t \geq 0$
 and for $q = q_T + q_H$, if $r > pq$, then it holds that
   \begin{equation*}
     \begin{aligned}
-      \Adv{\errep}_{\Pi,\delta,r}(t, q_R,q_T,0,q_H) &< \\
-      \hspace{20pt}
-        q_R \cdot \left(\frac{q_H}{2^\lambda} + \left(\frac{pq}{r}\right)^re^{r-pq}\right) \,,
+      \Adv{\errep}_{\Pi,\delta,r}(t,\,&q_R,q_T,0,q_H) \leq \\
+        & q_R \cdot \left(\frac{q_H}{2^\lambda} + \left(\frac{pq}{r}\right)^re^{r-pq}\right) \,,
     \end{aligned}
   \end{equation*}
   where $H$ is modeled as a random oracle.  %
-  \cpnote{I'm not sure if this advantage function is defined.}
 \end{theorem}
 We consider only the case of $r > pq$ because $pq$ is the expected number of
 false positives obtained by an adversary that simply uses its knowledge of the
