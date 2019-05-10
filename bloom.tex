@@ -304,27 +304,25 @@ and for $q = q_T + q_H$, if $r > pq$, then it holds that
 We consider only the case of $r > pq$ because $pq$ is the expected number of
 false positives obtained by an adversary that simply uses its knowledge of the
 salt (after the representation is created) to guess as many random elements as
-possible.
+possible. Because this simple adversary can get $pq$ successes on average, we
+can only hope to provide good security bounds against arbitrary adversaries in
+the case that $r > pq$.
 
-Once we have reduced the adversary to randomly guessing queries, an attack can
-be modeled using the binomial distribution. Each guess has a fixed chance $p$ of
-producing a false positive, and the adversary succeeds if it accumulates at
-least $r$ successes over the course of $q$ attempts. The bound given in the
-theorem statement can then be found using a standard Chernoff bound on Poisson
-distributions, namely
-\[
-  \Prob{X \ge (1+\delta)\mu} < \left(\frac{e^\delta}{(1+\delta)^{1+\delta}}\right)^\mu
-\]
+This bound can be broken down into three main components. The external $q_R$
+term means that the security guarantee will be weak in the case that the
+adversary is able to view a large number of representations. The $q_H/2^\lambda$
+term corresponds to the probability of the adversary guessing the salt before
+the representation is constructed, but this will be small as long as $\lambda$
+is chosen to be sufficiently large. The final, messier term comes from applying
+a Chernoff bound to the non-adaptive adversary's probability of succeeding in
+the experiment given $q_H+q_T$ guesses. The Chernoff bound is reasonably tight,
+but unfortunately in practice the term $q_H$ may be very large, since it
+represents the adversary's ability to perform offline hash computations.
 
-\todo{DC}{Add interpretation of the bound. It will look like nonsense to most
-readers, so help them out. For what parameters is it comparable to the
-non-adaptive false-positive probability? We'll want to plot this for reasonable
-values of $k, m, n, q_H, q_T, r$.}
-
-The bound given in the theorem statement is not directly comparable to the
-standard bounds for a Bloom filter, which are typically given in terms of the
-false positive probability per query rather than the probability of accumulating
-some target number of false positives over a larger number of queries.
+\begin{itemize}
+  \item The fact that calls to $\HASHO$ can be substituted for calls to $\QRYO$.
+  \item The 
+\end{itemize}
 
 \begin{proof}[Proof of Theorem~\ref{thm:sbf-errep-immutable}]
   \input{proof/sbf-errep-immutable}
