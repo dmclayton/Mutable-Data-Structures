@@ -66,7 +66,7 @@
 \label{fig:sbf-errep-immutable/games}
 \end{figure*}
 
-We will use the following lemma for keyless structures, which is proved in appendix~\ref{sec:keyless-proof}. We use $\errep1$ and
+We will use the following lemma for keyless structures, which is proved in Appendix~\ref{sec:keyless-proof}. We use $\errep1$ and
 $\erreps1$ to denote the public-representation and private-representation
 experiments where the adversary makes a single $\REPO$ query. In writing the
 advantage for these games we omit the $q_R$ parameter since it is fixed at 1.
@@ -189,28 +189,29 @@ for each $x\in X$ are independently and identically distributed.
 Hence, the probability that~$\advB$ succeeds is binomially distributed:
 %
 \begin{equation}
-  \Prob{ |\setT| \geq r } =
+   \Prob{\game_2(\advB)=1} = \Prob{ |\setT| \geq r } =
      \sum_{i=r}^{q} \binom{q}{i}p^i(1-p)^{q-i} \,,
 \end{equation}
 %
-where $q \leq q_H + q_T$ and $p = \Pr[T(x)=1]$. Note that the mean $\mu$ of this
-distribution is simply $pq$, so we can apply the Chernoff bound with
-$\delta = r(pq)^{-1}-1$
+where $q \leq q_H + q_T$ and $p = \Pr[T(x)=1]$. Here we can apply a Chernoff
+bound which states that, for any $\delta > 0$,
+\[
+  \Prob{X \geq (1+\delta)\mu} < \left(\frac{e^\delta}{(1+\delta)^{1+\delta}}\right)^\mu
+\]
+We set $\delta = r\mu^{-1}-1$ and note that $\mu = pq$.
+This yields
+\[
+ \Prob{|\setT| \geq r} < \left(\frac{e^{r\mu^{-1}-1}}{(r\mu^{-1})^{r\mu^{-1}}}\right)^\mu = \left(\frac{e^{r-\mu}}{(r\mu^{-1})^r}\right) = e^{r-pq}\left(\frac{pq}{r}\right)^r
+\]
 
-If we define
-$\alpha = \frac{r}{pq}$, then as long as $\alpha > 1$ we can apply a standard
-Chernoff bound to simplify this to
-\begin{equation}
-  \Prob{ |\setT| \geq r } <
-     \left(\frac{e^{\alpha-1}}{\alpha^\alpha}\right)^{pq} \,.
-\end{equation}
+So we have
 
-Substituting this value back in for $\Prob{\game_2(\advB)=1}$ and applying
-Lemma~\ref{thm:lemma1} to move from the single-representation case to the
+\[
+  \Adv{\errep}_{\Pi,\delta,r}(\advA) < \frac{q_H}{2^\lambda} + e^{r-pq}\left(\frac{pq}{r}\right)^r
+\]
+
+Applying Lemma~\ref{thm:lemma1} to move from the single-representation case to the
 general case, we get our final bound of
 \begin{equation}
   \Adv{\errep}_{\Pi,\delta,r}(\advA) < q_R \cdot \left(\frac{q_H}{2^\lambda} + \left(\frac{e^{\alpha-1}}{\alpha^\alpha}\right)^{pq}\right) \,.
 \end{equation}
-
-%
-\todo{DC (lead)}{Apply Lemma~\ref{thm:lemma1} and finish the bound.}
