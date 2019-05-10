@@ -215,7 +215,7 @@ This yields
 So we have
 %
 \begin{equation}
-  \Adv{\errep}_{\Pi,\delta,r}(\advA) < \frac{q_H}{2^\lambda} + e^{r-pq}\left(\frac{pq}{r}\right)^r
+  \Adv{\errep}_{\Pi,\delta,r}(\advA) < \frac{q_H}{2^\lambda} + \left(\frac{pq}{r}\right)^re^{r-pq}
 \end{equation}
 %
 Applying Lemma~\ref{thm:lemma1} to move from the single-representation case to the
@@ -224,8 +224,6 @@ general case, we get our final bound of
   \Adv{\errep}_{\Pi,\delta,r}(\advA) \leq
     q_R \cdot \left[
       \frac{q_H}{2^\lambda} +
-      \left(\frac{e^{\alpha-1}}{\alpha^\alpha}\right)^{pq}
+      \left(\frac{pq}{r}\right)^re^{r-pq}
     \right] \,.
 \end{equation}
-%
-\todo{DC}{That's not the final form! $\alpha$ is no longer defined}
