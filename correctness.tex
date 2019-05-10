@@ -117,24 +117,9 @@ $\Adv{\errep1}_{\struct,\delta,r}(t,q_T,q_U,q_H) = \Adv{\errep}_{\struct,\delta,
 and $\Adv{\erreps1}_{\struct,\delta,r}(t,q_T,q_U,q_H) = \Adv{\erreps}_{\struct,\delta,r}(t,1,q_T,q_U,q_H)$
 for convenience.
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\subsection{Generic results}
-
-\cpnote{Just stop we all agree on what are the things that are ``obviously
-true`` at data structures, let's state them all as lemmas here. We might end up
-removing them, but we at least need to have a picture in our heads of the
-generic relationships. So far I've counted:
-\begin{itemize}
-  \item \errep\ implies \erreps\ for all data structures.
-  \item \errep\ implies \errep1 for all data structures (losing a factor of $q_R$).
-  \item Mutable security implies immutable security for all data structures.
-\end{itemize}
-}
-
-\todo{DC}{State all relations as lemmas.}
-
-Here we state several basic results that hold for general data structures. In
-each case the proofs follow in a straightforward manner from the definitions.
+The first observation we make is that security in the public setting is a
+stronger notion than security in the private setting. The following proof
+follows from a simple simulation argument.
 
 \begin{lemma}[\errep\ implies \erreps]\label{thm:errep-to-erreps}
   For every structure~$\Gamma$ and error function $\delta$ and any parameters
@@ -167,6 +152,12 @@ Then, because $\advB$ produces the exact same representations and makes the
 exact same queries that $\advA$ does and produces the same final output, $\advB$
 wins whenever $\advA$ wins.
 \end{proof}
+
+This lemma shows that if we can demonstrate an attack in the
+private-representation setting, we know that the attack will also work in the
+public-representation setting, and conversely that if we can establish a security
+bound in the public-representation setting then the same bound holds in the
+private-representation setting.
 
 \ignore{
 \heading{Keyed structures}

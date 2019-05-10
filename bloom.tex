@@ -59,12 +59,12 @@ In this section, we will show that the basic Bloom filter construction
 $\BF[H,\ell,n]$ is flawed, allowing the adversary to make an offline attack that
 has a high probability of success while using a minimal number of queries. In
 the immutable setting, where the adversary is constrained to never use the
-$\UPO$ oracle, it suffices to use the $\SBF$ construction in order to provide a
-good security guarantee in either the public-representation or
-private-representation settings. However, in the case where the adversary is
-allowed to make updates, we will find that $\SBF$ is not secure in the
-public-representation setting, and that $\KBF$ must be used to guarantee
-security.
+$\UPO$ oracle, i.e. $q_U = 0$, it suffices to use the $\SBF$ construction in
+order to provide a good security guarantee in either the public-representation
+or private-representation settings. However, in the case where we allow
+$q_U > 0$ so that the adversary can make updates, we will find that $\SBF$ is
+not secure in the public-representation setting. Instead, $\KBF$ must be used to
+guarantee security.
 
 \ignore{%
 The standard Bloom filter shows a variety of different behaviors depending on
@@ -129,18 +129,6 @@ which choices will set the maximum number of bits to 1, or which choices will
 set certain target bits to 1 in order to cause specific false positives. They
 show that with some reasonable parameter choices, the adversary can double the
 false positive rate if they control a third of the inputs to the filter.
-%
-%\todo{DC (lead)}{Add a brief summary of attacks of Gerbet \etal that exploit bad
-%choices of hash functions. What fraction of the inputs does the adversary need
-%to control for the attack to be effective?}
-
-%
-Pollution attacks can even even be damaging for ``good'' choices of hash
-functions, but their effectiveness depends crucially on the fraction of inputs
-controlled by the adversary. Because the attack involves setting as many bits in
-the filter as possible to 1, an adversary that controls only a small fraction of
-the inputs can cause only a correspondingly small false positive probability. In
-order to have 
 %
 
 Gerbet \etal discuss multiple ways to mitigate pollution attacks, including
