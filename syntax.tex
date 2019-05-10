@@ -37,7 +37,34 @@ notation in bounds?}
 
 \heading{Pseudorandom functions}
 %
-\todo{DC}{Give syntax and security notion of a PRF.}
+For sets $\setX$ and $\setY$ and a keyspace $\keys$, we define a pseudorandom
+function to be a function $F: \keys \times \setX \to \setY$. The intent is for
+the outputs of the function to appear random for a fixed choice of key, which is
+formally captured by the game described in Figure~\ref{fig:prf-def}. We define
+the advantage of an adversary $\advA$ to be
+$\Adv{\prf}_F(\advA) = \Prob{\Exp{\prf}_F(\advA) = 1}$, and the advantage
+$\Adv{\prf}_F(t,q)$ to be the maximum advantage of any adversary running for $t$
+steps and making $q$ queries to the PRF oracle.
+
+\begin{figure}
+  \twoColsNoDivide{0.22}
+  {
+    \experimentv{$\Exp{\prf}_F(\advA)$}\\[2pt]
+      $b \getsr \bits$; $\key \getsr \keys$\\
+      $b' \getsr \advA^{\PRFO}$\\
+      return $[b = b']$
+  }
+  {
+    \oraclev{$\PRFO(x)$}\\[2pt]
+      if $b = 1$ then return $F_\key(x)$\\
+      if $T[x]$ is defined then return $T[x]$\\
+      $T[x] \getsr Y$; return $T[x]$
+  }
+  \caption{The notion of PRF correctness, capturing indistinguishability from a
+  random function.
+  }
+  \label{fig:prf-def}
+\end{figure}
 
 \subsection{Data Structures}
 Fix non-empty sets $\mathcal{D}, \mathcal{R}, \keys$ of \emph{data objects},
