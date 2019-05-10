@@ -450,15 +450,6 @@ Figure~\ref{fig:bf-def}.
   \input{proof/kbf-errep}
 \end{proof}
 
-%We can use this final and best bound to demonstrate some of the possible bounds
-%with various parameter settings. Figure ? shows the upper bound for a various
-%combination of parameters, starting from the default parameters of $k = 4$, $m =
-%1024$, $n = 100$, $r = 10$, $q_R = 1$, $q_T = 100$, and $q_U = 100$. The most
-%significant factor in the adversarial advantage is $q_R$, with even small
-%increases producing a drastic increase in the adversarial advantage. Since this
-%is the only part of the error bound that is not clearly associated with an
-%attack, it is possible that this term could be reduced or eliminated.
-
-%\includegraphics[scale=0.75]{BF_Fig}
-
-\cpnote{Got here 5/9.}
+\todo{DC}{Add discussion of how the $\REVO$ oracle rules out the security of
+keyed, unsalted Bloom filters. Be sure to mention that this was something
+considered by Gerbet \etal~\cite{gerbet2015power}.}
