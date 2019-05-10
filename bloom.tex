@@ -1,4 +1,3 @@
-\newcommand{\id}{\schemefont{id}}
 \begin{figure}
   \twoColsNoDivide{0.22}
   {
@@ -27,29 +26,6 @@
   \label{fig:bf-def}
 \end{figure}
 
-\todo{Any}{This should be moved to Section~\ref{sec:prelims}.}
-
-\heading{Bitstring operations}
-%
-For all $m\geq0$ define~$\bmap_m$ as the following function.
-For all $\v.x\in[m]^*$ let $\bmap_m(\v.x) = X$, where
-$|X|=m$ and $X_v=1$ if and only if $\v.x_i = v$ for some $i\in[|\v.x|]$
-%
-We call $\bmap_m(\v.x)$ the \emph{bitmap} of~$\v.x$.
-%
-Let~$X$ and~$Y$ be equal-length bitstrings. We write $X \OR Y$ for their
-bitwise-OR, $X \AND Y$ for their bitwise-AND, and $X \XOR Y$ for their
-bitwise-XOR. Let $\NOT X = 1^{|X|} \xor X$.
-%
-Finally, let $\hw(X)$ denote the Hamming wieght of (i.e., the number of 1s in)~$X$.
-
-\heading{More prliminaries}
-%
-For every function~$f$, define function $\id^f$ so that
-$\id^f(\emptystr, x) = f(x)$ for all $x$ in the domain of~$f$.
-%
-\todo{Any}{Define function $\ticks(A,\cdot)$ for algorithm~$A$. Do we need big-O
-notation in bounds?}
 
 \medskip
 We specify three Bloom filter variants using the keyed structure
