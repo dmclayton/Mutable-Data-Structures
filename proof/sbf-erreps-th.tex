@@ -1,62 +1,12 @@
-\begin{figure*}
-  \cpnote{As above, these games need to be revised. There's no $\HASHO$ oracle
-  here, since we're in the standard model!}
-  \boxThmBFSaltCorrect{0.48}
-  {
-    \underline{$\game_0(\advA)$}\\[2pt]
-      $\key \getsr \keys$; $i \gets 0$\\
-      $\bot \getsr \advA^{\HASHO,\REPO,\QRYO,\UPO}$\\
-      return $[\sum \err \geq r]$
-    \\[6pt]
-    \oraclev{$\REPO(\col)$}\\[2pt]
-      $i \gets i + 1$\\
-      $\col_i \gets \col$\\
-      $\pub_i \gets \Rep_K[\HASHO](\col)$\\
-      return $\pub_i$
-    \\[6pt]
-    \oraclev{$\QRYO(i,\qry_x)$}\\[2pt]
-      $a \gets \Qry[\HASHO](\pub_i, \qry_x)$\\
-      if $a \neq \qry_x(\col)$ then $\err_i[x] \gets 1$\\
-      return~$a$
-    \\[6pt]
-    \oraclev{$\UPO(i,\up_x)$}\\[2pt]
-      $a \gets \Qry[\HASHO](\pub_i, \qry_x)$\\
-      if $\err_i[x] = 1$ then $\err_i \gets 0$\\
-      $\col_i \gets \col_i \union \{x\}$\\
-      $\pub_i \gets \Up[\HASHO](\pub_i,\up_x)$\\
-      return~$\pub_i$
-    \\[4pt]
-    \oraclev{$\HASHO(x)$}\\[2pt]
-      return $H(x)$
-    %\hspace*{-4pt}\rule{1.043\textwidth}{.4pt}
-  }
-  {
-  \underline{$\game_1(\advB)$}\\[2pt]\\
-    \oraclev{$\HASHO(i,x)$}\\
-      if $T[i, x]$ is $\undefn$ then $T[i, x] \getsr [m]^k$\\
-      return $T[i, x]$
-    \\[6pt]
-    \underline{$\game_2(\advB)$}\\[2pt]\\
-      $\key \getsr \keys$; $i \gets 0$; $\setC \gets \emptyset$\\
-      $\bot \getsr \advA^{\HASHO,\REPO,\QRYO,\UPO}$\\
-      return $[\sum \err \geq r]$
-    \\[6pt]
-    \oraclev{$\QRYO(\qry_x)$}\\[2pt]
-      do\\
-      $\tab y \getsr \mathcal{X}$\\
-      while $y \in \col \cup \setC$\\
-      $a \gets \Qry[\HASHO](\pub_i, \qry_y)$\\
-      if $a \neq \qry_y(\col)$ then $\err_i[y] \gets 1$\\
-      return~$a$
-  }
-  {
-  }
-  {
-  }
-  \caption{Games 0--2 for proof of Theorem~\ref{thm:bf-priv-key-bound}.}
-  \label{fig:bf-priv-salt-bound}
-\end{figure*}
+As in previous proofs, we assume without loss of generality that there are no insertions of or queries for elements of $\col$.
 
+To avoid the unfortunate $q_R$ factor in the bound, we do not make use of Lemma~\ref{thm:lemma1} in this proof. Because of that, we must find some other way to ensure that $\REVO$ is not useful to the adversary. In particular, if there are unique salts across representations, the $\REPO$, $\QRYO$, and $\UPO$ calls for one representation will be independent of those for other representations, since the unique salt is passed as part of the input. Therefore in~$\game_1$ we specify that all salts created will be unique. By the birthday bound, we have $\Prob{\game_0(\advA) = 1} \le q_R^2/2^\lambda + \Prob{\game_1(\advA) = 1}$.
+
+In~$\game_1$, all queries within one representation are independent of those in other representations. We can then assume without loss of generality that the adversary never makes use of its $\REVO$ oracle, since doing so provides no information about other representations and can only constrain the adversary in terms of which outputs $i$ can potentially allow it to win. Next, we want to ensure that the adversary's $\HASHO_1$ queries are independent of the $\HASHO_2$ and $\HASHO_3$ queries used for $\REPO$, $\QRYO$, and $\UPO$. Since the $\HASHO_c$ oracles use random sampling to fill a shared table, this occurs if and only if the adversary calls $\HASHO_1(\langle\salt_i,x\rangle)$ for some salt $\salt_i$ used by one of the representations created by $\REPO$. By an argument very similar to that in the previous proofs, the adversary has at most $q_H/2^\lambda$ probability of calling $\HASHO_1$ with the salt used by some specific representation. However, since there are now $q_R$ representations, each with a distinct salt, there is a $q_Rq_H/2^\lambda$ probability of the adversary correctly guessing at least one of these salts. In~$\game_1(\advA)$, we set the $\bad_1$ flag if the adversary succeeds in guessing the salt in this manner, but the flag does not affect the game. When we move to~$\game_2(\advA)$, the %[...]
+
+We may now assume that the adversary never guesses the salt of any of the representations, and so the outputs of $\HASHO_1$ are independent of the results of all calls to $\REPO$, $\QRYO$, and $\UPO$. The next oracle we want to target is $\UPO$. Now that we have a filter threshold, we want to argue that the adversary cannot use $\UPO$ to mount an effective pollution attack.
+
+\ignore{
 \cpnote{In general, the same notes as above apply here. I can sort of see how
 the argument works, but the lack of sufficient detail makes it difficult for me
 to decide whether you're right.}
@@ -125,4 +75,4 @@ least $r$ errors given $q_T$ queries is
 %$$\Adv{\errep}_{\struct,r,d}(\advA) \le \Adv{\prf}(F) + q_R^2/2^\lambda + I_{p^k}(r, q_T-r+1)$$
 \todo{DC}{Complete the bound. Bear in mind that $\Adv{\prf}(F)$ is not a
 well-defined quantity! What you mean is $\Adv{\prf}_F(\advB)$, where $\advB$ is
-a PRF adversary that you define.}
+a PRF adversary that you define.}}
