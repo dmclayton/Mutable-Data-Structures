@@ -37,12 +37,12 @@
   \vspace{-2pt}
   \oraclev{$\HASHO_c(\salt \cat x)$}\\[2pt]
     $\vv \getsr [m]^k$\\
-    if $M^*=\bot$ and $\salt=\salt^*$ and $c=1$ then\\
+    if $\salt=\salt^*$ and $c=1$ then\\
     \tab $\bad_1 \gets 1$; return $\vv$\\
     if $T[Z,x] = \bot$ then $\vv \gets T[Z,z]$\\
     $T[Z,x] \gets \vv$\\[2pt]
     \diffplusbox{
-    \com{Caller is~$\advB$ or $\QRYO$}\\
+    \com{Caller is~$\QRYO$}\\
     if $c = 1$ or $c = 3$ then\\
     \tab if $\salt \ne \salt^*$  then return $\vv$\\
     \tab $\Ans[x] \gets \bmap_m(\vv) = M^* \AND \bmap_m(\vv)$\\
@@ -67,13 +67,15 @@
     }
     return $a$
 }
-\caption{Games 0, 1, and 2 for proof of Theorem~\ref{thm:sbf-errep-priv}.}
+\caption{Games 0, 1, and 2 for proof of Theorem~\ref{thm:sbf-erreps}.}
 \label{fig:sbf-errep-immutable/games}
 \end{figure*}
 
 This proof follows a similar structure to the previous one. The primary distinction is that in the final game, unless the adversary `gets lucky' and guesses the salt, they should only be able to produce errors with $q_T$ queries, as opposed to both $q_T$ and $q_H$ queries.
 %
 Just as in the proof of Theorem~\ref{thm:sbf-errep-immutable}, we will assume the adversary just makes a single call to $\REPO$ and use Lemma~\ref{thm:lemma1} to complete the bound. Let $\advA$ be an \erreps\ adversary making exactly 1 call to $\REPO$, $q_T$ calls to $\QRYO$, $q_U$ calls to $\UPO$, and $q_H$ calls to $\HASHO$. Because $\advA$ creates only a single representation, it will necessarily lose if it calls $\REVO$ on that representation. We may therefore assume without loss of generality that $\advA$ makes no calls to $\REVO$, and because of this we omit $\REVO$ from each of the games.
+
+In addition to the assumptions of the previous theorem, we assume without loss of generality that the adversary never uses $\UPO$ to insert an element into $\col$ which is already present in the set. Since such a `re-insertion' does not change the representation, the adversary would gain no advantage from doing this.
 
 We begin with a game~$\game_0(\advB)$ similar to the previous proof, as shown in Figure~\ref{fig:sbf-errep-immutable/games}. Again we observe that for every~$\advA$ there exists a~$\advB$  such that
 \begin{equation}
@@ -90,186 +92,19 @@ Since we are seeking a stronger bound, we now wish to isolate the possibility th
     \Prob{\game_1(\advB)=1} + q_H/2^\lambda \,.
 \end{eqnarray}
 %
+In~$\game_1$, we may now assume that the adversary never guesses the salt in its $\HASHO_1$ queries. This means that none of the inputs to $\HASHO_1$ is ever equal to any input to $\HASHO_2$ or $\HASHO_3$, both of which always use the salt $\salt^*$. Since each $\HASHO$ is modeled as a random oracle, the outputs of $\HASHO_1$ are therefore independent of the outputs of $\HASHO_2$ and $\HASHO_3$.
 
+This shows that, unless the adversary is able to guess the salt, access to $\HASHO_1$ is not beneficial for the adversary, and that the adversary cannot predict the behavior of $\QRYO$ or $\UPO$ in advance. However, we cannot quite reduce this game to the non-adaptive bionmial distribution, since it is possible for the adversary to update the filter based on responses to previous queries. We want to move to a game where it is not beneficial for the adversary to interleave updates and queries.
 
+Note that there are three types of updates the adversary can make:
+\begin{enumerate}
+  \item Updates which insert elements which have previously been tested with $\QRYO$ and which were found to be false positives.
+  \item Updates which insert elements which have previously been tested with $\QRYO$ and which were found not to be false positives.
+  \item Updates which insert elements that have not yet been tested with $\QRYO$.
+\end{enumerate}
+We may assume without loss of generality that the adversary never makes any updates of type 1, since doing so does not change the representation and actually decreases a counter in $\err$.
 
 \ignore{
-\begin{figure*}
-  \cpnote{I suggest re-doing this from scratch. The security experiment
-  (\erreps) has changed and so has the construction. $\Repx$ and $\fff$ are not
-  defined. Where's the $\REVO$ oracle?}
-  \boxThmBFSaltCorrect{0.48}
-  {
-    \underline{$\game_0(\advA)$}\\[2pt]
-      $\col \getsr \advA^H$; $\setC \gets \emptyset$; $\err \gets 0$\\
-      $\pub \getsr \Rep[H](\col)$\\
-      $\bot \getsr \advA^{H,\QRYO,\UPO}$\\
-      return $(\err \geq r)$
-    \\[6pt]
-    \oraclev{$\QRYO(\qry_x)$}\\[2pt]
-      if $\qry_x \in \mathcal{C}$ then return $\bot$\\
-      $\setC \gets \setC \union \{\qry_x\}$\\
-      $a \gets \Qry[H](\pub, \qry_x)$\\
-      if $a \neq \qry_x(\col)$ then $\err \gets \err + 1$\\
-      return~$a$
-    \\[6pt]
-    \oraclev{$\UPO(\up_x)$}\\[2pt]
-      $\setC \gets \emptyset$\\
-      $a \gets \Qry[H](\pub, \qry_x)$\\
-      if $\qry_x \in \setC$ and $a \neq \qry_x(\col)$ then\\
-      \tab $\err \gets \err-1$\\
-      $\col \gets \col \union \{x\}$\\
-      $\pub \gets \Up[H](\pub,\up_x)$\\
-      return~$\bot$
-    \\[4pt]
-    \hspace*{-4pt}\rule{1.043\textwidth}{.4pt}
-    \\[5pt]
-    \oraclev{$\HASHO_1(\salt,x)$} \hfill\diffplus{$\game_2$}\;{$\game_1$}\hspace*{3pt}\\
-      $\hh \getsr [m]^2$; $\vv \gets \fff(\hh)$\\
-      if $\salt = \salt^*$ then\\
-      \tab $\bad_1 \gets 1$; \diffplus{return $\vv$}\\
-      if $T[\salt,x]$ is defined then $\vv \gets T[\salt,x]$\\
-      $T[\salt,x] \gets \vv$;
-      return $\vv$
-  }
-  {
-    \underline{$\game_1(\advB)$}\\[2pt]
-      $\salt^* \getsr \bits^\lambda$;
-      $\col \getsr \advB^{\HASHO_1}$\\
-      $\pub \gets \Repx[\HASHO_2](\col, \salt^*)$\\
-      $\setC \gets \emptyset$;
-      $\err \gets 0$\\
-      $\bot \getsr \advB^{\HASHO_1,\QRYO,\UPO}$\\
-      return $(\err \geq r)$
-    \\[6pt]
-    \oraclev{$\QRYO(\qry_x)$}\\[2pt]
-      if $\qry_x \in \mathcal{C}$ then return $\bot$\\
-      $\setC \gets \setC \cup \{\qry_x\}$\\
-      $a \gets \Qry[\HASHO_2](\pub, \qry_x)$\\
-      if $a \neq \qry_x(\col)$ then $\err \gets \err + 1$\\
-      return~$a$
-    \\[6pt]
-    \oraclev{$\UPO(\up_x)$}\\[2pt]
-      $\setC \gets \emptyset$\\
-      $a \gets \Qry[H](\pub, \qry_x)$\\
-      if $a \neq \qry_x(\col)$ and $\qry_x \in \setC$ then\\
-      \tab $\err \gets \err-1$\\
-      $\col \gets \col \union \{x\}$\\
-      $\pub \gets \Up[\HASHO_2](\pub,\up_x)$\\
-      return~$\bot$
-    \\[6pt]
-    \oraclev{$\HASHO_2(\salt,x)$}\\[2pt]
-      $\hh \getsr [m]^2$; $\vv \gets \fff(\hh)$\\
-      if $T[\salt,x]$ is defined then\\
-      \tab $\vv \gets T[\salt,x]$\\
-      $T[\salt,x] \gets \vv$;
-      return $\vv$
-  }
-  {
-    \underline{$\game_3(\advB)$}\\[2pt]
-    \oraclev{$\QRYO(\qry_x)$}\\[2pt]
-      $a \gets \Qry[\HASHO_3](\pub, \qry_x)$\\
-      if $a \neq \qry_x(\col)$ then $\err \gets \err + 1$\\
-      $\col \gets \col \union \{x\}$
-      $\pub \gets \Up[\HASHO_2](\pub,\up_x)$\\
-      return~$a$
-  }
-  {
-    \oraclev{$\UPO(\up_x)$}\\[2pt]
-      $a \gets \Qry[\HASHO_3](\pub, \qry_x)$\\
-      if $a \neq \qry_x(\col)$ then $\err \gets \err + 1$\\
-      $\col \gets \col \union \{x\}$
-      $\pub \gets \Up[\HASHO_2](\pub,\up_x)$\\
-      return~$\bot$
-    \\[6pt]
-    \oraclev{$\HASHO_i(\salt,x)$}\\[2pt]
-      $\hh \getsr [m]^2$; $\vv \gets \fff(\hh)$\\
-      return $\vv$
-  }
-  \caption{Games 0--3 for proof of Theorem~\ref{thm:sbf-erreps}.}
-  \label{fig:sbf-erreps/games}
-\end{figure*}
-
-\cpnote{I understand the crux of the argument of how you deal with interleaved
-updates/queries. It's a clever idea and I think it's believable. That said,
-there's a lot of details that are omitted addressed.
-%
-Right now the biggest problem with this argument is that the games have
-virtually nothing to do with the security notions and nothing to do with the
-scheme being analyzed. They seem to be a carry-over from the old paper, but
-things have change significantly. They will need to be rewritten. Try using the
-games in Figure~\ref{fig:sbf-errep1/games} as a reference.}
-
-\cpnote{I'm not clear on how update thresholding is used in the argument. From
-my read it seems you're assuming some maximum represented set size, but we're
-not maintaining a counter in the construction. Here's a hint: if thresholding is
-necessary for security, then I'd expect $\ell$ to come up in the bound; if it
-doesn't, then there'd better be a good reason.}
-
-\cpnote{The argument silently assumes that there's no $\REVO$ oracle.}
-
-\cpnote{Try starting this way:}
-%
-Just as in the proof of Theorem~\ref{thm:sbf-errep1} we will assume the
-advwersary just makes a single query to~$\QRYO$ and use Lemma~\ref{thm:lemma1}
-to complete the bound.
-%
-Let $\advA$ be an \erreps adversary making exactly~$1$ query to~$\REPO$, $q_T$
-queries to~$\QRYO$, $q_U$ queries to~$\UPO$, and $q_H$ queries to~$\HASHO$.
-
-
-\cpnote{Tip: If an claim follows easily from an argument made earlier than the
-proof, then feel free to move quickly through it and refer the reader to the
-argument for detials. The best you can do is say something like ``Equation (X)
-follows nearly the same argument as used to deerive Equation (Y) ...''}
-
-\cpnote{It'll be easier to apply Lemma~\ref{thm:lemma1} at the end.}
-We first reduce from the \erreps case to the \erreps1 case, which by
-lemma~\ref{lemma:errep} may scale the adversary's advantage only by a factor of
-$q_R$. The game~$\game_0$ is exactly equivalent to the $\erreps1$ experiment, so
-$\Adv{\errep1}_{\struct_s,r}(\advA) = \Prob{\game_0(\advA) = 1}$.%
-
-In~$\game_1$ we split the hash oracle into three, giving the adversary access
-$\HASHO_1$ in both stages of the game, while $\HASHO_2$ is reserved for oracular
-use by $\Repx$ \cpnote{Undefined!}, $\QRYO$, and $\UPO$. For any $\advA$ for~$\game_0$, there is
-$\advB$ for~$\game_1$ which produces the same advantage by simulating $\advA$.
-This adversary first creates its own table $R$ with all values initially
-undefined.  When $\advA$ makes a query $w$ to $H$, $\advB$ returns $R[w]$ if
-that entry in the table is defined. Otherwise, if there are $\salt \in
-\bits^\lambda$, $j \in [k]$, and $x \in \bits^*$ such that $w = \langle\salt, j,
-x\rangle$, forward $(\salt,x)$ to $\HASHO_1$. For each $j \in [k]$, set
-$R[\langle\salt, j, x\rangle] = \vv_j$, where $\vv$ is the output of the
-$\HASHO_1$ oracle. If there is no such triple $\langle\salt, j, x\rangle$, just
-sample $r$ from $[m]$ uniformly and set $R[w] = r$.
-%
-\cpnote{All of this is out date. This is about the linear hashing scheme of
-Kirsch-Mitzenmacher, which we're no longer analyzing.}
-%
-In either case, return
-$R[w]$ to $\advA$. When $\advA$ outputs its collection $\col$, $\advB$ outputs
-$\col$ as well. Any queries by $\advA$ to $\QRYO$ or $\UPO$ are forwarded to
-$\advB$'s corresponding oracle. The simulation is perfect because
-$\Rep[H](\col)$ and $\Up[H](\col,\up)$ are identically distributed to
-$\Rep[\HASHO_2](\col)$ and
-$\Up[\HASHO_2](\col,\up)$. Because we have a perfect simulation,
-$\Adv{\erreps1}_{\struct_s,r}(\advA) = \Prob{\game_1(\advA) = 1}$.
-
-The game~$\game_2$ is the same as~$\game_1$ until $\bad_1$ is set, which occurs
-exactly when $\advB$ sends $(\salt^*,x)$ to $\HASHO_1$ for some $x$. In the
-first phase, there is again a $q_1/2^\lambda$ chance of the adversary guessing
-the salt. In the second phase, the random sampling used by $\HASHO_i$ ensures
-that each call the adversary makes to the $\HASHO_i$ oracle is independent of
-all previous calls. We therefore have a $q_2/2^\lambda$ chance of the adversary
-guessing the salt during this phase, for a total chance of $q_H/2^\lambda$
-chance of the adversary guessing the salt at some point during the experiment.
-Then $\Adv{\erreps}_{\struct_s,r}(\advA) \le \Prob{\game_2(\advB) = 1} +
-q_H/2^\lambda$. Having taken this into account, we may now assume the adversary
-never guesses the salt.
-%
-\cpnote{I would move quickly through this point. Just refer back to the step in
-Theorem~\ref{thm:sbf-errep1}.}
-
-
 \cpnote{The rest of this seems like the meat of the argument.}
 
 We want to show that alternating between sequences of queries and sequences of
