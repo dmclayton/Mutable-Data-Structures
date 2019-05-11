@@ -394,11 +394,16 @@ filter under attack be kept secret from adversaries. In fact, we can attain the
 following \erreps\ bound.
 
 \begin{theorem}[\erreps\ security of salted BFs]\label{thm:sbf-erreps}
-  For every $q_R, q_T, q_U, q_H, t, r\geq 0$, it holds that
+Let $p_+$ be the standard (non-adaptive) false positive probability for a Bloom
+filter with the chosen parameters \emph{except} that the set threshold is
+increased from $n$ to $n+r$. For all integers $q_R, q_T, q_H, r, t \geq 0$, if
+$r > p_+q_T$, then it holds that
   \begin{eqnarray*}
     \begin{aligned}
       \Adv{\erreps}_{\Pi,\delta,r}(t,q_R, q_T, q_U, q_H) &\leq \\
-          \text{some cool bound} \,,
+          & q_R \cdot \left[
+      \frac{q_H}{2^\lambda} +
+      \left(\frac{p_+q_T}{r}\right)^re^{r-p_+q_T}\right]\,,
     \end{aligned}
 \end{eqnarray*}
 where $H$ is modeled as a random oracle
