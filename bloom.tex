@@ -2,11 +2,43 @@
   \twoColsNoDivide{0.22}
   {
     \underline{$\Rep^R_K(\col)$}\\[2pt]
-      if $|\col| > n$ return $\bot$\\
-      $\salt \getsr \bits^\lambda$\\
-      $M \gets \bigvee_{x \in \col} \bmap_m(R_K(\salt \cat x))$\\
-      if $w(M) > \ell$ then return $\bot$\\
-      return $\langle M, \salt \rangle$
+      $\salt \getsr \bits^\lambda$;
+      $\pub \gets \langle 0^m, \salt, 0\rangle$\\
+      for $x \in \col$ do \\
+        $\tab \pub \gets \Up^R_K(\pub, \qry_x)$\\
+        $\tab$if $\pub = \bot$ then return $\bot$\\
+      return $\pub$
+  }
+  {
+    \underline{$\Qry^R_K(\langle M, \salt, ct \rangle,\qry_x)$}\\[2pt]
+      $X \gets \bmap_m(R_K(\salt \cat x))$\\
+      return $M \AND X = X$
+    \\[6pt]
+    \underline{$\Up^R_K(\langle M, \salt, ct \rangle,\qry_x)$}\\[2pt]
+      if $ct \geq n$ then return $\bot$\\
+      $M \gets M \vee \bmap_m(R_K(\salt \cat x))$\\
+      return $\langle M, \salt, ct+1 \rangle$
+  }
+  \caption{The keyless structure $\bloom[R,n,\lambda]$ given by
+  $(\Rep^R,\Qry^R,\Up^R)$ is used to define Bloom filter variants. The
+  parameters are a function $R: \keys\by\bits^* \to [m]^k$ and integers $n,
+  \lambda \geq0$. A concrete scheme is given by a particular choice of
+  parameters.  The function~$\bmap_m$ is defined in
+  Section~\ref{sec:prelims}.
+  }
+  \label{fig:bf-def}
+\end{figure}
+
+\begin{figure}
+  \twoColsNoDivide{0.22}
+  {
+    \underline{$\Rep^R_K(\col)$}\\[2pt]
+      $\salt \getsr \bits^\lambda$;
+      $\pub \gets \langle 0^m, \salt\rangle$\\
+      for $x \in \col$ do\\
+        $\tab \pub \gets \Up^R_K(\pub,\qry_x)$\\
+        $\tab$if $\pub = \bot$ then return $\bot$\\
+      return $\pub$
   }
   {
     \underline{$\Qry^R_K(\langle M, \salt \rangle,\qry_x)$}\\[2pt]
@@ -17,14 +49,14 @@
       if $\hw(M) > \ell$ then return $\bot$\\
       return $\langle M \vee \bmap_m(R_K(\salt \cat x)), \salt \rangle$
   }
-  \caption{The keyless structure $\bloom[R,\ell,n,\lambda]$ given by
-  $(\Rep^R,\Qry^R,\Up^R)$ is used to define Bloom filter variants. The
-  parameters are a function $R: \keys\by\bits^* \to [m]^k$ and integers $\ell, n,
+  \caption{A slightly modified structure $\bloom[R,\ell,\lambda]$ given by
+  $(\Rep^R,\Qry^R,\Up^R)$ which produces Bloom filter variants that use a different notion of fullness. The
+  parameters are a function $R: \keys\by\bits^* \to [m]^k$ and integers $\ell,
   \lambda \geq0$. A concrete scheme is given by a particular choice of
   parameters.  Functions~$\hw$ and~$\bmap_m$ are defined in
   Section~\ref{sec:prelims}.
   }
-  \label{fig:bf-def}
+  \label{fig:bft-def}
 \end{figure}
 
 
@@ -33,31 +65,41 @@ We specify three Bloom filter variants using the keyed structure
 $\bloom[R,\ell,n,\lambda] = (\Rep^R,\Qry^R,\Up^R)$ specified in
 Figure~\ref{fig:bf-def}.
 %
-The construction has four paraemters: a function~$R:\keys\by\bits^*\to[m]^k$, the
-\emph{update threshold} $\ell\geq0$, the \emph{initial threshold} $n\geq0$, and
-the \emph{salt length}~$\lambda\geq0$.
+The construction has four paraemters: a function~$R:\keys\by\bits^*\to[m]^k$,
+\emph{set threshold} $n\geq0$, and the \emph{salt length}~$\lambda\geq0$.
 %
 Let $H:\bits^*\to[m]^k$ be a hash function and let $\ell, n, \lambda\geq0$ be
 integers.
 %
-The standard Bloom filter is the structure $\BF[H,\ell,n] =
-\bloom[\id^H,\ell,n,0]$, which we will term the \emph{basic} Bloom filter. It
+The standard Bloom filter is the structure $\BF[H,n,\lambda] =
+\bloom[\id^H,n,0]$, which we will term the \emph{basic} Bloom filter. It
 has no key (the key sapce of $\id^H$ is $\{\emptystr\}$, see
 Section~\ref{sec:prelims}) and does not use a salt.
 %
-The \emph{salted} Bloom filter $\SBF[H,\ell,n,\lambda] =
-\bloom[\id^H,\ell,n,\lambda]$ is the same except that it allows a nonempty salt.
+The \emph{salted} Bloom filter $\SBF[H,n,\lambda] =
+\bloom[\id^H,n,\lambda]$ is the same except that it allows a nonempty salt.
 %
-Finally, we also consider a salted variant that uses a PRF instead of a hash
-function. The \emph{keyed} Bloom filter $\KBF[F,\ell,n,\lambda]$ is the
-structure $\bloom[F,\ell,n,\lambda]$, where $F:\keys\by\bits^*\to[m]^k$ is a
+We also consider a salted variant that uses a PRF instead of a hash
+function. The \emph{keyed} Bloom filter $\KBF[F,n,\lambda]$ is the
+structure $\bloom[F,n,\lambda]$, where $F:\keys\by\bits^*\to[m]^k$ is a
 PRF.
 %
 Note that the basic and salted BFs have key spaces $\{\emptystr\}$ and the keyed
 BF has key space~$\keys$.
 
+Finally, we can consider alternate versions of each of the above which use a
+\emph{filter threshold} $\ell\geq0$ in place of the set threshold. This means
+that, instead of bounding the number of elements that can be inserted into the
+filter, we bound the number of bits in the filter that can be set to 1. In the
+absence of an adaptive adversary this construction performs very similarly to
+the standard Bloom filter, since for random inputs the number of bits set to 1
+can be very closely approximated given the number of elements in the underlying
+set. However, a filter threshold allows us to obtain better bounds against
+adaptive adversaries and has the additional advantage of not requiring a
+separate counter to keep track of the number of elements in the filter.
+
 In this section, we will show that the basic Bloom filter construction
-$\BF[H,\ell,n]$ is flawed, allowing the adversary to make an offline attack that
+$\BF[H,n]$ is flawed, allowing the adversary to make an offline attack that
 has a high probability of success while using a minimal number of queries. In
 the immutable setting, where the adversary is constrained to never use the
 $\UPO$ oracle, i.e. $q_U = 0$, it suffices to use the $\SBF$ construction in
@@ -89,18 +131,6 @@ $q_T((1-e^{-kn/m})^k + O(1/m))$ false positives to occur. Our goal is to
 minimize the probability that even an adaptive adversary can perform
 significantly better than this lower bound.
 
-The standard definition of a Bloom filter does not make use of a threshold
-$\ell$ on the number of 1s in the filter. In practice the close relationshop
-between the size of the set and the number of 1s in the representation given by
-the Kirsch and Mitzenmacher bound means that that the behavior of the filter in
-the absence of an adversary will be almost identical for reasonable choices of
-$\ell$. On the other hand, in the presence of an adversary that has access to
-$\UPO$ the use of $\ell$ allows us to make stronger guarantees with cleaner
-error bounds than would otherwise be possible. If the adversary does not have
-access to $\UPO$, i.e. if $q_U = 0$, we will assume an $\ell$ which is large
-enough to not affect the behavior of the filter at all, in order to model actual
-practice as closely as possible.
-
 \heading{Error function for set-mempership queries}
 %
 Throughout this section we will use the error function $\delta:\bits^2\to\N$
@@ -114,8 +144,8 @@ defined as
 \end{equation*}
 
 \subsection{Insecurity of unsalted BFs}
-Fix a hash function $H:\bits^*\to[m]^k$ and integers $n\geq0$,$\ell = kn$ and
-let $\Pi = \BF[H,\ell,n] = (\Rep^H, \Qry^H, \Up^H)$.
+Fix a hash function $H:\bits^*\to[m]^k$ and integer $n\geq0$ and
+let $\Pi = \BF[H,n] = (\Rep^H, \Qry^H, \Up^H)$.
 %
 Suppose the adversary is interacting with a system representing a dataset
 with~$\Pi$ and that it is able to choose some fraction of the input data.
@@ -205,8 +235,8 @@ avoids this pitfall.
 Here we consider the correctness of Bloom filters when the hashed input is
 prepended with a salt.
 %
-Fix $H:\bits^*\to[m]^k$, $n,\lambda\geq0$, $\ell = kn$, and let
-$\Pi = \SBF[H,\ell,n,\lambda] = (\Rep^H, \Qry^H, \Up^H)$ as defined above.
+Fix $H:\bits^*\to[m]^k$ and $n,\lambda\geq0$ and let
+$\Pi = \SBF[H,n,\lambda] = (\Rep^H, \Qry^H, \Up^H)$ as defined above.
 
 In the mutable setting, where the adversary is allowed to make $\UPO$ queries,
 we can perform an $\errep$ attack against~$\Pi$ as follows. First, the adversary
