@@ -1,25 +1,33 @@
 \begin{figure*}
-\threeColsOneDivideUnbalanced{0.40}{0.27}{0.27}
+\twoColsNoDivide{0.47}
 {
   \vspace{-7pt}
-  \experimentv{$\game_{0}(\advB)$}
-      \hfill \diffplus{$\game_1$}\\[2pt]
+  \experimentv{$\game_{0}(\advB)$}\\[2pt]
     $M^* \gets \bot$;
     $\salt^* \getsr \bits^\lambda$\\
     $\advB^{\REPO,\QRYO,\UPO,\HASHO_1}$;
     return $\big[\sum_x \err[x] \geq r\big]$
   \\[6pt]
-  \oraclev{$\REPO(\col)$}\\[2pt]
-    $M^* \gets \bigvee_{x \in \col} \bmap_m(\HASHO_2(\salt^* \cat x))$;
-    $\setS^* \gets \col$;
-    return $\top$
-  \\[6pt]
-  \oraclev{$\QRYO(\qry_x)$}\\[2pt]
+  \oraclev{$\HASHO_c(\salt \cat x)$}\hfill \diffminus{$\game_1$}\\[2pt]
+    $\vv \getsr [m]^k$\\
+    if $\salt=\salt^*$ and $c = 1$ then \com{Caller is~$\advB$}\\
+    \tab $\bad_1 \gets 1$; \diffminus{return $\vv$}\\
+    if $T[Z,x] = \bot$ then $\vv \gets T[Z,z]$\\
+    $T[Z,x] \gets \vv$; return $\vv$
+}
+{
+  \oraclev{$\QRYO(\qry_x)$}\hfill \diffplus{$\game_2$}\\[2pt]
     $X \gets \bmap_m(\HASHO_3(\salt^* \cat x))$;
     $a \gets X = M^* \AND X$\\
     if $\err[x] < \delta(a,\qry_x(\col^*))$ then
           $\err[x] \gets \delta(a,\qry_x(\col^*))$\\
+    \diffplus{$\UPO(\up_x)$}\\
     return $a$
+  \\[6pt]
+  \oraclev{$\REPO(\col)$}\\[2pt]
+    $M^* \gets \bigvee_{x \in \col} \bmap_m(\HASHO_2(\salt^* \cat x))$;
+    $\setS^* \gets \col$;
+    return $\top$
   \\[6pt]
   \oraclev{$\UPO(\up_x)$}\\[2pt]
     if $w(M) > \ell$ then return $\top$\\
@@ -27,47 +35,6 @@
     $M^* \gets M^* \vee \bmap_m(\HASHO_2(\salt^* \cat x))$;
     $\setS^* \gets \up_x(\setS)$;
     return $\top$
-  \\[6pt]
-  \oraclev{$\HASHO_c(\salt \cat x)$}\\[2pt]
-    $\vv \getsr [m]^k$\\
-    if $\salt=\salt^*$ and $c = 1$ then \com{Caller is~$\advB$}\\
-    \tab $\bad_1 \gets 1$; \diffplus{return $\vv$}\\
-    if $T[Z,x] = \bot$ then $\vv \gets T[Z,z]$\\
-    $T[Z,x] \gets \vv$; return $\vv$
-}
-{
-  \vspace{-2pt}
-  \oraclev{$\HASHO_c(\salt \cat x)$}\\[2pt]
-    $\vv \getsr [m]^k$\\
-    if $\salt=\salt^*$ and $c=1$ then\\
-    \tab $\bad_1 \gets 1$; return $\vv$\\
-    if $T[Z,x] = \bot$ then $\vv \gets T[Z,z]$\\
-    $T[Z,x] \gets \vv$\\[2pt]
-    \diffplusbox{
-    \com{Caller is~$\QRYO$}\\
-    if $c = 1$ or $c = 3$ then\\
-    \tab if $\salt \ne \salt^*$  then return $\vv$\\
-    \tab $\Ans[x] \gets \bmap_m(\vv) = M^* \AND \bmap_m(\vv)$\\
-    \tab if $\err[x] < \delta(\Ans[x],\qry_x(\col^*))$ then
-    \tab\tab $\err[x] \gets \delta(\Ans[x],\qry_x(\col^*))$
-    }
-    return $\vv$
-}
-{
-  \vspace{-7pt}
-  \oraclev{$\QRYO(\qry_x)$}\
-      \hfill \diffminus{$\game_1$} \diffplus{$\game_2$}\\[2pt]
-    \diffminusbox{%
-      $X \gets \bmap_m(\HASHO_3(\salt^* \cat x))$\\
-      $a \gets X = M^* \AND X$\\
-      if $\err[x] < \delta(a,\qry_x(\col^*))$ then\\
-      \tab $\err[x] \gets \delta(a,\qry_x(\col^*))$
-    }\\[2pt]
-    \diffplusbox{
-      $\HASHO_3(Z^* \cat x)$\\
-      $a \gets \Ans[x]$
-    }
-    return $a$
 }
 \caption{Games 0, 1, and 2 for proof of Theorem~\ref{thm:sbf-erreps}.}
 \label{fig:sbf-errep-immutable/games}
@@ -77,7 +44,7 @@ This proof follows a similar structure to the previous one. The primary distinct
 %
 Just as in the proof of Theorem~\ref{thm:sbf-errep-immutable}, we will assume the adversary just makes a single call to $\REPO$ and use Lemma~\ref{thm:lemma1} to complete the bound. Let $\advA$ be an \erreps\ adversary making exactly 1 call to $\REPO$, $q_T$ calls to $\QRYO$, $q_U$ calls to $\UPO$, and $q_H$ calls to $\HASHO$. Because $\advA$ creates only a single representation, it will necessarily lose if it calls $\REVO$ on that representation. We may therefore assume without loss of generality that $\advA$ makes no calls to $\REVO$, and because of this we omit $\REVO$ from each of the games.
 
-In addition to the assumptions of the previous theorem, we assume without loss of generality that the adversary never uses $\UPO$ to insert an element into $\col$ which is already present in the set. Since such a `re-insertion' does not change the representation, the adversary would gain no advantage from doing this.
+In addition to the assumptions of the previous theorem, we assume without loss of generality that the adversary never uses $\UPO$ to insert an element into $\col$ which is already present in the set, and never uses $\UPO$ to insert an element $x$ where $\QRYO(\qry_x)$ has already been called and has returned a positive result. Since these insertions do not change the filter and in the latter case may actually reduce the error count, the adversary would gain no advantage from performing these updates. Furthermore, we assume without loss of generality that an adversary halts as soon as it determines it has accumulated enough errors to win the experiment.
 
 We begin with a game~$\game_0(\advB)$ similar to the previous proof, as shown in Figure~\ref{fig:sbf-errep-immutable/games}. Again we observe that for every~$\advA$ there exists a~$\advB$  such that
 \begin{equation}
@@ -95,36 +62,43 @@ Since we are seeking a stronger bound, we now wish to isolate the possibility th
 \end{eqnarray}
 %
 In~$\game_1$, we may now assume that the adversary never guesses the salt in its $\HASHO_1$ queries. This means that none of the inputs to $\HASHO_1$ is ever equal to any input to $\HASHO_2$ or $\HASHO_3$, both of which always use the salt $\salt^*$. Since each $\HASHO$ is modeled as a random oracle, the outputs of $\HASHO_1$ are therefore independent of the outputs of $\HASHO_2$ and $\HASHO_3$.
-
-This shows that, unless the adversary is able to guess the salt, access to $\HASHO_1$ is not beneficial for the adversary, and that the adversary cannot predict the behavior of $\QRYO$ or $\UPO$ in advance.
-
 %
+We still cannot move to the binomial distribution for non-adaptive queries, however, since $\HASHO_2$ and $\HASHO_3$ queries are not necessarily independent of each other. By one of our starting assumptions, the same input is never provided twice to $\HASHO_2$ because the adversary never tries to insert an element which is already in $\col$. We also argue that (without loss of generality) the same input is never provided twice to $\HASHO_3$, i.e. that the same element is never queried twice.
 
-Furthermore, since each $\HASHO$ uses random sampling, each $\HASHO_2$ and $\HASHO_3$ call used for $\UPO$ and $\QRYO$ are independent of all other $\HASHO$ calls except in the case of repeated calls on the same element $x$. These repeated calls fall into one of three types:
-
+On one hand, if a $\QRYO(x)$ call shows that $x$ is already a false positive for $\pub$, further $\QRYO(x)$ calls cannot increase the adversary's error score. On the other hand, if a $\QRYO(x)$ call shows that $x$ is not a false positive, it is still possible for $x$ to become a false positive later on due to $\UPO$ calls. However, the adversary would obtain at least as large a chance of finding a false positive by calling $\QRYO(y)$ for some previously unqueried $y \not\in\col$, since the sequence of updates that could make $x$ a false positive are just as likely to make $y$ a false positive by the independence of $\HASHO_c$ calls on different inputs. We can therefore assume that the adversary does not send repeated queries to $\QRYO$.
+%
+We have now reduced to a case where all hash queries are independent except for $\QRYO$ and $\UPO$ calls to the same element. By our starting assumptions, an adversary never calls $\QRYO$ on an element which has already been inserted, so we need only consider the case of an element being queried before it is inserted. In fact, doing thos can be beneficial to a pollution attack, since determining with $\QRYO$ that an element is not already a false positive informs the adversary that inserting that element must necessarily set at least one new bit in the filter to 1. Since all other possibilities have been eliminated, we need only consider two types of update the adversary may make:
 \begin{enumerate}
-  \item Calling $\QRYO(\qry_x)$ when $\up_x$ has already been sent to $\UPO$.
-  \item Calling $\QRYO(\qry_x)$ when $\up_x$ has not already been sent to $\UPO$, but when $\qry_x$ has already been sent to $\QRYO$.
-  \item Calling 
+  \item Inserting an element which is not already in $\col$ and has previously been tested with $\QRYO$, returning a negative result.
+  \item Inserting an element which is not already in $\col$ and has not previously been tested with $\QRYO$.
 \end{enumerate}
+Since calls to $\HASHO_3$ with different choices of $x$ are independent of each other, and since $\HASHO_3$ uses random sampling, the effects of type 1 updates on the representation are identically distributed. Similarly, since calls to $\HASHO_2$ produce independent random results, the effects of type 2 updates on the representation are also identically distributed. However, the effects of the two types of update are \emph{not} identically distributed compared to each other. In particular, making a type 1 update ensures that at least one new bit in the filter will be set to 1, since the distribution of $\bmap_m(\HASHO_2(\salt^* \cat x))$ is conditioned on not producing a false positive. On the other hand, making a type 2 update provides no guarantee about how many bits in the filter might be set to 1. Type 1 updates are therefore always preferable for an adversary attempting to produce false positives.
 
-From these arguments, we can assume without loss of generality that no $x$ is ever sent to $\HASHO_c$ twice for $c \in \{2,3\}$. Since the $\HASHO$ oracles use random sampling, all such calls are independent of each other. Since $\QRYO$ and $\UPO$ use $\HASHO$ calls to compute queries and updates, this means that all query and update operations are independent as well.
+In fact, we can make an even stronger statement: it is always optimal for the adversary to insert $x$ as soon as $\QRYO(x)$ reveals that $x$ is not a false positive. Since this is a type 1 update, there is no `better' update which could benefit the adversary more, so there is no reason for the adversary's next $\UPO$ call to be anything other than $\UPO(\up_x)$. Furthermore, there is no reason to make additional $\QRYO$ calls before calling $\UPO(\up_x)$, since this insertion can only increase the probability that further $\QRYO$ calls produce an error.
 
-Since $\UPO$ calls are independent of all other oracle calls and the representation is private, the only influence $\UPO$ has on the game is to potentially increase the false positive probability by increasing the number of 1s in the filter. However, the number of 1s in the filter cannot increase beyond $\ell+k$ by the thresholding constraints on $\REPO$ and $\UPO$.
+For~$\game_2(\advB)$, then, we enforce this behavior, changing $\QRYO(x)$ to automatically insert $x$ into $\col$ after computing the correct response to the query. To make computing the final bound easier, we perform this insertion regardless of whether $x$ is a false positive. However, this does require relaxing our parameters. We know that the adversary halts after $r$ different calls to $\QRYO$ produce errors, so up to $r$ false positives may be inserted into $\col$ through this automatic insertion which would not have been inserted in~$\game_1$. This could cause the filter to prematurely fill up, so we must raise the set threshold from $n$ to $n+r$ to guarantee that $\Prob{\game_1(\advB) = 1} \le \Prob{\game_2(\advB) = 1}$.
 
-% no more than \ell+k bits will be set to 1, UNLESS more than that were set initially
-% more than \ell bits will be set to 1
-% if the adversary starts with a maximal set, 
+In~$\game_2$, $\UPO$ queries are actually superfluous. Since every element queried is automatically inserted into the set, $\UPO$ calls are now all of type 2. Since these insertions can only increase the chance of each following $\QRYO$ call being a false positive, it is optimal for the adversary to make all $\UPO$ calls at the beginning of the experiment, and then to make all $\QRYO$ calls. But this means we can assume without loss of generality that the adversary makes no $\UPO$ calls at all, since any elements added through $\UPO$ could just as easily have been included in the original call to $\REPO$.
 
-However, we cannot quite reduce this game to the non-adaptive bionmial distribution, since it is possible for the adversary to update the filter based on responses to previous queries. We want to move to a game where it is not beneficial for the adversary to interleave updates and queries.
+We now therefore only consider the case of a $\REPO$ call followed by the~$\game_2$ version of $\QRYO$ calls. Let $\setX$ be the set of all $x$ which are sent to $\QRYO$ over the course of the experiment. We necessarily have $|\setX| \le q_T$, and each $x \in \setX$ has a probability of causing an error. Since $\col^*$ never grows to contain more than $n+r$ elements, the false positive probability for each such $x$ is bounded above by $p_+$, the false-positive probability of a Bloom filter containing $n+r$ elements. So we have, analagously to the previous theorem,
+\begin{equation}
+   \Prob{\game_2(\advB)=1} \le
+     \sum_{i=r}^{q_T} \binom{q_T}{i}p_+^i(1-p_+)^{q_T-i} \,,
+\end{equation}
+where $q_T$ replaces $q$ and the larger $p_+$ replaces $p$. Applying the same Chernoff bound reduces this to
+\begin{equation}
+   \Prob{\game_2(\advB)=1} \le
+     e^{r-p_+q_T}\left(\frac{p_+q_T}{r}\right)^r.
+\end{equation}
 
-Note that there are three types of updates the adversary can make:
-\begin{enumerate}
-  \item Updates which insert elements which have previously been tested with $\QRYO$ and which were found to be false positives.
-  \item Updates which insert elements which have previously been tested with $\QRYO$ and which were found not to be false positives.
-  \item Updates which insert elements that have not yet been tested with $\QRYO$.
-\end{enumerate}
-Updates of type 1 are not helpful to the adversary, since doing so does not change the representation and actually decreases an entry in $\err$. Updates of the second and third type are identical except that 
+Again we apply Lemma~\ref{thm:lemma1} to get a final bound of
+\begin{equation}
+  \Adv{\erreps}_{\Pi,\delta,r}(\advA) \leq
+    q_R \cdot \left[
+      \frac{q_H}{2^\lambda} +
+      \left(\frac{p_+q_T}{r}\right)^re^{r-p_+q_T}
+    \right] \,.
+\end{equation}
 
 \ignore{
 \cpnote{The rest of this seems like the meat of the argument.}
