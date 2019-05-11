@@ -5,6 +5,7 @@
       if $|\col| > n$ return $\bot$\\
       $\salt \getsr \bits^\lambda$\\
       $M \gets \bigvee_{x \in \col} \bmap_m(R_K(\salt \cat x))$\\
+      if $w(M) > \ell$ then return $\bot$\\
       return $\langle M, \salt \rangle$
   }
   {
@@ -88,6 +89,18 @@ $q_T((1-e^{-kn/m})^k + O(1/m))$ false positives to occur. Our goal is to
 minimize the probability that even an adaptive adversary can perform
 significantly better than this lower bound.
 
+The standard definition of a Bloom filter does not make use of a threshold
+$\ell$ on the number of 1s in the filter. In practice the close relationshop
+between the size of the set and the number of 1s in the representation given by
+the Kirsch and Mitzenmacher bound means that that the behavior of the filter in
+the absence of an adversary will be almost identical for reasonable choices of
+$\ell$. On the other hand, in the presence of an adversary that has access to
+$\UPO$ the use of $\ell$ allows us to make stronger guarantees with cleaner
+error bounds than would otherwise be possible. If the adversary does not have
+access to $\UPO$, i.e. if $q_U = 0$, we will assume an $\ell$ which is large
+enough to not affect the behavior of the filter at all, in order to model actual
+practice as closely as possible.
+
 \heading{Error function for set-mempership queries}
 %
 Throughout this section we will use the error function $\delta:\bits^2\to\N$
@@ -101,8 +114,8 @@ defined as
 \end{equation*}
 
 \subsection{Insecurity of unsalted BFs}
-Fix a hash function $H:\bits^*\to[m]^k$ and integers $\ell,n\geq0$ and let $\Pi
-= \BF[H,\ell,n] = (\Rep^H, \Qry^H, \Up^H)$.
+Fix a hash function $H:\bits^*\to[m]^k$ and integers $n\geq0$,$\ell = kn$ and
+let $\Pi = \BF[H,\ell,n] = (\Rep^H, \Qry^H, \Up^H)$.
 %
 Suppose the adversary is interacting with a system representing a dataset
 with~$\Pi$ and that it is able to choose some fraction of the input data.
@@ -175,6 +188,8 @@ In Appendix~\ref{app:unsalted-attack} we demonstrate that target-set coverage
 attacks are feasible for practical BF parameters. We do so by simulating the
 attack when~$H$ is a random function (i.e., for each distinct input we choose
 $k$ integers from $[m]$ at random) for typical choices of $k$, $m$, and~$n$.
+%
+\todo{CP}{Add simulation to appendix.}
 
 %\todo{DS (lead)}{Double check that Gerbet \etal don't suggest anything like this
 %attack. If they do it's not a big deal; we just need to ensure, to the best of
@@ -190,7 +205,7 @@ avoids this pitfall.
 Here we consider the correctness of Bloom filters when the hashed input is
 prepended with a salt.
 %
-Fix $H:\bits^*\to[m]^k$, $\ell,n,\lambda\geq0$, and let
+Fix $H:\bits^*\to[m]^k$, $n,\lambda\geq0$, $\ell = kn$, and let
 $\Pi = \SBF[H,\ell,n,\lambda] = (\Rep^H, \Qry^H, \Up^H)$ as defined above.
 
 In the mutable setting, where the adversary is allowed to make $\UPO$ queries,
