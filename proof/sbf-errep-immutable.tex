@@ -96,11 +96,11 @@ oracle~$\HASHO$.
 %
 We make the following assumptions, all of which are without loss of generality.
 %
-First, all of~$\advA$'s $\QRYO$ queries proceed its $\REPO$ query.
+First, all of~$\advA$'s $\QRYO$ queries follow its $\REPO$ query.
 %
 Second, we assume that $x\not\in\setS$ for all queries $\qry_x$ to $\QRYO$,
 where~$\setS$ was the input to~$\advA$'s $\REPO$ query. This is without loss
-because Bloom filtersadmit false positives, but not false negatives
+because Bloom filters admit false positives, but not false negatives
 %
 Third, we we assume that $|\setS| \leq n$; this is without loss because
 otherwise~$\REPO$ outputs~$\bot$ and~$\advA$ gets no advantage.
