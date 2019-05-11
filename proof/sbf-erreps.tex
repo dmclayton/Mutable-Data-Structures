@@ -74,21 +74,23 @@ We have now reduced to a case where all hash queries are independent except for 
 \end{enumerate}
 Since calls to $\HASHO_3$ with different choices of $x$ are independent of each other, and since $\HASHO_3$ uses random sampling, the effects of type 1 updates on the representation are identically distributed. Similarly, since calls to $\HASHO_2$ produce independent random results, the effects of type 2 updates on the representation are also identically distributed. However, the effects of the two types of update are \emph{not} identically distributed compared to each other. In particular, making a type 1 update ensures that at least one new bit in the filter will be set to 1, since the distribution of $\bmap_m(\HASHO_2(\salt^* \cat x))$ is conditioned on not producing a false positive. On the other hand, making a type 2 update provides no guarantee about how many bits in the filter might be set to 1. Type 1 updates are therefore always preferable for an adversary attempting to produce false positives.
 
-In fact, we can make an even stronger statement: it is always optimal for the adversary to insert $x$ as soon as $\QRYO(x)$ reveals that $x$ is not a false positive. Since this is a type 1 update, there is no `better' update which could benefit the adversary more, so there is no reason for the adversary's next $\UPO$ call to be anything other than $\UPO(\up_x)$. Furthermore, there is no reason to make additional $\QRYO$ calls before calling $\UPO(\up_x)$, since this insertion can only increase the probability that further $\QRYO$ calls produce an error.
+In fact, we can make an even stronger statement: it is always optimal for the adversary to insert $x$ as soon as $\QRYO(x)$ reveals that $x$ is not a false positive. Since this is a type 1 update, there is no `better' update which could benefit the adversary more, so there is no reason for the adversary's next $\UPO$ call to be anything other than $\UPO(\up_x)$. There is also no reason to make additional $\QRYO$ calls before calling $\UPO(\up_x)$, since calling $\UPO(\up_x)$ can only increase the probability that further $\QRYO$ calls produce an error. We therefore assume without loss of generality that $\advB$ inserts $x$ after $\QRYO(x)$ returns a negative result, provided it still has at least one $\UPO$ call remaining and this insertion would not increase the size of the underlying set over the maximum number of $n$ elements.
 
-For~$\game_2(\advB)$, then, we enforce this behavior, changing $\QRYO(x)$ to automatically insert $x$ into $\col$ after computing the correct response to the query. To make computing the final bound easier, we perform this insertion regardless of whether $x$ is a false positive. However, this does require relaxing our parameters. We know that the adversary halts after $r$ different calls to $\QRYO$ produce errors, so up to $r$ false positives may be inserted into $\col$ through this automatic insertion which would not have been inserted in~$\game_1$. This could cause the filter to prematurely fill up, so we must raise the set threshold from $n$ to $n+r$ to guarantee that $\Prob{\game_1(\advB) = 1} \le \Prob{\game_2(\advB) = 1}$.
+For~$\game_2(C)$, then, we enforce this behavior, changing $\QRYO(x)$ to automatically insert $x$ into $\col$ after computing the correct response to the query. For any $\advB$ for~$\game_1$ we can construct $C$ for~$\game_2$ that simulates $\advB$ to attain the same advantage, forwarding oracle queries in the natural way except that any call of the form $\UPO(x)$ are ignored if $\QRYO(x)$ has been called previously. Ignoring these $\UPO$ calls does not negatively affect the adversary because in~$\game_2$ the original $\QRYO(x)$ call has already inserted $x$ into the set. Furthermore, the `enhanced' $\QRYO$ available to $C$ does not negatively affect $C$ at any point because inserting additional elements into the filter can only increase the probability that later queries return false positives. Then $C$ wins whenever $\advB$ does, and $\Prob{\game_1(\advB) = 1} \le \Prob{\game_2(C) = 1}$.
 
-In~$\game_2$, $\UPO$ queries are actually superfluous. Since every element queried is automatically inserted into the set, $\UPO$ calls are now all of type 2. Since these insertions can only increase the chance of each following $\QRYO$ call being a false positive, it is optimal for the adversary to make all $\UPO$ calls at the beginning of the experiment, and then to make all $\QRYO$ calls. But this means we can assume without loss of generality that the adversary makes no $\UPO$ calls at all, since any elements added through $\UPO$ could just as easily have been included in the original call to $\REPO$.
+However, the parameters of the games played by $C$ and $\advB$ are slightly different. In particular, $\advB$ (and, by extension, $C$) may find up to $r$ false positives before halting. When $\advB$ finds these false positives they are by assumption not ever inserted into $\col$, while in the case of $C$ the $\QRYO$ oracle automatically inserts them into the set as soon as they are found. While inserting a false positive does not affect the filter itself in any way, it does increment the number of elements in the underlying set. Therefore if adversaries $\advB$ in~$\game_1$ are limited to representing a set of size $n$, we restrict adversaries $C$ in~$\game_2$ to representing sets of up to size $n+r$.
 
-We now therefore only consider the case of a $\REPO$ call followed by the~$\game_2$ version of $\QRYO$ calls. Let $\setX$ be the set of all $x$ which are sent to $\QRYO$ over the course of the experiment. We necessarily have $|\setX| \le q_T$, and each $x \in \setX$ has a probability of causing an error. Since $\col^*$ never grows to contain more than $n+r$ elements, the false positive probability for each such $x$ is bounded above by $p_+$, the false-positive probability of a Bloom filter containing $n+r$ elements. So we have, analagously to the previous theorem,
+In~$\game_2$, $\UPO$ queries are actually superfluous. Since every element queried is automatically inserted into the set and the adversary never inserts an element more than once, $\UPO$ calls are now all of type 2. Since these insertions can only increase the chance of each following $\QRYO$ call being a false positive, it is optimal for the adversary to make all $\UPO$ calls at the beginning of the experiment, and then to make all $\QRYO$ calls. But this means we can assume without loss of generality that the adversary makes no $\UPO$ calls at all, since any elements added through $\UPO$ before any $\QRYO$ calls are made could just as easily have been included in the original call to $\REPO$ without affecting the adversary's advantage.
+
+We now therefore only consider the case of a $\REPO$ call followed by the~$\game_2$ version of $\QRYO$ calls. Let $\setX$ be the set of all $x$ which are sent to $\QRYO$ over the course of the experiment. We necessarily have $|\setX| \le q_T$, and each $x \in \setX$ has a probability of causing an error. Since $\col^*$ never grows to contain more than $n+r$ elements, the false positive probability for each such $x$ is bounded above by $p_*$, the false-positive probability of a Bloom filter containing $n+r$ elements. So we have, analagously to the previous theorem,
 \begin{equation}
    \Prob{\game_2(\advB)=1} \le
-     \sum_{i=r}^{q_T} \binom{q_T}{i}p_+^i(1-p_+)^{q_T-i} \,,
+     \sum_{i=r}^{q_T} \binom{q_T}{i}p_*^i(1-p_*)^{q_T-i} \,,
 \end{equation}
-where $q_T$ replaces $q$ and the larger $p_+$ replaces $p$. Applying the same Chernoff bound reduces this to
+where $q_T$ replaces $q$ and the larger $p_*$ replaces $p$. Applying the same Chernoff bound reduces this to
 \begin{equation}
    \Prob{\game_2(\advB)=1} \le
-     e^{r-p_+q_T}\left(\frac{p_+q_T}{r}\right)^r.
+     e^{r-p_*q_T}\left(\frac{p_*q_T}{r}\right)^r.
 \end{equation}
 
 Again we apply Lemma~\ref{thm:lemma1} to get a final bound of
@@ -96,77 +98,6 @@ Again we apply Lemma~\ref{thm:lemma1} to get a final bound of
   \Adv{\erreps}_{\Pi,\delta,r}(\advA) \leq
     q_R \cdot \left[
       \frac{q_H}{2^\lambda} +
-      \left(\frac{p_+q_T}{r}\right)^re^{r-p_+q_T}
+      \left(\frac{p_*q_T}{r}\right)^re^{r-p_*q_T}
     \right] \,.
 \end{equation}
-
-\ignore{
-\cpnote{The rest of this seems like the meat of the argument.}
-
-We want to show that alternating between sequences of queries and sequences of
-updates is no better than making one long series of updates and then one long
-sequence of queries. There are three types of updates the adversary can make:
-updates to add elements that have been queried and found to be false positives;
-updates to add elements that have been queried and found not to be false
-positives; and updates to add elements that have not been queried yet. We may
-assume without loss of generality that the adversary never makes the first type
-of update, since doing so is never beneficial (it does not change the
-representation at all and decreases the number of errors the adversary has
-found). \cpnote{Explicitly name these type-1, type-2, and type-3 updates, since
-you refer to them below. IN fact, it might be beneficial to put them in a
-bultted list.}
-
-Note that the choices of $\vv$ constructed by the $\HASHO_i$ oracles are
-independent of all previous queries. Because of this, any update of type-3 is
-equivalent to any other update of type-3%
-%
-\cpnote{Careful with the word ``equivalent'': I think you mean ``have the same
-distribution'' or something?}%
-%
-; the probability of any bit being flipped by one update is the same as the
-probability of the bit being flipped by the other update. Similarly, any update
-of type-2 is equivalent to any other update of type-2, but is not the same as
-type-3 since the probability is conditioned on $\vv$ not being a false positive.
-We assume the worst case, namely that all updates are type-2 (i.e. at least one
-bit is flipped by each update).
-
-Because the adversary never guesses the salt, $\HASHO_1$ simply functions as a
-random oracle.
-%
-\cpnote{This isn't quite true. Go back to Thereom~\ref{fig:sbf-errep1} and think
-about the semantics of~$\HASHO_1$ in games~0 and~1.}
-%
-Furthermore, we can assume the adversary never adds an element of
-$\col$ to $\col$%
-%
-\cpnote{Word this differently. You mean update the data structure with an
-element that is already in it?}
-%
-and never makes a $\QRYO$ call for an element which is already
-in $\col$, since neither of these provides any additional information and
-neither affects the rest of the experiment in any way.
-
-Now we move to the game~$\game_3$. Here each $\QRYO$ query also calls $\UPO$ to
-add that element to $\col$. \cpnote{Clever.}  Additionally, the penalty for adding known false
-positives is removed. To avoid penalizing the adversary by prematurely maxing
-out the number of elements in $\col$ because of added false positives, we also
-increase the maximum size of $\col$ from $n$ to $n+s$, where $s = \min(r,q_U)$.
-Because the adversary (without loss of generality) stops after accumulating $r$
-errors, only $\min(r,q_U)$ false positives will be added to $\col$ and so a
-maximum size of $n+s$ is sufficient to produce no penalty for the adversary.
-Furthermore, each $\UPO$ call is preceded by a $\QRYO$ call. Neither of these
-changes can produce a worse result for the adversary, so $\Prob{\game_2(\advB) =
-1} \le \Prob{\game_3(\advB) = 1}$. Now, however, there is no longer any
-distinction between $\QRYO$ and $\UPO$ calls. All calls to either oracle are
-independent of each other and produce the same effect, querying and then
-updating $\col$. Each of these queries for false positives is at most as
-successful as a query to a Bloom filter with $n+r$ elements, so the adversary's
-probability of finding a false positive on any query is bounded above by the
-standard success rate for a Bloom filter with those parameters. The adversary is
-required to produce $r$ errors over the course of $q_T+q_U$ queries, which by
-the binomial theorem gives an advantage bound of $\Prob{\game_3(\advB) = 1} \leq
-...$.
-%
-\cpnote{What about~$q_H$?}
-
-\todo{DC (lead)}{Finish the bound by applying Lemma~\ref{thm:lemma1}.}}
