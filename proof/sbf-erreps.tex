@@ -22,6 +22,8 @@
     return $a$
   \\[6pt]
   \oraclev{$\UPO(\up_x)$}\\[2pt]
+    if $w(M) > \ell$ then return $\top$\\
+    if $\QRYO(\qry_x) = 1$ then $\err[x] \gets 0$\\
     $M^* \gets M^* \vee \bmap_m(\HASHO_2(\salt^* \cat x))$;
     $\setS^* \gets \up_x(\setS)$;
     return $\top$
@@ -94,7 +96,27 @@ Since we are seeking a stronger bound, we now wish to isolate the possibility th
 %
 In~$\game_1$, we may now assume that the adversary never guesses the salt in its $\HASHO_1$ queries. This means that none of the inputs to $\HASHO_1$ is ever equal to any input to $\HASHO_2$ or $\HASHO_3$, both of which always use the salt $\salt^*$. Since each $\HASHO$ is modeled as a random oracle, the outputs of $\HASHO_1$ are therefore independent of the outputs of $\HASHO_2$ and $\HASHO_3$.
 
-This shows that, unless the adversary is able to guess the salt, access to $\HASHO_1$ is not beneficial for the adversary, and that the adversary cannot predict the behavior of $\QRYO$ or $\UPO$ in advance. However, we cannot quite reduce this game to the non-adaptive bionmial distribution, since it is possible for the adversary to update the filter based on responses to previous queries. We want to move to a game where it is not beneficial for the adversary to interleave updates and queries.
+This shows that, unless the adversary is able to guess the salt, access to $\HASHO_1$ is not beneficial for the adversary, and that the adversary cannot predict the behavior of $\QRYO$ or $\UPO$ in advance.
+
+%
+
+Furthermore, since each $\HASHO$ uses random sampling, each $\HASHO_2$ and $\HASHO_3$ call used for $\UPO$ and $\QRYO$ are independent of all other $\HASHO$ calls except in the case of repeated calls on the same element $x$. These repeated calls fall into one of three types:
+
+\begin{enumerate}
+  \item Calling $\QRYO(\qry_x)$ when $\up_x$ has already been sent to $\UPO$.
+  \item Calling $\QRYO(\qry_x)$ when $\up_x$ has not already been sent to $\UPO$, but when $\qry_x$ has already been sent to $\QRYO$.
+  \item Calling 
+\end{enumerate}
+
+From these arguments, we can assume without loss of generality that no $x$ is ever sent to $\HASHO_c$ twice for $c \in \{2,3\}$. Since the $\HASHO$ oracles use random sampling, all such calls are independent of each other. Since $\QRYO$ and $\UPO$ use $\HASHO$ calls to compute queries and updates, this means that all query and update operations are independent as well.
+
+Since $\UPO$ calls are independent of all other oracle calls and the representation is private, the only influence $\UPO$ has on the game is to potentially increase the false positive probability by increasing the number of 1s in the filter. However, the number of 1s in the filter cannot increase beyond $\ell+k$ by the thresholding constraints on $\REPO$ and $\UPO$.
+
+% no more than \ell+k bits will be set to 1, UNLESS more than that were set initially
+% more than \ell bits will be set to 1
+% if the adversary starts with a maximal set, 
+
+However, we cannot quite reduce this game to the non-adaptive bionmial distribution, since it is possible for the adversary to update the filter based on responses to previous queries. We want to move to a game where it is not beneficial for the adversary to interleave updates and queries.
 
 Note that there are three types of updates the adversary can make:
 \begin{enumerate}
@@ -102,7 +124,7 @@ Note that there are three types of updates the adversary can make:
   \item Updates which insert elements which have previously been tested with $\QRYO$ and which were found not to be false positives.
   \item Updates which insert elements that have not yet been tested with $\QRYO$.
 \end{enumerate}
-We may assume without loss of generality that the adversary never makes any updates of type 1, since doing so does not change the representation and actually decreases a counter in $\err$.
+Updates of type 1 are not helpful to the adversary, since doing so does not change the representation and actually decreases an entry in $\err$. Updates of the second and third type are identical except that 
 
 \ignore{
 \cpnote{The rest of this seems like the meat of the argument.}
