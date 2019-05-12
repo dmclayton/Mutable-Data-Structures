@@ -1,46 +1,88 @@
-\ignore{\begin{figure*}
-\twoColsNoDivide{0.47}
+\begin{figure*}
+\twoCols{0.47}
 {
   \vspace{-7pt}
-  \experimentv{$\game_{0}(\advB)$}\\[2pt]
-    $M^* \gets \bot$;
-    $\salt^* \getsr \bits^\lambda$\\
-    $\advB^{\REPO,\QRYO,\UPO,\HASHO_1}$;
+  \experimentv{$\game_{0}(\advA)$}\\[2pt]
+    $\key \getsr \keys$;
+    $ct \gets 0$\\
+    $\advA^{\REPO,\QRYO,\UPO}$;
     return $\big[\sum_x \err[x] \geq r\big]$
   \\[6pt]
-  \oraclev{$\HASHO_c(\salt \cat x)$}\hfill \diffminus{$\game_1$}\\[2pt]
-    $\vv \getsr [m]^k$\\
-    if $\salt=\salt^*$ and $c = 1$ then \com{Caller is~$\advB$}\\
-    \tab $\bad_1 \gets 1$; \diffminus{return $\vv$}\\
+  \oraclev{$\HASHO(\salt \cat x)$}\hfill\diffminus{$\game_0$}\diffplus{$\game_1$}\\[2pt]
+    \diffminus{$\vv \gets F_K(\salt \cat x)$}\\
+    \diffplusbox{$\vv \getsr [m]^k$\\
     if $T[Z,x] = \bot$ then $\vv \gets T[Z,z]$\\
-    $T[Z,x] \gets \vv$; return $\vv$
-}
-{
-  \oraclev{$\QRYO(\qry_x)$}\hfill \diffplus{$\game_2$}\\[2pt]
-    $X \gets \bmap_m(\HASHO_3(\salt^* \cat x))$;
-    $a \gets X = M^* \AND X$\\
-    if $\err[x] < \delta(a,\qry_x(\col^*))$ then
-          $\err[x] \gets \delta(a,\qry_x(\col^*))$\\
-    \diffplus{$\UPO(\up_x)$}\\
+    $T[Z,x] \gets \vv$; return $\vv$}
+  \\[6pt]
+  \oraclev{$\QRYO(i, \qry_x)$}\\[2pt]
+    $X \gets \bmap_m(\HASHO(\salt_i \cat x))$;
+    $a \gets X = M_i \AND X$\\
+    if $\err[x] < \delta(a,\qry_x(\col_i))$ then
+          $\err[x] \gets \delta(a,\qry_x(\col_i))$\\
     return $a$
   \\[6pt]
   \oraclev{$\REPO(\col)$}\\[2pt]
-    $M^* \gets \bigvee_{x \in \col} \bmap_m(\HASHO_2(\salt^* \cat x))$;
-    $\setS^* \gets \col$;
-    return $\top$
+    $ct \gets ct+1$;
+    $\setS_{ct} \gets \col$;
+    $\salt_{ct} \getsr \bits^\lambda$;
+    $c_{ct} \gets |\col|$\\
+    $M_{ct} \gets \bigvee_{x \in \col} \bmap_m(\HASHO(\salt_{ct} \cat x))$;
+    return $\langle M_{ct}, \salt_{ct}, c_{ct} \rangle$
   \\[6pt]
-  \oraclev{$\UPO(\up_x)$}\\[2pt]
+  \oraclev{$\UPO(i, \up_x)$}\\[2pt]
     if $w(M) > \ell$ then return $\top$\\
     if $\QRYO(\qry_x) = 1$ then $\err[x] \gets 0$\\
-    $M^* \gets M^* \vee \bmap_m(\HASHO_2(\salt^* \cat x))$;
-    $\setS^* \gets \up_x(\setS)$;
-    return $\top$
+    $M_i \gets M_i \vee \bmap_m(\HASHO(\salt_i \cat x))$;
+    $\setS_i \gets \up_x(\setS_i)$;
+    return $\langle M_i, \salt_i, c_i+1\rangle$
 }
-\caption{Games 0, 1, and 2 for proof of Theorem~\ref{thm:sbf-erreps}.}
-\label{fig:sbf-errep-immutable/games}
-\end{figure*}}
+{
+  \vspace{-7pt}
+  \experimentv{$\game_{2}(\advA)$}\hfill\diffplus{$\game_3$}\\[2pt]
+    $\key \getsr \keys$;
+    $ct \gets 0$;
+    $\salt_0 \gets \emptyset$\\
+    $\advA^{\REPO,\QRYO,\UPO}$;
+    return $\big[\sum_x \err[x] \geq r\big]$
+  \\[6pt]
+  \oraclev{$\REPO(\col)$}\\[2pt]
+    $ct \gets ct+1$;
+    $\setS_{ct} \gets \col$;
+    $\salt_{ct} \getsr \bits^\lambda \setminus \salt_0$;
+    $c_{ct} \gets |\col|$\\
+    $\salt_0 \gets \salt_0 \cup \{\salt_{ct}\}$\\
+    $M_{ct} \gets \bigvee_{x \in \col} \bmap_m(\HASHO(\salt_{ct} \cat x))$;
+    return $\langle M_{ct}, \salt_{ct}, c_{ct} \rangle$
+  \\[6pt]
+  \oraclev{$\QRYO(i, \qry_x)$}\\[2pt]
+    $X \gets \bmap_m(\HASHO(\salt_i \cat x))$;
+    $a \gets X = M_i \AND X$\\
+    if $\err[x] < \delta(a,\qry_x(\col_i))$ then
+          $\err[x] \gets \delta(a,\qry_x(\col_i))$\\
+    \diffplus{$\UPO(i, \up_x)$;}
+    return $a$
+  \\[6pt]
+  \experimentv{$\game_{4}(\advB)$}\\[2pt]
+    $\key \getsr \keys$;
+    $ct \gets 0$;
+    $\salt_0 \gets \emptyset$\\
+    $\advB^{\REPO,\QRYO}$;
+    return $\big[\sum_x \err[x] \geq r\big]$
+  \\[6pt]
+  \oraclev{$\QRYO(i, \qry_x)$}\\[2pt]
+    for $i \in [ct]$ do\\
+    $\tab X \gets \bmap_m(\HASHO(\salt_i \cat x))$;
+    $a \gets X = M_i \AND X$\\
+    $\tab$if $\err[x] < \delta(a,\qry_x(\col_i))$ then
+          $\err[x] \gets \delta(a,\qry_x(\col_i))$\\
+    $\tab\UPO(i, \up_x)$;
+    return $a$
+}
+\caption{Games 0--4 for proof of Theorem~\ref{thm:bf-key-bound}.}
+\label{fig:kbf-errep/games}
+\end{figure*}
 
-We start with a game~$\game_0$ which is essentially the same as the standard \errep\ experiment on a Bloom filter. As with the other proofs, it is easy to see that
+We start with a game~$\game_0$ which is essentially the same as the standard \errep\ experiment on a Bloom filter, given the assumption (without loss of generality) that the adversary never attempts to construct a representation for a set with more than $n$ elements. As with the other proofs, it is easy to see that
 \begin{equation}
   \Adv{\errep}_{\Pi,\delta,r}(\advA) \leq \Prob{\game_0(\advB) = 1}
 \end{equation}
@@ -48,23 +90,23 @@ for $\advB$ given the same resources as $\advA$.
 
 Unlike in the previous two proofs, we cannot use Lemma~\ref{thm:lemma1} because an adversary cannot simulate the oracles without knowing the private key. We use an alternate approach to gradually reduce to the standard binomial bound deriving from the non-adaptive false positive probabilities. The first thing we want to do is to bound the probability that the adversary can break the PRF.
 
-The number of times the PRF is evaluated on distinct inputs is bounded by the number of queries available to the adversary. In particular, $\QRYO$ and $\UPO$ each call the PRF once, while $\REPO$ may call the PRF up to $n$ times. If the adversary runs in $t$ time steps, then, the probability it can distinguish the PRF from a random function is bounded by $\Adv{\prf}_F(t,nq_R+q_T+q_U)$. In~$\game_0$, we have a game which is identical to the standard \errep\ game except that it uses random sampling in place of the PRF. If $\advA$ cannot distinguish the PRF from a random function then these games are indistinguishable from the adversary's perspective, so $\Prob{\game_0(\advA) = 1} \le \Adv{\prf}_F(t,nq_R+q_T+q_U) + \Prob{\game_1(\advA) = 1}$.
+The number of times the PRF is evaluated on distinct inputs is bounded by the number of queries available to the adversary. In particular, $\QRYO$ and $\UPO$ each call the PRF once, while $\REPO$ may call the PRF up to $n$ times. If the adversary runs in $t$ time steps, then, the probability it can distinguish the PRF from a random function is bounded by $\Adv{\prf}_F(t,nq_R+q_T+q_U)$. In~$\game_1$, we have a game which is identical to~$\game_0$ except that it uses random sampling in place of the PRF. If $\advA$ cannot distinguish the PRF from a random function then these games are indistinguishable from the adversary's perspective, so $\Prob{\game_0(\advA) = 1} \le \Adv{\prf}_F(t,nq_R+q_T+q_U) + \Prob{\game_1(\advA) = 1}$.
 
 Our goal is to argue, in a similar manner as to the previous theorems, that all of the oracle calls are independent. In order to guarantee this we must deal with the possibility of a salt collision between different representations. In~$\game_2(\advA)$ we require that all salts be distinct between representations. By the birthday bound, collisions between randomly-generated salts occur with frequency at most $q_R^2/2^\lambda$, so $\Prob{\game_1(\advA) = 1} \le q_R^2/2^\lambda + \Prob{\game_2(\advA) = 1}$.
 
-With guaranteed-unique salts, the result of each $\REPO$, $\UPO$, and $\QRYO$ call for a given representation is independent of the calls for all other representations. By an almost identical argument to the proof of Theorem~\ref{thm:sbf-erreps}, we can assume without loss of generality that the adversary follows any $\QRYO$ call that does not find a false positive with an $\UPO$ call to insert that element, and therefore move to~$\game_3(\advA)$. Since the adversary never inserts the same element multiple times, we can again conclude that without loss of generality the adversary never directly invokes the $\UPO$ oracle.
+With guaranteed-unique salts, the result of each $\REPO$, $\UPO$, and $\QRYO$ call for a given representation is independent of the calls for all other representations. By an almost identical argument to the proof of Theorem~\ref{thm:sbf-erreps}, we can assume without loss of generality that the adversary follows any $\QRYO$ call that does not find a false positive with an $\UPO$ call to insert that element, and therefore move to~$\game_3(\advA)$, which as in the previous proof automatically performs an update after each query is made. Since the adversary never inserts the same element multiple times, we can again conclude that without loss of generality the adversary never directly invokes the $\UPO$ oracle.
 
-Finally, we must deal with the possibility that the adversary chooses which representations to target with $\UPO$ and $\QRYO$ calls based on the result of $\REPO$, since some representations may be more full than others. When we move to~$\game_4(\advA)$, the adversary gets credit if a call to $\QRYO$ produces an error in any of the representations that have been constructed, and furthermore the updates apply to all representations that are not already full. Since all $\UPO$ calls are identically and independently distributed, and having more elements in a filter cannot decrease the false positive rate, the fact that some representations may become full more quickly than they otherwise would have can only help the adversary. Similarly, having $\QRYO$ count errors across all representations never harms the adversary, and so the adversary's advantage may only increase when moving to~$\game_4(\advA)$. Therefore $\Prob{\game_3(\advA) = 1} \le \Prob{\game_4(\advA) = 1}$.
+Finally, we must deal with the possibility that the adversary chooses which representations to target with $\UPO$ and $\QRYO$ calls based on the result of $\REPO$, since some representations may be more full than others. When we move to~$\game_4(\advB)$, we deny the adversary direct access to the $\UPO$ oracle because it is never needed, but we allow the adversary credit if a call to $\QRYO$ produces an error in any of the representations that have been constructed. Furthermore, the updates made by $\QRYO$ apply to all representations that are not already full. Since all $\UPO$ calls are identically and independently distributed, and having more elements in a filter cannot decrease the false positive rate, the fact that some representations may become full more quickly than they otherwise would have can only help the adversary. Similarly, having $\QRYO$ count errors across all representations never harms the adversary, and so the adversary's advantage may only increase when moving to~$\game_4(\advB)$. Therefore $\Prob{\game_3(\advA) = 1} \le \Prob{\game_4(\advB) = 1}$, where $\advB$ is an adversary which behaves identically to $\advA$ but which is syntactically distinct because it lacks the unused $\UPO$ oracle.
 
 We are now in a situation where we can apply the standard, non-adaptive error bound. Let $\setX$ be the set of all queries $\qry_x$ made by the adversary over the course of the game. As in the previous proof, we have $|\setX| \le q_T$. However, $\qry_x$ may now cause a false positive in any of the representations. The probability of causing a false positive in a specific representation is still given by the non-adaptive false positive probability $p_*$ for a Bloom filter containing $n+r$ elements. Since the representations are independent of each other, the probability of a false positive occurring in any of up to $q_R$ representations is at most $p_*q_R$. We can therefore bound the adversary's success probability using a binomial distribution, similar to before:
 \begin{equation}
-   \Prob{\game_4(\advA)=1} \le
+   \Prob{\game_4(\advB)=1} \le
      \sum_{i=r}^{q_T} \binom{q_T}{i}(p_*q_R)^i(1-p_*q_R)^{q_T-i} \,.
 \end{equation}
 
 Applying the usual Chernoff bound, we find
 \begin{equation}
-   \Prob{\game_4(\advA)=1} \le
+   \Prob{\game_4(\advB)=1} \le
      e^{r-p_*q_Rq_T}\left(\frac{p_*q_Rq_T}{r}\right)^r.
 \end{equation}
 
