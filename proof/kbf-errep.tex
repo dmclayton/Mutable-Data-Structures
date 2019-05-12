@@ -63,3 +63,16 @@ We are now in a situation where we can apply the standard, non-adaptive error bo
 \end{equation}
 
 Applying the usual Chernoff bound, we find
+\begin{equation}
+   \Prob{\game_4(\advA)=1} \le
+     e^{r-p_*q_Rq_T}\left(\frac{p_*q_Rq_T}{r}\right)^r.
+\end{equation}
+
+So, substituting this bound back into the earlier advantage inequalities, we find the final bound of
+\begin{equation}
+  \Adv{\errep}_{\Pi,\delta,r}(\advA) \leq
+      \Adv{\prf}_F(t,nq_R+q_T+q_U) +
+      \frac{q_R^2}{2^\lambda} +
+      \left(\frac{p_*q_Rq_T}{r}\right)^re^{r-p_*q_Rq_T}
+    \,.
+\end{equation}
