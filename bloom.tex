@@ -19,17 +19,6 @@
       $M \gets M \vee \bmap_m(R_K(\salt \cat x))$\\
       return $\langle M, \salt, c+1 \rangle$
   }
-  \caption{The keyless structure $\bloom[R,n,\lambda]$ given by
-  $(\Rep^R,\Qry^R,\Up^R)$ is used to define Bloom filter variants. The
-  parameters are a function $R: \keys\by\bits^* \to [m]^k$ and integers $n,
-  \lambda \geq0$. A concrete scheme is given by a particular choice of
-  parameters.  The function~$\bmap_m$ is defined in
-  Section~\ref{sec:prelims}.
-  }
-  \label{fig:bf-def}
-\end{figure}
-
-\begin{figure}
   \twoColsNoDivide{0.22}
   {
     \underline{$\Rep^R_K(\col)$}\\[2pt]
@@ -49,18 +38,30 @@
       if $\hw(M) > \ell$ then return $\bot$\\
       return $\langle M \vee \bmap_m(R_K(\salt \cat x)), \salt \rangle$
   }
-  \caption{A slightly modified structure $\bloom_\mathrm{ft}[R,\ell,\lambda]$ given by
-  $(\Rep^R,\Qry^R,\Up^R)$ which produces Bloom filter variants that use a different notion of fullness. The
-  parameters are a function $R: \keys\by\bits^* \to [m]^k$ and integers $\ell,
-  \lambda \geq0$. A concrete scheme is given by a particular choice of
-  parameters.  Functions~$\hw$ and~$\bmap_m$ are defined in
-  Section~\ref{sec:prelims}.
+  \caption{Top: Keyed structure $\bloom[R,n,\lambda]$ given by
+  $(\Rep^R,\Qry^R,\Up^R)$ is used to define Bloom filter variants used to
+  rerpresent sets of at most~$n$ elements.  parameters are a function $R:
+  \keys\by\bits^* \to [m]^k$ and integers $n, \lambda \geq0$. A concrete scheme
+  is given by a particular choice of parameters. The function~$\bmap_m$ is
+  defined in Section~\ref{sec:prelims}.
+  %
+  Bottom: A slightly modified structure, $\bloom_\mathrm{ft}[R,\ell,\lambda]$ given by
+  $(\Rep^R,\Qry^R,\Up^R)$ which uses the Hamming weight of the filter ($\hw$, as
+  defined in Section~\ref{sec:prelims}) to decide if the filter is full.
   }
   \label{fig:bft-def}
+  \label{fig:bf-def}
 \end{figure}
 
-
-\medskip
+\todo{DC}{Revise this text (now out-of-date!). ``In this section we consider two
+classes of the Bloom filters, each employing a different thresholding strategy.
+[We will have discussed why different strategies are needed in the intro, at
+least at a high level.] Let $R:\keys\by\bits^*\to[m]^k$ be a function and let
+$n,\ell,\lambda\geq0$ be integers. The first class, defined at the top of
+Figure~\ref{fig:bf-def}, ...'' Don't define the concrete structures, as we did
+before. Instead, define the concrete structure at the top of the section in
+which it appears.}
+%
 We specify three Bloom filter variants using the keyed structure
 $\bloom[R,\ell,n,\lambda] = (\Rep^R,\Qry^R,\Up^R)$ specified in
 Figure~\ref{fig:bf-def}.
@@ -113,25 +114,50 @@ extended to the filter-threshold construction in the natural way, though we only
 consider the unkeyed and salted construction $\SBF_\mathrm{ft}$ to provide an example
 of the tighter error bounds this alternate construction can provide.
 
-In the non-adaptive setting, the false positive rate for a Bloom filter of $m$
-bits using $k$ hash functions and storing $n$ items can be closely approximated
-as $(1-e^{-kn/m})^k + O(1/m)$.~\cite{kirsch2006less} Over the course of $q_T$
-random evaluations of $\Qry$, we would then expect about
-$q_T((1-e^{-kn/m})^k + O(1/m))$ false positives to occur. Our goal is to
-minimize the probability that even an adaptive adversary can perform
-significantly better than this lower bound.
+
+\heading{False-positive probbility in the non-adaptive setting}
+Let~$\rho$ be a function, $\lambda\geq0$ be an intger, and define
+$\Pi = \bloom[\id^\rho,n,\lambda] = (\Rep^\rho, \Qry^\rho, \Up^\rho)$ as in
+Figure~\ref{fig:bf-def}.
+%
+Let $\setS\subseteq\bits^*$ be a set of length~$n$ and let
+$x\in\bits^*\setminus\setS$. We define the non-adaptive, false positive
+probabiity for Bloom filters as
+\begin{equation}\label{eq:bf-fp}
+  \begin{aligned}
+    P_\bff(k,m,n) =
+      \Pr\big[&\rho \getsr \Func(\bits^*,[m]^k); \\
+              &\pub \getsr \Rep^\rho(\setS): \\
+              &\Qry^\rho(\pub, \qry_x) = 1 \given \pub \ne \bot
+      \big] \,.
+  \end{aligned}
+\end{equation}
+%
+That is, $P_\bff(k,m,n)$ is the probability that any~$x$ a false positive for
+the representation of some~$\setS$ when a random function is used for hashing.
+%
+Deriving a tight, concrete uppper bound is illusive; \todo{DC}{Briefly comment
+on why this is difficult.} However, we do understand its asymptotic behavior
+quite well. Kirsch and Mitzenmacher~\cite{kirsch2006less} prove that, for
+particular choices of $k$ and $m$ as functions of~$n$
+\[
+  P_\bff(k,m,n) = \lim_{n\goesto\infty} (1-e^{-kn/m})^k \,.
+\]
+%
+In the same paper, they demonstrate via simulation that this is a very good
+approximation of the false positive probability for parameters of practical
+interest.
 
 \heading{Error function for set-mempership queries}
 %
-Throughout this section we will use the error function $\delta:\bits^2\to\R$
-defined as
-\begin{equation*}
-  \delta(a, b) =
+Throughout this section we will use the error function $\delta_\bff$ as
+\begin{equation}
+  \delta_\bff(x, y) =
   \begin{cases}
-    0 & \text{if}\ a=b \\
+    0 & \text{if}\ x=y \\
     1 & \text{otherwise.}
   \end{cases}
-\end{equation*}
+\end{equation}
 
 \subsection{Insecurity of unsalted BFs}
 Fix a hash function $H:\bits^*\to[m]^k$ and integer $n\geq0$ and
