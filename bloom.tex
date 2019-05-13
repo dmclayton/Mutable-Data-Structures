@@ -115,10 +115,11 @@ consider the unkeyed and salted construction $\SBF_\mathrm{ft}$ to provide an ex
 of the tighter error bounds this alternate construction can provide.
 
 
-\heading{False-positive probbility in the non-adaptive setting}
+\heading{Non-adaptive false-positive probbility.}
 Let~$\rho$ be a function, $\lambda\geq0$ be an intger, and define
-$\Pi = \bloom[\id^\rho,n,\lambda] = (\Rep^\rho, \Qry^\rho, \Up^\rho)$ as in
-Figure~\ref{fig:bf-def}.
+$\bloom[\id^\rho,n,\lambda] = (\Rep^\rho, \Qry^\rho, \Up^\rho)$ as in
+Figure~\ref{fig:bf-def}. (Note the mild abuse of notation by which we write
+``$\rho$'' instead of ``$\id^\rho$''.)
 %
 Let $\setS\subseteq\bits^*$ be a set of length~$n$ and let
 $x\in\bits^*\setminus\setS$. We define the non-adaptive, false positive
@@ -126,31 +127,37 @@ probabiity for Bloom filters as
 \begin{equation}\label{eq:bf-fp}
   \begin{aligned}
     P_{k,m}(n) =
-      \Pr\big[&\rho \getsr \Func(\bits^*,[m]^k); \\
-              &\pub \getsr \Rep^\rho(\setS): \\
+      \Pr\big[&\rho \getsr \Func(\bits^*,[m]^k);
+              \pub \getsr \Rep^\rho(\setS): \\
               &\Qry^\rho(\pub, \qry_x) = 1 \given \pub \ne \bot
       \big] \,.
   \end{aligned}
 \end{equation}
 %
-That is, $P_{k,m}(n)$ is the probability that any~$x$ a false positive for
-the representation of some~$\setS$ when a random function is used for hashing.
+(Note that, since the probability is conditioned on the event that
+$\pub\ne\bot$, this quantity is the same for both classes of filter.)
+%
+That is, $P_{k,m}(n)$ is the probability some~$x$ a false positive for the
+representation of some~$\setS$ for which $|\setX|=n$ and $x\not\in\setS$, when a
+random function is used for hashing.
 %
 Deriving a tight, concrete uppper bound is illusive; \todo{DC}{Briefly comment
 on why this is difficult.} However, we do understand its asymptotic behavior
 quite well. Kirsch and Mitzenmacher~\cite{kirsch2006less} prove that, for
-particular choices of $k$ and $m$ as functions of~$n$
+particular choices of $k$ and $m$ as functions of~$n$, it holds that
 $
   P_{k,m}(n) = \lim_{n\goesto\infty} (1-e^{-kn/m})^k \,.
 $
 %
-In the same paper, they demonstrate via simulation that this is a very good
-approximation of the false positive probability for parameters of practical
-interest.
+Moreover, they demonstrate via simulation that this is a very good approximation
+of the false positive probability for parameters of practical interest.
+%
+In lieu of a concrete upper bound, we will refer to $P_{k,m}(n)$ as defined in
+Equation~(\ref{eq:bf-pf}) in the remainder of this section.
 
 \heading{Error function for set-mempership queries}
 %
-Throughout this section we will use the error function~$\delta$ as
+Throughout this section we will use the error function~$\delta$ defined as
 \begin{equation}
   \delta(x, y) =
   \begin{cases}
@@ -158,46 +165,66 @@ Throughout this section we will use the error function~$\delta$ as
     1 & \text{otherwise.}
   \end{cases}
 \end{equation}
+This simply indicates whether the query result matched the correct response.
 
 \subsection{Insecurity of unsalted BFs}
 Fix a hash function $H:\bits^*\to[m]^k$ and integer $n\geq0$ and
-let $\Pi = \BF[H,n] = (\Rep^H, \Qry^H, \Up^H)$.
+let $\Pi = \todo{DC}{...}$.
 %
 Suppose the adversary is interacting with a system representing a dataset
-with~$\Pi$ and that it is able to choose some fraction of the input data.
-For example, some web spiders use Bloom filters to store the set of webpages
-which have already been visited during a crawl. Suppose the adversary controls
-at least one such webpage and wishes to deny the spider access to a different
-webpage, the `target webpage'. The adversary can choose the links present on its
-own webpage, which will cause the spider to visit the chosen webpages and set
-the corresponding bits of its Bloom filter to 1. If those links are chosen in
-such a way that they produce a false positive for the target webpage, the spider
-will then erroneously believe it has already visited the target webpage. The
-target webpage will therefore never be visited during the spider's crawl.
+with~$\Pi$ and that it is able to choose some fraction of the input data.  For
+example, some web spiders \cpnote{``Web spiders''? Do you mean web crawlers?  In
+either case, ensure that the reader knows what this means.} use Bloom filters to
+store the set of webpages which have already been visited during a crawl.
+Suppose the adversary controls at least one such webpage and wishes to deny the
+spider access to a different webpage, the `target webpage'. The adversary can
+choose the links present on its own webpage, which will cause the spider to
+visit the chosen webpages and set the corresponding bits of its Bloom filter to
+1. If those links are chosen in such a way that they produce a false positive
+for the target webpage, the spider will then erroneously believe it has already
+visited the target webpage. The target webpage will therefore never be visited
+during the spider's crawl.
 
 \heading{Pollution attacks}
+%
+\cpnote{Overall, I think this part needs to be revised to make it more clear.
+Answer the following questions. (1) How does their attack model compare to ours,
+i.e., are pollution attacks effective in the sense of \errep? (2) What makes
+their attacks possible? Is is it the use of weak (non-cryptographic) hash
+functions? How dependent is their attack on controlling a fraction of the
+inputs? Do they assume that the inputs they don't control are \emph{known} to
+the adversary? (3) Are their mitigigations sufficient for security in the sense
+of \errep, or is their an attack? (The answer is there's an attack: target-set
+coverage)}
 %
 The goal of the attacks pointed out by Gerbet \etal~~\cite{gerbet2015power} is
 to pollute the filter such that the ``average'' set-membership query yields a
 false positive with high probability; to do so, the attacker chooses a set of
 inputs that maximize the number of 1s in the filter. This strategy is especially
 effective when the structure of the hash function is known to the adversary. In
-particular, if a secretly-keyed cryptographically-secure function is not used,
-the adversary can compute the hash function on its own in order to determine
-which choices will set the maximum number of bits to 1, or which choices will
-set certain target bits to 1 in order to cause specific false positives. They
-show that with some reasonable parameter choices, the adversary can double the
-false positive rate if they control a third of the inputs to the filter.
-%
+particular, depending on the choice of hash, the adversary can compute the hash
+function on its own in order to determine which choices will set the maximum
+number of bits to 1, or which choices will set certain target bits to 1 in order
+to cause specific false positives. They show that with some reasonable parameter
+choices \cpnote{and a particular ``bad'' choice of hash function? what are the
+parameters?}, the
+adversary can double the false positive rate if they control a third of the
+inputs to the filter.
 
 Gerbet \etal discuss multiple ways to mitigate pollution attacks, including
-using alternate data structures besides Bloom filters or choosing the parameters
+\st{using alternate data structures besides Bloom filters}\cpnote{not worth
+mentioning this here} or choosing the parameters
 of the filter pesimistically, so that even if a pollution attack occurs, the
-false positive rate is kept below some threshold of acceptability. Both of these
+false positive rate is kept below some threshold of acceptability. \st{Both} of these
 possibilities are potentially viable, but can significantly increase the amount
 of memory required to store the data structure. Since Bloom filters are designed
 to store large amounts of data compactly, these solutions may be unnaceptable in
-practice. The authors also discuss the possibility of using a secretly-keyed
+practice.
+%
+\cpnote{Well, we're suggesting 3KB for representing just $n$ elements! How does
+our size explosion compare to theirs?}
+%
+The authors also discuss the possibility of using a secretly-keyed
 hash function. Since they assume that the filter itself is kept entirely
 private, with no potential for long-term leakage or other phenomena modeled by
 our $\REVO$ oracle, this does not fall prey to the attacks against keyed but
@@ -220,7 +247,7 @@ This type of attack is nicely captured by our adversarial model.
 %
 In a \emph{target-set coverage attack}, the adversary is given a small target set
 $\setT\subseteq\bits^*$ and searches for a cover set $\setR\subseteq\bits^*$
-such that $\Qry^H(\Rep^H(\setR),x)=1$ for each $x\in\setT$.
+such that $\Qry^H(\Rep^H(\setR),\qry_x)=1$ for each $x\in\setT$.
 %
 Once a suitable cover set is found, the adversary queries $\Rep(\setR)$. Then
 for each $x\in\setT$, it asks $\Qry(x)$, achieving a score of $r = |\setT|$.
@@ -252,10 +279,15 @@ Here we consider the correctness of Bloom filters when the hashed input is
 prepended with a salt.
 %
 Fix $H:\bits^*\to[m]^k$ and $n,\lambda\geq0$ and let
-$\Pi = \SBF[H,n,\lambda] = (\Rep^H, \Qry^H, \Up^H)$ as defined above.
+$\Pi = \todo{DC}{...}$.
 
+\todo{DC}{Simplify the description of this attack, as well as the next
+paragraph. Simply say that, given the salt, the adversary can construct the
+representation on its own, just as in the attacks described in the previous
+section.}
+%
 In the mutable setting, where the adversary is allowed to make $\UPO$ queries,
-we can perform an $\errep$ attack against~$\Pi$ as follows. First, the adversary
+we can perform an \errep\ attack against~$\Pi$ as follows. First, the adversary
 calls $\REPO(\emptyset)$, receiving an empty filter and the salt. Now that the
 adversary has the salt, it performs the exact same pollution attack as in the
 unsalted case, with any evaluations of $H(x)$ replaced with evaluations of
@@ -263,8 +295,6 @@ $H(\salt \cat x)$. After a pollution set is found that sets many bits to 1, the
 adversary calls $\UPO$ repeatedly to insert these elements into the filter. This
 attack succeeds whenever the original pollution attack succeeds against an
 unsalted filter.
-
-%
 
 The attack succeeds because the adversary can search for false positives on its
 own as soon as it learns the salt. An adversary in the real world may not be
@@ -337,9 +367,7 @@ elements even after the salt has been seen, the above attack fails. Indeed, when
 we restrict ourselves to the immutable setting, we can prove the following.
 %
 \begin{theorem}[Immutable \errep\ security of salted BFs]\label{thm:sbf-errep-immutable}
-Let $p$ be the standard (non-adaptive) false positive probability for a Bloom
-filter with the chosen parameters. For all integers $q_R, q_T, q_H, r, t \geq 0$
-and for $q = q_T + q_H$, if $r > pq$, then it holds that
+  For all integers $q_R, q_T, q_H, r, t \geq 0$ it holds that
   \begin{equation*}
     \begin{aligned}
             \Adv{\errep}_{\Pi,\delta,r}(t,\,&q_R,q_T,0,q_H) \leq \\
@@ -347,7 +375,8 @@ and for $q = q_T + q_H$, if $r > pq$, then it holds that
         \left(\frac{pq}{r}\right)^re^{r-pq}\right] \,,
     \end{aligned}
   \end{equation*}
-  where $H$ is modeled as a random oracle.  %
+  where $H$ is modeled as a random oracle, $p=P_{k,m}(n)$, $q = q_T + q_H$, and
+  $p > pq$.
 \end{theorem}
 We consider only the case of $r > pq$ because $pq$ is the expected number of
 false positives obtained by an adversary that simply uses its knowledge of the
@@ -356,43 +385,51 @@ possible. Because this simple adversary can get $pq$ successes on average, we
 can only hope to provide good security bounds against arbitrary adversaries in
 the case that $r > pq$.
 
-This bound can be broken down into three main components. The external $q_R$
-term means that the security guarantee will be weak in the case that the
-adversary is able to view a large number of representations. The $q_H/2^\lambda$
-term corresponds to the probability of the adversary guessing the salt before
-the representation is constructed, but this will be negligibleas long as
-$\lambda$ is chosen to be sufficiently large (say, $\lambda=128$). The final,
-messier term comes from applying a Chernoff bound to the non-adaptive
-adversary's probability of succeeding in the experiment given $q = q_H+q_T$
-guesses.
-
+This bound can be broken down into three main components. The multiplicative
+factor of~$q_R$ means that the bound will be weak in the case that a number of
+representations are used. The $q_H/2^\lambda$ term corresponds to the
+probability of the adversary guessing the salt before the representation is
+constructed, but this will be negligible as long as $\lambda$ is chosen to be
+sufficiently large (say, $\lambda=128$). The final, messier term comes from
+applying a Chernoff bound to the non-adaptive adversary's probability of
+succeeding in the experiment given $q = q_H+q_T$ guesses.
+%
 By way of clarifying the performance of our bound, we have plotted the last
 component for various parameters of interest. Let
 %
-\begin{equation}
-  \zeta_{k,m,n}(q,r) = \left(\frac{pq}{r}\right)^re^{r-pq}
+\begin{equation}\label{eq:zeta}
+  \zeta_{k,m,n}(q,r) = \left(\frac{p^*q}{r}\right)^re^{r-p^*q}
 \end{equation}
 %
-and refer to Figure~\ref{fig:bf-bound}. This shows values
-of~$\zeta_{k,m,n}(q,r)$ for varying~$m$ (filter length in kilobytes). What this
-plot shows that, for a given error capacity~$r$, once a certain lower bound on
-the filter size is reached, the $\zeta$ value decreases quite quickly. Moreover,
-the rate at which~$\zeta$ decreases scales quite nicely with the error capacity.
-For example, if one is willing to tolerate up to~$r=10$ false positives when for
-a single filter (i.e., $q_R=1$) representing $n=100$ elements, then picking a
-filter length of $3$ kilobytes is sufficient to ensure that observing~$10$ false
+where
+$
+  p^* = \lim_{n\goesto\infty} (1-e^{-kn/m})^k \,,
+$
+the approximation of the non-adaptive false positive probability given by Kirsch
+and Mitzenmacher~\cite{kirsch2006less}.
+%
+Figure~\ref{fig:bf-bound} shows values
+of~$\zeta_{k,m,n}(q,r)$ for varying~$m$.
+%
+What this plot shows is that, for a given error capacity~$r$, once a certain lower
+bound on the filter size is reached, the $\zeta$ term decreases quite quickly.
+Moreover, the rate at which~$\zeta$ decreases scales nicely with the error
+capacity.  For example, if one is willing to tolerate up to~$r=10$ false
+positives for a filter representing $n=100$ elements, then picking a filter
+length of $3$ kilobytes is sufficient to ensure that observing~$10$ false
 positives occurs with probability less than $2^{-17}$, even when the adversary
 can make~$2^{64}$ RO queries.
-
+%
+We compare this (rather conservative) result to Gerbet \etal at the end of this section.
 
 \begin{figure}
   \hspace*{-10pt}
   \includegraphics{fig/bf-bound}
   \vspace{-24pt}
   \caption{
-    The value of $\zeta_{k,m,n}(q,r)$ for $q=2^{64}$, $k=16$, $n=100$, varying
-    values of~$r$ (one line per $r$-value) and filter length~$m$ (the x-axis).
-    Note the log-2 scale on the y-axis.
+    The value of $\zeta_{k,m,n}(q,r)$ (Equation~\ref{eq:zeta}) for $q=2^{64}$,
+    $k=16$, $n=100$, varying values of~$r$ (one line per $r$-value) and filter
+    length~$m$ (the x-axis).  Note the log-2 scale on the y-axis.
   }
   \label{fig:bf-bound}
 \end{figure}
@@ -533,3 +570,15 @@ to place a limit on the adversarial advantage even in this worst-case scenario.
 \begin{proof}
   \input{proof/sbf-erreps-th}
 \end{proof}
+
+
+\subsection{Discussion}
+\todo{DC}{At a high level, our suggested mitigation is to use salt and to use a
+cryptographically strong hash function, but the exact strategy depends on the
+setting. If you aren't going to update the structure, then salting is
+sufficient. If you're going to update the structure, then salting is still
+efficient as long as the structure is never revealed to attacker (i.e., the
+party or parites choosing the inputs). If keeping the structure secret isn't
+possible, then you need to also use a secret key. How does this mitigation
+strategy compared to the mitigations suggested by Gerbet \etal? In particular,
+are our filters smaller, larger, or about the same length as theirs?}
