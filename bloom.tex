@@ -19,40 +19,17 @@
       $M \gets M \vee \bmap_m(R_K(\salt \cat x))$\\
       return $\langle M, \salt, c+1 \rangle$
   }
-  \twoColsNoDivide{0.22}
-  {
-    \underline{$\Rep^R_K(\col)$}\\[2pt]
-      $\salt \getsr \bits^\lambda$;
-      $\pub \gets \langle 0^m, \salt\rangle$\\
-      for $x \in \col$ do\\
-        $\tab \pub \gets \Up^R_K(\pub,\qry_x)$\\
-        $\tab$if $\pub = \bot$ then return $\bot$\\
-      return $\pub$
-  }
-  {
-    \underline{$\Qry^R_K(\langle M, \salt \rangle,\qry_x)$}\\[2pt]
-      $X \gets \bmap_m(R_K(\salt \cat x))$\\
-      return $M \AND X = X$
-    \\[6pt]
-    \underline{$\Up^R_K(\langle M, \salt \rangle,\qry_x)$}\\[2pt]
-      if $\hw(M) > \ell$ then return $\bot$\\
-      return $\langle M \vee \bmap_m(R_K(\salt \cat x)), \salt \rangle$
-  }
-  \caption{Top: Keyed structure $\bloom[R,n,\lambda]$ given by
+  \caption{Keyed structure $\bloom[R,n,\lambda]$ given by
   $(\Rep^R,\Qry^R,\Up^R)$ is used to define Bloom filter variants used to
   rerpresent sets of at most~$n$ elements.  parameters are a function $R:
   \keys\by\bits^* \to [m]^k$ and integers $n, \lambda \geq0$. A concrete scheme
   is given by a particular choice of parameters. The function~$\bmap_m$ is
   defined in Section~\ref{sec:prelims}.
   %
-  Bottom: A slightly modified structure, $\bloom_\mathrm{ft}[R,\ell,\lambda]$ given by
-  $(\Rep^R,\Qry^R,\Up^R)$ which uses the Hamming weight of the filter ($\hw$, as
-  defined in Section~\ref{sec:prelims}) to decide if the filter is full.
   }
-  \label{fig:bft-def}
   \label{fig:bf-def}
 \end{figure}
-
+\ignore{
 \todo{DC}{Revise this text (now out-of-date!). ``In this section we consider two
 classes of the Bloom filters, each employing a different thresholding strategy.
 [We will have discussed why different strategies are needed in the intro, at
@@ -60,19 +37,21 @@ least at a high level.] Let $R:\keys\by\bits^*\to[m]^k$ be a function and let
 $n,\ell,\lambda\geq0$ be integers. The first class, defined at the top of
 Figure~\ref{fig:bf-def}, ...'' Don't define the concrete structures, as we did
 before. Instead, define the concrete structure at the top of the section in
-which it appears.}
-%
-We specify three Bloom filter variants using the keyed structure
-$\bloom[R,\ell,n,\lambda] = (\Rep^R,\Qry^R,\Up^R)$ specified in
-Figure~\ref{fig:bf-def}.
-%
-The construction has four paraemters: a function~$R:\keys\by\bits^*\to[m]^k$,
-\emph{set threshold} $n\geq0$, and the \emph{salt length}~$\lambda\geq0$.
+which it appears.}}
+
+In this section we consider two classes of Bloom filters, each employing a
+different strategy to determine when the filter reaches full capacity. The first
+class, specified in Figure~\ref{fig:bf-def}, we call the $n$-capped Bloom
+filter. This class captures the classical definition of a Bloom filter which is
+capped at storing some fixed constant number of elements $n\geq0$. Our
+construction $\bloom[R,\ell,n,\lambda] = (\Rep^R,\Qry^R,\Up^R)$ has two
+additional parameters besides the cap: a function~$R:\keys\by\bits^*\to[m]^k$
+and the \emph{salt length}~$\lambda\geq0$.
 %
 Let $H:\bits^*\to[m]^k$ be a hash function and let $\ell, n, \lambda\geq0$ be
 integers.
 %
-The standard Bloom filter is the structure $\BF[H,n,\lambda] =
+The standard Bloom filter is the structure $\BF[H,n] =
 \bloom[\id^H,n,0]$, which we will term the \emph{basic} Bloom filter. It
 has no key (the key sapce of $\id^H$ is $\{\emptystr\}$, see
 Section~\ref{sec:prelims}) and does not use a salt.
@@ -99,17 +78,17 @@ $q_U > 0$ so that the adversary can make updates, we will find that $\SBF$ is
 not secure in the public-representation setting. Instead, $\KBF$ must be used to
 guarantee security.
 
-Finally, we consider an alternate Bloom filter construction, as depicted in
-Figure~\ref{fig:bft-def}, which uses a \emph{filter threshold} $\ell\geq0$ in
-place of the set threshold. This means that, instead of bounding the number of
-elements that can be inserted into the filter, we bound the number of bits in
-the filter that can be set to 1. In the absence of an adaptive adversary this
-construction performs very similarly to the standard Bloom filter, since for a
-random input set the number of bits set to 1 can be predicted with a high degree
-of accuracy from the number of elements in the underlying set. However, a filter
-threshold allows us to obtain better bounds against adaptive adversaries and has
-the additional advantage of not requiring a separate counter to keep track of
-the number of elements in the filter. Each of the above special cases can be
+At the end of the section, we discuss the second class of filter, we call the
+$\ell$-thresholded filter. This construction uses a \emph{filter threshold}
+$\ell\geq0$ in place of the set threshold, which bounds the number of bits in
+the filter that can be set to 1 instead of the number of elements in the
+underlying set. In the absence of an adaptive adversary this construction
+performs very similarly to the standard Bloom filter, since for a random input
+set the number of bits set to 1 can be predicted with a high degree of accuracy
+from the number of elements in the underlying set. However, a filter threshold
+allows us to obtain better bounds against adaptive adversaries and has the
+additional advantage of not requiring a separate counter to keep track of the
+number of elements in the filter. Each of the above special cases can be
 extended to the filter-threshold construction in the natural way, though we only
 consider the unkeyed and salted construction $\SBF_\mathrm{ft}$ to provide an example
 of the tighter error bounds this alternate construction can provide.
@@ -141,7 +120,7 @@ That is, $P_{k,m}(n)$ is the probability some~$x$ a false positive for the
 representation of some~$\setS$ for which $|\setX|=n$ and $x\not\in\setS$, when a
 random function is used for hashing.
 %
-Deriving a tight, concrete uppper bound is illusive; \todo{DC}{Briefly comment
+Deriving a tight, concrete upper bound is elusive; \todo{DC}{Briefly comment
 on why this is difficult.} However, we do understand its asymptotic behavior
 quite well. Kirsch and Mitzenmacher~\cite{kirsch2006less} prove that, for
 particular choices of $k$ and $m$ as functions of~$n$, it holds that
@@ -169,14 +148,16 @@ This simply indicates whether the query result matched the correct response.
 
 \subsection{Insecurity of unsalted BFs}
 Fix a hash function $H:\bits^*\to[m]^k$ and integer $n\geq0$ and
-let $\Pi = \todo{DC}{...}$.
+let $\Pi = \BF[H,n]$.
 %
 Suppose the adversary is interacting with a system representing a dataset
 with~$\Pi$ and that it is able to choose some fraction of the input data.  For
-example, some web spiders \cpnote{``Web spiders''? Do you mean web crawlers?  In
-either case, ensure that the reader knows what this means.} use Bloom filters to
-store the set of webpages which have already been visited during a crawl.
-Suppose the adversary controls at least one such webpage and wishes to deny the
+example, consider a web crawler which performs a `crawl' of webpages, following
+the links on each page it visits in order to index, archive, or otherwise
+analyze websites. In order to keep track of the set of webpages which have
+already been visited during a crawl, some crawlers use a Bloom filter which is
+updated to include each new page the crawler visits. Suppose the adversary
+controls at least one such webpage along the crawl's path and wishes to deny the
 spider access to a different webpage, the `target webpage'. The adversary can
 choose the links present on its own webpage, which will cause the spider to
 visit the chosen webpages and set the corresponding bits of its Bloom filter to
@@ -187,7 +168,7 @@ during the spider's crawl.
 
 \heading{Pollution attacks}
 %
-\cpnote{Overall, I think this part needs to be revised to make it more clear.
+\ignore{\cpnote{Overall, I think this part needs to be revised to make it more clear.
 Answer the following questions. (1) How does their attack model compare to ours,
 i.e., are pollution attacks effective in the sense of \errep? (2) What makes
 their attacks possible? Is is it the use of weak (non-cryptographic) hash
@@ -195,45 +176,41 @@ functions? How dependent is their attack on controlling a fraction of the
 inputs? Do they assume that the inputs they don't control are \emph{known} to
 the adversary? (3) Are their mitigigations sufficient for security in the sense
 of \errep, or is their an attack? (The answer is there's an attack: target-set
-coverage)}
+coverage)}}
 %
 The goal of the attacks pointed out by Gerbet \etal~~\cite{gerbet2015power} is
 to pollute the filter such that the ``average'' set-membership query yields a
 false positive with high probability; to do so, the attacker chooses a set of
 inputs that maximize the number of 1s in the filter. This strategy is especially
 effective when the structure of the hash function is known to the adversary. In
-particular, depending on the choice of hash, the adversary can compute the hash
-function on its own in order to determine which choices will set the maximum
-number of bits to 1, or which choices will set certain target bits to 1 in order
-to cause specific false positives. They show that with some reasonable parameter
-choices \cpnote{and a particular ``bad'' choice of hash function? what are the
-parameters?}, the
-adversary can double the false positive rate if they control a third of the
-inputs to the filter.
+particular, as long as the choice of hash function and any associated parameters
+are public, the adversary can compute the hash function on its own in order to
+determine which choices will set the maximum number of bits to 1, or which
+choices will set certain target bits to 1 in order to cause specific false
+positives. They show that with $m = 3200$ and $k = 4$, the adversary can double
+the false positive rate if they control 200 out of a total of $n = 600$
+insertions.
 
-Gerbet \etal discuss multiple ways to mitigate pollution attacks, including
-\st{using alternate data structures besides Bloom filters}\cpnote{not worth
-mentioning this here} or choosing the parameters
-of the filter pesimistically, so that even if a pollution attack occurs, the
-false positive rate is kept below some threshold of acceptability. \st{Both} of these
-possibilities are potentially viable, but can significantly increase the amount
-of memory required to store the data structure. Since Bloom filters are designed
-to store large amounts of data compactly, these solutions may be unnaceptable in
-practice.
-%
-\cpnote{Well, we're suggesting 3KB for representing just $n$ elements! How does
-our size explosion compare to theirs?}
-%
+Significantly, the attack model considered assumes that the representations of
+the filter are always kept private. This gives the adversary less power than in
+our \errep\ or even \erreps\ attack model, since there is no analogue to the
+$\REVO$ oracle. Within this model, Gerbet \etal show various ways to mitigate
+pollution attacks, such as choosing the parameters of the filter pesimistically,
+so that even if a pollution attack occurs, the false positive rate is kept below
+some threshold of acceptability. This strategy is  potentially viable, but may
+significantly increase the amount of memory required to store the data structure.
+The bounds we provide show how the parameters of a filter can be tweaked to keep
+the error rate low not just in the presence of this specific type of attack, but
+in the presence of any adversary covered by our more general attack model.
+
 The authors also discuss the possibility of using a secretly-keyed
-hash function. Since they assume that the filter itself is kept entirely
-private, with no potential for long-term leakage or other phenomena modeled by
-our $\REVO$ oracle, this does not fall prey to the attacks against keyed but
-unsalted filters that occur in our model. In this paper we consider the
-possibility that the structure may not be secret, either in the sense that it
-may eventually be recovered (in the private-representation setting) or that it
-is publicly available to potential adversaries (in the public-representation
-setting). Simply using a MAC with a long-term secret key does not suffice to
-secure a Bloom filter in these scenarios.
+hash function. In the attack model they consider, where representations are kept
+private indefinitely, this suffices to prevent the pollution attack they
+describe. However, under the more general attack models where the representation
+may eventually be recovered (in the private-representation setting) or is simply
+available to potential adversaries (in the public-representation setting).
+Simply using a MAC with a long-term secret key does not suffice to
+secure a Bloom filter in the \errep\ and \erreps\ scenarios we consider.
 
 \heading{Target-set coverage attacks}
 %
@@ -279,21 +256,21 @@ Here we consider the correctness of Bloom filters when the hashed input is
 preppended with a salt.
 %
 Fix $H:\bits^*\to[m]^k$ and $n,\lambda\geq0$ and let
-$\Pi = \todo{DC}{...}$.
+$\Pi = \SBF[H,n,\lambda]$.
 
 \todo{DC}{Simplify the description of this attack, as well as the next
 paragraph. Simply say that, given the salt, the adversary can construct the
 representation on its own, just as in the attacks described in the previous
 section.}
-%
-In the mutable setting, where the adversary is allowed to make $\UPO$ queries,
-we can perform an \errep\ attack against~$\Pi$ as follows. First, the adversary
-calls $\REPO(\emptyset)$, receiving an empty filter and the salt. Now that the
-adversary has the salt, it performs the exact same pollution attack as in the
-unsalted case, with any evaluations of $H(x)$ replaced with evaluations of
-$H(\salt \cat x)$. After a pollution set is found that sets many bits to 1, the
-adversary calls $\UPO$ repeatedly to insert these elements into the filter. This
-attack succeeds whenever the original pollution attack succeeds against an
+
+In the mutable setting, we can perform an \errep\ attack against~$\Pi$ in an
+almost identical manner to the previous section. If the adversary calls
+$\REPO(\emptyset)$, the salt will be given to the adversary along with an empty
+filter. The adversary can use this salt to construct representations on its own
+just as described in the target-set coverage attack. The only further alteration
+is that the adversary will need to use $\UPO$ to insert the elements of the
+covering set into the filter before making its $\QRYO$ calls to win the game.
+This attack succeeds whenever the original pollution attack succeeds against an
 unsalted filter.
 
 The attack succeeds because the adversary can search for false positives on its
@@ -540,6 +517,32 @@ adversary, however, we emphasize that merely using a long-term secret key
 without a per-representation salt does not guarantee security.
 
 \subsection{Thresholded BFs}
+
+\begin{figure}
+  \twoColsNoDivide{0.22}
+  {
+    \underline{$\Rep^R_K(\col)$}\\[2pt]
+      $\salt \getsr \bits^\lambda$;
+      $\pub \gets \langle 0^m, \salt\rangle$\\
+      for $x \in \col$ do\\
+        $\tab \pub \gets \Up^R_K(\pub,\qry_x)$\\
+        $\tab$if $\pub = \bot$ then return $\bot$\\
+      return $\pub$
+  }
+  {
+    \underline{$\Qry^R_K(\langle M, \salt \rangle,\qry_x)$}\\[2pt]
+      $X \gets \bmap_m(R_K(\salt \cat x))$\\
+      return $M \AND X = X$
+    \\[6pt]
+    \underline{$\Up^R_K(\langle M, \salt \rangle,\qry_x)$}\\[2pt]
+      if $\hw(M) > \ell$ then return $\bot$\\
+      return $\langle M \vee \bmap_m(R_K(\salt \cat x)), \salt \rangle$
+  }
+  \caption{A slightly modified structure, $\bloom_\mathrm{ft}[R,\ell,\lambda]$ given by
+  $(\Rep^R,\Qry^R,\Up^R)$ which uses the Hamming weight of the filter ($\hw$, as
+  defined in Section~\ref{sec:prelims}) to decide if the filter is full.}
+  \label{fig:bft-def}
+\end{figure}
 
 While the above proofs show security bounds for Bloom filters in certain
 settings, the bounds may not be as tight as we would like for applications. The
