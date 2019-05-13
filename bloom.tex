@@ -440,8 +440,9 @@ this advantage is taken into account.
 
 \subsection{Keyed BFs}
 
-Salted BFs are secure in the immutable setting \emph{or} the private
-representation setting, but not both. Our argument for the \erreps\ security of
+Salted BFs are \erreps\ secure in general, and are \errep\ secure in the
+immutable setting, but are not \errep\ secure when the adversary has access to
+an $\UPO$ oracle. Our argument for the \erreps\ security of
 salted Bloom filters is made possible by virtue of the structure under attack
 not being revealed to the adversary. While this is realistic in many
 applications, it may be desirable for the Bloom filter to be public \emph{and}
