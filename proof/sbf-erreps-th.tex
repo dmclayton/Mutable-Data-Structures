@@ -76,8 +76,7 @@
     while $w(M_{ct}) < \ell+k$ do\\
     $\tab i \getsr [m]$;
     $M_{ct}[i] \gets 1$\\
-    $D^{\QRYO}$;
-      \cpnote{Where's $D$'s $\HASHO_1$ oracle?}\\
+    $D^{\QRYO,\HASHO_1}$;
     return $\big[\sum_x \err[x] \geq r\big]$
   \\[6pt]
   \oraclev{$\QRYO(\qry_x)$}\\[2pt]
@@ -92,8 +91,7 @@
 
 As in previous proofs, we assume without loss of generality that there are no
 insertions of or queries for elements of $\col$, and we start with a
-game~$\game_0$ that is identical to the \erreps\ game for $\KBF_\mathrm{ft}$.
-\cpnote{Where is~$\game_0$? Refer to the figure.}
+game~$\game_0$, defined in Figure~\ref{fig:sbf-erreps/games} that is identical to the \erreps\ game for $\KBF_\mathrm{ft}$.
 
 To avoid the unfortunate $q_R$ factor in the bound, we do not make use of
 Lemma~\ref{thm:lemma1} in this proof. Because of that, we must find some other
@@ -115,7 +113,7 @@ Next, we want to ensure that the adversary's $\HASHO_1$ queries are independent
 of the $\HASHO_2$ and $\HASHO_3$ queries used for $\REPO$, $\QRYO$, and $\UPO$.
 Since the $\HASHO_c$ oracles use random sampling to fill a shared table, this
 occurs if and only if the adversary calls
-$\HASHO_1(\langle\salt_i,x\rangle)$\todo{DC}{Fix syntax}
+$\HASHO_1(\langle\salt_i \cat x\rangle)$
 for some salt $\salt_i$ used by one of the representations created by $\REPO$.
 By an argument very similar to that in the previous proofs, the adversary has at
 most $q_H/2^\lambda$ probability of calling $\HASHO_1$ with the salt used by
@@ -128,31 +126,20 @@ case of~$\game_2(\advB)$ is identical until the $\bad_1$ flag is set, which
 occurs only when a salt is guessed, so we have $\Prob{\game_1(\advB) = 1} \le
 q_Rq_H/2^\lambda + \Prob{\game_2(\advB) = 1}$.
 
-We may now assume~\cpnote{Actually, this is by \textbf{construction}! In the
-revised game, the adversary is never handed the correct salt, and it's never
-handed any RO output whose input is preprended by the salt. it's not the
-aadversary never ``guesses'' it, it's that it doesn't matter if it does! This
-the real power game-based proofs. Please revise this, here and elsehwere.} that
-the adversary never guesses the salt of any of the
-representations, and so the outputs of $\HASHO_1$ are independent of the results
+Now the adversary derives no advantage from guessing the salts of the
+representations, in the sense that the outputs of $\HASHO_1$ are independent of the results
 of all calls to $\REPO$, $\QRYO$, and $\UPO$. The next oracle we want to target
 is $\UPO$. Now that we have a filter threshold, we want to argue that the
-adversary cannot use $\UPO$ to mount an effective pollution attack.
+adversary cannot use $\UPO$ to mount an effective attack.
 %
-\cpnote{You're implicitly assuming that pollution attacks are the best we can
-do. Why is this true? It doesn't seem to me like it's true. Maybe it is at this
-point in the proof, because we've already dealt with the salt guessing? If
-that's the case, we can't call it a ``pollution attack'', since this the
-experiment has changed.}
-%
-In~$\game_3(C)$, the $\REPO$ oracle creates the filter as normal and then
+In~$\game_3(\advC)$, the $\REPO$ oracle creates the filter as normal and then
 randomly sets bits until filter is full (i.e., its Hamming weight is at least
 $\ell$), which is $\ell+k$ (since
 updates are not allowed when more than $\ell$ bits are set, and a single update
 may set at most $k$ bits to 1). For any $\advB$ in~$\game_2$, we can construct
-$C$ for~$\game_3$ that obtains at least as large an advantage by having $C$
+$\advC$ for~$\game_3$ that obtains at least as large an advantage by having $\advC$
 simulate $\advB$, forwarding all oracle queries in the natural way except that
-$\UPO$ queries are ignored, with $C$ simply returning $\top$ to $\advB$ without
+$\UPO$ queries are ignored, with $\advC$ simply returning $\top$ to $\advB$ without
 performing any additional computations or oracle calls. (Recall that, in the
 \erreps setting, the adversry expects $\top$ to be the output of~$\UPO$.) Since $\advB$ does not
 query elements which are already in $\col$, the outputs of $\HASHO_3$ calls are
@@ -163,13 +150,9 @@ function of the number of bits in the filter which have been set to 1.
 %
 Since at least as many bits have been set to 1 in~$\game_3$ as in~$\game_2$,
 every $\QRYO$ call is at least as likely to produce a false positive. Therefore
-$\Prob{\game_2(\advB) = 1} \le \Prob{\game_3(C) = 1}$.
+$\Prob{\game_2(\advB) = 1} \le \Prob{\game_3(\advC) = 1}$.
 
-In~$\game_3$ we can assume without loss of generality that the adversary makes
-no $\UPO$ calls, since the filter is already full and no additional updates will
-be accepted. \cpnote{Why assume this? The adversary can make as many $\UPO$
-queries it wants and it won't make a difference. So why stop it? The reason not
-to is that, as a general good, it's good to keep your assumptions minimal.} Since each
+In~$\game_3$, $\UPO$ calls do not actually change the representation. Since each
 representation is created using independent $\HASHO_2$ outputs and then filled
 in a uniform random manner until $\ell+k$ bits are set to 1, and is never
 modified afterwards, the representations
@@ -178,22 +161,20 @@ $m$-length bitmaps with $\ell+k$ bits set to 1. This allows us to move
 to~$\game_4(D)$, where the adversary is given a single arbitrary bitmap $\pub$
 of length $m$ with $\ell+k$ bits set to 1 and makes $\QRYO$ calls exclusively
 for $\pub$, winning if it produces $r$ errors for that `representation'. Given
-an adversary $C$ for~$\game_3$, we construct a $D$ for~$\game_4$ that simulates
-$C$. When $C$ makes a $\REPO$ call, $D$ immediately returns $\top$ to $C$, and
-when $C$ makes a $\QRYO(i,\qry_x)$ call, $D$ selects a random
-previously-unqueried element $y$ and calls $\QRYO(y)$, returning the result to
-$C$. \cpnote{What about~$C$'s $\HASHO_1$ queries?} Since representations are uniformly distributed and $\HASHO_3$ calls are
+an adversary $\advC$ for~$\game_3$, we construct a $D$ for~$\game_4$ that simulates
+$\advC$. When $\advC$ makes a $\REPO$ call, $D$ immediately returns $\top$ to $\advC$, and
+when $\advC$ makes a $\QRYO(i,\qry_x)$ call, $D$ selects the lexicographically first
+$y$ that has not yet been queried and calls $\QRYO(y)$, returning the result to
+$\advC$. Random oracle calls are forwarded to $D$'s own random oracle.
+Since representations are uniformly distributed and $\HASHO_3$ calls are
 independent of the $\HASHO_2$ calls used to construct the representation, each
 $\QRYO$ call made by $D$ has the same chance of producing a hit as the $\QRYO$
 call made by $C$ has of producing a false positive.
 %
-\cpnote{What about queries $(i,\qry_x)$ and $(j,\qry_x)$? $D$'s response will be
-the same for both, but $C$ is expecting independent outputs.}
-%
 The win conditions differ
 only in that $D$ wins by accumulating $r$ positive results, whereas $C$ must
 accumulate $r$ false positives within a single representation, and so $D$ wins
-if $\advB$\todo{DC}{You mean $C$?} does. Therefore $\Prob{\game_3(C) = 1} \le \Prob{\game_4(D) = 1}$.
+if $\advC$ does. Therefore $\Prob{\game_3(\advC) = 1} \le \Prob{\game_4(D) = 1}$.
 
 However, since $\QRYO$ calls with distinct inputs have independent outputs, each $\QRYO$ call made by $D$ has the same probability of producing a false positive. In particular, the probability of any one of the $k$ outputs of $\HASHO_3$ colliding with a 1 bit is $(\ell+k)/m$, and the probability of all $k$ outputs doing so is then $((\ell+k)/m)^k$. If we let $\setX$ be the set of all inputs made to $\QRYO$, we again have a binomial distribution where $q_T$ queries are made. Letting $p_\ell = ((\ell+k)/m)^k$, we have
 \begin{equation}
