@@ -125,7 +125,7 @@ $x\in\bits^*\setminus\setS$. We define the non-adaptive, false positive
 probabiity for Bloom filters as
 \begin{equation}\label{eq:bf-fp}
   \begin{aligned}
-    P_\bff(k,m,n) =
+    P_{k,m}(n) =
       \Pr\big[&\rho \getsr \Func(\bits^*,[m]^k); \\
               &\pub \getsr \Rep^\rho(\setS): \\
               &\Qry^\rho(\pub, \qry_x) = 1 \given \pub \ne \bot
@@ -133,16 +133,16 @@ probabiity for Bloom filters as
   \end{aligned}
 \end{equation}
 %
-That is, $P_\bff(k,m,n)$ is the probability that any~$x$ a false positive for
+That is, $P_{k,m}(n)$ is the probability that any~$x$ a false positive for
 the representation of some~$\setS$ when a random function is used for hashing.
 %
 Deriving a tight, concrete uppper bound is illusive; \todo{DC}{Briefly comment
 on why this is difficult.} However, we do understand its asymptotic behavior
 quite well. Kirsch and Mitzenmacher~\cite{kirsch2006less} prove that, for
 particular choices of $k$ and $m$ as functions of~$n$
-\[
-  P_\bff(k,m,n) = \lim_{n\goesto\infty} (1-e^{-kn/m})^k \,.
-\]
+$
+  P_{k,m}(n) = \lim_{n\goesto\infty} (1-e^{-kn/m})^k \,.
+$
 %
 In the same paper, they demonstrate via simulation that this is a very good
 approximation of the false positive probability for parameters of practical
@@ -150,9 +150,9 @@ interest.
 
 \heading{Error function for set-mempership queries}
 %
-Throughout this section we will use the error function $\delta_\bff$ as
+Throughout this section we will use the error function~$\delta$ as
 \begin{equation}
-  \delta_\bff(x, y) =
+  \delta(x, y) =
   \begin{cases}
     0 & \text{if}\ x=y \\
     1 & \text{otherwise.}
