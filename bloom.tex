@@ -483,8 +483,9 @@ how we're thresholding. (At this point I have no idea.)}
 Salted BFs are secure in the immutable setting \emph{or} the private
 representation setting, but not both. Our argument for the \erreps\ security of
 salted Bloom filters is made possible by virtue of the structure under attack
-not being revealed to the adversary. While this is realistic in many settings,
-it may be desirable for the Bloom filter to be public \emph{and} updatable.
+not being revealed to the adversary. While this is realistic in many
+applications, it may be desirable for the Bloom filter to be public \emph{and}
+updatable.
 %
 Here we show that building a Bloom filter from a PRF suffices for security in
 this setting.
@@ -492,30 +493,26 @@ this setting.
 Let $F:\keys\by\bits^*\to[m]^k$ be a function and fix
 integers~$n,\lambda\geq0$.
 %
-Let $\Pi = \KBF[F,n,\lambda] = (\Rep^F, \Qry^F, \Up^F)$ as defined in
-Figure~\ref{fig:bf-def}.
+Let $\Pi = \todo{DC}{...}$.
 
 \begin{theorem}[\errep\ security of keyed BFs]\label{thm:bf-key-bound}
-Let $p'$ be the standard (non-adaptive) false positive probability for a Bloom
-filter with the chosen parameters \emph{except} that the set threshold is
-increased from $n$ to $n+r$.
-For integers $q_R, q_T, q_H, r, t \geq 0$, if $r > p'q_T$, it holds that
+  Let $p' = P_{k,m}(n+r)$.  For integers $q_R, q_T, q_H, r, t \geq 0$ such that
+  $r > p'q_T$, it holds that
   \begin{equation*}
     \begin{aligned}
       \Adv{\errep}_{\Pi,\delta,r}(t,\,&q_R,q_T,q_U,q_H) \leq \\
         \Adv{\prf}_F(t,nq_R+q_T+q_U) & +
       \frac{q_R^2}{2^\lambda} +
-      \left(\frac{p'q_Rq_T}{r}\right)^re^{r-p'q_Rq_T}
+      \left(\frac{p'q_Rq_T}{r}\right)^re^{r-p'q_Rq_T} \,.
     \end{aligned}
   \end{equation*}
 \end{theorem}
 
-Though the bound is similar, and the underlying idea of showing oracle queries
-are independent and thereby reducing to the non-adaptive case is still present,
-the technicalities of this proof differ from the previous two. In particular,
-since we are using a PRF, the initial parts of the proof deal with the adversary
-potentially being able to break the PRF and with the possibility of the salts
-repeating rather than with the adversary being able to guess the salt.
+Though the bound is similar, the details of this proof differ from the
+previous two. In particular, since we are using a PRF, the initial parts of the
+proof deal with the adversary potentially being able to break the PRF and with
+the possibility of the salts repeating rather than with the adversary being able
+to guess the salt.
 
 \begin{proof}
   \input{proof/kbf-errep}
