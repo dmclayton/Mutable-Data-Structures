@@ -29,16 +29,6 @@
   }
   \label{fig:bf-def}
 \end{figure}
-\ignore{
-\todo{DC}{Revise this text (now out-of-date!). ``In this section we consider two
-classes of the Bloom filters, each employing a different thresholding strategy.
-[We will have discussed why different strategies are needed in the intro, at
-least at a high level.] Let $R:\keys\by\bits^*\to[m]^k$ be a function and let
-$n,\ell,\lambda\geq0$ be integers. The first class, defined at the top of
-Figure~\ref{fig:bf-def}, ...'' Don't define the concrete structures, as we did
-before. Instead, define the concrete structure at the top of the section in
-which it appears.}}
-
 In this section we consider two classes of Bloom filters, each employing a
 different strategy to determine when the filter reaches full capacity. The first
 class, specified in Figure~\ref{fig:bf-def}, we call the $n$-capped Bloom
@@ -240,10 +230,6 @@ attack when~$H$ is a random function (i.e., for each distinct input we choose
 $k$ integers from $[m]$ at random) for typical choices of $k$, $m$, and~$n$.
 %
 \todo{CP}{Add simulation to appendix.}
-
-%\todo{DS (lead)}{Double check that Gerbet \etal don't suggest anything like this
-%attack. If they do it's not a big deal; we just need to ensure, to the best of
-%our ability, that we give credit where credit is due.}
 
 The key to pollution attacks and target-set coverage attacks is that the
 adversary can compute the representation of the set on its own. In the remainder
@@ -447,9 +433,6 @@ derived. The first of these is straightforward given the private-representation
 setting, but the second requires investigating how much of an advantage the
 $\UPO$ oracle can give in a pollution attack, and then moving to games where
 this advantage is taken into account.
-%
-\todo{DC}{Be sure the reader knows that class of BF you're talking about, i.e.,
-how we're thresholding. (At this point I have no idea.)}
 
 \begin{proof}[Proof of Theorem~\ref{thm:sbf-erreps}]
   \input{proof/sbf-erreps}
@@ -467,10 +450,8 @@ updatable.
 Here we show that building a Bloom filter from a PRF suffices for security in
 this setting.
 %
-Let $F:\keys\by\bits^*\to[m]^k$ be a function and fix
-integers~$n,\lambda\geq0$.
-%
-Let $\Pi = \todo{DC}{...}$.
+Let $F:\keys\by\bits^*\to[m]^k$ be a function, fix
+integers~$n,\lambda\geq0$, and let $\Pi = \KBF[F,n,\lambda]$.
 
 \begin{theorem}[\errep\ security of keyed BFs]\label{thm:bf-key-bound}
   Let $p' = P_{k,m}(n+r)$.  For integers $q_R, q_T, q_H, r, t \geq 0$ such that
