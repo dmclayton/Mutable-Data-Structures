@@ -1,6 +1,4 @@
 \begin{figure*}
-\todo{DC}{Rename $\HASHO$ to something else! It looks like a random oracle, but
-it's not!}
 \todo{DC}{nit: Here and throughout the rest of paper, change $ct$ to
 $\mathit{ct}$. The former looks like $c\cdot t$.}
 \twoCols{0.47}
@@ -12,14 +10,14 @@ $\mathit{ct}$. The former looks like $c\cdot t$.}
     $i \getsr \advA^{\REPO,\QRYO,\UPO}$;
     return $\big[\sum_x \err_i[x] \geq r\big]$
   \\[6pt]
-  \oraclev{$\HASHO(\salt \cat x)$}\hfill\diffminus{$\game_0$}\diffplus{$\game_1$}\\[2pt]
+  \oraclev{$\PRFO(\salt \cat x)$}\hfill\diffminus{$\game_0$}\diffplus{$\game_1$}\\[2pt]
     \diffminus{$\vv \gets F_K(\salt \cat x)$}\\
     \diffplusbox{$\vv \getsr [m]^k$\\
     if $T[Z,x] = \bot$ then $\vv \gets T[Z,z]$\\
     $T[Z,x] \gets \vv$; return $\vv$}
   \\[6pt]
   \oraclev{$\QRYO(i, \qry_x)$}\\[2pt]
-    $X \gets \bmap_m(\HASHO(\salt_i \cat x))$;
+    $X \gets \bmap_m(\PRFO(\salt_i \cat x))$;
     $a \gets X = M_i \AND X$\\
     if $\err_i[x] < \delta(a,\qry_x(\col_i))$ then
           $\err_i[x] \gets \delta(a,\qry_x(\col_i))$\\
@@ -30,19 +28,19 @@ $\mathit{ct}$. The former looks like $c\cdot t$.}
     $\setS_{ct} \gets \col$;
     $\salt_{ct} \getsr \bits^\lambda$;
     $c_{ct} \gets |\col|$\\
-    $M_{ct} \gets \bigvee_{x \in \col} \bmap_m(\HASHO(\salt_{ct} \cat x))$;
+    $M_{ct} \gets \bigvee_{x \in \col} \bmap_m(\PRFO(\salt_{ct} \cat x))$;
     return $\langle M_{ct}, \salt_{ct}, c_{ct} \rangle$
   \\[6pt]
   \oraclev{$\UPO(i, \up_x)$}\\[2pt]
     if $w(M) > \ell$ then return $\top$\\
     if $\QRYO(\qry_x) = 1$ then $\err_i[x] \gets 0$\\
-    $M_i \gets M_i \vee \bmap_m(\HASHO(\salt_i \cat x))$;
+    $M_i \gets M_i \vee \bmap_m(\PRFO(\salt_i \cat x))$;
     $\setS_i \gets \up_x(\setS_i)$;
     return $\langle M_i, \salt_i, c_i+1\rangle$
 }
 {
   \vspace{-7pt}
-  \experimentv{$\game_{2}(\advA)$}\hfill\diffplus{$\game_3$}\\[2pt]
+  \experimentv{$\game_2(\advA)$}\hfill\diffplus{$\game_3$}\\[2pt]
     $\key \getsr \keys$;
     $ct \gets 0$;
     $\setZ \gets \emptyset$\\
@@ -55,32 +53,36 @@ $\mathit{ct}$. The former looks like $c\cdot t$.}
     $\salt_{ct} \getsr \bits^\lambda \setminus \setZ$;
     $c_{ct} \gets |\col|$\\
     $\setZ \gets \setZ \cup \{\salt_{ct}\}$\\
-    $M_{ct} \gets \bigvee_{x \in \col} \bmap_m(\HASHO(\salt_{ct} \cat x))$;
+    $M_{ct} \gets \bigvee_{x \in \col} \bmap_m(\PRFO(\salt_{ct} \cat x))$;
     return $\langle M_{ct}, \salt_{ct}, c_{ct} \rangle$
   \\[6pt]
   \oraclev{$\QRYO(i, \qry_x)$}\\[2pt]
-    $X \gets \bmap_m(\HASHO(\salt_i \cat x))$;
+    $X \gets \bmap_m(\PRFO(\salt_i \cat x))$;
     $a \gets X = M_i \AND X$\\
     if $\err_i[x] < \delta(a,\qry_x(\col_i))$ then
           $\err_i[x] \gets \delta(a,\qry_x(\col_i))$\\
     \diffplus{$\UPO(i, \up_x)$;}
     return $a$
-  \\[6pt]
-  \experimentv{$\game_{4}(\advB)$}\\[2pt]
-    $\key \getsr \keys$;
-    $ct \gets 0$;
-    $\setZ \gets \emptyset$\\
-    $i \getsr \advB^{\REPO,\QRYO}$;
-    return $\big[\sum_x \err_i[x] \geq r\big]$
-  \\[6pt]
-  \oraclev{$\QRYO(i, \qry_x)$}\\[2pt]
-    for $i \in [ct]$ do\\
-    $\tab X \gets \bmap_m(\HASHO(\salt_i \cat x))$;
+  \\[4pt]
+  \hrule
+  \vspace{2pt}
+  \oraclev{$\QRYO(i, \qry_x)$}\hfill\diffminus{$\game_3$}\diffplus{$\game_4$}\\[2pt]
+    \diffminusbox{
+    $X \gets \bmap_m(\PRFO(\salt_i \cat x))$;
     $a \gets X = M_i \AND X$\\
-    $\tab$if $\err_i[x] < \delta(a,\qry_x(\col_i))$ then
+    if $\err_i[x] < \delta(a,\qry_x(\col_i))$ then
           $\err_i[x] \gets \delta(a,\qry_x(\col_i))$\\
-    $\tab\UPO(i, \up_x)$;
+    $\UPO(i, \up_x)$;
     return $a$
+    }
+    \diffplusbox{
+    for $j \in [ct]$ do\\
+    $\tab X \gets \bmap_m(\PRFO(\salt_j \cat x))$;
+    $a_j \gets X = M_j \AND X$\\
+    $\tab$if $\err_j[x] < \delta(a_j,\qry_x(\col_j))$ then
+          $\err_j[x] \gets \delta(a_j,\qry_x(\col_j))$\\
+    $\tab\UPO(j, \up_x)$\\
+    return $a_i$}
 }
 \caption{Games 0--4 for proof of Theorem~\ref{thm:bf-key-bound}.}
 \label{fig:kbf-errep/games}
@@ -121,23 +123,17 @@ Our goal is to argue, in a similar manner as to the previous theorems, that all 
 
 With guaranteed-unique salts, the result of each $\REPO$, $\UPO$, and $\QRYO$
 call for a given representation is independent of the calls for all other
-representations. By an almost identical argument to the proof of
-Theorem~\ref{thm:sbf-erreps}, we can assume without loss of generality that the
-adversary follows any $\QRYO$ call that does not find a false positive with an
-$\UPO$ call to insert that element, and therefore move to~$\game_3(\advA)$,
-which as in the previous proof automatically performs an update after each query
-is made. Since the adversary never inserts the same element multiple times, we
-can again conclude that without loss of generality the adversary never directly
-invokes the $\UPO$ oracle.
-%
-\cpnote{As in the previous result, I think it's better to give an explicit
-reduction, rather than say ``we can assume without loss of generality ..''}
+representations. By an almost identical argument to the one in the proof of
+Theorem~\ref{thm:sbf-erreps}, we can reduce from any $\advA$ to an adversary
+$\advB$ which follows any $\QRYO$ call that finds a true negative with an
+$\UPO$ call to insert that element, and therefore move to~$\game_3(\advB)$,
+which as in the Theorem~\ref{thm:sbf-erreps} proof performs an update after each
+query is made, with the guarantee that $\Prob{\game_1(\advA) = 1} \le \Prob{\game_2(\advB) = 1}$
 
 Finally, we must deal with the possibility that the adversary chooses which
 representations to target with $\UPO$ and $\QRYO$ calls based on the result of
 $\REPO$, since some representations may be more full than others. In
-game~$\game_4$,we deny the adversary direct access to the $\UPO$ oracle
-because it is never needed, but we allow the adversary credit if a call to
+game~$\game_4$, we allow the adversary credit if a call to
 $\QRYO$ produces an error in any of the representations that have been
 constructed. Furthermore, the updates made by $\QRYO$ apply to all
 representations that are not already full. Since all $\UPO$ calls are
@@ -146,13 +142,8 @@ cannot decrease the false positive rate, the fact that some representations may
 become full more quickly than they otherwise would have can only help the
 adversary. Similarly, having $\QRYO$ count errors across all representations
 never harms the adversary, and so the adversary's advantage may only increase
-when moving to~$\game_4(\advB)$ \todo{DC}{$\advB$ is undefined at this point}. Therefore $\Prob{\game_3(\advA) = 1} \le
-\Prob{\game_4(\advB) = 1}$, where $\advB$ is an adversary which behaves
-identically to $\advA$ but which is syntactically distinct because it lacks the
-unused $\UPO$ oracle.
-%
-\cpnote{Instead of making assumptions about~$\advA$'s behavior and arguing that
-they're not without loss, just give an explicit reduction.}
+when moving to~$\game_4$,
+i.e. $\Prob{\game_3(\advB) = 1} \le \Prob{\game_4(\advB) = 1}$.
 
 We are now in a situation where we can apply the standard, non-adaptive error
 bound. Let $\setX$ be the set of all queries $\qry_x$ made by the adversary over
