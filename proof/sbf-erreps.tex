@@ -1,28 +1,22 @@
 \begin{figure*}
-\cpnote{It should be clear from this figure which boxed statments are included
-  in which games. Without the context of the text, the way someone would read
-  this is ``gamke 0 includes all unboxed statements; game 1 includes all unboxed
-  statments and all boxed statements; and game 2 includes all unboxed and
-  gray-boxed statements.'' Please clarify this figure so that it's clear what
-  statments are included in what games.}
 \twoColsNoDivide{0.47}
 {
   \vspace{-7pt}
-  \experimentv{$\game_{0}(\advB)$}\\[2pt]
+  \experimentv{$\game_{0}(\advB)$}\hfill \diffminus{$\game_1$}\diffplus{$\game_2$}\\[2pt]
     $M^* \gets \bot$;
     $\salt^* \getsr \bits^\lambda$\\
     $\advB^{\REPO,\QRYO,\UPO,\HASHO_1}$;
     return $\big[\sum_x \err[x] \geq r\big]$
   \\[6pt]
-  \oraclev{$\HASHO_c(\salt \cat x)$}\hfill \diffminus{$\game_1$}\\[2pt]
+  \oraclev{$\HASHO_c(\salt \cat x)$}\\[2pt]
     $\vv \getsr [m]^k$\\
     if $\salt=\salt^*$ and $c = 1$ then \com{Caller is~$\advB$}\\
-    \tab $\bad_1 \gets 1$; \diffminus{return $\vv$}\\
+    \tab $\bad_1 \gets 1$; \diffplus{\diffminus{return $\vv$}}\\
     if $T[Z,x] = \bot$ then $\vv \gets T[Z,z]$\\
     $T[Z,x] \gets \vv$; return $\vv$
 }
 {
-  \oraclev{$\QRYO(\qry_x)$}\hfill \diffplus{$\game_2$}\\[2pt]
+  \oraclev{$\QRYO(\qry_x)$}\\[2pt]
     $X \gets \bmap_m(\HASHO_3(\salt^* \cat x))$;
     $a \gets X = M^* \AND X$\\
     if $\err[x] < \delta(a,\qry_x(\col^*))$ then
@@ -31,7 +25,6 @@
     return $a$
   \\[6pt]
   \oraclev{$\REPO(\col)$}\\[2pt]
-    \cpnote{I believe this is incorrect, since $\Rep$ is now thresholding.}
     $M^* \gets \bigvee_{x \in \col} \bmap_m(\HASHO_2(\salt^* \cat x))$;
     $\setS^* \gets \col$;
     return $\top$
@@ -47,11 +40,8 @@
 \label{fig:sbf-erreps/games}
 \end{figure*}
 
-This proof follows a similar structure to the previous one.
-%
-\cpnote{Don't refer to thoerems this way; say
-Theorem~\ref{thm:sbf-errep-immutable}. That way this reference isn't dangling if
-we restructure the paper.}
+This proof follows a similar structure to the proof of
+Theorem~\ref{thm:sbf-errep-immutable}.
 %
 The primary distinction is that in the final game, unless the adversary `gets
 lucky' and guesses the salt, they should only be able to produce errors with
@@ -70,22 +60,20 @@ because of this we omit $\REVO$ from each of the games.
 in the experiment, since at this point the reader has no reason to believe that
 $\REVO$ captures something useful.}
 
-In addition to the assumptions of the previous theorem \todo{DC}{Fix ref}, we
+In addition to the assumptions of Theorem~\ref{thm:sbf-errep-immutable}, we
 assume without loss of generality that the adversary never uses $\UPO$ to insert
-an element into $\col$ which is already present in the set \todo{DC}{Double
-check this assumption isn't made above}, and never uses $\UPO$ to insert an
-element $x$ where $\QRYO(\qry_x)$ has already been called and has returned a
-positive result. Since these insertions do not change the filter and in the
-latter case may actually reduce the error count \cpnote{WHAT?? I don't think
-that's true. Remember that the error function is \textbf{fixed} at this point.},
-the adversary would gain no advantage from performing these updates.
+an element into $\col$ which is already present in the set, and never uses
+$\UPO$ to insert an element $x$ where $\QRYO(\qry_x)$ has already been called
+and has returned a positive result. Since these insertions do not change the
+filter, the adversary would gain no advantage from performing these updates.
 Furthermore, we assume without loss of generality that an adversary halts as
 soon as it determines it has accumulated enough errors to win the experiment.
 
 We begin with a game~$\game_0(\advB)$
-(Figure~\ref{fig:sbf-errep-immutable/games}) similar to the previous
-proof\todo{DC}{fix ref}, except that it also defines an~$\UPO$ oracle. Again, we
-observe that for every~$\advA$ there exists a~$\advB$  such that
+(Figure~\ref{fig:sbf-errep-immutable/games}) similar to the first game in the
+proof of Theorem~\ref{thm:sbf-errep-immutable}, except that it also defines
+an~$\UPO$ oracle. Again, we observe that for every~$\advA$ there exists
+a~$\advB$ such that
 \begin{equation}
   \Adv{\errep}_{\Pi,\delta,r}(\advA) \leq \Prob{\game_0(\advB) = 1}
 \end{equation}
@@ -114,31 +102,47 @@ We still cannot move to the binomial distribution for non-adaptive queries,
 however, since $\HASHO_2$ and $\HASHO_3$ queries are not necessarily independent
 of each other. By one of our starting assumptions, the same input is never
 provided twice to $\HASHO_2$ because the adversary never tries to insert an
-element which is already in $\col$. We also argue \cpnote{Do you mean assume?} that (without loss of
-generality) the same input is never provided twice to $\HASHO_3$, i.e. that the
-same element is never queried twice.
+element which is already in $\col$. We also want to show that an adversary never
+queries the same element twice. To do this, let $\advB$ be an adversary
+for~$\game_1$. We construct an adversary $\advC$ that achieves at least the same
+advantage without making repeated queries. This $\advC$ simulates $\advB$,
+maintaining a list of queries that have been made so far during the
+game. Any $\REPO$, $\UPO$, or $\HASHO_1$ queries from $\advB$ are forwarded to $\advC$'s
+oracles without performing additional computations. When $\advB$ makes a
+$\QRYO(\qry_x)$ call, $\advC$ checks whether $x$ has already been queried. If
+so, $\advC$ randomly selects as $y$ the lexicographically first string such that
+$y \not\in \col$ and such that $y$ has not been previously
+queried, and calls $\QRYO(\qry_y)$ instead of $\QRYO(\qry_x)$.
 
-\todo{DC}{Replace $\QRYO(x)$ with $\QRYO(\qry_x)$, here and everywhere else.}
-On one hand, if a $\QRYO(x)$ call shows that $x$ is already a false positive for
-$\pub$, further $\QRYO(x)$ calls cannot increase the adversary's error score. On
-the other hand, if a $\QRYO(x)$ call shows that $x$ is not a false positive, it
-is still possible for $x$ to become a false positive later on due to $\UPO$
-calls. However, the adversary would obtain at least as large a chance of finding
-a false positive by calling $\QRYO(y)$ for some previously unqueried $y
-\not\in\col$, since the sequence of updates that could make $x$ a false positive
-are just as likely to make $y$ a false positive by the independence of
-$\HASHO_c$ calls on different inputs. We can therefore assume that the adversary
-does not send repeated queries to $\QRYO$.
-%
-We have now reduced to a case where all hash queries are independent except for
-$\QRYO$ and $\UPO$ calls to the same element. By our starting assumptions, an
-adversary never calls $\QRYO$ on an element which has already been inserted, so
-we need only consider the case of an element being queried before it is
-inserted. In fact, doing this can be beneficial to a pollution attack, since
-determining with $\QRYO$ that an element is not already a false positive informs
-the adversary that inserting that element must necessarily set at least one new
-bit in the filter to 1. Since all other possibilities have been eliminated, we
-need only consider two types of update the adversary may make:
+Recall that $\advB$ makes no queries for elements of $\col$, so any repeated
+queries must have returned either false positives or true negatives the first
+time they were queried. If $\advB$ makes a $\QRYO(\qry_x)$ where $x$ was
+previously found to be a false positive, the total number of errors cannot
+possibly increase since $\advB$ has already gotten credit for this error. On the
+other hand, if $\advB$ calls $\QRYO(\qry_x)$ for an $x$ that was previously
+found to be a true negative, it is possible that $x$ has since become a false
+positive due to $\UPO$ calls that have occurred since. However, since $\HASHO_3$
+calls are independent of $\HASHO_2$ calls with different inputs, it is just as
+likely that those intervening updates have made $y$ a false positive. Therefore,
+regardless of what type of queries $\advB$ makes, $\advC$ makes queries that are
+at least as likely to produce false positives and is therefore at least as
+likely to win, i.e. $\Prob{\game_1(\advB) = 1} \le \Prob{\game_1(\advC) = 1}$.
+
+By the reduction from $\advB$ to $\advC$, we are now dealing with an adversary
+where the hash queries are all independent except for $\QRYO$ and $\UPO$ calls
+to the same element. We will now further reduce from~$\advC$ to $D$, where $D$
+immediately follows any $\QRYO(\qry_x)$ that finds a true negative with a
+call to $\UPO(\up_x)$ to insert that element. We have $D$ simulate $\advC$ while
+maintaining a count of updates that have been performed so far. Any $\REPO$ and
+$\HASHO_1$ calls from $\advC$ are forwarded to $D$'s oracles without
+performing any additional computation. Any $\QRYO(\qry_x)$ call is also
+forwarded, but if the oracle reveals the element is a true negative then $D$
+immediately calls $\UPO(\up_x)$ unless $q_U$ updates have already been
+performed. Finally, if $\advC$ makes an $\UPO$ call then $D$ forwards the call
+unless it has already made $q_U$ updates, in which case it just returns $\top$
+to $\advC$.
+
+By our earlier assumptions, there are only two types of update $\advC$ may make:
 %
 \begin{enumerate}
   \item Inserting an element which is not already in $\col$ and has previously been tested with $\QRYO$, returning a negative result.
@@ -157,46 +161,33 @@ positive. On the other hand, making a type 2 update provides no guarantee about
 how many bits in the filter might be set to 1. Type 1 updates are therefore
 always preferable for an adversary attempting to produce false positives.
 
-In fact, we can make an even stronger statement: it is always optimal for the
-adversary to insert $x$ as soon as $\QRYO(x)$ reveals that $x$ is not a false
-positive. Since this is a type 1 update, there is no `better' update which could
-benefit the adversary more, so there is no reason for the adversary's next
-$\UPO$ call to be anything other than $\UPO(\up_x)$. There is also no reason to
-make additional $\QRYO$ calls before calling $\UPO(\up_x)$, since calling
-$\UPO(\up_x)$ can only increase the probability that further $\QRYO$ calls
-produce an error. We therefore assume without loss of generality that $\advB$
-inserts $x$ after $\QRYO(x)$ returns a negative result, provided it still has at
-least one $\UPO$ call remaining and this insertion would not increase the size
-of the underlying set over the maximum number of $n$ elements.
+Note that, at any point during the experiment, $D$ has always made at least as
+many updates as $\advC$ has. Furthermore, all of the updates made by $D$ but not
+by $\advC$ are type 1 updates, which are maximally effective at increasing the
+error rate. Therefore any $\QRYO$ calls made by $\advC$ have at least the same
+probability of causing an error when made by $D$, and so
+$\Prob{\game_1(\advC) = 1} \le \Prob{\game_1(D) = 1}$.
 
-For~$\game_2$, then, we enforce this behavior, changing $\QRYO(x)$ to
+For~$\game_2$, then, we enforce this update-after-query behavior, changing
+$\QRYO(\qry_x)$ to
 automatically insert $x$ into $\col$ after computing the correct response to the
-query. For any $\advB$ for~$\game_1$ we can construct $C$ for~$\game_2$ that
-simulates $\advB$ to attain the same advantage, forwarding oracle queries in the
-natural way except that any call of the form $\UPO(x)$ are ignored if $\QRYO(x)$
+query. For any $D$ for~$\game_1$ we can construct $E$ for~$\game_2$ that
+simulates $D$ to attain the same advantage, forwarding oracle queries in the
+natural way except that any call of the form $\UPO(\up_x)$ are ignored if $\QRYO(\qry_x)$
 has been called previously. Ignoring these $\UPO$ calls does not negatively
-affect the adversary because in~$\game_2$ the original $\QRYO(x)$ call has
-already inserted $x$ into the set. Furthermore, the `enhanced' $\QRYO$ available
-to $C$ does not negatively affect $C$ at any point because inserting additional
-elements into the filter can only increase the probability that later queries
-return false positives. Then $C$ wins whenever $\advB$ does, and
-$\Prob{\game_1(\advB) = 1} \le \Prob{\game_2(C) = 1}$.
-%
-\cpnote{The above argument is rather long, and It might be easier to make itby
-giving an explicit reduction. Given that 1 and 2 are as dfined, if there's an
-adversry $\advB$ thqat's good at game 1, how do you build an adversary~$\advC$
-from~$\advB$ that gets at least as much advantage in game 2 as~$\advB$ does in
-game 1?}
+affect the adversary because in~$\game_2$ the original $\QRYO(\qry_x)$ call
+already automatically inserts $x$ into the set. Then $E$ wins whenever $D$ does, and
+$\Prob{\game_1(D) = 1} \le \Prob{\game_2(E) = 1}$.
 
-However, the parameters of the games played by $C$ and $\advB$ are slightly
-different. In particular, $\advB$ (and, by extension, $C$) may find up to $r$
-false positives before halting. When $\advB$ finds these false positives they
-are by assumption not ever inserted into $\col$, while in the case of $C$ the
+However, the parameters of the games played by $E$ and $D$ are slightly
+different. In particular, $D$ (and, by extension, $E$) may find up to $r$
+false positives before halting. When $D$ finds these false positives they
+are by assumption not ever inserted into $\col$, while in the case of $E$ the
 $\QRYO$ oracle automatically inserts them into the set as soon as they are
 found. While inserting a false positive does not affect the filter itself in any
 way, it does increment the number of elements in the underlying set. Therefore
-if adversaries $\advB$ in~$\game_1$ are limited to representing a set of size
-$n$, we restrict adversaries $C$ in~$\game_2$ to representing sets of up to size
+if adversaries $D$ in~$\game_1$ are limited to representing a set of size
+$n$, we restrict adversaries $E$ in~$\game_2$ to representing sets of up to size
 $n+r$.
 
 In~$\game_2$, $\UPO$ queries are actually superfluous. Since every element
@@ -217,14 +208,15 @@ necessarily have $|\setX| \le q_T$, and each $\qry_x \in \setX$ has some
 probability of causing an error. Since $\col^*$ never grows to contain more than
 $n+r$ elements, the false positive probability for each such $\qry_x$ is bounded
 above by $p'$, the false-positive probability of a Bloom filter containing $n+r$
-elements. So we have, analagously to the previous theorem\todo{DC}{fix ref},
+elements. So we have, analagously to the proof of
+Theorem~\ref{thm:sbf-errep-immutable},
 \begin{equation}
-   \Prob{\game_2(\advB)=1} \le
+   \Prob{\game_2(E)=1} \le
      \sum_{i=r}^{q_T} \binom{q_T}{i}p'^i(1-p')^{q_T-i} \,,
 \end{equation}
 where $q_T$ replaces $q$ and the larger $p'$ replaces $p$. Applying the same Chernoff bound reduces this to
 \begin{equation}
-   \Prob{\game_2(\advB)=1} \le
+   \Prob{\game_2(E)=1} \le
      e^{r-p'q_T}\left(\frac{p'q_T}{r}\right)^r.
 \end{equation}
 %
