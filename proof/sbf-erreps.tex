@@ -1,4 +1,10 @@
 \begin{figure*}
+\cpnote{It should be clear from this figure which boxed statments are included
+  in which games. Without the context of the text, the way someone would read
+  this is ``gamke 0 includes all unboxed statements; game 1 includes all unboxed
+  statments and all boxed statements; and game 2 includes all unboxed and
+  gray-boxed statements.'' Please clarify this figure so that it's clear what
+  statments are included in what games.}
 \twoColsNoDivide{0.47}
 {
   \vspace{-7pt}
@@ -25,6 +31,7 @@
     return $a$
   \\[6pt]
   \oraclev{$\REPO(\col)$}\\[2pt]
+    \cpnote{I believe this is incorrect, since $\Rep$ is now thresholding.}
     $M^* \gets \bigvee_{x \in \col} \bmap_m(\HASHO_2(\salt^* \cat x))$;
     $\setS^* \gets \col$;
     return $\top$
@@ -40,19 +47,59 @@
 \label{fig:sbf-erreps/games}
 \end{figure*}
 
-This proof follows a similar structure to the previous one. The primary distinction is that in the final game, unless the adversary `gets lucky' and guesses the salt, they should only be able to produce errors with $q_T$ queries, as opposed to both $q_T$ and $q_H$ queries.
+This proof follows a similar structure to the previous one.
 %
-Just as in the proof of Theorem~\ref{thm:sbf-errep-immutable}, we will assume the adversary just makes a single call to $\REPO$ and use Lemma~\ref{thm:lemma1} to complete the bound. Let $\advA$ be an \erreps\ adversary making exactly 1 call to $\REPO$, $q_T$ calls to $\QRYO$, $q_U$ calls to $\UPO$, and $q_H$ calls to $\HASHO$. Because $\advA$ creates only a single representation, it will necessarily lose if it calls $\REVO$ on that representation. We may therefore assume without loss of generality that $\advA$ makes no calls to $\REVO$, and because of this we omit $\REVO$ from each of the games.
+\cpnote{Don't refer to thoerems this way; say
+Theorem~\ref{thm:sbf-errep-immutable}. That way this reference isn't dangling if
+we restructure the paper.}
+%
+The primary distinction is that in the final game, unless the adversary `gets
+lucky' and guesses the salt, they should only be able to produce errors with
+$q_T$ queries, as opposed to both $q_T$ and $q_H$ queries.
+%
+Just as in the proof of Theorem~\ref{thm:sbf-errep-immutable}, we will assume
+the adversary just makes a single call to $\REPO$ and use Lemma~\ref{thm:lemma1}
+to complete the bound. Let $\advA$ be an \erreps\ adversary making exactly 1
+call to $\REPO$, $q_T$ calls to $\QRYO$, $q_U$ calls to $\UPO$, and $q_H$ calls
+to $\HASHO$. Because $\advA$ creates only a single representation, it will
+necessarily lose if it calls $\REVO$ on that representation. We may therefore
+assume without loss of generality that $\advA$ makes no calls to $\REVO$, and
+because of this we omit $\REVO$ from each of the games.
+%
+\cpnote{Good. Somehwere in the body we'll need to justify why we include~$\REVO$
+in the experiment, since at this point the reader has no reason to believe that
+$\REVO$ captures something useful.}
 
-In addition to the assumptions of the previous theorem, we assume without loss of generality that the adversary never uses $\UPO$ to insert an element into $\col$ which is already present in the set, and never uses $\UPO$ to insert an element $x$ where $\QRYO(\qry_x)$ has already been called and has returned a positive result. Since these insertions do not change the filter and in the latter case may actually reduce the error count, the adversary would gain no advantage from performing these updates. Furthermore, we assume without loss of generality that an adversary halts as soon as it determines it has accumulated enough errors to win the experiment.
+In addition to the assumptions of the previous theorem \todo{DC}{Fix ref}, we
+assume without loss of generality that the adversary never uses $\UPO$ to insert
+an element into $\col$ which is already present in the set \todo{DC}{Double
+check this assumption isn't made above}, and never uses $\UPO$ to insert an
+element $x$ where $\QRYO(\qry_x)$ has already been called and has returned a
+positive result. Since these insertions do not change the filter and in the
+latter case may actually reduce the error count \cpnote{WHAT?? I don't think
+that's true. Remember that the error function is \textbf{fixed} at this point.},
+the adversary would gain no advantage from performing these updates.
+Furthermore, we assume without loss of generality that an adversary halts as
+soon as it determines it has accumulated enough errors to win the experiment.
 
-We begin with a game~$\game_0(\advB)$ similar to the previous proof, as shown in Figure~\ref{fig:sbf-errep-immutable/games}. Again we observe that for every~$\advA$ there exists a~$\advB$  such that
+We begin with a game~$\game_0(\advB)$
+(Figure~\ref{fig:sbf-errep-immutable/games}) similar to the previous
+proof\todo{DC}{fix ref}, except that it also defines an~$\UPO$ oracle. Again, we
+observe that for every~$\advA$ there exists a~$\advB$  such that
 \begin{equation}
   \Adv{\errep}_{\Pi,\delta,r}(\advA) \leq \Prob{\game_0(\advB) = 1}
 \end{equation}
 and~$\advB$ has the same query resources as~$\advA$.
 
-Since we are seeking a stronger bound, we now wish to isolate the possibility that the adversary \emph{ever} guesses the salt, as opposed to just guessing the salt before calling $\REPO$. This is no longer a trivial task for the adversary because the representations are private, and so $\REPO$ does not directly reveal the salt. We therefore set the~$\bad_1$ flag whenever the adversary manages to guess the salt, without the requirement that $M^* = \bot$. However, since the adversary is still limited to a total of $q_H$ $\HASHO$ queries, regardless of when the queries are made, we can follow nearly the same argument as in the previous proof to get the bound
+Since we are seeking a stronger bound, we now wish to isolate the possibility
+that the adversary \emph{ever} guesses the salt, as opposed to just guessing the
+salt before calling $\REPO$. This is no longer a trivial task for the adversary
+because the representations are private, and so $\REPO$ does not directly reveal
+the salt. We therefore set the~$\bad_1$ flag whenever the adversary manages to
+guess the salt, without the requirement that $M^* = \bot$. However, since the
+adversary is still limited to a total of $q_H$ $\HASHO$ queries, regardless of
+when the queries are made, we can follow nearly the same argument as in the
+previous proof to get the bound
 %
 \begin{eqnarray}
   \Prob{\game_0(\advB)=1} &\leq&
@@ -63,18 +110,65 @@ Since we are seeking a stronger bound, we now wish to isolate the possibility th
 %
 In~$\game_1$, we may now assume that the adversary never guesses the salt in its $\HASHO_1$ queries. This means that none of the inputs to $\HASHO_1$ is ever equal to any input to $\HASHO_2$ or $\HASHO_3$, both of which always use the salt $\salt^*$. Since each $\HASHO$ is modeled as a random oracle, the outputs of $\HASHO_1$ are therefore independent of the outputs of $\HASHO_2$ and $\HASHO_3$.
 %
-We still cannot move to the binomial distribution for non-adaptive queries, however, since $\HASHO_2$ and $\HASHO_3$ queries are not necessarily independent of each other. By one of our starting assumptions, the same input is never provided twice to $\HASHO_2$ because the adversary never tries to insert an element which is already in $\col$. We also argue that (without loss of generality) the same input is never provided twice to $\HASHO_3$, i.e. that the same element is never queried twice.
+We still cannot move to the binomial distribution for non-adaptive queries,
+however, since $\HASHO_2$ and $\HASHO_3$ queries are not necessarily independent
+of each other. By one of our starting assumptions, the same input is never
+provided twice to $\HASHO_2$ because the adversary never tries to insert an
+element which is already in $\col$. We also argue \cpnote{Do you mean assume?} that (without loss of
+generality) the same input is never provided twice to $\HASHO_3$, i.e. that the
+same element is never queried twice.
 
-On one hand, if a $\QRYO(x)$ call shows that $x$ is already a false positive for $\pub$, further $\QRYO(x)$ calls cannot increase the adversary's error score. On the other hand, if a $\QRYO(x)$ call shows that $x$ is not a false positive, it is still possible for $x$ to become a false positive later on due to $\UPO$ calls. However, the adversary would obtain at least as large a chance of finding a false positive by calling $\QRYO(y)$ for some previously unqueried $y \not\in\col$, since the sequence of updates that could make $x$ a false positive are just as likely to make $y$ a false positive by the independence of $\HASHO_c$ calls on different inputs. We can therefore assume that the adversary does not send repeated queries to $\QRYO$.
+\todo{DC}{Replace $\QRYO(x)$ with $\QRYO(\qry_x)$, here and everywhere else.}
+On one hand, if a $\QRYO(x)$ call shows that $x$ is already a false positive for
+$\pub$, further $\QRYO(x)$ calls cannot increase the adversary's error score. On
+the other hand, if a $\QRYO(x)$ call shows that $x$ is not a false positive, it
+is still possible for $x$ to become a false positive later on due to $\UPO$
+calls. However, the adversary would obtain at least as large a chance of finding
+a false positive by calling $\QRYO(y)$ for some previously unqueried $y
+\not\in\col$, since the sequence of updates that could make $x$ a false positive
+are just as likely to make $y$ a false positive by the independence of
+$\HASHO_c$ calls on different inputs. We can therefore assume that the adversary
+does not send repeated queries to $\QRYO$.
 %
-We have now reduced to a case where all hash queries are independent except for $\QRYO$ and $\UPO$ calls to the same element. By our starting assumptions, an adversary never calls $\QRYO$ on an element which has already been inserted, so we need only consider the case of an element being queried before it is inserted. In fact, doing thos can be beneficial to a pollution attack, since determining with $\QRYO$ that an element is not already a false positive informs the adversary that inserting that element must necessarily set at least one new bit in the filter to 1. Since all other possibilities have been eliminated, we need only consider two types of update the adversary may make:
+We have now reduced to a case where all hash queries are independent except for
+$\QRYO$ and $\UPO$ calls to the same element. By our starting assumptions, an
+adversary never calls $\QRYO$ on an element which has already been inserted, so
+we need only consider the case of an element being queried before it is
+inserted. In fact, doing this can be beneficial to a pollution attack, since
+determining with $\QRYO$ that an element is not already a false positive informs
+the adversary that inserting that element must necessarily set at least one new
+bit in the filter to 1. Since all other possibilities have been eliminated, we
+need only consider two types of update the adversary may make:
+%
 \begin{enumerate}
   \item Inserting an element which is not already in $\col$ and has previously been tested with $\QRYO$, returning a negative result.
   \item Inserting an element which is not already in $\col$ and has not previously been tested with $\QRYO$.
 \end{enumerate}
-Since calls to $\HASHO_3$ with different choices of $x$ are independent of each other, and since $\HASHO_3$ uses random sampling, the effects of type 1 updates on the representation are identically distributed. Similarly, since calls to $\HASHO_2$ produce independent random results, the effects of type 2 updates on the representation are also identically distributed. However, the effects of the two types of update are \emph{not} identically distributed compared to each other. In particular, making a type 1 update ensures that at least one new bit in the filter will be set to 1, since the distribution of $\bmap_m(\HASHO_2(\salt^* \cat x))$ is conditioned on not producing a false positive. On the other hand, making a type 2 update provides no guarantee about how many bits in the filter might be set to 1. Type 1 updates are therefore always preferable for an adversary attempting to produce false positives.
+Since calls to $\HASHO_3$ with different choices of $x$ are independent of each
+other, and since $\HASHO_3$ uses random sampling, the effects of type 1 updates
+on the representation are identically distributed. Similarly, since calls to
+$\HASHO_2$ produce independent random results, the effects of type 2 updates on
+the representation are also identically distributed. However, the effects of the
+two types of update are \emph{not} identically distributed compared to each
+other. In particular, making a type 1 update ensures that at least one new bit
+in the filter will be set to 1, since the distribution of
+$\bmap_m(\HASHO_2(\salt^* \cat x))$ is conditioned on not producing a false
+positive. On the other hand, making a type 2 update provides no guarantee about
+how many bits in the filter might be set to 1. Type 1 updates are therefore
+always preferable for an adversary attempting to produce false positives.
 
-In fact, we can make an even stronger statement: it is always optimal for the adversary to insert $x$ as soon as $\QRYO(x)$ reveals that $x$ is not a false positive. Since this is a type 1 update, there is no `better' update which could benefit the adversary more, so there is no reason for the adversary's next $\UPO$ call to be anything other than $\UPO(\up_x)$. There is also no reason to make additional $\QRYO$ calls before calling $\UPO(\up_x)$, since calling $\UPO(\up_x)$ can only increase the probability that further $\QRYO$ calls produce an error. We therefore assume without loss of generality that $\advB$ inserts $x$ after $\QRYO(x)$ returns a negative result, provided it still has at least one $\UPO$ call remaining and this insertion would not increase the size of the underlying set over the maximum number of $n$ elements.
+\cpnote{Got here}
+In fact, we can make an even stronger statement: it is always optimal for the
+adversary to insert $x$ as soon as $\QRYO(x)$ reveals that $x$ is not a false
+positive. Since this is a type 1 update, there is no `better' update which could
+benefit the adversary more, so there is no reason for the adversary's next
+$\UPO$ call to be anything other than $\UPO(\up_x)$. There is also no reason to
+make additional $\QRYO$ calls before calling $\UPO(\up_x)$, since calling
+$\UPO(\up_x)$ can only increase the probability that further $\QRYO$ calls
+produce an error. We therefore assume without loss of generality that $\advB$
+inserts $x$ after $\QRYO(x)$ returns a negative result, provided it still has at
+least one $\UPO$ call remaining and this insertion would not increase the size
+of the underlying set over the maximum number of $n$ elements.
 
 For~$\game_2(C)$, then, we enforce this behavior, changing $\QRYO(x)$ to automatically insert $x$ into $\col$ after computing the correct response to the query. For any $\advB$ for~$\game_1$ we can construct $C$ for~$\game_2$ that simulates $\advB$ to attain the same advantage, forwarding oracle queries in the natural way except that any call of the form $\UPO(x)$ are ignored if $\QRYO(x)$ has been called previously. Ignoring these $\UPO$ calls does not negatively affect the adversary because in~$\game_2$ the original $\QRYO(x)$ call has already inserted $x$ into the set. Furthermore, the `enhanced' $\QRYO$ available to $C$ does not negatively affect $C$ at any point because inserting additional elements into the filter can only increase the probability that later queries return false positives. Then $C$ wins whenever $\advB$ does, and $\Prob{\game_1(\advB) = 1} \le \Prob{\game_2(C) = 1}$.
 

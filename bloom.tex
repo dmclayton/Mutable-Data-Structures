@@ -276,7 +276,7 @@ avoids this pitfall.
 \subsection{Salted BFs in the (im)mutable setting}
 %
 Here we consider the correctness of Bloom filters when the hashed input is
-prepended with a salt.
+preppended with a salt.
 %
 Fix $H:\bits^*\to[m]^k$ and $n,\lambda\geq0$ and let
 $\Pi = \todo{DC}{...}$.
@@ -447,30 +447,32 @@ filter under attack be kept secret from adversaries. In fact, we can attain the
 following \erreps\ bound.
 
 \begin{theorem}[\erreps\ security of salted BFs]\label{thm:sbf-erreps}
-Let $p_*$ be the standard (non-adaptive) false positive probability for a Bloom
-filter with the chosen parameters \emph{except} that the set threshold is
-increased from $n$ to $n+r$. For all integers $q_R, q_T, q_H, r, t \geq 0$, if
-$r > p_*q_T$, then it holds that
+  Let $p' = P_{k,m}(n+r)$.
+  For all integers $q_R, q_T, q_H, r, t \geq 0$, if
+  $r > p'q_T$, then it holds that
   \begin{eqnarray*}
     \begin{aligned}
-      \Adv{\erreps}_{\Pi,\delta,r}(t,q_R, q_T, q_U, q_H) &\leq \\
+      \Adv{\erreps}_{\Pi,\delta,r}(t,\,&q_R, q_T, q_U, q_H) \leq \\
           & q_R \cdot \left[
       \frac{q_H}{2^\lambda} +
-      \left(\frac{p_*q_T}{r}\right)^re^{r-p_*q_T}\right]\,,
+      \left(\frac{p'q_T}{r}\right)^re^{r-p'q_T}\right]\,,
     \end{aligned}
 \end{eqnarray*}
-where $H$ is modeled as a random oracle
+  where $H$ is modeled as a random oracle.
 \end{theorem}
 
-This proof follows a very similar structure to that of
+The proof follows a similar structure to that of
 Theorem~\ref{thm:sbf-errep-immutable}. The primary differences come from arguing
-that without a `lucky' guess of the salt the adversary cannot use offline hash
+that without a ``lucky'' guess of the salt the adversary cannot use offline hash
 queries to find false positives, and from having to show that the adversary's
 access to $\UPO$ does not substantially change the security bound that can be
 derived. The first of these is straightforward given the private-representation
 setting, but the second requires investigating how much of an advantage the
 $\UPO$ oracle can give in a pollution attack, and then moving to games where
 this advantage is taken into account.
+%
+\todo{DC}{Be sure the reader knows that class of BF you're talking about, i.e.,
+how we're thresholding. (At this point I have no idea.)}
 
 \begin{proof}[Proof of Theorem~\ref{thm:sbf-erreps}]
   \input{proof/sbf-erreps}
@@ -494,16 +496,16 @@ Let $\Pi = \KBF[F,n,\lambda] = (\Rep^F, \Qry^F, \Up^F)$ as defined in
 Figure~\ref{fig:bf-def}.
 
 \begin{theorem}[\errep\ security of keyed BFs]\label{thm:bf-key-bound}
-Let $p_*$ be the standard (non-adaptive) false positive probability for a Bloom
+Let $p'$ be the standard (non-adaptive) false positive probability for a Bloom
 filter with the chosen parameters \emph{except} that the set threshold is
 increased from $n$ to $n+r$.
-For integers $q_R, q_T, q_H, r, t \geq 0$, if $r > p_*q_T$, it holds that
+For integers $q_R, q_T, q_H, r, t \geq 0$, if $r > p'q_T$, it holds that
   \begin{equation*}
     \begin{aligned}
-      \Adv{\errep}_{\Pi,\delta,r}(t, q_R,q_T,q_U,q_H) &\leq \\
+      \Adv{\errep}_{\Pi,\delta,r}(t,\,&q_R,q_T,q_U,q_H) \leq \\
         \Adv{\prf}_F(t,nq_R+q_T+q_U) & +
       \frac{q_R^2}{2^\lambda} +
-      \left(\frac{p_*q_Rq_T}{r}\right)^re^{r-p_*q_Rq_T}
+      \left(\frac{p'q_Rq_T}{r}\right)^re^{r-p'q_Rq_T}
     \end{aligned}
   \end{equation*}
 \end{theorem}
