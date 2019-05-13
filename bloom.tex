@@ -2,10 +2,8 @@
   \twoColsNoDivide{0.22}
   {
     \underline{$\Rep^R_K(\col)$}\\[2pt]
-      $\salt \getsr \bits^\lambda$\\
-      for $i$ in $[1..k]$ do\\
-        $\tab M[i] \gets 0^m$\\
-      $\pub \gets \langle M, \salt, c \rangle$
+      $\salt \getsr \bits^\lambda$;
+      $\pub \gets \langle 0^m, \salt, 0\rangle$\\
       for $x \in \col$ do \\
         $\tab \pub \gets \Up^R_K(\pub, \qry_x)$\\
         $\tab$if $\pub = \bot$ then return $\bot$\\
@@ -13,16 +11,12 @@
   }
   {
     \underline{$\Qry^R_K(\langle M, \salt, c \rangle,\qry_x)$}\\[2pt]
-      $X \gets R_K(\salt \cat x)$;
-      $m \gets \infty$\\
-      for $i$ in $[1..k]$ do\\
-      $\tab m \gets \min(m, M[i][X[i]])$
-      return $m$
+      $X \gets \bmap_m(R_K(\salt \cat x))$\\
+      return $M \AND X = X$
     \\[6pt]
     \underline{$\Up^R_K(\langle M, \salt, c \rangle,\qry_x)$}\\[2pt]
       if $c \geq n$ then return $\bot$\\
-      $M' \gets M$
-      $X \gets R_K(\salt \cat x)$\\
+      $M \gets M \vee \bmap_m(R_K(\salt \cat x))$\\
       return $\langle M, \salt, c+1 \rangle$
   }
   \caption{Keyed structure $\bloom[R,n,\lambda]$ given by
