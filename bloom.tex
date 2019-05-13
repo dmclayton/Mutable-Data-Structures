@@ -516,7 +516,7 @@ oracle. Without this assumption that representations are never leaked to the
 adversary, however, we emphasize that merely using a long-term secret key
 without a per-representation salt does not guarantee security.
 
-\subsection{Thresholded BFs}
+\subsection{$\ell$-threshold BFs}
 
 \begin{figure}
   \twoColsNoDivide{0.22}
@@ -551,6 +551,10 @@ achieving good security in practice. We show that a stronger bound can be
 achieved using the tweaked Bloom filter construction $\SBF_\mathrm{ft}$, showing
 a better bound in the private-representation setting than we had for $\SBF$.
 %
+\cpnote{When a reviewer read this they'll think: ``why, then, do I care about
+$n$-capped filters if $\ell$-threshold filters perform so much better?''}
+
+%
 \begin{theorem}[\errep\ security of thresholded BFs]\label{thm:bf-thr-bound}
 Let $p_\ell = ((\ell+k)/m)^k$. For integers $q_R, q_T, q_H, r, t \geq 0$ such
 that $r > p_\ell q_T$, it holds that
@@ -568,6 +572,9 @@ $\ell+k$ bits of the filter to 1, regardless of how the attack is conducted.
 We therefore assume that the adversary will always be able to produce such a
 maximally full filter, and then use a standard binomial-distribution-based bound
 to place a limit on the adversarial advantage even in this worst-case scenario.
+%
+\cpnote{It sounds like you're claiming that pollution attacks are the best the
+adversary can do. If this is the case, then you have to prove this.}
 
 \begin{proof}
   \input{proof/sbf-erreps-th}
