@@ -157,7 +157,6 @@ positive. On the other hand, making a type 2 update provides no guarantee about
 how many bits in the filter might be set to 1. Type 1 updates are therefore
 always preferable for an adversary attempting to produce false positives.
 
-\cpnote{Got here}
 In fact, we can make an even stronger statement: it is always optimal for the
 adversary to insert $x$ as soon as $\QRYO(x)$ reveals that $x$ is not a false
 positive. Since this is a type 1 update, there is no `better' update which could
@@ -170,28 +169,70 @@ inserts $x$ after $\QRYO(x)$ returns a negative result, provided it still has at
 least one $\UPO$ call remaining and this insertion would not increase the size
 of the underlying set over the maximum number of $n$ elements.
 
-For~$\game_2(C)$, then, we enforce this behavior, changing $\QRYO(x)$ to automatically insert $x$ into $\col$ after computing the correct response to the query. For any $\advB$ for~$\game_1$ we can construct $C$ for~$\game_2$ that simulates $\advB$ to attain the same advantage, forwarding oracle queries in the natural way except that any call of the form $\UPO(x)$ are ignored if $\QRYO(x)$ has been called previously. Ignoring these $\UPO$ calls does not negatively affect the adversary because in~$\game_2$ the original $\QRYO(x)$ call has already inserted $x$ into the set. Furthermore, the `enhanced' $\QRYO$ available to $C$ does not negatively affect $C$ at any point because inserting additional elements into the filter can only increase the probability that later queries return false positives. Then $C$ wins whenever $\advB$ does, and $\Prob{\game_1(\advB) = 1} \le \Prob{\game_2(C) = 1}$.
+For~$\game_2$, then, we enforce this behavior, changing $\QRYO(x)$ to
+automatically insert $x$ into $\col$ after computing the correct response to the
+query. For any $\advB$ for~$\game_1$ we can construct $C$ for~$\game_2$ that
+simulates $\advB$ to attain the same advantage, forwarding oracle queries in the
+natural way except that any call of the form $\UPO(x)$ are ignored if $\QRYO(x)$
+has been called previously. Ignoring these $\UPO$ calls does not negatively
+affect the adversary because in~$\game_2$ the original $\QRYO(x)$ call has
+already inserted $x$ into the set. Furthermore, the `enhanced' $\QRYO$ available
+to $C$ does not negatively affect $C$ at any point because inserting additional
+elements into the filter can only increase the probability that later queries
+return false positives. Then $C$ wins whenever $\advB$ does, and
+$\Prob{\game_1(\advB) = 1} \le \Prob{\game_2(C) = 1}$.
+%
+\cpnote{The above argument is rather long, and It might be easier to make itby
+giving an explicit reduction. Given that 1 and 2 are as dfined, if there's an
+adversry $\advB$ thqat's good at game 1, how do you build an adversary~$\advC$
+from~$\advB$ that gets at least as much advantage in game 2 as~$\advB$ does in
+game 1?}
 
-However, the parameters of the games played by $C$ and $\advB$ are slightly different. In particular, $\advB$ (and, by extension, $C$) may find up to $r$ false positives before halting. When $\advB$ finds these false positives they are by assumption not ever inserted into $\col$, while in the case of $C$ the $\QRYO$ oracle automatically inserts them into the set as soon as they are found. While inserting a false positive does not affect the filter itself in any way, it does increment the number of elements in the underlying set. Therefore if adversaries $\advB$ in~$\game_1$ are limited to representing a set of size $n$, we restrict adversaries $C$ in~$\game_2$ to representing sets of up to size $n+r$.
+However, the parameters of the games played by $C$ and $\advB$ are slightly
+different. In particular, $\advB$ (and, by extension, $C$) may find up to $r$
+false positives before halting. When $\advB$ finds these false positives they
+are by assumption not ever inserted into $\col$, while in the case of $C$ the
+$\QRYO$ oracle automatically inserts them into the set as soon as they are
+found. While inserting a false positive does not affect the filter itself in any
+way, it does increment the number of elements in the underlying set. Therefore
+if adversaries $\advB$ in~$\game_1$ are limited to representing a set of size
+$n$, we restrict adversaries $C$ in~$\game_2$ to representing sets of up to size
+$n+r$.
 
-In~$\game_2$, $\UPO$ queries are actually superfluous. Since every element queried is automatically inserted into the set and the adversary never inserts an element more than once, $\UPO$ calls are now all of type 2. Since these insertions can only increase the chance of each following $\QRYO$ call being a false positive, it is optimal for the adversary to make all $\UPO$ calls at the beginning of the experiment, and then to make all $\QRYO$ calls. But this means we can assume without loss of generality that the adversary makes no $\UPO$ calls at all, since any elements added through $\UPO$ before any $\QRYO$ calls are made could just as easily have been included in the original call to $\REPO$ without affecting the adversary's advantage.
+In~$\game_2$, $\UPO$ queries are actually superfluous. Since every element
+queried is automatically inserted into the set and the adversary never inserts
+an element more than once, $\UPO$ calls are now all of type 2. Since these
+insertions can only increase the chance of each following $\QRYO$ call being a
+false positive, it is optimal for the adversary to make all $\UPO$ calls at the
+beginning of the experiment, and then to make all $\QRYO$ calls. But this means
+we can assume without loss of generality that the adversary makes no $\UPO$
+calls at all, since any elements added through $\UPO$ before any $\QRYO$ calls
+are made could just as easily have been included in the original call to $\REPO$
+without affecting the adversary's advantage.
 
-We now therefore only consider the case of a $\REPO$ call followed by the~$\game_2$ version of $\QRYO$ calls. Let $\setX$ be the set of all queries $\qry_x$ which are sent to $\QRYO$ over the course of the experiment. We necessarily have $|\setX| \le q_T$, and each $\qry_x \in \setX$ has some probability of causing an error. Since $\col^*$ never grows to contain more than $n+r$ elements, the false positive probability for each such $\qry_x$ is bounded above by $p_*$, the false-positive probability of a Bloom filter containing $n+r$ elements. So we have, analagously to the previous theorem,
+We now therefore only consider the case of a $\REPO$ call followed by
+the~$\game_2$ version of $\QRYO$ calls. Let $\setX$ be the set of all queries
+$\qry_x$ which are sent to $\QRYO$ over the course of the experiment. We
+necessarily have $|\setX| \le q_T$, and each $\qry_x \in \setX$ has some
+probability of causing an error. Since $\col^*$ never grows to contain more than
+$n+r$ elements, the false positive probability for each such $\qry_x$ is bounded
+above by $p'$, the false-positive probability of a Bloom filter containing $n+r$
+elements. So we have, analagously to the previous theorem\todo{DC}{fix ref},
 \begin{equation}
    \Prob{\game_2(\advB)=1} \le
-     \sum_{i=r}^{q_T} \binom{q_T}{i}p_*^i(1-p_*)^{q_T-i} \,,
+     \sum_{i=r}^{q_T} \binom{q_T}{i}p'^i(1-p')^{q_T-i} \,,
 \end{equation}
-where $q_T$ replaces $q$ and the larger $p_*$ replaces $p$. Applying the same Chernoff bound reduces this to
+where $q_T$ replaces $q$ and the larger $p'$ replaces $p$. Applying the same Chernoff bound reduces this to
 \begin{equation}
    \Prob{\game_2(\advB)=1} \le
-     e^{r-p_*q_T}\left(\frac{p_*q_T}{r}\right)^r.
+     e^{r-p'q_T}\left(\frac{p'q_T}{r}\right)^r.
 \end{equation}
-
+%
 Again we apply Lemma~\ref{thm:lemma1} to get a final bound of
 \begin{equation}
   \Adv{\erreps}_{\Pi,\delta,r}(\advA) \leq
     q_R \cdot \left[
       \frac{q_H}{2^\lambda} +
-      \left(\frac{p_*q_T}{r}\right)^re^{r-p_*q_T}
+      \left(\frac{p'q_T}{r}\right)^re^{r-p'q_T}
     \right] \,.
 \end{equation}
