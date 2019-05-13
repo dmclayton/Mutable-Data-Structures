@@ -1,60 +1,62 @@
 \begin{figure*}[t]
-  \fourColsOneDivide{0.25}{.2}{.275}{.25}
-  {
-     \raisebox{-5pt}{\experimentv{$\Exp{\errep}_{\struct,d,r}(\advA)$ {\colorbox{lightgray}{$\Exp{\erreps}_{\struct,r}(\advA)$}}}}\\[2pt]
-      $\setP \gets \emptyset$\\
-      $\ct \gets 0$ \\
-      $\key \getsr \keys$\\
-      $i \getsr \advA^{\REPO,\UPO,\QRYO\highlighto{,\REVO}}$\\
-      \colorbox{lightgray}{if $i \in \setP$ then return 0} \\[2.0pt]
-      return $[\sum_\qry \err_i[\qry] \geq r]$ 
- }
+\fourColsNoDivide{0.22}{.18}{.275}{.25}
 {
-    \oraclev{$\REPO(\col)$}\\[2pt]
-      $\pub \getsr \Rep_\key(\col)$\\
-      if $\pub = \bot$ return $\bot$\\
-      $\ct\gets\ct+1$ \\
-      $\pub_\ct \gets \pub$\\
-      %$\setC_\ct \gets \emptyset$\\
-      $\col_\ct \gets \col$\\
-      $\mathrm{rv} \gets \pub_\ct$ \highlight{;\mathrm{rv} \gets \top} \\
-      return $\mathrm{rv}$
-  }
-  {
-    \oraclev{$\UPO(i, \up)$}\\[2pt]
-%      $X \gets \col^{v[i]}_i
-%      $v[i] \gets v[i]+1$\\
-      $\pub \getsr \Up_\key(\pub_i, \up)$\\
-      if $\pub = \bot$ return $\bot$\\
-      $X \gets \col_i$ \\
-      $\col_i \gets \up(X)$\\
-      $\pub_i \getsr \pub$\\
-%      $\setC_i \gets \emptyset$\\
-      for $\qry$ in $\err_i$ do\\
-      \tab $a \gets \Qry_K(\pub_i, \qry)$\\
-      \tab if $\err_i[\qry] > d(a,\qry(\col_i))$ then\\
-      \tab\tab$\err_i[\qry] \gets d(a,\qry(\col_i))$\\
-      $\mathrm{rv} \gets \pub_i$ \highlight{;\mathrm{rv} \gets \top}\\
-      return $\mathrm{rv}$
-      \medskip
+  \raisebox{-5pt}{\experimentv{$\Exp{\errep}_{\struct,\delta,r}(\advA)$
+          \diffminus{$\Exp{\erreps}_{\struct,\delta,r}(\advA)$}}}\\[2pt]
+    $\setP \gets \emptyset$; $\ct \gets 0$; $\key \getsr \keys$\\
+    $i \getsr \advA^{\REPO,\UPO,\QRYO,\highlighto{\REVO}}$\\
+    \diffminus{if $i \in \setP$ then return 0} \\[2.0pt]
+    return $[\sum_\qry \err_i[\qry] \geq r]$
+  \\[8pt]
+  \diffplusbox{
+  \oraclev{$\HASHO(X)$}\\[2pt]
+    if $X \not\in \setX$ then return $\bot$\\
+    if $T[X]=\bot$ then $T[X] \getsr \setY$\\
+    return $T[X]$
+  }\vspace{-4pt}
 }
 {
-    \oraclev{$\QRYO(i, \qry)$}\\[2pt]
-      if $\qry \in \setC_i$ then return $\bot$\\
-%      $\setC_i \gets \setC \union \{\qry\}$\\
-      $a \gets \Qry_K(\pub_i, \qry)$\\
-      if $\err_i[\qry] < d(a,\qry(\col_i))$ then\\
-      \tab$\err_i[\qry] \gets d(a,\qry(\col_i))$\\
-      return $a$
-
-
-      \medskip
-    \oraclev{$\REVO(i)$}\\[2pt]
-     $\setP \gets \setP \cup \{i\}$ \\
-      return $\pub_i$
-
-  }
-  \caption{Two notions of adversarial correctness. The $\errep$ notion captures correctness when the representation is always known to the adversary, while the $\erreps$ notion captures correctness when the representation is secret.}
+  \oraclev{$\REPO(\col)$}\\[2pt]
+    $\pub \getsr \Rep_\key(\col)$\\
+    if $\pub = \bot$ return $\bot$\\
+    $\ct\gets\ct+1$ \\
+    $\pub_\ct \gets \pub$\\
+    %$\setC_\ct \gets \emptyset$\\
+    $\col_\ct \gets \col$\\
+    $\mathsf{rv} \gets \pub_\ct$; \diffminus{$\mathsf{rv} \gets \top$}\\
+    return $\mathsf{rv}$
+}
+{
+  \oraclev{$\UPO(i, \up)$}\\[2pt]
+    %$X \gets \col^{v[i]}_i
+    %$v[i] \gets v[i]+1$\\
+    $\pub \getsr \Up_\key(\pub_i, \up)$\\
+    if $\pub = \bot$ return $\bot$\\
+    $\col_i \gets \up(\col_i)$\\
+    $\pub_i \gets \pub$\\
+    for $\qry$ in $\err_i$ do\\
+    \tab $a \gets \Qry_K(\pub_i, \qry)$\\
+    \tab if $\err_i[\qry] > \delta(a,\qry(\col_i))$ then\\
+    \tab\tab$\err_i[\qry] \gets \delta(a,\qry(\col_i))$\\
+    $\mathsf{rv} \gets \pub_i$; \diffminus{$\mathsf{rv} \gets \top$}\\
+    return $\mathsf{rv}$
+}
+{
+  \oraclev{$\QRYO(i, \qry)$}\\[2pt]
+    $a \gets \Qry_K(\pub_i, \qry)$\\
+    if $\err_i[\qry] < \delta(a,\qry(\col_i))$ then\\
+    \tab$\err_i[\qry] \gets \delta(a,\qry(\col_i))$\\
+    return $a$
+  \\[6pt]
+  \oraclev{$\REVO(i)$}\\[2pt]
+    $\setP \gets \setP \cup \{i\}$ \\
+    return $\pub_i$
+}
+  \caption{Two notions of adversarial correctness. The \errep\ notion captures
+  correctness when the representation is always known to the adversary, while
+  the \erreps\ notion captures correctness when the representation is secret.
+  When modeling a function $H:\setX\to\setY$ as a random oracle, the $\HASHO$
+  oracle is given to $\advA$, $\Rep$, $\Up$ and $\Qry$.}
   \vspace{6pt}\hrule
   \label{fig:security}
 \end{figure*}
@@ -73,6 +75,7 @@
   }
 }
 
+\ignore{
 \begin{figure}[t]
 \oneColCCS{0.25}
 {
@@ -85,3 +88,4 @@ return~$V$
 \caption{Pseudocode for a Random Oracle~$R$ with outputs in set $\mathcal{V}$}
 \label{fig:ROM}
 \end{figure}
+}

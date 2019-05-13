@@ -12,8 +12,8 @@
 %\include{macros}
 
 % Notions
-\newcommand{\errep}{\notionfont{ERR\mbox{-}UP}}
-\newcommand{\erreps}{\notionfont{ERR\mbox{-}UP(S)}}
+\newcommand{\errep}{\notionfont{ERR\mbox{-}Pub}}
+\newcommand{\erreps}{\notionfont{ERR\mbox{-}Priv}}
 \newcommand{\indrep}{\notionfont{IND\mbox{-}UP}}
 \newcommand{\indrepr}{\notionfont{IND\mbox{-}UPR}}
 \newcommand{\prf}{\notionfont{PRF}}
@@ -54,7 +54,7 @@
 \newcommand{\DICT}{\schemefont{DICT}}
 \newcommand{\bloom}{\schemefont{Bloom}}
 \newcommand{\countbloom}{\schemefont{Count}}
-\newcommand{\bi}{\mathrm{bi}}
+\newcommand{\bff}{\mathrm{bf}}
 \newcommand{\saltybloom}{\mathrm{sbf}}
 \newcommand{\prfbloom}{\mathrm{kbf}}
 \newcommand{\dict}{\mathrm{dict}}
@@ -91,17 +91,18 @@
 \newcommand{\setU}{\setfont{U}}
 \newcommand{\setV}{\setfont{V}}
 \newcommand{\setX}{\setfont{X}}
+\newcommand{\setY}{\setfont{Y}}
 \newcommand{\setW}{\setfont{W}}
 \newcommand{\setZ}{\setfont{Z}}
 % Adversaries
 \newcommand{\advA}{\adversaryfont{A}}
 \newcommand{\advB}{\adversaryfont{B}}
+\newcommand{\advC}{\adversaryfont{C}}
 \newcommand{\dist}{\adversaryfont{D}}
 
 % Variables
 \newcommand{\err}{\varfont{err}}
 \newcommand{\ct}{\varfont{ct}}
-\renewcommand{\st}{\varfont{st}}
 \newcommand{\salt}{Z}
 
 % Oracles
@@ -138,6 +139,7 @@
 \newcommand{\bmap}{{B}}
 \newcommand{\cmap}{{B}}
 \newcommand{\hw}{{w}}
+\newcommand{\id}{\schemefont{id}}
 
 \newcommand{\emptystring}{\varepsilon}
 
@@ -170,6 +172,7 @@
 \label{sec:bloom}
 \input{bloom}
 
+\ignore{
 \section{Counting Filters}
 \label{sec:counting}
 \input{counting}
@@ -189,6 +192,7 @@
   limitations of our formalisms.}
 \label{sec:structures}
 \input{structures}
+}
 
 %\section{Privacy}
 %\label{sec:privacy}
@@ -198,11 +202,12 @@
 
 \appendix
 
-\section{A generic \erreps1 attack against unsalted Bloom filters}
+\section{A generic \erreps1 attack against basic Bloom filters}
 \input{attack/bf}
 
-\section{A generic security bound for keyless data structures}
-\input{proof/lemma-keyless}
+\section{Deferred proofs}
+\label{app:deferred}
+\input{deferred}
 
 %\begin{thebibliography}{9}
 %\bibitem{bloomfilter} 

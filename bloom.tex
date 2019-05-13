@@ -1,184 +1,216 @@
-\newcommand{\id}{\schemefont{id}}
 \begin{figure}
   \twoColsNoDivide{0.22}
   {
     \underline{$\Rep^R_K(\col)$}\\[2pt]
-      if $|\col| > n$ return $\bot$\\
-      $\salt \getsr \bits^\lambda$\\
-      $M \gets \bigvee_{x \in \col} \bmap_m(R_K(\salt \cat x))$\\
-      return $\langle M, \salt \rangle$
+      $\salt \getsr \bits^\lambda$;
+      $\pub \gets \langle 0^m, \salt, 0\rangle$\\
+      for $x \in \col$ do \\
+        $\tab \pub \gets \Up^R_K(\pub, \qry_x)$\\
+        $\tab$if $\pub = \bot$ then return $\bot$\\
+      return $\pub$
   }
   {
-    \underline{$\Qry^R_K(\langle M, \salt \rangle,\qry_x)$}\\[2pt]
+    \underline{$\Qry^R_K(\langle M, \salt, c \rangle,\qry_x)$}\\[2pt]
       $X \gets \bmap_m(R_K(\salt \cat x))$\\
       return $M \AND X = X$
     \\[6pt]
-    \underline{$\Up^R_K(\langle M, \salt \rangle,\qry_x)$}\\[2pt]
-      if $\hw(M) > \ell$ then return $\bot$\\
-      return $\langle M \vee \bmap_m(R_K(\salt \cat x)), \salt \rangle$
+    \underline{$\Up^R_K(\langle M, \salt, c \rangle,\qry_x)$}\\[2pt]
+      if $c \geq n$ then return $\bot$\\
+      $M \gets M \vee \bmap_m(R_K(\salt \cat x))$\\
+      return $\langle M, \salt, c+1 \rangle$
   }
-  \caption{The keyless structure $\bloom[R,\ell,n,\lambda]$ given by
-  $(\Rep^R,\Qry^R,\Up^R)$ is used to define Bloom filter variants. The
-  parameters are a function $R: \keys\by\bits^* \to [m]^k$ and integers $\ell, n,
-  \lambda \geq0$. A concrete scheme is given by a particular choice of
-  parameters.  Functions~$\hw$ and~$\bmap_m$ are defined in
-  Section~\ref{sec:prelims}.
+  \caption{Keyed structure $\bloom[R,n,\lambda]$ given by
+  $(\Rep^R,\Qry^R,\Up^R)$ is used to define Bloom filter variants used to
+  rerpresent sets of at most~$n$ elements.  parameters are a function $R:
+  \keys\by\bits^* \to [m]^k$ and integers $n, \lambda \geq0$. A concrete scheme
+  is given by a particular choice of parameters. The function~$\bmap_m$ is
+  defined in Section~\ref{sec:prelims}.
+  %
   }
   \label{fig:bf-def}
 \end{figure}
+\ignore{
+\todo{DC}{Revise this text (now out-of-date!). ``In this section we consider two
+classes of the Bloom filters, each employing a different thresholding strategy.
+[We will have discussed why different strategies are needed in the intro, at
+least at a high level.] Let $R:\keys\by\bits^*\to[m]^k$ be a function and let
+$n,\ell,\lambda\geq0$ be integers. The first class, defined at the top of
+Figure~\ref{fig:bf-def}, ...'' Don't define the concrete structures, as we did
+before. Instead, define the concrete structure at the top of the section in
+which it appears.}}
 
-\todo{Any}{This should be moved to Section~\ref{sec:prelims}.}
-
-\heading{Bitstring operations}
-%
-For all $m\geq0$ define~$\bmap_m$ as the following function.
-For all $\v.x\in[m]^*$ let $\bmap_m(\v.x) = X$, where
-$|X|=m$ and $X_v=1$ if and only if $\v.x_i = v$ for some $i\in[|\v.x|]$
-%
-We call $\bmap_m(\v.x)$ the \emph{bitmap} of~$\v.x$.
-%
-Let~$X$ and~$Y$ be equal-length bitstrings. We write $X \OR Y$ for their
-bitwise-OR, $X \AND Y$ for their bitwise-AND, and $X \XOR Y$ for their
-bitwise-XOR. Let $\NOT X = 1^{|X|} \xor X$.
-%
-Finally, let $\hw(X)$ denote the Hamming wieght of (i.e., the number of 1s in)~$X$.
-
-\heading{More prliminaries}
-%
-For every function~$f$, define function $\id^f$ so that
-$\id^f(\emptystr, x) = f(x)$ for all $x$ in the domain of~$f$.
-%
-\todo{Any}{Define function $\ticks(A,\cdot)$ for algorithm~$A$. Do we need big-O
-notation in bounds?}
-
-\medskip
-We specify three Bloom filter variants using the keyed structure
-$\bloom[R,\ell,n,\lambda] = (\Rep^R,\Qry^R,\Up^R)$ specified in
-Figure~\ref{fig:bf-def}.
-%
-The construction has four paraemters: a function~$R:\keys\by\bits^*\to[m]^k$, the
-\emph{update threshold} $\ell\geq0$, the \emph{initial threshold} $n\geq0$, and
-the \emph{salt length}~$\lambda\geq0$.
+In this section we consider two classes of Bloom filters, each employing a
+different strategy to determine when the filter reaches full capacity. The first
+class, specified in Figure~\ref{fig:bf-def}, we call the $n$-capped Bloom
+filter. This class captures the classical definition of a Bloom filter which is
+capped at storing some fixed constant number of elements $n\geq0$. Our
+construction $\bloom[R,\ell,n,\lambda] = (\Rep^R,\Qry^R,\Up^R)$ has two
+additional parameters besides the cap: a function~$R:\keys\by\bits^*\to[m]^k$
+and the \emph{salt length}~$\lambda\geq0$.
 %
 Let $H:\bits^*\to[m]^k$ be a hash function and let $\ell, n, \lambda\geq0$ be
 integers.
 %
-The standard Bloom filter is the structure $\BF[H,\ell,n] =
-\bloom[\id^H,\ell,n,0]$, which we will term the \emph{basic} Bloom filter. It
+The standard Bloom filter is the structure $\BF[H,n] =
+\bloom[\id^H,n,0]$, which we will term the \emph{basic} Bloom filter. It
 has no key (the key sapce of $\id^H$ is $\{\emptystr\}$, see
 Section~\ref{sec:prelims}) and does not use a salt.
 %
-The \emph{salted} Bloom filter $\SBF[H,\ell,n,\lambda] =
-\bloom[\id^H,\ell,n,\lambda]$ is the same except that it allows a nonempty salt.
+The \emph{salted} Bloom filter $\SBF[H,n,\lambda] =
+\bloom[\id^H,n,\lambda]$ is the same except that it allows a nonempty salt.
 %
-Finally, we also consider a salted variant that uses a PRF instead of a hash
-function. The \emph{keyed} Bloom filter $\KBF[F,\ell,n,\lambda]$ is the
-structure $\bloom[F,\ell,n,\lambda]$, where $F:\keys\by\bits^*\to[m]^k$ is a
+We also consider a salted variant that uses a PRF instead of a hash
+function. The \emph{keyed} Bloom filter $\KBF[F,n,\lambda]$ is the
+structure $\bloom[F,n,\lambda]$, where $F:\keys\by\bits^*\to[m]^k$ is a
 PRF.
 %
 Note that the basic and salted BFs have key spaces $\{\emptystr\}$ and the keyed
 BF has key space~$\keys$.
 
 In this section, we will show that the basic Bloom filter construction
-$\BF[H,\ell,n]$ is flawed, allowing the adversary to make an offline attack that
+$\BF[H,n]$ is flawed, allowing the adversary to make an offline attack that
 has a high probability of success while using a minimal number of queries. In
 the immutable setting, where the adversary is constrained to never use the
-$\UPO$ oracle, it suffices to use the $\SBF$ construction in order to provide a
-good security guarantee in either the public-representation or
-private-representation settings. However, in the case where the adversary is
-allowed to make updates, we will find that $\SBF$ is not secure in the
-public-representation setting, and that $\KBF$ must be used to guarantee
-security.
+$\UPO$ oracle, i.e. $q_U = 0$, it suffices to use the $\SBF$ construction in
+order to provide a good security guarantee in either the public-representation
+or private-representation settings. However, in the case where we allow
+$q_U > 0$ so that the adversary can make updates, we will find that $\SBF$ is
+not secure in the public-representation setting. Instead, $\KBF$ must be used to
+guarantee security.
 
-\ignore{%
-The standard Bloom filter shows a variety of different behaviors depending on
-its exact implementation. If the hash functions used are chosen beforehand and
-potentially known to the adversary, this public information allows offline
-attacks to be mounted against the data structure which can produce potentially
-damaging false positives. In the case of immutable Bloom filters, making use of
-a per-representation salt is sufficient to prevent these attacks, though
-depending on the use case the use of non-fixed per-representation randomness may
-or may not be feasible. Furthermore, in the case of mutable Bloom filters there
-are additional difficulties with offline attacks due to adversarially-chosen
-updates. To guarantee correctness in this case we must additionally guarantee
-that representations can be kept private from the adversary.
-}
+At the end of the section, we discuss the second class of filter, we call the
+$\ell$-thresholded filter. This construction uses a \emph{filter threshold}
+$\ell\geq0$ in place of the set threshold, which bounds the number of bits in
+the filter that can be set to 1 instead of the number of elements in the
+underlying set. In the absence of an adaptive adversary this construction
+performs very similarly to the standard Bloom filter, since for a random input
+set the number of bits set to 1 can be predicted with a high degree of accuracy
+from the number of elements in the underlying set. However, a filter threshold
+allows us to obtain better bounds against adaptive adversaries and has the
+additional advantage of not requiring a separate counter to keep track of the
+number of elements in the filter. Each of the above special cases can be
+extended to the filter-threshold construction in the natural way, though we only
+consider the unkeyed and salted construction $\SBF_\mathrm{ft}$ to provide an example
+of the tighter error bounds this alternate construction can provide.
 
-\todo{DC}{Recall the Kirsch-Mitzenmacher bound~\cite{kirsch2006less}.  I.e.,
-explain this thing: $(1 - e^{-kn/m})^k + O(1/m)$.}
+
+\heading{Non-adaptive false-positive probbility.}
+Let~$\rho$ be a function, $\lambda\geq0$ be an intger, and define
+$\bloom[\id^\rho,n,\lambda] = (\Rep^\rho, \Qry^\rho, \Up^\rho)$ as in
+Figure~\ref{fig:bf-def}. (Note the mild abuse of notation by which we write
+``$\rho$'' instead of ``$\id^\rho$''.)
+%
+Let $\setS\subseteq\bits^*$ be a set of length~$n$ and let
+$x\in\bits^*\setminus\setS$. We define the non-adaptive, false positive
+probabiity for Bloom filters as
+\begin{equation}\label{eq:bf-fp}
+  \begin{aligned}
+    P_{k,m}(n) =
+      \Pr\big[&\rho \getsr \Func(\bits^*,[m]^k);
+              \pub \getsr \Rep^\rho(\setS): \\
+              &\Qry^\rho(\pub, \qry_x) = 1 \given \pub \ne \bot
+      \big] \,.
+  \end{aligned}
+\end{equation}
+%
+(Note that, since the probability is conditioned on the event that
+$\pub\ne\bot$, this quantity is the same for both classes of filter.)
+%
+That is, $P_{k,m}(n)$ is the probability some~$x$ a false positive for the
+representation of some~$\setS$ for which $|\setX|=n$ and $x\not\in\setS$, when a
+random function is used for hashing.
+%
+Deriving a tight, concrete upper bound is elusive; \todo{DC}{Briefly comment
+on why this is difficult.} However, we do understand its asymptotic behavior
+quite well. Kirsch and Mitzenmacher~\cite{kirsch2006less} prove that, for
+particular choices of $k$ and $m$ as functions of~$n$, it holds that
+$
+  P_{k,m}(n) = \lim_{n\goesto\infty} (1-e^{-kn/m})^k \,.
+$
+%
+Moreover, they demonstrate via simulation that this is a very good approximation
+of the false positive probability for parameters of practical interest.
+%
+In lieu of a concrete upper bound, we will refer to $P_{k,m}(n)$ as defined in
+Equation~(\ref{eq:bf-pf}) in the remainder of this section.
 
 \heading{Error function for set-mempership queries}
 %
-Throughout this section we will use the error function $\delta:\bits^2\to\N$
-defined as
-\begin{equation*}
-  \delta(a, b) =
+Throughout this section we will use the error function~$\delta$ defined as
+\begin{equation}
+  \delta(x, y) =
   \begin{cases}
-    0 & \text{if}\ a=b \\
+    0 & \text{if}\ x=y \\
     1 & \text{otherwise.}
   \end{cases}
-\end{equation*}
+\end{equation}
+This simply indicates whether the query result matched the correct response.
 
 \subsection{Insecurity of unsalted BFs}
-Fix a hash function $H:\bits^*\to[m]^k$ and integers $\ell,n\geq0$ and let $\Pi
-= \BF[H,\ell,n] = (\Rep^H, \Qry^H, \Up^H)$.
+Fix a hash function $H:\bits^*\to[m]^k$ and integer $n\geq0$ and
+let $\Pi = \BF[H,n]$.
 %
 Suppose the adversary is interacting with a system representing a dataset
-with~$\Pi$ and that it is able to choose some fraction of the input data.
-For example, some web spiders use Bloom filters to store the set of webpages
-which have already been visited during a crawl. Suppose the adversary controls
-at least one such webpage and wishes to deny the spider access to a different
-webpage, the `target webpage'. The adversary can choose the links present on its
-own webpage, which will cause the spider to visit the chosen webpages and set
-the corresponding bits of its Bloom filter to 1. If those links are chosen in
-such a way that they produce a false positive for the target webpage, the spider
-will then erroneously believe it has already visited the target webpage. The
-target webpage will therefore never be visited during the spider's crawl.
+with~$\Pi$ and that it is able to choose some fraction of the input data.  For
+example, consider a web crawler which performs a `crawl' of webpages, following
+the links on each page it visits in order to index, archive, or otherwise
+analyze websites. In order to keep track of the set of webpages which have
+already been visited during a crawl, some crawlers use a Bloom filter which is
+updated to include each new page the crawler visits. Suppose the adversary
+controls at least one such webpage along the crawl's path and wishes to deny the
+spider access to a different webpage, the `target webpage'. The adversary can
+choose the links present on its own webpage, which will cause the spider to
+visit the chosen webpages and set the corresponding bits of its Bloom filter to
+1. If those links are chosen in such a way that they produce a false positive
+for the target webpage, the spider will then erroneously believe it has already
+visited the target webpage. The target webpage will therefore never be visited
+during the spider's crawl.
 
 \heading{Pollution attacks}
+%
+\ignore{\cpnote{Overall, I think this part needs to be revised to make it more clear.
+Answer the following questions. (1) How does their attack model compare to ours,
+i.e., are pollution attacks effective in the sense of \errep? (2) What makes
+their attacks possible? Is is it the use of weak (non-cryptographic) hash
+functions? How dependent is their attack on controlling a fraction of the
+inputs? Do they assume that the inputs they don't control are \emph{known} to
+the adversary? (3) Are their mitigigations sufficient for security in the sense
+of \errep, or is their an attack? (The answer is there's an attack: target-set
+coverage)}}
 %
 The goal of the attacks pointed out by Gerbet \etal~~\cite{gerbet2015power} is
 to pollute the filter such that the ``average'' set-membership query yields a
 false positive with high probability; to do so, the attacker chooses a set of
 inputs that maximize the number of 1s in the filter. This strategy is especially
 effective when the structure of the hash function is known to the adversary. In
-particular, if a secretly-keyed cryptographically-secure function is not used,
-the adversary can compute the hash function on its own in order to determine
-which choices will set the maximum number of bits to 1, or which choices will
-set certain target bits to 1 in order to cause specific false positives. They
-show that with some reasonable parameter choices, the adversary can double the
-false positive rate if they control a third of the inputs to the filter.
-%
-%\todo{DC (lead)}{Add a brief summary of attacks of Gerbet \etal that exploit bad
-%choices of hash functions. What fraction of the inputs does the adversary need
-%to control for the attack to be effective?}
+particular, as long as the choice of hash function and any associated parameters
+are public, the adversary can compute the hash function on its own in order to
+determine which choices will set the maximum number of bits to 1, or which
+choices will set certain target bits to 1 in order to cause specific false
+positives. They show that with $m = 3200$ and $k = 4$, the adversary can double
+the false positive rate if they control 200 out of a total of $n = 600$
+insertions.
 
-%
-Pollution attacks can even even be damaging for ``good'' choices of hash
-functions, but their effectiveness depends crucially on the fraction of inputs
-controlled by the adversary. Because the attack involves setting as many bits in
-the filter as possible to 1, an adversary that controls only a small fraction of
-the inputs can cause only a correspondingly small false positive probability. In
-order to have 
-%
+Significantly, the attack model considered assumes that the representations of
+the filter are always kept private. This gives the adversary less power than in
+our \errep\ or even \erreps\ attack model, since there is no analogue to the
+$\REVO$ oracle. Within this model, Gerbet \etal show various ways to mitigate
+pollution attacks, such as choosing the parameters of the filter pesimistically,
+so that even if a pollution attack occurs, the false positive rate is kept below
+some threshold of acceptability. This strategy is  potentially viable, but may
+significantly increase the amount of memory required to store the data structure.
+The bounds we provide show how the parameters of a filter can be tweaked to keep
+the error rate low not just in the presence of this specific type of attack, but
+in the presence of any adversary covered by our more general attack model.
 
-Gerbet \etal discuss multiple ways to mitigate pollution attacks, including
-using alternate data structures besides Bloom filters or choosing the parameters
-of the filter pesimistically, so that even if a pollution attack occurs, the
-false positive rate is kept below some threshold of acceptability. Both of these
-possibilities are potentially viable, but can significantly increase the amount
-of memory required to store the data structure. Since Bloom filters are designed
-to store large amounts of data compactly, these solutions may be unnaceptable in
-practice. The authors also discuss the possibility of using a secretly-keyed
-hash function. Since they assume that the filter itself is kept entirely
-private, with no potential for long-term leakage or other phenomena modeled by
-our $\REVO$ oracle, this does not fall prey to the attacks against keyed but
-unsalted filters that occur in our model. In this paper we consider the
-possibility that the structure may not be secret, either in the sense that it
-may eventually be recovered (in the private-representation setting) or that it
-is publicly available to potential adversaries (in the public-representation
-setting). Simply using a MAC with a long-term secret key does not suffice to
-secure a Bloom filter in these scenarios.
+The authors also discuss the possibility of using a secretly-keyed
+hash function. In the attack model they consider, where representations are kept
+private indefinitely, this suffices to prevent the pollution attack they
+describe. However, under the more general attack models where the representation
+may eventually be recovered (in the private-representation setting) or is simply
+available to potential adversaries (in the public-representation setting).
+Simply using a MAC with a long-term secret key does not suffice to
+secure a Bloom filter in the \errep\ and \erreps\ scenarios we consider.
 
 \heading{Target-set coverage attacks}
 %
@@ -192,7 +224,7 @@ This type of attack is nicely captured by our adversarial model.
 %
 In a \emph{target-set coverage attack}, the adversary is given a small target set
 $\setT\subseteq\bits^*$ and searches for a cover set $\setR\subseteq\bits^*$
-such that $\Qry^H(\Rep^H(\setR),x)=1$ for each $x\in\setT$.
+such that $\Qry^H(\Rep^H(\setR),\qry_x)=1$ for each $x\in\setT$.
 %
 Once a suitable cover set is found, the adversary queries $\Rep(\setR)$. Then
 for each $x\in\setT$, it asks $\Qry(x)$, achieving a score of $r = |\setT|$.
@@ -221,22 +253,25 @@ avoids this pitfall.
 \subsection{Salted BFs in the (im)mutable setting}
 %
 Here we consider the correctness of Bloom filters when the hashed input is
-prepended with a salt.
+preppended with a salt.
 %
-Fix $H:\bits^*\to[m]^k$, $\ell,n,\lambda\geq0$, and let
-$\Pi = \SBF[H,\ell,n,\lambda] = (\Rep^H, \Qry^H, \Up^H)$ as defined above.
+Fix $H:\bits^*\to[m]^k$ and $n,\lambda\geq0$ and let
+$\Pi = \SBF[H,n,\lambda]$.
 
-In the mutable setting, where the adversary is allowed to make $\UPO$ queries,
-we can perform an $\errep$ attack against~$\Pi$ as follows. First, the adversary
-calls $\REPO(\emptyset)$, receiving an empty filter and the salt. Now that the
-adversary has the salt, it performs the exact same pollution attack as in the
-unsalted case, with any evaluations of $H(x)$ replaced with evaluations of
-$H(\salt \cat x)$. After a pollution set is found that sets many bits to 1, the
-adversary calls $\UPO$ repeatedly to insert these elements into the filter. This
-attack succeeds whenever the original pollution attack succeeds against an
+\ignore{\todo{DC}{Simplify the description of this attack, as well as the next
+paragraph. Simply say that, given the salt, the adversary can construct the
+representation on its own, just as in the attacks described in the previous
+section.}}
+
+In the mutable setting, we can perform an \errep\ attack against~$\Pi$ in an
+almost identical manner to the previous section. If the adversary calls
+$\REPO(\emptyset)$, the salt will be given to the adversary along with an empty
+filter. The adversary can use this salt to construct representations on its own
+just as described in the target-set coverage attack. The only further alteration
+is that the adversary will need to use $\UPO$ to insert the elements of the
+covering set into the filter before making its $\QRYO$ calls to win the game.
+This attack succeeds whenever the original pollution attack succeeds against an
 unsalted filter.
-
-%
 
 The attack succeeds because the adversary can search for false positives on its
 own as soon as it learns the salt. An adversary in the real world may not be
@@ -309,38 +344,73 @@ elements even after the salt has been seen, the above attack fails. Indeed, when
 we restrict ourselves to the immutable setting, we can prove the following.
 %
 \begin{theorem}[Immutable \errep\ security of salted BFs]\label{thm:sbf-errep-immutable}
-Let $p$ be the standard (non-adaptive) false positive probability for a Bloom
-filter with the chosen parameters. For all integers $q_R, q_T, q_H, r, t \geq 0$
-and for $q = q_T + q_H$, if $r > pq$, then it holds that
+  For all integers $q_R, q_T, q_H, r, t \geq 0$ it holds that
   \begin{equation*}
     \begin{aligned}
-      \Adv{\errep}_{\Pi,\delta,r}(t, q_R,q_T,0,q_H) &< \\
-      \hspace{20pt}
-        q_R \cdot \left(\frac{q_H}{2^\lambda} + \left(\frac{pq}{r}\right)^re^{r-pq}\right) \,,
+            \Adv{\errep}_{\Pi,\delta,r}(t,\,&q_R,q_T,0,q_H) \leq \\
+        & q_R \cdot \left[\frac{q_H}{2^\lambda} +
+        \left(\frac{pq}{r}\right)^re^{r-pq}\right] \,,
     \end{aligned}
   \end{equation*}
-  where $H$ is modeled as a random oracle.  %
-  \cpnote{I'm not sure if this advantage function is defined.}
+  where $H$ is modeled as a random oracle, $p=P_{k,m}(n)$, $q = q_T + q_H$, and
+  $p > pq$.
 \end{theorem}
 We consider only the case of $r > pq$ because $pq$ is the expected number of
 false positives obtained by an adversary that simply uses its knowledge of the
 salt (after the representation is created) to guess as many random elements as
-possible.
+possible. Because this simple adversary can get $pq$ successes on average, we
+can only hope to provide good security bounds against arbitrary adversaries in
+the case that $r > pq$.
 
-Once we have reduced the adversary to randomly guessing queries, an attack can
-be modeled using the binomial distribution. Each guess has a fixed chance $p$ of
-producing a false positive, and the adversary succeeds if it accumulates at
-least $r$ successes over the course of $q$ attempts. The bound given in the
-theorem statement can then be found using a standard Chernoff bound on Poisson
-distributions, namely
-\[
-  \Prob{X \ge (1+\delta)\mu} < \left(\frac{e^\delta}{(1+\delta)^{1+\delta}}\right)^\mu
-\]
+This bound can be broken down into three main components. The multiplicative
+factor of~$q_R$ means that the bound will be weak in the case that a number of
+representations are used. The $q_H/2^\lambda$ term corresponds to the
+probability of the adversary guessing the salt before the representation is
+constructed, but this will be negligible as long as $\lambda$ is chosen to be
+sufficiently large (say, $\lambda=128$). The final, messier term comes from
+applying a Chernoff bound to the non-adaptive adversary's probability of
+succeeding in the experiment given $q = q_H+q_T$ guesses.
+%
+By way of clarifying the performance of our bound, we have plotted the last
+component for various parameters of interest. Let
+%
+\begin{equation}\label{eq:zeta}
+  \zeta_{k,m,n}(q,r) = \left(\frac{p^*q}{r}\right)^re^{r-p^*q}
+\end{equation}
+%
+where
+$
+  p^* = \lim_{n\goesto\infty} (1-e^{-kn/m})^k \,,
+$
+the approximation of the non-adaptive false positive probability given by Kirsch
+and Mitzenmacher~\cite{kirsch2006less}.
+%
+Figure~\ref{fig:bf-bound} shows values
+of~$\zeta_{k,m,n}(q,r)$ for varying~$m$.
+%
+What this plot shows is that, for a given error capacity~$r$, once a certain lower
+bound on the filter size is reached, the $\zeta$ term decreases quite quickly.
+Moreover, the rate at which~$\zeta$ decreases scales nicely with the error
+capacity.  For example, if one is willing to tolerate up to~$r=10$ false
+positives for a filter representing $n=100$ elements, then picking a filter
+length of $3$ kilobytes is sufficient to ensure that observing~$10$ false
+positives occurs with probability less than $2^{-17}$, even when the adversary
+can make~$2^{64}$ RO queries.
+%
+We compare this (rather conservative) result to Gerbet \etal at the end of this section.
 
-\todo{DC}{Add interpretation of the bound. It will look like nonsense to most
-readers, so help them out. For what parameters is it comparable to the
-non-adaptive false-positive probability? We'll want to plot this for reasonable
-values of $k, m, n, q_H, q_T, r$.}
+\begin{figure}
+  \hspace*{-10pt}
+  \includegraphics{fig/bf-bound}
+  \vspace{-24pt}
+  \caption{
+    The value of $\zeta_{k,m,n}(q,r)$ (Equation~\ref{eq:zeta}) for $q=2^{64}$,
+    $k=16$, $n=100$, varying values of~$r$ (one line per $r$-value) and filter
+    length~$m$ (the x-axis).  Note the log-2 scale on the y-axis.
+  }
+  \label{fig:bf-bound}
+\end{figure}
+
 \begin{proof}[Proof of Theorem~\ref{thm:sbf-errep-immutable}]
   \input{proof/sbf-errep-immutable}
 \end{proof}
@@ -354,85 +424,32 @@ filter under attack be kept secret from adversaries. In fact, we can attain the
 following \erreps\ bound.
 
 \begin{theorem}[\erreps\ security of salted BFs]\label{thm:sbf-erreps}
-  For every $q_R, q_T, q_U, q_H, t, r\geq 0$, it holds that
+  Let $p' = P_{k,m}(n+r)$.
+  For all integers $q_R, q_T, q_H, r, t \geq 0$, if
+  $r > p'q_T$, then it holds that
   \begin{eqnarray*}
     \begin{aligned}
-      \Adv{\erreps}_{\Pi,\delta,r}(t,q_R, q_T, q_U, q_H) &\leq \\
-          \text{some cool bound} \,,
+      \Adv{\erreps}_{\Pi,\delta,r}(t,\,&q_R, q_T, q_U, q_H) \leq \\
+          & q_R \cdot \left[
+      \frac{q_H}{2^\lambda} +
+      \left(\frac{p'q_T}{r}\right)^re^{r-p'q_T}\right]\,,
     \end{aligned}
 \end{eqnarray*}
-where $H$ is modeled as a random oracle
+  where $H$ is modeled as a random oracle.
 \end{theorem}
 
-\todo{DC (lead)}{Turn this into a short summary of what's different from
-Theorem~\ref{thm:sbf-errep-immutable}. In an earlier iteration this was the first result
-in the paper, hence the length. But now it's the second result.}
+The proof follows a similar structure to that of
+Theorem~\ref{thm:sbf-errep-immutable}. The primary differences come from arguing
+that without a ``lucky'' guess of the salt the adversary cannot use offline hash
+queries to find false positives, and from having to show that the adversary's
+access to $\UPO$ does not substantially change the security bound that can be
+derived. The first of these is straightforward given the private-representation
+setting, but the second requires investigating how much of an advantage the
+$\UPO$ oracle can give in a pollution attack, and then moving to games where
+this advantage is taken into account.
 %
-The main idea behind the proof is to remove the adversary's
-adaptivity a step at a time. We isolate the possibility of the adversary
-guessing the salt, which would allow it to mount its own offline attack on the
-filter without relying on the $\QRYO$ oracle. If the adversary does not guess
-the salt, the outputs of the $\REPO$, $\QRYO$, and $\UPO$ oracles are
-unpredictable to the adversary, producing uniformly randomly distributed bits to
-set (for $\REPO$ and $\UPO$) or to check (for $\QRYO$). Under the assumption
-that the adversary does not predict the salt, queries made to distinct elements
-are independent of each other. The only remaining issue is that the adversary
-can potentially gain an advantage by testing whether some object $x$ is a false
-positive for the filter, and then updating the filter to include $x$ only if the
-test query returned `false'.
-%
-An analysis shows that this is now (once imperfect
-pseudorandom functions and salt collisions have been dealt with \cpnote{This
-doesn't quite make sense ... there's no PRF in~$\Pi$})
-%
-the only way for the adversary to gain an advantage over making queries to an
-immutable Bloom filter. Because this adaptive strategy introduces tricky
-conditional possibilities, we cannot compute an exact value for the adversary's
-advantage.  Instead, we move to an alternate scenario where each $\QRYO$ also
-produces a free update and every $\UPO$ first performs a free query. This makes
-$\QRYO$ and $\UPO$ calls indistinguishable, so that the adversary is effectively
-making a series of independent random queries that each have a chance to
-increment the error counter. Because the number of 1s in the filter can only
-increase, the probability of a false positive from any one of these queries is
-bounded above by the probability of a false positive on the final
-maximally-sized filter, a probability which is given by the Kirsch and
-Mitzenmacher bound.
-
-\cpnote{I muted a ``In the ROM, salted hashing is almost as good as distinct
-random functions'' lemma that appeared. As stated, I don't think it cleanly
-isolates the part of the proof you're attempting to isolate. This is the
-$\game_0$ to $\game_1$ transition in Theorem~\ref{thm:sbf-errep-immutable}. I think it's
-better to leave this argument in-line in the proof.}
-\ignore{
-\begin{lemma}[In the ROM, salted hashing is almost as good as distinct random
-  functions in \errep1]\label{lemma:salttorand}
-  %
-  Let $\struct = (\Rep, \Qry, \Up)$ be a data structure with key space
-  $\{\emptystr\}$ and salt space $\bits^\lambda$, and let $\struct'$ be the same
-  structure using true random functions in place of salted hash functions. For
-  every $t, q_R, q_T, q_U, q_H, r \geq 0$, it holds that
-  \[
-    \Adv{\errep1}_{\struct,r}(t, q_R, q_T, q_U, q_H) \leq \frac{q_H}{2^\lambda} + \Adv{\errep1}_{\struct',r}(t, q_R, q_T, q_U, q_H)
-  \]
-\end{lemma}
-
-\begin{proof}
-Let $\game_0$ be the standard $\errep1$ game for the structure $\struct$, and
-let $\game_1$ be the same game for $\struct'$. There exists an adversary $\advB$
-such that $\Prob{\game_0(\advA) = 1} \le \Prob{\game_1(\advB) = 1} + q_H/2^\lambda$.
-This adversary initializes an empty table $R$ and simulates $\advA$. When a
-query $w$ is sent to $\HASHO$, $\advB$ returns $R[w]$ if this entry in the table
-is defined. Otherwise, if $w = \langle\salt, x\rangle$ for some
-$\salt \in \bits^\lambda$ and $x \in \bits^*$, forward $(\salt, x)$ to $\HASHO$,
-store the result in $R[w]$, and return this value. Finally, if $R[w]$ is not
-defined and $w$ is not of this form, sample $r$ uniformly from the range of the
-hash function, store the result in $R[w]$ and return that result. Queries to all
-other oracles are simply forwarded to $\advB$'s oracle. Assuming the output of
-the hash function is uniformly distributed, this simulation is perfect unless
-$\advA$ guesses the salt correctly, which happens with probability
-$q_H/2^\lambda$.
-\end{proof}
-}
+\todo{DC}{Be sure the reader knows that class of BF you're talking about, i.e.,
+how we're thresholding. (At this point I have no idea.)}
 
 \begin{proof}[Proof of Theorem~\ref{thm:sbf-erreps}]
   \input{proof/sbf-erreps}
@@ -443,44 +460,136 @@ $q_H/2^\lambda$.
 Salted BFs are secure in the immutable setting \emph{or} the private
 representation setting, but not both. Our argument for the \erreps\ security of
 salted Bloom filters is made possible by virtue of the structure under attack
-not being revealed to the adversary. While this is realistic in many settings,
-it may be desirable for the Bloom filter to be public \emph{and} updatable.
+not being revealed to the adversary. While this is realistic in many
+applications, it may be desirable for the Bloom filter to be public \emph{and}
+updatable.
 %
 Here we show that building a Bloom filter from a PRF suffices for security in
 this setting.
 %
-So far our bounds have lost a factor of~$q_R$ in order to move from the \errep1\
-to the \errep\ setting; as a bonus, here we show that it is possible to do
-better.
-%
 Let $F:\keys\by\bits^*\to[m]^k$ be a function and fix
-integers~$\ell,n,\lambda\geq0$.
+integers~$n,\lambda\geq0$.
 %
-Let $\Pi = \KBF[F,\ell,n,\lambda] = (\Rep^F, \Qry^F, \Up^H)$ as defined in
-Figure~\ref{fig:bf-def}.
+Let $\Pi = \todo{DC}{...}$.
 
 \begin{theorem}[\errep\ security of keyed BFs]\label{thm:bf-key-bound}
-  For integers $q_R, q_T, q_H, r, t \geq 0$ it holds that.
+  Let $p' = P_{k,m}(n+r)$.  For integers $q_R, q_T, q_H, r, t \geq 0$ such that
+  $r > p'q_T$, it holds that
   \begin{equation*}
     \begin{aligned}
-      \Adv{\errep}_{\Pi,\delta,r}(t, q_R,q_T,q_U,q_H) &\leq \\
-        \Adv{\prf}_{F}(\cdots) + \text{some cool bound} \,.
+      \Adv{\errep}_{\Pi,\delta,r}(t,\,&q_R,q_T,q_U,q_H) \leq \\
+        \Adv{\prf}_F(t,nq_R+q_T+q_U) & +
+      \frac{q_R^2}{2^\lambda} +
+      \left(\frac{p'q_Rq_T}{r}\right)^re^{r-p'q_Rq_T} \,.
     \end{aligned}
   \end{equation*}
 \end{theorem}
+
+Though the bound is similar, the details of this proof differ from the
+previous two. In particular, since we are using a PRF, the initial parts of the
+proof deal with the adversary potentially being able to break the PRF and with
+the possibility of the salts repeating rather than with the adversary being able
+to guess the salt.
+
 \begin{proof}
   \input{proof/kbf-errep}
 \end{proof}
 
-%We can use this final and best bound to demonstrate some of the possible bounds
-%with various parameter settings. Figure ? shows the upper bound for a various
-%combination of parameters, starting from the default parameters of $k = 4$, $m =
-%1024$, $n = 100$, $r = 10$, $q_R = 1$, $q_T = 100$, and $q_U = 100$. The most
-%significant factor in the adversarial advantage is $q_R$, with even small
-%increases producing a drastic increase in the adversarial advantage. Since this
-%is the only part of the error bound that is not clearly associated with an
-%attack, it is possible that this term could be reduced or eliminated.
+The fact that both a key and a salt are used in the $\KBF$ construction is
+critical. In particular, without the per-representation randomness given by the
+salt, we would not be able to argue that $\UPO$ and $\QRYO$ calls are
+independent across representations. On the contrary, seeing the representation
+of a singleton set $\{x\}$ would immediately allow the adversary to test whether
+$x$ was a member in every other representation that had been constructed, simply
+by testing whether every bit set to 1 in the representation of $\{x\}$ was also
+set to 1 in other representations. Even in the \erreps\ game, using the $\REVO$
+oracle on some representations leaks information about other representations,
+and again we cannot use the argument that provides the above bound.
 
-%\includegraphics[scale=0.75]{BF_Fig}
+We note that Gerbet \etal~\cite{gerbet2015power} suggest using cryptographic
+hash functions as one possibility for constructing secure filters, which is
+equivalent in our terminology to using a keyed but unsalted filter. The
+distinction is that Gerbet \etal assume that representations are kept private
+indefinitely, an assumption similar to that underlying our \erreps\ game but
+with the stronger restriction that the adversary has no equivalent of a $\REVO$
+oracle. Without this assumption that representations are never leaked to the
+adversary, however, we emphasize that merely using a long-term secret key
+without a per-representation salt does not guarantee security.
 
-\cpnote{Got here 5/9.}
+\subsection{$\ell$-threshold BFs}
+
+\begin{figure}
+  \twoColsNoDivide{0.22}
+  {
+    \underline{$\Rep^R_K(\col)$}\\[2pt]
+      $\salt \getsr \bits^\lambda$;
+      $\pub \gets \langle 0^m, \salt\rangle$\\
+      for $x \in \col$ do\\
+        $\tab \pub \gets \Up^R_K(\pub,\qry_x)$\\
+        $\tab$if $\pub = \bot$ then return $\bot$\\
+      return $\pub$
+  }
+  {
+    \underline{$\Qry^R_K(\langle M, \salt \rangle,\qry_x)$}\\[2pt]
+      $X \gets \bmap_m(R_K(\salt \cat x))$\\
+      return $M \AND X = X$
+    \\[6pt]
+    \underline{$\Up^R_K(\langle M, \salt \rangle,\qry_x)$}\\[2pt]
+      if $\hw(M) > \ell$ then return $\bot$\\
+      return $\langle M \vee \bmap_m(R_K(\salt \cat x)), \salt \rangle$
+  }
+  \caption{A slightly modified structure, $\bloom_\mathrm{ft}[R,\ell,\lambda]$ given by
+  $(\Rep^R,\Qry^R,\Up^R)$ which uses the Hamming weight of the filter ($\hw$, as
+  defined in Section~\ref{sec:prelims}) to decide if the filter is full.}
+  \label{fig:bft-def}
+\end{figure}
+
+While the above proofs show security bounds for Bloom filters in certain
+settings, the bounds may not be as tight as we would like for applications. The
+extra factor of $q_R$ in the error bound, for example, may prevent a filter from
+achieving good security in practice. We show that a stronger bound can be
+achieved using the tweaked Bloom filter construction $\SBF_\mathrm{ft}$, showing
+a better bound in the private-representation setting than we had for $\SBF$.
+%
+\cpnote{When a reviewer read this they'll think: ``why, then, do I care about
+$n$-capped filters if $\ell$-threshold filters perform so much better?''}
+
+%
+\begin{theorem}[\errep\ security of thresholded BFs]\label{thm:bf-thr-bound}
+Let $p_\ell = ((\ell+k)/m)^k$. For integers $q_R, q_T, q_H, r, t \geq 0$ such
+that $r > p_\ell q_T$, it holds that
+  \begin{equation*}
+    \begin{aligned}
+      \Adv{\errep}_{\Pi,\delta,r}(t, q_R,q_T,q_U,q_H) &\leq \\
+        & \frac{q_R(q_H+q_R)}{2^\lambda} + e^{r-p_\ell q_T}\left(\frac{p_\ell q_T}{r}\right)^r.
+    \end{aligned}
+  \end{equation*}
+\end{theorem}
+
+The distinction between this proof and the proofs for the standard Bloom filter
+construction lies in the fact that pollution attacks cannot set more than
+$\ell+k$ bits of the filter to 1, regardless of how the attack is conducted.
+We therefore assume that the adversary will always be able to produce such a
+maximally full filter, and then use a standard binomial-distribution-based bound
+to place a limit on the adversarial advantage even in this worst-case scenario.
+%
+\cpnote{It sounds like you're claiming that pollution attacks are the best the
+adversary can do. If this is the case, then you have to prove this.}
+
+\begin{proof}
+  \input{proof/sbf-erreps-th}
+\end{proof}
+
+
+\subsection{Discussion}
+\todo{DC}{At a high level, our suggested mitigation is to use salt and to use a
+cryptographically strong hash function, but the exact strategy depends on the
+setting. If you aren't going to update the structure, then salting is
+sufficient. If you're going to update the structure, then salting is still
+efficient as long as the structure is never revealed to attacker (i.e., the
+party or parites choosing the inputs). If keeping the structure secret isn't
+possible, then you need to also use a secret key. How does this mitigation
+strategy compared to the mitigations suggested by Gerbet \etal? In particular,
+are our filters smaller, larger, or about the same length as theirs?}
+
+\cpnote{How does the $\ell$-threshold bound compare to that of $n$-capping?}

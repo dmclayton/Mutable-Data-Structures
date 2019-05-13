@@ -1,41 +1,39 @@
-Fix inetgers $t, \lambda \geq0$, let $H:\bits^*\to[m]^k$ be a function,  and let
-$\Pi = \BF[H,t,\lambda]$ as specified in Figure~\ref{fig:bf}.
+\label{app:unsalted-attack}
+\todo{CP}{Decide whether we want to include the simualtion code. Given how
+simple the attack is, I think we can get away with not including it.}
+
+Fix inetgers $\ell, n, \lambda \geq0$, let $H:\bits^*\to[m]^k$ be a function,  and let
+$\Pi = \BF[H,t,\lambda]$ as specified in Figure~\ref{fig:bf-def}.
 %
 The possibility of pre-computing the structure in the \errep1 games yields the
 following attack. Given a set $\setT\subseteq\bits^*$ of target queries, the
-adversary searches for a set $\setR\subseteq\bits^*$ such that
-$\Qry^H(\Rep^H(\setR), x) = 1$ for all $x \in \setT$. We call such a set a
+adversary searches for a set $\setS\subseteq\bits^*$ such that
+$\Qry^H(\Rep^H(\setS), x) = 1$ for all $x \in \setT$. We call such a set a
 \emph{cover} set.
 %
-Once a suitable~$\setT$ is found, the adversary queries $\REPO(\setR)$ followed
+Once a suitable~$\setT$ is found, the adversary queries $\REPO(\setS)$ followed
 by $\QRYO(x)$ for each $x\in\setT$.
 %
-Assuming \todo{CP}{Figure out what's needed from the error function in order for
-the adversary to succeed with probability~$1$}, the attack succeeds with
-probability~$1$.
-
-\cpnote{WIP}
-
-
-
-
-
-At a high level, the attack works as follows. The attacker chooses a set of~$r$
-\emph{target queries} and a set of~$s$ \emph{test queries}.  Its goal is to find
-a set~$\col$ of~$n$ test queries for which every target query is a false
-positive.
+Assuming $|\setT| \geq r$, where~$r$ is the error capacity, the attack succeeds
+with probability~$1$.
 %
-It does so by computing the Bloom filter for each subset (by making queries
-to~$H$) and evaluating $\Qry$ for each of the target queries (again, using~$H$).
-If a satisfying~$\col$ is found, it queries~$\REPO(\col)$ and halts.
+In this appendix we describe a strategy for finding a covering set and evalute
+its performance in terms of success rate and computational cost. We will
+(conservatively) model~$H$ as a random oracle.
+
+Fix a set of~$s$ \emph{test queries}. Our goal is to find a set~$\col$ of at
+most~$n \leq s$ test queries that covers~$\setT$.
 %
-To finish, it simply queries~$\QRYO$ on each of the target queries and
-outputs~$1$. It wins if (and only if)~$\col$ is a satisfying set.
+For each test query~$x$, we ompute $X = \bmap_m(\HASHO(x))$. If we have the the
+resources to compute $X_1 \OR \cdots \OR X_n$ for each of the ${s}\choose{n}$
+size-$n$ subsets of targets, twe will eventually find a suitable covering set if
+such a set exists.
 %
-The query complexity of this attacker is quite modest; it makes $k(s+r)$ queries
-to~$H$, one query to~$\REPO$, and~$r$ queries to~$\QRYO$.  However, since there
-are $\binom{s}{n}$ possible sets to check, the runtime of this attack makes it
-infeasible, even for modest choices of $k$, $m$, and $n$.
+The query complexity of this appraoch is modest; we need to make $s+r$ queries
+to~$\HASHO$ ($s$ for the test set, $r$ for the target set), one query
+to~$\REPO$, and~$r$ queries to~$\QRYO$. However, checking $\binom{s}{n}$ sets
+would be infeasible, even for modest choices of $k$, $m$, and $n$. Observe,
+hwoever, that there is a lot of sub-structure to exploit in the search.
 %
 In the remainder, we describe a \emph{heuristic} strategy for finding a
 satisfying set (if it exists) in which we need only check about $O(kr)$ sets on
@@ -44,9 +42,9 @@ average.
 Let $\setT = \{x_1, \ldots, x_s\}$ be the set of test queries, and let $\setR =
 \{x_{s+1}, \ldots, x_{s+r}\}$ be the set of target queries.
 %
-Construct a tree whose vertices are labeled with subsets of~$[s]$ as follows:
+We construct a tree whose vertices are labeled with subsets of~$[s]$ as follows.
 %
-let $\emptyset$ be the root.
+Let~$\emptyset$ be the root.
 %
 For each node $I$ and each $w \in [s] \setminus I$, if $\setlen{I} < n$, then let $I
 \union \{ w \}$ be a child of~$I$.
@@ -68,7 +66,7 @@ First, if there is no solution, then often this can be determined without
 traversing the tree. Let $M_\setT$ and $M_\setR$ denote the filters
 corresponding to the set of test and target queries, respectively.  If for some
 $i \in [m]$, the $i$-th bit of $M_\setR$ is set, but the $i$-th bit of $M_\setT$
-is not set, then it is immediate that there is no satisfying set.
+is not set, then it is immediate that there is no covering set.
 %
 The second is a greedy heuristic for eliminating branches of the search tree.
 The idea is that we only take a branch if it results in covering an additional
@@ -80,8 +78,7 @@ branch~$J$ is taken; otherwise it is not.
 This optimization results in a heuristic attack, since the search may miss the
 optimal solution.
 
-We implemented this attack\footnote{The C source code is in a ZIP file
-accompanying this submission.} and evaluated its performance.
+We implemented this attack and evaluated its performance.
 Figure~\ref{fig:bf-correct-attk-sim} shows the success rate and average number
 of sets checked for a number of simulations and various parameters.
 %
@@ -91,7 +88,7 @@ $m=1024$, $n=100$, and $r=1$, a test set of just $512$ elements suffices for a
 success rate of nearly $60\%$ (top-right). It is also worth noting that
 increasing the error parameter only slightly decreases the success rate
 (bottom-left). These results show that even for very pessimistic parameter
-choices, the classic Bloom filter is not secure in the \errep sense.
+choices, the basic Bloom filter is not secure in the \errep1\ sense.
 %
 Finally, we find that the average number of sets that were tested is about
 $O(kr)$ within all of the parameter ranges we tested.
@@ -117,6 +114,7 @@ $O(kr)$ within all of the parameter ranges we tested.
 \label{fig:bf-correct-attk-sim}
 \end{SCfigure*}
 
+\ignore{
 \heading{Privacy.}
 %
 \ignore{
@@ -181,6 +179,7 @@ is given a bounded amount of information about the random oracle. This allows us
 to model offline computation performed by the adversary before beginning its
 attack. Both attacks exploit the fact that the adversary is given the random
 oracle \emph{before} choosing its set.
+}
 
 \if{0}{
   \heading{Security of RO-independent collections. }

@@ -66,23 +66,20 @@
 \label{fig:sbf-errep-immutable/games}
 \end{figure*}
 
-We will use the following lemma for keyless structures. We use $\errep1$ and
-$\erreps1$ to denote the public-representation and private-representation
-experiments where the adversary makes a single $\REPO$ query. In writing the
-advantage for these games we omit the $q_R$ parameter since it is fixed at 1.
-%
-\todo{DC (lead)}{Prove this in the appendix.}
+We will use the following lemma for keyless structures, which is proved in
+Appendix~\ref{sec:keyless-proof}.
 
 \begin{lemma}\label{thm:lemma1}
   For every $q_R, q_T, q_U, q_H, r, t \geq 0$ and keyless structure~$\Gamma$ it
   holds that
-  \begin{equation*}
-    \Adv{\errep}_{\Gamma,\delta,r}(t, q_R, q_T, q_U, q_H) \leq
-    q_R\Adv{\errep1}_{\Gamma,\delta,r}(O(f(t)), q_T, q_U, q_H) \,,
-  \end{equation*}
+  \begin{eqnarray*}
+    \begin{aligned}
+      \Adv{\errep}_{\Gamma,\delta,r}(t,\,&q_R, q_T, q_U, q_H) \leq \\
+      & q_R \cdot \Adv{\errep1}_{\Gamma,\delta,r}(O(f(t)), q_T, q_U, q_H) \,,
+    \end{aligned}
+  \end{eqnarray*}
   where $f(t) = t + (q_R-1)\ticks(\Rep,t) + q_T\ticks(\Qry,t) + q_U\ticks(\Up,t)$.
 \end{lemma}
-%
 %
 \noindent
 The proof is by a fairly straightforward hybrid argument. Because~$\Gamma$ is
@@ -91,7 +88,8 @@ and use our own oracles for the remaining query. The best we can do with this
 strategy is to ``guess'' which representation the \errep\ adversary will use in
 its attack, which results in the~$q_R$ factor in the bound.
 %
-We defer the full details to Appendix~\ref{app:iproof/lemma-keyless}.
+We defer the full details to Appendix~\ref{app:iproof/lemma-keyless}
+\todo{DC}{Prove this and fix the reference}.
 
 Let $\advA$ be an \errep\ adversary making~$1$ query to~$\REPO$, $q_T$ queries
 to $\QRYO$, $0$ queries to $\UPO$, and $q_H$ queries to the random
@@ -99,34 +97,35 @@ oracle~$\HASHO$.
 %
 We make the following assumptions, all of which are without loss of generality.
 %
-First, all of~$\advA$'s $\QRYO$ queries proceed its $\REPO$ query.
+First, all of~$\advA$'s $\QRYO$ queries follow its $\REPO$ query.
 %
 Second, we assume that $x\not\in\setS$ for all queries $\qry_x$ to $\QRYO$,
 where~$\setS$ was the input to~$\advA$'s $\REPO$ query. This is without loss
-because Bloom filtersadmit false positives, but not false negatives
+because Bloom filters admit false positives, but not false negatives
 %
 Third, we we assume that $|\setS| \leq n$; this is without loss because
 otherwise~$\REPO$ outputs~$\bot$ and~$\advA$ gets no advantage.
-
+%
 Fourth, we assume that all of~$\advA$'s $\HASHO$ queries are of the form $Z\cat
 x$, where $|Z| = \lambda$.
 
 We begin with a game-playing argument~\cite{bellare2006triple}, then obtain the
 final bound via applicaition of Lemma~\ref{thm:lemma1}.
 %
-\cpnote{Here's the proof sketch.}
-%
 The high-level goal is to rewrite the game so that the probability that one
-of~$\advA$'s queries runs up the score is precisely the false positive
-probability for Bloom filters in the usual analytical
-setting~\cite{kirsch2006less}. In other words, our goal is transistion into a
-setting in which the Bloom filter output by~$\REPO$ is independent of the
-outcome of~$\advA$'s other queries.
+of~$\advA$'s queries runs up the score is precisely non-adaptive false positive
+probability.
+%
+In other words, our goal is to transistion into a setting in which the Bloom
+filter output by~$\REPO$ is independent of the outcome of~$\advA$'s other
+queries.
 
-We begin with the game~$\game_0(\advB)$ defined in
-Figure~\ref{fig:sbf-errep-immutable/games}. It is similar to the \errep\ experiment when
-executed with~$\advA$, $\Pi$, $\delta$, and~$r$. Indeed, it is not difficult to
-see that for every~$\advA$ there exists an adversary~$\advB$ such that
+Consider the game~$\game_0(\advB)$ defined in
+Figure~\ref{fig:sbf-errep-immutable/games}. It is similar to the \errep\
+experiment when executed with~$\advA$, $\Pi$, $\delta$, and~$r$, but the
+pseudocode has been simplified to clarify our argumen. Indeed, it is not
+difficult to see that for every~$\advA$ there exists an adversary~$\advB$ such
+that
 \begin{equation}
   \Adv{\errep}_{\Pi,\delta,r}(\advA) \leq \Prob{\game_0(\advB) = 1}
 \end{equation}
@@ -158,13 +157,14 @@ is independent of the choices of~$\advB$.
 
 In game $\game_2$ the $\HASHO$ and $\QRYO$ oracles have been rewritten so that
 the winning-condition is computed by $\HASHO$ instead of $\QRYO$. The former
-oracle maintains a set~$\Ans$ such that $\Ans[x] = \Qry^{\HASHO_3}(M^*, x)$ for
+oracle maintains a set~$\Ans$ such that $\Ans[x] = \Qry^{\HASHO_3}(M^*, \qry_x)$ for
 each query $\salt^* \cat x$; on input of $\qry_x$, oracle~$\QRYO$ simply runs
 $\HASHO_3(\salt^* \cat x)$ and returns $\Ans[x]$.
 %
 We are effectively giving the adverseary credit for RO queries that result in
 false positives for the representation of~$\setS^*$, but which it does not
-explicitly ask of the~$\QRYO$. Clearly, for every~$\advB$ it holds that
+explicitly ask of the~$\QRYO$. Because~$\advB$'s advantage is at least that
+of~$\advA$'s, it holds that
 %
 \begin{equation}
   \Prob{\game_1(\advB)=1} \leq \Prob{\game_2(\advB)=1} \,.
@@ -176,13 +176,13 @@ Let $\setX$ be the set $\{ x \in \bits^* : \Ans[x] \ne \bot \}$ and $\setT = \{x
 \in\setX: \Ans[x] = 1\}$, where $\Ans$ is at is defined when~$\advB$ halts. We
 will call~$\setX$ the set of attempts and~$\setT$ the set of false positives.
 %
-Note that $\setX\intersection\setS^*=\emptyset$ by construction, and that
+Note that $\setX\intersection\setS^*=\emptyset$ and
 $|\setX| \leq q_H + q_T$.
 %
 Hence, the probability that~$\game_2(\advB)=1$ is equal to the probability
 that~$|\setT| \geq r$.
 
-For each $x\in\setX$, let $T(x)$ denote the event that $x\in\setT$
+For each $x\in\setX$, let $T(x)$ denote the event that $x\in\setT$.
 %
 In the random oracle model for~$H$, the set of random random variables $T(x)$
 for each $x\in X$ are independently and identically distributed.
@@ -190,24 +190,36 @@ for each $x\in X$ are independently and identically distributed.
 Hence, the probability that~$\advB$ succeeds is binomially distributed:
 %
 \begin{equation}
-  \Prob{ |\setT| \geq r } =
+   \Prob{\game_2(\advB)=1} = \Prob{ |\setT| \geq r } =
      \sum_{i=r}^{q} \binom{q}{i}p^i(1-p)^{q-i} \,,
 \end{equation}
 %
-where $q \leq q_H + q_T$ and $p = \Pr[T(x)=1]$. If we define
-$\alpha = \frac{r}{pq}$, then as long as $\alpha > 1$ we can apply a standard
-Chernoff bound to simplify this to
+where $q \leq q_H + q_T$ and $p = \Pr[T(x)=1]$. Here we can apply a Chernoff
+bound which states that, for any $\delta > 0$,
+%
 \begin{equation}
-  \Prob{ |\setT| \geq r } <
-     \left(\frac{e^{\alpha-1}}{\alpha^\alpha}\right)^{pq} \,.
+  \Prob{X \geq (1+\delta)\mu} < \left(\frac{e^\delta}{(1+\delta)^{1+\delta}}\right)^\mu
 \end{equation}
-
-Substituting this value back in for $\Prob{\game_2(\advB)=1}$ and applying
-Lemma~\ref{thm:lemma1} to move from the single-representation case to the
+%
+We set $\delta = r\mu^{-1}-1$ and note that $\mu = pq$.
+This yields
+%
+\begin{equation}
+ \Prob{|\setT| \geq r} < \left(\frac{e^{r\mu^{-1}-1}}{(r\mu^{-1})^{r\mu^{-1}}}\right)^\mu = \left(\frac{e^{r-\mu}}{(r\mu^{-1})^r}\right) = e^{r-pq}\left(\frac{pq}{r}\right)^r
+\end{equation}
+%
+So we have
+%
+\begin{equation}
+  \Adv{\errep}_{\Pi,\delta,r}(\advA) < \frac{q_H}{2^\lambda} + \left(\frac{pq}{r}\right)^re^{r-pq}
+\end{equation}
+%
+Applying Lemma~\ref{thm:lemma1} to move from the single-representation case to the
 general case, we get our final bound of
 \begin{equation}
-  \Adv{\errep}_{\Pi,\delta,r}(\advA) < q_R \cdot \left(\frac{q_H}{2^\lambda} + \left(\frac{e^{\alpha-1}}{\alpha^\alpha}\right)^{pq}\right) \,.
+  \Adv{\errep}_{\Pi,\delta,r}(\advA) \leq
+    q_R \cdot \left[
+      \frac{q_H}{2^\lambda} +
+      \left(\frac{pq}{r}\right)^re^{r-pq}
+    \right] \,.
 \end{equation}
-
-%
-\todo{DC (lead)}{Apply Lemma~\ref{thm:lemma1} and finish the bound.}

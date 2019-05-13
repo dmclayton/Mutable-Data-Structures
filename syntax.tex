@@ -1,31 +1,182 @@
-\heading{Preliminaries.}
-\todo{Any}{Fill in with usual things.}
+\subsection{Preliminaries}
+\label{sec:prelims}
 
-\heading{Data Structures.}
-Fix non-empty sets $\mathcal{D}, \mathcal{R}, \keys$ of \emph{data objects}, \emph{responses} and \emph{keys}, respectively.  Let $\mathcal{Q}\subseteq \Func(\mathcal{D},\mathcal{R})$ be a set of allowed \emph{queries}, and let
-$\mathcal{U} \subseteq \Func(\mathcal{D},\mathcal{D})$ be a set of allowed data-object \emph{updates}. 
-A {\em data structure} is a tuple $\Pi = (\Rep,\Qry,\Up)$, where:
+Let $x \getsr \setX$ denote sampling~$x$ from a set~$\setX$ according to the
+distribution associated with~$\setX$; if~$\setX$ is finite and the distribution
+is unspecified, then it is uniform.
+%
+Let $[i..j]$ denote the set of integers $\{i, \ldots, j\}$; if $i > j$, then
+define $[i..j] = \emptyset$. For all $m$ let $[m] = [1..m]$.
 
-\cpnote{DAvid and I are treating $\setQ$ as a subset of $\bits^*$.}
+\heading{Bitstring operations}
+Let $\bits^*$ denote the set of bitstrings and let~$\emptystr$ denote the empty
+string.
+%
+Let $X \cat Y$ denote the concatenation of bitstrings~$X$ and~$Y$.
+%
+For all $m\geq0$ define~$\bmap_m$ as the following function.  For all
+$\v.x\in[m]^*$ let $\bmap_m(\v.x) = X$, where $|X|=m$ and $X_v=1$ if and only if
+$\v.x_i = v$ for some $i\in[|\v.x|]$
+%
+We call $\bmap_m(\v.x)$ the \emph{bitmap} of~$\v.x$.
+%
+Let~$X$ and~$Y$ be equal-length bitstrings. We write $X \OR Y$ for their
+bitwise-OR, $X \AND Y$ for their bitwise-AND, and $X \XOR Y$ for their
+bitwise-XOR. Let $\NOT X = 1^{|X|} \xor X$.
+%
+Finally, let $\hw(X)$ denote the Hamming wieght of (i.e., the number of 1s
+in)~$X$.
+
+Let $\Func(\setX,\setY)$ denote the set of functions $f:\setX\to\setY$.
+
+For every function~$f$, define $\id^f$ so that
+$\id^f(\emptystr, x) = f(x)$ for all $x$ in the domain of~$f$.
+
+\todo{Any}{Define function $\ticks(A,\cdot)$ for algorithm~$A$. Do we need big-O
+notation in bounds?}
+
+\heading{Pseudorandom functions}
+%
+For sets $\setX$ and $\setY$ and a keyspace $\setK$, we define a pseudorandom
+function to be a function $F: \setK \times \setX \to \setY$. The intent is for
+the outputs of the function to appear random for a fixed choice of key, which is
+formally captured by the game described in Figure~\ref{fig:prf-def}. We define
+the advantage of an adversary $\advA$ to be
+$\Adv{\prf}_F(\advA) = \Prob{\Exp{\prf}_F(\advA) = 1}$, and the advantage
+$\Adv{\prf}_F(t,q)$ to be the maximum advantage of any adversary running for $t$
+steps and making $q$ queries to the PRF oracle.
+
+\begin{figure}
+  \twoColsNoDivide{0.22}
+  {
+    \experimentv{$\Exp{\prf}_F(\advA)$}\\[2pt]
+      $b \getsr \bits$; $\key \getsr \keys$\\
+      $b' \getsr \advA^{\PRFO}$\\
+      return $[b = b']$
+  }
+  {
+    \oraclev{$\PRFO(x)$}\\[2pt]
+      if $b = 1$ then return $F_\key(x)$\\
+      if $T[x] \neq \bot$ then return $T[x]$\\
+      $T[x] \getsr \setY$; return $T[x]$
+  }
+  \caption{The PRF experiment used to define the pseudorandomness of function
+  $F$ with key space $\setK$.
+  }
+  \label{fig:prf-def}
+\end{figure}
+
+\subsection{Data Structures}
+Fix non-empty sets $\mathcal{D}, \mathcal{R}, \keys$ of \emph{data objects},
+\emph{responses} and \emph{keys}, respectively.  Let $\mathcal{Q}\subseteq
+\Func(\mathcal{D},\mathcal{R})$ be a set of allowed \emph{queries}, and let
+$\mathcal{U} \subseteq \Func(\mathcal{D},\mathcal{D})$ be a set of allowed
+data-object \emph{updates}.  A {\em data structure} is a tuple $\Pi =
+(\Rep,\Qry,\Up)$, where:
+
 \begin{itemize}
-  \item $\Rep\colon \keys \times \mathcal{D} \to \{0,1\}^* \cup \{\bot\}$ is a randomized {\em representation algorithm}, taking as input a key $\key \in \keys$ and data object $\col \in \mathcal{D}$, and outputting the representation $\pub \in \{0,1\}^*$ of $D$, or $\bot$ in the case of a failure. We write this as $\pub \getsr \Rep_\key(\col)$.
+  \item $\Rep\colon \keys \times \mathcal{D} \to \{0,1\}^* \cup \{\bot\}$ is a
+  randomized {\em representation algorithm}, taking as input a key $\key \in
+  \keys$ and data object $\col \in \mathcal{D}$, and outputting the
+  representation $\pub \in \{0,1\}^*$ of $D$, or $\bot$ in the case of a
+  failure. We write this as $\pub \getsr \Rep_\key(\col)$.
 %
-  \item $\Qry\colon \keys \times \{0,1\}^* \times \mathcal{Q} \to \mathcal{R}$ is a deterministic {\em query-evaluation algorithm}, taking as input $\key \in \keys$, $\pub \in \{0,1\}^*$, and $\qry \in \mathcal{Q}$, and outputting an answer $a \in \mathcal{R}$. We write this as $a \gets \Qry_\key(\pub,\qry)$.
+  \item $\Qry\colon \keys \times \{0,1\}^* \times \mathcal{Q} \to \mathcal{R}$
+  is a deterministic {\em query-evaluation algorithm}, taking as input $\key \in
+  \keys$, $\pub \in \{0,1\}^*$, and $\qry \in \mathcal{Q}$, and outputting an
+  answer $a \in \mathcal{R}$. We write this as $a \gets \Qry_\key(\pub,\qry)$.
 %
-  \item $\Up\colon \keys \times \{0,1\}^* \times \mathcal{U} \to \{0,1\}^* \cup \{\bot\}$ is a randomized {\em update algorithm}, taking as input $\key \in \keys$, $\pub \in \{0,1\}^*$, and $\up \in \mathcal{U}$, and outputting an updated representation $\pub'$, or $\bot$ in the case of a failure. We write this as $\pub' \getsr \Up_\key(\pub,\up)$.
+  \item $\Up\colon \keys \times \{0,1\}^* \times \mathcal{U} \to \{0,1\}^* \cup
+  \{\bot\}$ is a randomized {\em update algorithm}, taking as input $\key \in
+  \keys$, $\pub \in \{0,1\}^*$, and $\up \in \mathcal{U}$, and outputting an
+  updated representation $\pub'$, or $\bot$ in the case of a failure. We write
+  this as $\pub' \getsr \Up_\key(\pub,\up)$.
 \end{itemize}
 
-Allowing each of the algorithm to take a key~$K$ lets us separate (in our security notions) any secret randomness that is across data structure operations, from per-operation randomness (e.g., salts).  Note that our syntax admits the common case of \emph{unkeyed} data structures, by setting $\keys=\{\emptystring\}$.  
+Allowing each of the algorithm to take a key~$K$ lets us separate (in our
+security notions) any secret randomness used across data structure operations,
+from per-operation randomness (e.g., salts).  Note that our syntax admits the
+common case of \emph{unkeyed} data structures, by setting
+$\keys=\{\emptystring\}$.
 
-We formalize $\Rep$ as randomized to admit defenses against offline attacks and, as we will see, per-representation randomness will play an important role in achieving our notion of correctness in the presence of adaptive adversaries.  Both~$\Rep$ and the~$\Up$ algorithm can be viewed (informally) as mapping data objects to representations ---~explicitly so in the case of~$\Rep$, and implicitly in the case of~$\Up$~--- so we allow~$\Up$ to make per-call random choices, too.  Many common data structures do not have randomized representation updates, but some do, e.g. the Cuckoo filter~\cite{xxx} and the Stable Bloom filter~\cite{xxx}.
+We formalize $\Rep$ as randomized to admit defenses against offline attacks and,
+as we will see, per-representation randomness will play an important role in
+achieving our notion of correctness in the presence of adaptive adversaries.
+Both~$\Rep$ and the~$\Up$ algorithm can be viewed (informally) as mapping data
+objects to representations ---~explicitly so in the case of~$\Rep$, and
+implicitly in the case of~$\Up$~--- so we allow~$\Up$ to make per-call random
+choices, too.  Many common data structures do not have randomized representation
+updates, but some do, e.g. the Cuckoo filter~\cite{fan2014cuckoo} and the stable
+Bloom filter~\cite{deng2006approximately}.
 
-Some important data structures admit update operations that are ``inverses'' of each other.  For example, the count-min sketch structure supports the addition and deletion of elements from the underlying (multi)set that it represents.  Thus, we say that $\Pi$ is {\em invertible} if, for every representation $\pub$ , update $\up \in \mathcal{U}$, and key~$K \in \keys$, there is $\up' \in \mathcal{U}$ such that $\Prob{\Up(K,\Up(K,\pub,\up),\up') = \pub} = 1$.  
-%Relatedly, we will say that data structure~$\Pi$ is \emph{immutable} if $\Prob{\Up(\pub,\up))=\pub}=1$ for all $\pub,\up$.
+The query algorithm $\Qry$ is formalized as deterministic.  This reflects the
+overwhelming behavior of data structures in practice, in particular those with
+space-efficient representations.  It also allows us to focus on correctness
+errors caused by the actions of an adaptive adversary, without attending to
+those caused by randomized query responses.  Randomized query responses may be
+of interest from a data privacy perspective, but our focus is on correctness.
 
-The query algorithm $\Qry$ is formalized as deterministic.  This reflects the overwhelming behavior of data structures in practice, in particular those with space-efficient representations.  It also allows us to focus on correctness errors caused by the actions of an adaptive adversary, without attending to those caused by randomized query responses.  Randomized query responses may be of interest from a data privacy perspective, but our focus is on correctness.
+\heading{Invertibility}
+%
+Some important data structures admit update operations that are ``inverses'' of
+each other.  For example, the count-min sketch structure supports the addition
+and deletion of elements from the underlying (multi)set that it represents.
+Thus, we say that $\Pi$ is {\em invertible} if, for every representation $\pub$
+, update $\up \in \mathcal{U}$, and key~$K \in \keys$, there is $\up' \in
+\mathcal{U}$ such that \[\Prob{\Up(K,\Up(K,\pub,\up),\up') = \pub} = 1\,.\]
 
 \ignore{
-For example, count-min sketches are invertible, by consequence of being deterministic and having both insertion and deletion operations. Counting Bloom filters are not quite invertible because the counters have a minimum of 0. Consider an element $a$ such that some but not all of the counters associated with $a$ are 0. A deletion operation for an element $a$ will decrement only the nonzero counters, after which an insertion operation for $a$ would increment all of the counters. This shows that insertion and deletion are not perfect inverses.
+For example, count-min sketches are invertible, by consequence of being
+deterministic and having both insertion and deletion operations. Counting Bloom
+filters are not quite invertible because the counters have a minimum of 0.
+Consider an element $a$ such that some but not all of the counters associated
+with $a$ are 0. A deletion operation for an element $a$ will decrement only the
+nonzero counters, after which an insertion operation for $a$ would increment all
+of the counters. This shows that insertion and deletion are not perfect
+inverses.
 }
 
-\input{tab-structures}
+\todo{Any}{Fix the weird spacing in the last column of
+Figure~\ref{fig:tab-structures}. Also, we need to refer to this \emph{somewhere}
+in the body.}
+
+\begin{figure*}[tp]
+\begin{center}
+\small
+  \begin{tabular}{ |p{1.75cm} | p{2.5cm} | p{2.95cm} | p{4cm} | p{3.7cm}|}
+    \hline
+    {\bf Structure} & {\bf Data Objects} & {\bf Supported Queries} & {\bf Supported Updates} & {\bf Parameters} \\ \hline
+    \parbox[c]{1.5cm}{Bloom\\ filter}
+          & \parbox[c][6ex]{2cm}{Sets\\$\col\subseteq \bits^*$} %, or\\ $\col \in \Func(\bits^*,\{0,1\})$}
+          & $\qry_x(\col) = [x \in \col]$
+          &  $\up_x(\col) = \col \cup \{x\}$
+          & \parbox[c]{4cm}{$n$, max $|\col|$\\$k$, \# hash functions\\$m$, array size (bits)}
+          \\\hline
+    \parbox[c]{1.5cm}{Counting\\ filter}
+          & \parbox[c]{2.5cm}{Multisets\\ $\col \in \Func(\bits^*,\N)$}
+          & $\qry_x(\col) = [\col(x) > 0]$
+          & \parbox[c][10ex]{4cm}{$\up_{x,0}(\col)(x) = \col(x)+1$ \\ $\up_{x,1}(\col)(x) = \col(x)-1$ \\ $\up_{x,b}(\col)(y) = \col(y)$ for $x \neq y$}
+          & \parbox[c]{3.5cm}{$n$, max $|\col|$\\$k$, \# hash functions\\$m$, array size (counters)\\ $d$, bits per counter}
+         \\ \hline
+    \parbox[c]{1.5cm}{Cuckoo\\ filter}
+          & \parbox[c]{2.5cm}{Multisets\\ $\col \in \Func(\bits^*,\N)$}
+          & $\qry_x(\col) = [\col(x) > 0]$
+          & \parbox[c][10ex]{4cm}{$\up_{x,0}(\col)(x) = \col(x)+1$ \\ $\up_{x,1}(\col)(x) = \col(x)-1$ \\ $\up_{x,b}(\col)(y) = \col(y)$ for $x \neq y$}
+          & \parbox[c]{3.5cm}{$n$, max $|\col|$\\$m$, \# buckets\\$b$, bucket size (entries)\\$f$, fingerprint size (bits)}
+          \\ \hline
+     \parbox[c]{2cm}{Count-min\\ sketch}
+          & \parbox[c]{2.5cm}{Multisets\\ $\col \in \Func(\bits^*,\N)$}
+          & $\qry_x(\col) = \col(x)$
+          & \parbox[c][10ex]{4cm}{$\up_{x,0}(\col)(x) = \col(x)+1$ \\ $\up_{x,1}(\col)(x) = \col(x)-1$ \\ $\up_{x,b}(\col)(y) = \col(y)$ for $x \neq y$}
+          & \parbox[c]{3.75cm}{$n$, max $|\col|$\\$k$, \# hash functions and arrays\\$m$, array size (counters)\\$d$, bits per counter}
+          \\ \hline
+  \end{tabular}
+\caption{The data structrues that we consider. Each data structure yields a
+space-efficient representation of its input data object and, in the presense of
+non-adaptive attacks, provides approximately correct responses to the supported
+queries.  For counting filters, cuckoo filters, and count-min sketch, typical
+implementations prevent updates that would cause $\col(x)-1 < 0$.}
+  \label{fig:structures-summary}
+  \label{fig:tab-structures}
+\end{center}
+\end{figure*}
