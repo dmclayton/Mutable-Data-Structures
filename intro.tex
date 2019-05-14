@@ -118,20 +118,22 @@ adversarial) updates to~$\col$ and its representation.
   security bounds are weaker. If the filter is assumed to be immutable after
   construction, we can even get away with not keeping anything secret, though
   the security bound is \emph{much} weaker.
-  \item Immutable Bloom filters: Not secure at all in the `standard'
-  construction (i.e. no salt or key), but we do find a weak ($q_H$ features
-  prominently) \errep\ bound if a per-representation salt is used.
-  \item Mutable Bloom filters: We show that salts do not give \errep\ security,
-  but they do give \erreps\ security. Using a key along with the salt allows for
-  security even in the \errep\ setting.
-  \item $\ell$-thresholded mutable Bloom filters: We show that a salted filter
-  gives a better \erreps\ bound than in the previous case.
-  \item Count min-sketch: We show that \errep\ security is impossible regardless
-  of which construction you use (key, threshold, etc.), but that \erreps\
-  security is achievable using a salt and $\ell$-thresholding.
-  \item Counting filter: Same results as count min-sketch, with a slightly
-  different security bound. This bound is given in terms of $\delta^+$ and
-  $\delta^-$, which describe the relative `badness' of false positives and
+  \item Standard Bloom filters (4.1): With no salt or key there is no security
+  in either sense.
+  \item Salted Bloom filters (4.2): If the filters are immutable, we find a weak
+  ($q_H$ features prominently) \errep\ bound. If the filters are mutable, we
+  show an attack in the \errep\ setting and provide a decent bound for \erreps\
+  security.
+  \item Keyed Bloom filters (4.3): We get a decent bound for the \errep\
+  setting.
+  \item Salted, $\ell$-thresholded Bloom filters (4.4): We get a better
+  \erreps\ bound than in the $n$-capped case.
+  \item Count min-sketch (5.1-2): We show that \errep\ security is impossible
+  regardless of which construction you use (key, threshold, etc.), but that
+  \erreps\ security is achievable using a salt and $\ell$-thresholding.
+  \item Counting filter (6.1-2): Same results as count min-sketch, with a
+  slightly different security bound. This bound is given in terms of $\delta^+$
+  and $\delta^-$, which describe the relative `badness' of false positives and
   false negatives. A large value of $\delta^-$ is more harmful than a large
   value of $\delta^+$, i.e. counting filters are better for avoiding false
   positives than false negatives. (Interestingly, the opposite is true in the

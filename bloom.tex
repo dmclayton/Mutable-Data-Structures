@@ -62,11 +62,11 @@ $\BF[H,n]$ is flawed, allowing the adversary to make an offline attack that
 has a high probability of success while using a minimal number of queries. In
 the immutable setting, where the adversary is constrained to never use the
 $\UPO$ oracle, i.e. $q_U = 0$, it suffices to use the $\SBF$ construction in
-order to provide a good security guarantee in either the public-representation
+order to provide a security guarantee in either the public-representation
 or private-representation settings. However, in the case where we allow
 $q_U > 0$ so that the adversary can make updates, we will find that $\SBF$ is
-not secure in the public-representation setting. Instead, $\KBF$ must be used to
-guarantee security.
+only secure in the \erreps\ setting. To provide \errep\ security, $\KBF$ must be
+used instead.
 
 At the end of the section, we discuss the second class of filter, we call the
 $\ell$-thresholded filter. This construction uses a \emph{filter threshold}
@@ -75,13 +75,11 @@ the filter that can be set to 1 instead of the number of elements in the
 underlying set. In the absence of an adaptive adversary this construction
 performs very similarly to the standard Bloom filter, since for a random input
 set the number of bits set to 1 can be predicted with a high degree of accuracy
-from the number of elements in the underlying set. However, a filter threshold
-allows us to obtain better bounds against adaptive adversaries and has the
-additional advantage of not requiring a separate counter to keep track of the
-number of elements in the filter. Each of the above special cases can be
-extended to the filter-threshold construction in the natural way, though we only
-consider the unkeyed and salted construction $\SBF_\mathrm{ft}$ to provide an example
-of the tighter error bounds this alternate construction can provide.
+from the number of elements in the underlying set. However, we find that a
+filter threshold allows us to obtain better \erreps\ bounds against adaptive
+adversaries when using a salted filter, and this construction has the additional
+advantage of not requiring a separate counter to keep track of the number of
+elements in the filter.
 
 
 \heading{Non-adaptive false-positive probability}
