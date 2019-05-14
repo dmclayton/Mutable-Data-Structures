@@ -102,13 +102,40 @@ adversarial) updates to~$\col$ and its representation.
 \item ...
 \end{itemize}
 
+\dcnote{Summaries follow:}
 \begin{itemize}
-  \item We show that some traditional data structures like the Bloom filter
-  are insecure in their usual form. However, they can be made secure by keeping
-  the representation private, using a per-representation random salt, and in
-  some cases by using a simple `thresholding' procedure to ensure that the
-  structures do not become too full. In the case of Bloom filters, it suffices
-  to merely keep a secret key private rather than the full 
+  \item Overall pitch: We construct general definitions to capture the idea of a
+  probabilistic data structure and define notions of what it means for these
+  structures to be secure against an adversary attempting to force the
+  structures to produce errors when queried. We show that three traditional data
+  structures, the Bloom filter, the count-min sketch, and the counting filter,
+  are insecure in their usual form. Any of these can be kept secure by keeping
+  the representation private, adding a per-representation random salt to the
+  hash functions, and introducing a simple `thresholding' procedure to ensure
+  that the structures do not become too full. With Bloom filters, we can get
+  away with not using thresholding, and even with only keeping a key
+  for the hash functions secret rather than the entire filter, but the
+  security bounds are weaker. If the filter is assumed to be immutable after
+  construction, we can even get away with not keeping anything secret, though
+  the security bound is \emph{much} weaker.
+  \item Immutable Bloom filters: Not secure at all in the `standard'
+  construction (i.e. no salt or key), but we do find a weak ($q_H$ features
+  prominently) \errep\ bound if a per-representation salt is used.
+  \item Mutable Bloom filters: We show that salts do not give \errep\ security,
+  but they do give \erreps\ security. Using a key along with the salt allows for
+  security even in the \errep\ setting.
+  \item $\ell$-thresholded mutable Bloom filters: We show that a salted filter
+  gives a better \erreps\ bound than in the previous case.
+  \item Count min-sketch: We show that \errep\ security is impossible regardless
+  of which construction you use (key, threshold, etc.), but that \erreps\
+  security is achievable using a salt and $\ell$-thresholding.
+  \item Counting filter: Same results as count min-sketch, with a slightly
+  different security bound. This bound is given in terms of $\delta^+$ and
+  $\delta^-$, which describe the relative `badness' of false positives and
+  false negatives. A large value of $\delta^-$ is more harmful than a large
+  value of $\delta^+$, i.e. counting filters are better for avoiding false
+  positives than false negatives. (Interestingly, the opposite is true in the
+  non-adpative case.)
 \end{itemize}
 \tsnote{old stuff below here}
 
