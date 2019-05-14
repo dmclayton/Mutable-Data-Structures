@@ -77,7 +77,7 @@ positives.
 
 \begin{theorem}
 For integers $q_R, q_T, q_H, r, t \geq 0$, let $p_\ell = ((\ell+1)/m)^k$ and
-$r' = \lfloor r/(k+1) \rfloor$. If $r' > p_\ell q_T$, it holds that
+$r' = \lfloor r/\max(\delta^+,k\delta^-) \rfloor$. If $r' > p_\ell q_T$, it holds that
   \begin{equation*}
   \begin{aligned}
    \Adv{\erreps}_{\Pi,\delta,r}(t, q_R,q_T,q_U,q_H,q_V) &\leq\\
