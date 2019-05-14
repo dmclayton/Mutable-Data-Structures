@@ -1,0 +1,155 @@
+\ignore{\begin{figure*}
+\twoColsNoDivide{0.47}
+{
+  \vspace{-7pt}
+  \experimentv{$\game_{0}(\advB)$}\hfill \diffminus{$\game_1$}\diffplus{$\game_2$}\\[2pt]
+    $M^* \gets \bot$;
+    $\salt^* \getsr \bits^\lambda$\\
+    $\advB^{\REPO,\QRYO,\UPO,\HASHO_1}$;
+    return $\big[\sum_x \err[x] \geq r\big]$
+  \\[6pt]
+  \oraclev{$\HASHO_c(\salt \cat x)$}\\[2pt]
+    $\vv \getsr [m]^k$\\
+    if $\salt=\salt^*$ and $c = 1$ then \com{Caller is~$\advB$}\\
+    \tab $\bad_1 \gets 1$; \diffplus{\diffminus{return $\vv$}}\\
+    if $T[Z,x] = \bot$ then $\vv \gets T[Z,z]$\\
+    $T[Z,x] \gets \vv$; return $\vv$
+}
+{
+  \oraclev{$\QRYO(\qry_x)$}\\[2pt]
+    $X \gets \bmap_m(\HASHO_3(\salt^* \cat x))$;
+    $a \gets X = M^* \AND X$\\
+    if $\err[x] < \delta(a,\qry_x(\col^*))$ then
+          $\err[x] \gets \delta(a,\qry_x(\col^*))$\\
+    \diffplus{$\UPO(\up_x)$}\\
+    return $a$
+  \\[6pt]
+  \oraclev{$\REPO(\col)$}\\[2pt]
+    $M^* \gets \bigvee_{x \in \col} \bmap_m(\HASHO_2(\salt^* \cat x))$;
+    $\setS^* \gets \col$;
+    return $\top$
+  \\[6pt]
+  \oraclev{$\UPO(\up_x)$}\\[2pt]
+    if $w(M) > \ell$ then return $\top$\\
+    if $\QRYO(\qry_x) = 1$ then $\err[x] \gets 0$\\
+    $M^* \gets M^* \vee \bmap_m(\HASHO_2(\salt^* \cat x))$;
+    $\setS^* \gets \up_x(\setS)$;
+    return $\top$
+}
+\caption{Games 0, 1, and 2 for proof of Theorem~\ref{thm:sbf-erreps}.}
+\label{fig:sbf-erreps/games}
+\end{figure*}}
+
+As with the proof of Theorem~\ref{thm:sbf-errep-immutable}, we derive a bound in
+the \erreps1 case and then use Lemma~\ref{thm:lemma1} to move from \erreps1 to
+the more general \erreps case. Because we are in the \erreps1 case, we may
+assume without loss of generality that the adversary does not call $\REVO$,
+since revealing the only representation automatically prevents the adversary
+from winning.
+
+We begin with a game~$\game_0$ which has identical behavior to the \erreps1
+experiment for a salted CMS. As in the proofs of
+Theorems~\ref{thm:sbf-errep-immutable} and~\ref{thm:sbf-erreps}, we have a
+$\bad_1$ flag that gets set if the adversary ever calls $\HASHO_1$ with the
+actual salt used by the representation. By an almost identical argument, we can
+move to~$\game_1$, where the behavior is different only when the $\bad_1$ flag
+is set, with a bound of
+\begin{equation}
+  \Prob{\game_0(\advA)=1} \leq
+    q_H/2^\lambda + \Prob{\game_1(\advA)=1} \,.
+\end{equation}
+
+The key differences between this proof and the Bloom filter proof are the more
+complex response space of $\QRYO$ ($\N$ rather than $\bits$) and the possibility
+of achieving an error through either overestimation or underestimation of the
+actual frequency.
+
+%
+
+It is difficult to bound the probability that, if $\QRYO(\qry_x)$ finds that $x$
+is overestimated by 1, the adversary can quickly determine which elements to
+re-insert into the sketch in order to increase this error beyond the $n\epsilon$
+threshold of `significance'. We therefore move to~$\game_2$, where the adversary
+gets credit for any response which overestimates the true value, regardless of
+the magnitude of the error. Since this can only increase the probability of a
+query producing an error, we have
+$\Prob{\game_1(\advA) = 1} \le \Prob{\game_2(\advA) = 1}$.
+
+As a first step in dealing with the $\UPO$ oracle, we want to show that deletion
+is never helpful for the adversary. So, for any $\advA$, we construct an
+adversary $\advB$ that simulates $\advA$, forwarding all oracle queries in the
+natural way, except that it ignores any $\UPO(\up_{x,-1})$ calls, i.e. any
+deletions. Because deleting $x$ does not change whether $x$ is overestimated or
+not, ignoring deletions does not affect whether later calls of the form
+$\QRYO(\qry_x)$ will produce an error. Furthermore, if $y \neq x$, then the
+probability of $\QRYO(\qry_y)$ causing an error can only increase if $x$'s
+deletion is ignored, since the deletion of $x$ decreases counter values without
+decreasing the true frequency of $y$. Therefore
+$\Prob{\game_2(\advA) = 1} \le \Prob{\game_2(\advB) = 1}$, and we have reduced
+to the case of an adversary whose $\UPO$ calls only consist of insertions.
+
+%%
+
+Next, we move from $\advB$ to an $\advC$ that never inserts an element more than
+once. Similarly to the previous step, $\advC$ simulates $\advB$, tracking the
+elements of $\col$ and forwarding $\advB$'s oracle queries in
+the natural way, except that any $\UPO$ queries to insert an element already
+present in $\col$ are ignored. First, inserting $x$ does not
+change whether $x$ is overestimated or not, so $\advC$ ignoring the re-insertion
+does not affect whether later $\QRYO(\qry_x)$ calls will produce an error. For
+$y \neq x$, the fact that $\advB$ makes no deletions is key. The value of the
+counters associated with $y$ by the hash functions must be at least equal to the
+true frequency of $y$, and $\QRYO(\qry_y)$ will find an overestimate if these
+counters are all strictly greater than the true frequency. Since updates are
+deterministic, re-inserting $x$ can only increment the same counters that were
+incremented by the original insertion of $x$, and so this re-insertion cannot
+cause $y$ to become overestimated if it was not already. So all $\QRYO$ calls
+are just as likely to produce an error for $\advC$ as they are for $\advB$, and
+$\Prob{\game_2(\advB) = 1} = \Prob{\game_2(\advC) = 1}$.
+
+As a third step, we move from~$\game_2$ to a~$\game_3$ where the adversary gains
+$k+1$ `points' worth of errors for finding an query which produces an
+overestimate, but which prevents the adversary from querying elements of $\col$.
+These extra points are necessary because, unlike in the case of a Bloom
+filter, inserting an overestimated element $x$ can cause other elements of
+$\col$ to become overestimated. In particular, if one of the counters
+incremented by the insertion of $x$ is shared with an element of $\col$ that is
+not overestimated, that element may become overestimated. However, if that
+counter is shared with multiple elements of $\col$, that counter is already an
+overestimate for all of the elements associated with it, and so no more than one
+overestimate can be caused per counter incremented by the insertion of $x$.
+Since inserting $x$ increments $k$ counters, at most $k$ errors can be caused in
+this way. For any adversary $\advC$ for~$\game_2$, we can construct $D$
+for~$\game_3$ that simulates $\advC$ perfectly except that it ignores any oracle
+calls that would insert these elements. Since $D$ already gets credit equal to
+the maximum number of errors these insertions could cause in addition to the
+credit for the original overestimate, $D$ accumulates at least as many errors as
+$\advC$ does, and so $\Prob{\game_2(\advC) = 1} \le \Prob{\game_3(D) = 1}$.
+
+Analagously to the proof of~\ref{thm:sbf-erreps-th}, we now move to a
+game~$\game_4$ where $\REPO$ randomly fills the sketch to capacity after
+inserting the elements of $\col$, so that each row has $\ell+1$ nonzero
+counters. For any $D$ for~$\game_3$ we construct $E$ for~$\game_4$ that
+simulates $D$, forwarding $\REPO$, $\QRYO$, and $\HASHO_1$ calls but ignoring
+$\UPO$ calls. By a very similar argument, $E$ achieves at least the same
+advantage as $D$ by having a maximally full filter as soon as $\REPO$ is called,
+and so $\Prob{\game_3(D) = 1} \le \Prob{\game_4{E} = 1}$.
+
+The probability of $E$ winning can now be given by another binomial bound. Since
+each row of the sketch is a uniformly random bitmap with $\ell+1$ out of $m$
+bits set to 1, the probability of any particular $\QRYO$ call causing a
+collision within a single row $i$ is $(\ell+1)/m$, and the probability of a
+collision in every row (i.e. an error) is $((\ell+1)/m)^k$. The adversary has a
+total of $q_T$ attempts, and wins if it accumulates $\lfloor r/(k+1) \rfloor$
+successes. So, letting $p_\ell = ((\ell+1)/m)^k$ and
+$r' = \lfloor r/(k+1) \rfloor$, we have
+\begin{equation}
+   \Prob{\game_4(D)=1} \le
+     \sum_{i=r'}^{q_T} \binom{q_T}{i}p_\ell^i(1-p_\ell)^{q_T-i} \,.
+\end{equation}
+Applying the usual Chernoff bound and applying Lemma~\ref{thm:lemma1} turns this
+into the final bound of
+\begin{equation}
+   \Adv{\erreps}_{\Pi,\delta,r}(\advA) \leq
+     q_R \cdot \left[\frac{q_H}{2^\lambda} + e^{r'-p_\ell q_T}\left(\frac{p_\ell q_T}{r'}\right)^r\right].
+\end{equation}
