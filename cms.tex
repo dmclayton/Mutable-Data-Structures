@@ -1,45 +1,42 @@
 \begin{figure}
   \twoColsNoDivide{0.22}
   {
-    \underline{$\Rep^R_K(\col)$}\hfill\diffminus{$\sketch$}\diffplus{$\sketch_\mathrm{ft}$}\\[2pt]
+    \underline{$\Rep^R_K(\col)$}\\[2pt]
       $\salt \getsr \bits^\lambda$\\
       for $i$ in $[1..k]$ do\\
-        $\tab M[i] \gets 0^m$\\
-      $\pub \gets \langle M, \salt$\diffminus{$, 0$}$\rangle$
+        $\tab M[i] \gets \zeroes(m)$\\
+      $\pub \gets \langle M, \salt\rangle$\\
       for $x \in \col$ do \\
         $\tab \pub \gets \Up^R_K(\pub, \up_{x,1})$\\
         $\tab$if $\pub = \bot$ then return $\bot$\\
       return $\pub$
-  }
-  {
-    \underline{$\Qry^R_K(\langle M, \salt$\diffminus{$, c$}$\rangle,\qry_x)$}\\[2pt]
+    \\[6pt]
+    \underline{$\Qry^R_K(\langle M, \salt\rangle,\qry_x)$}\\[2pt]
       $X \gets R_K(\salt \cat x)$;
       $a \gets \infty$\\
       for $i$ in $[1..k]$ do\\
       $\tab a \gets \min(a, M[i][X[i]])$\\
       return $a$
-    \\[6pt]
-    \underline{$\Up^R_K(\langle M, \salt$\diffminus{$, c$}$\rangle,\up_{x,b})$}\\[2pt]
-      \diffminus{if $c \geq n$ then return $\bot$}\\
-      \diffplus{if $\hw'(M) > \ell$ then return $\bot$}\\
+  }
+  {
+    \underline{$\Up^R_K(\langle M, \salt\rangle,\up_{x,b})$}\\[2pt]
+      if $\bigvee_{i\in[1..k]} [\hw'(M[i]) > \ell]$ then return $\bot$\\
       $M' \gets M$;
       $X \gets R_K(\salt \cat x)$\\
       for $i$ in $[1..k]$ do\\
-      $\tab$ if $M'[i][X[i]] = 0$ and $b < 0$ then return $\bot$\\
-      $\tab M'[i][X[i]] \gets M'[i][X[i]] + b$\\
+      $\tab a \gets M'[i][X[i]]$\\
+      $\tab$ if $a = 0 \wedge b < 0$ then return $\bot$\\
+      $\tab M'[i][X[i]] \gets a + b$\\
       $M \gets M'$;
       return $\langle M, \salt, c+b \rangle$
   }
-  \caption{Left: Keyed structure $\sketch[R,n,\lambda]$ given by
+  \caption{Keyed structure $\sketch[R,\ell,\lambda]$ given by
   $(\Rep^R,\Qry^R,\Up^R)$ is used to define count min-sketch variants used to
-  rerpresent streams of size at most~$n$. The parameters are a function $R:
-  \keys\by\bits^* \to [m]^k$ and integers $n, \lambda \geq0$. A concrete scheme
-  is given by a particular choice of parameters. Right: The alternate,
-  $\ell$-thresholded construction $\sketch_\mathrm{ft}[R,\ell,\lambda]$, which
-  uses the number of nonzero counters ($\hw'$, as defined in
-  Section~\ref{sec:prelims}) to decide if the filter is full.
-  %
-  }
+  rerpresent streams that never fill the rows of the sketch to more than $\ell$.
+  The parameters are a function $R: \keys\by\bits^* \to [m]^k$ and integers
+  $\ell, \lambda \geq0$. A concrete scheme is given by a particular choice of
+  parameters. The function $\hw'$, used to determine if the sketch is full, is
+  defined in Section~\ref{sec:prelims}.}
   \label{fig:cms-def}
 \end{figure}
 

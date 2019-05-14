@@ -3,7 +3,7 @@
   {
     \underline{$\Rep^R_K(\col)$}\\[2pt]
       $\salt \getsr \bits^\lambda$\\
-      $\pub \gets \langle 0^m, \salt, 0\rangle$\\
+      $\pub \gets \langle \zeroes(m), \salt, 0\rangle$\\
       for $x \in \col$ do \\
         $\tab \pub \gets \Up^R_K(\pub, \up_{x,1})$\\
         $\tab$if $\pub = \bot$ then return $\bot$\\

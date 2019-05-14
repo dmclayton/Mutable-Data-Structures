@@ -26,7 +26,9 @@ bitwise-XOR. Let $\NOT X = 1^{|X|} \xor X$, and let $\hw(X)$ denote the Hamming
 wieght of (i.e., the number of 1s in)~$X$.
 
 For an array~$M$ of integers, we analagously define $\hw'(X)$ to be the number
-of \emph{nonzero} integers in the array.
+of \emph{nonzero} integers in the array. We also define $\zeroes(m)$ to be a
+function taking a nonnegative integer and returning a length-$m$ integer vector
+with all entries set to 0.
 
 Let $\Func(\setX,\setY)$ denote the set of functions $f:\setX\to\setY$.
 
@@ -76,7 +78,7 @@ $\mathcal{U} \subseteq \Func(\mathcal{D},\mathcal{D})$ be a set of allowed
 data-object \emph{updates}.  A {\em data structure} is a tuple $\Pi =
 (\Rep,\Qry,\Up)$, where:
 
-\begin{itemize}
+\begin{itemize}[leftmargin=*]
   \item $\Rep\colon \keys \times \mathcal{D} \to \{0,1\}^* \cup \{\bot\}$ is a
   randomized {\em representation algorithm}, taking as input a key $\key \in
   \keys$ and data object $\col \in \mathcal{D}$, and outputting the
@@ -95,7 +97,7 @@ data-object \emph{updates}.  A {\em data structure} is a tuple $\Pi =
   this as $\pub' \getsr \Up_\key(\pub,\up)$.
 \end{itemize}
 
-Allowing each of the algorithm to take a key~$K$ lets us separate (in our
+Allowing each of the algorithms to take a key~$K$ lets us separate (in our
 security notions) any secret randomness used across data structure operations,
 from per-operation randomness (e.g., salts).  Note that our syntax admits the
 common case of \emph{unkeyed} data structures, by setting
