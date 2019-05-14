@@ -130,12 +130,14 @@ adversary) but does not place any bounds on underestimation. In the case of
 $\ell$-thresholded sketches defined later, we will actually move to a stricter
 error function than this.
 
-\subsection{Insecurity of Public Sketches}
+\subsection{Insecurity of public sketches}
 
 Unlike in the Bloom filter case, good security bounds cannot be achieved for a
 count-min sketch in the \errep\ setting even if salts and/or private keys are
-used. Given a stronger $\UPO$ oracle, the adversary can mount an attack similar
-to the target-set coverage attack for a Bloom filter even if a PRF is used for
+used. Given a stronger $\UPO$ oracle \cpnote{Do you mean ``given that the $\UPO$
+oracle is more poweerful''? If so, then say why it is.} the adversary can mount
+an attack similar to the target-set coverage attack for a Bloom filter even if a
+PRF is used for
 hashing. First, the adversary calls $\REPO(\emptyset)$ to get an empty
 representation. The adversary can then call $\UPO$ to insert an element into the
 set, see exactly what the outputs of each of the hash functions are, and then
@@ -157,7 +159,7 @@ simulate, since the adversary can build a lookup table just by watching the
 sketch as it is updated. Instead, we must require that the sketch itself is kept
 secret from the saversary.
 
-\subsection{Private Thresholded Sketches}
+\subsection{Private, $\ell$-threshold sketches}
 
 As in the case of Bloom filters, it is possible to tweak the count min-sketch
 definition by placing a bound on how full the filter itself can get. In this
