@@ -7,12 +7,12 @@
 %actually have been returned. In general we require $\delta(x,x) = 0$, but otherwise
 %place no restrictions on what the error function might look like.
 
-Let $\struct=(\Rep,\Up,\Qry)$ be a data structure with result space~$\results$.
+Let $\struct=(\Rep,\Up,\Qry)$ be a data structure with response space~$\results$.
 %
 We define two adversarial notions of correctness given by a pair of related
 experiments for~$\struct$, \emph{error function} $\delta:\results^2 \to \R$,
 and \emph{error capacity}~$r$. The values $\delta(x,y)$ of the error function
-represent the `badness' of getting an erroneous result of $x$ from $\Qry$ when
+represent the ``badness'' of getting an erroneous result of $x$ from $\Qry$ when
 $y$ should actually have been returned. In general we require
 $\delta(x,y) \geq 0$ and $\delta(x,x) = 0$ for all $x$ and $y$, but otherwise
 place no restrictions on what the error function might look like.
@@ -33,7 +33,7 @@ and $\UPO$ oracles.
 
 To track errors, both experiments maintain an array $\err_i[]$ for every data
 object~$\col_i$ that has been defined.  Initially, $\err_i[]$ is implicitly
-assigned the value of~$\undefn$ at every index. (We will silentely adopt the
+assigned the value of~$\undefn$ at every index. (We will silently adopt the
 same convention for all uninitialized arrays.) For purposes of value
 comparison, we adopt the convention that $\undefn < n$ for all $n \in \R$.
 %
@@ -58,12 +58,12 @@ error-producing query to $\QRYO$.
 When a query $\UPO(i,\up)$ is made, the oracle first updates the data
 object~$\col_i$ and its corresponding representation.
 %
-Now, for each defined value~$\err_i[\qry]$, we reevaluate the error that
+Now, for each defined value~$\err_i[\qry]$, we re-evaluate the error that
 \emph{would} be caused by the previously asked~$\qry$ WRT the newly updated
 $\col_i$ and $\pub_i$. If the existing value of $\err_i[\qry]$ is larger than
 the error that~$\qry$ would cause to WRT the newly updated~$\col_i$ and
 $\pub_i$, then we overwrite $\err_i[\qry]$ with the smaller value.  Doing so
-insures that the array~$\err_i$ does not overcredit the attacker for errors
+ensures that the array~$\err_i$ does not overcredit the attacker for errors
 against the current data object and representation.
 
 For a concrete example of why these choices are necessary, consider a
@@ -84,24 +84,22 @@ trivially equivalent to the public-representation case we do not allow the
 adversary to win by finding errors in a representation which has been revealed
 using $\REVO$.
 
-Given the experiments defined here, we define the advantage of an adversary
-$\advA$ as the probability it succeeds at the experiment, i.e.,
-\[\Adv{\errep}_{\struct,\delta,r}(\advA) = \Prob{\Exp{\errep}_{\struct,\delta,r}(\advA) = 1}\]
-in the public-representation setting. The advantage of~$\advA$ in the
-private-represetnation is defined analogously.
+We define the advantage of an \errep-adversary~$\advA$ as
+\[\Adv{\errep}_{\struct,\delta,r}(\advA) =
+\Prob{\Exp{\errep}_{\struct,\delta,r}(\advA) = 1} \,\]
+and write
+$\Adv{\errep}_{\struct,\delta,r}(t,q_R,q_T,q_U,q_H)$ as the maximum advantage of
+any \errep-adversary running in~$t$ time steps and making~$q_R$ calls to
+$\REPO$, $q_T$ calls to $\QRYO$, $q_U$ calls to $\UPO$, and~$q_H$ calls
+to~$\HASHO$ in the ROM.
 %
-We define the function
-$\Adv{\errep}_{\struct,\delta,r}(t,q_R,q_T,q_U,q_H)$ to be the maximum advantage
-attained by an adversary running in $t$ time steps and making $q_R$ calls to
-$\REPO$, $q_T$ calls to $\QRYO$, $q_U$ calls to $\UPO$, and $q_H$ calls
-to~$\HASHO$ in the ROM. We define advantage similarly for \erreps\ except that
-we add an extra parameter $q_V$ representing the number of calls to $\REVO$. We
+We define \erreps\ advantage in kind, except that
+we add an extra parameter~$q_V$ representing the number of calls to $\REVO$. We
 sometimes use \errep1 or \erreps1 to refer to the restriction of the \errep\ or
-\erreps\ games to the case of $q_R = 1$, and define
-$\Adv{\errep1}_{\struct,\delta,r}(t,q_T,q_U,q_H) = \Adv{\errep}_{\struct,\delta,r}(t,1,q_T,q_U,q_H)$
-and $\Adv{\erreps1}_{\struct,\delta,r}(t,q_T,q_U,q_H) = \Adv{\erreps}_{\struct,\delta,r}(t,1,q_T,q_U,q_H)$
-for convenience.
+\erreps\ games to the case of $q_R = 1$; for these we remove the~$q_R$ parameter
+from the advantage function.
 
+\ignore{
 The first observation we make is that security in the public setting is a
 stronger notion than security in the private setting. The following proof
 follows from a simple simulation argument.
@@ -143,6 +141,7 @@ private-representation setting, we know that the attack will also work in the
 public-representation setting, and conversely that if we can establish a security
 bound in the public-representation setting then the same bound holds in the
 private-representation setting.
+}
 
 \ignore{
 \heading{Keyed structures}
