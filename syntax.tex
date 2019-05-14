@@ -35,17 +35,19 @@ $\setY$, then we associate to this set the following distribution. For all
 $x\in\setX$ and $y\in\setY$ it holds that
 $\Prob{f\getsr\Func(\setX,\setY):f(x)=y} = |\setY|^{-1}$.
 %
-\todo{TS}{Decide if you're happy with this}
+\todo{TS}{Decide if you're happy with this. Note that it's used to define the
+non-adaptive FP prob of stuff.}
 
 For every function~$f$, define $\id^f$ so that
 $\id^f(\emptystr, x) = f(x)$ for all $x$ in the domain of~$f$.
 
-\todo{Any (Tom?)}{Define function $\ticks(A,\cdot)$ for algorithm~$A$. Do we need big-O
-notation in bounds?}
-\dcnote{Not sure what this is supposed to mean.}
-\cpnote{IIRC it's a relic of the old paper, one of Jon's contributions. I also
-don't remember what this means, but I can dig it up if need be. It needs to be
-defined or we need to drop it from the \errep1 to \errep\ lemma.}
+\heading{Adversaries}
+Adversaries are randomized algorithms that expect access to one or more oracles
+defined by the experiment in which it is executed. We say that an adversary is
+$t$-time if it halts in $t$ time steps (with respect to some model of
+computation, which we leave implicit) regardless of its random coins or the
+responses to its oracle queries. By convention, the adversary's runtime includes
+the time required to evaluate its oracle queries.
 
 \heading{Pseudorandom functions}
 %

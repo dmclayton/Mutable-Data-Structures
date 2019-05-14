@@ -224,8 +224,6 @@ In Appendix~\ref{app:unsalted-attack} we demonstrate that target-set coverage
 attacks are feasible for practical BF parameters. We do so by simulating the
 attack when~$H$ is a random function (i.e., for each distinct input we choose
 $k$ integers from $[m]$ at random) for typical choices of $k$, $m$, and~$n$.
-%
-\todo{CP}{Add simulation to appendix.}
 
 The key to pollution attacks and target-set coverage attacks is that the
 adversary can compute the representation of the set on its own. In the remainder
@@ -303,7 +301,7 @@ component for various parameters of interest. Let
 %
 where
 $
-  p^* = \lim_{n\goesto\infty} (1-e^{-kn/m})^k \,,
+  p^* = (1-e^{-kn/m})^k \,,
 $
 the approximation of the non-adaptive false positive probability given by Kirsch
 and Mitzenmacher~\cite{kirsch2006less}.
@@ -402,6 +400,8 @@ integers~$n,\lambda\geq0$, and let $\Pi = \KBF[F,n,\lambda]$.
       \left(\frac{p'q_Rq_T}{r}\right)^re^{r-p'q_Rq_T} \,.
     \end{aligned}
   \end{equation*}
+  \todo{DC}{CP has fixed a convention for accounting for adversaries' resources;
+  please update the bound accordingly. (See Section \ref{sec:prelims}.)}
 \end{theorem}
 
 Though the bound involves a similar Chernoff approximation to the other proofs,
