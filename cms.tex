@@ -1,5 +1,5 @@
-\begin{figure}
-  \twoColsNoDivide{0.22}
+\begin{figure*}
+  \twoColsNoDivide{0.47}
   {
     \underline{$\Rep^R_K(\col)$}\\[2pt]
       $\salt \getsr \bits^\lambda$\\
@@ -36,7 +36,7 @@
   %
   }
   \label{fig:cms-def}
-\end{figure}
+\end{figure*}
 
 The count min-sketch data structure is somewhat similar to a Bloom filter in
 construction, but instead of a length-$m$ array of bits it uses a $k$-by-$m$
@@ -53,11 +53,24 @@ determine how many times an element is present in the sketch.
 The count min-sketch is designed to minimize the number of elements whose
 frequencies are overestimated, while still allowing for reasonably low memory
 usage. For a function $\rho$ and integer $\lambda\ge0$, let
-$\sketch[\id^\rho,n,\lambda]$ as defined previously. Then for
-$\col \in \Func(\bits^*,\N)$ a multiset with %[...]
-
-Cormode and Muthukrishnan~\cite{cormode2005improved} show that this probability
-is bounded above by $e^{-k}$.
+$\sketch[\id^\rho,n,\lambda] = (\Rep^\rho,\Qry^\rho,\Up^\rho)$ as defined
+previously. Then for $\col \in \Func(\bits^*,\N)$ a multiset containing a total
+of $n$ elements (counting duplicates as separate elements), and for any
+$x \in \bits^*$, we define the error probability for a count-min sketch as
+\begin{equation}\label{eq:bf-fp}
+  \begin{aligned}
+    P_{k,m}(n) =
+      \Pr\big[&\rho \getsr \Func(\bits^*,[m]^k);
+              \pub \getsr \Rep^\rho(\setS): \\
+              &\Qry^\rho(\pub, \qry_x) > \qry_x(\setS)+\frac{en}{m} \given \pub \ne \bot
+      \big] \,.
+  \end{aligned}
+\end{equation}
+Informally, $P_{k,m}(n)$ is the probability that some~$x$ is overestimated by a
+non-negligible amount in the representation of some $\setS$ containing a total
+of $n$ elements, when a random function is used for hashing. Cormode and
+Muthukrishnan~\cite{cormode2005improved} show that this probability is bounded
+above by $e^{-k}$.
 
 \heading{Error function for frequency queries}
 %
@@ -66,7 +79,7 @@ is the~$\delta$ defined as
 \begin{equation}
   \delta(x, y) =
   \begin{cases}
-    1 & \text{if}\ x - y > n\epsilon \\
+    1 & \text{if}\ x - y > \frac{en}{m} \\
     0 & \text{otherwise.}
   \end{cases}
 \end{equation}
@@ -77,7 +90,7 @@ data structure, which provides a tight bound on the number of accidental
 overestimates which are likely to occur (in the absence of an adaptive
 adversary) but does not place any bounds on underestimation.
 
-However, 
+However, in the proof we provide later, 
 
 \subsection{Insecurity of Public Sketches}
 
@@ -96,8 +109,8 @@ coverage attack.
 
 \subsection{Private Thresholded Sketches}
 
-\begin{figure}
-  \twoColsNoDivide{0.22}
+\begin{figure*}
+  \twoColsNoDivide{0.47}
   {
     \underline{$\Rep^R_K(\col)$}\\[2pt]
       $\salt \getsr \bits^\lambda$\\
@@ -109,7 +122,7 @@ coverage attack.
         $\tab$if $\pub = \bot$ then return $\bot$\\
       return $\pub$
     \\[6pt]
-    \underline{$\Qry^R_K(\langle M, \salt, c \rangle,\qry_x)$}\\[2pt]
+    \underline{$\Qry^R_K(\langle M, \salt \rangle,\qry_x)$}\\[2pt]
       $X \gets R_K(\salt \cat x)$;
       $m \gets \infty$\\
       for $i$ in $[1..k]$ do\\
@@ -117,14 +130,14 @@ coverage attack.
       return $m$
   }
   {
-    \underline{$\Up^R_K(\langle M, \salt, c \rangle,\up_{x,b})$}\\[2pt]
+    \underline{$\Up^R_K(\langle M, \salt \rangle,\up_{x,b})$}\\[2pt]
       if $hw'(M) > \ell$ then return $\bot$\\
       $M' \gets M$;
       $X \gets R_K(\salt \cat x)$\\
       for $i$ in $[1..k]$ do\\
       $\tab$ if $M'[i][X[i]] = 0$ and $b < 0$ then return $\bot$\\
       $\tab M'[i][X[i]] \gets M'[i][X[i]] + b$\\
-      return $\langle M', \salt, c+b \rangle$
+      return $\langle M', \salt \rangle$
   }
   \caption{A slightly modified structure, $\sketch_\mathrm{st}[R,\ell,\lambda]$ given by
   $(\Rep^R,\Qry^R,\Up^R)$ which uses the number of nonzero counters ($\hw'$, as
@@ -132,7 +145,7 @@ coverage attack.
   %
   }
   \label{fig:cmst-def}
-\end{figure}
+\end{figure*}
 
 As in the case of Bloom filters, it is possible to tweak the count min-sketch
 definition by placing a bound on how full the filter itself can get. In this
