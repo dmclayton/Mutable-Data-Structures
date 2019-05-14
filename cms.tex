@@ -20,7 +20,8 @@
   }
   {
     \underline{$\Up^R_K(\langle M, \salt\rangle,\up_{x,b})$}\\[2pt]
-      if $\bigvee_{i\in[1..k]} [\hw'(M[i]) > \ell]$ then return $\bot$\\
+      $\mathit{full} \gets \bigvee_{i\in[1..k]} [\hw'(M[i]) > \ell]$\\
+      if $\mathit{full}$ then return $\bot$\\
       $M' \gets M$;
       $X \gets R_K(\salt \cat x)$\\
       for $i$ in $[1..k]$ do\\
