@@ -1,25 +1,27 @@
-\begin{figure*}
-  \twoCols{0.47}
+\begin{figure}
+  \twoColsNoDivide{0.22}
   {
-    \underline{$\Rep^R_K(\col)$}\\[2pt]
+    \underline{$\Rep^R_K(\col)$}\hfill\diffminus{$\sketch$}\diffplus{$\sketch_\mathrm{ft}$}\\[2pt]
       $\salt \getsr \bits^\lambda$\\
       for $i$ in $[1..k]$ do\\
         $\tab M[i] \gets 0^m$\\
-      $\pub \gets \langle M, \salt, 0 \rangle$
+      $\pub \gets \langle M, \salt$\diffminus{$, 0$}$\rangle$
       for $x \in \col$ do \\
         $\tab \pub \gets \Up^R_K(\pub, \up_{x,1})$\\
         $\tab$if $\pub = \bot$ then return $\bot$\\
       return $\pub$
-    \\[6pt]
-    \underline{$\Qry^R_K(\langle M, \salt, c \rangle,\qry_x)$}\\[2pt]
+  }
+  {
+    \underline{$\Qry^R_K(\langle M, \salt$\diffminus{$, c$}$\rangle,\qry_x)$}\\[2pt]
       $X \gets R_K(\salt \cat x)$;
       $a \gets \infty$\\
       for $i$ in $[1..k]$ do\\
       $\tab a \gets \min(a, M[i][X[i]])$\\
       return $a$
     \\[6pt]
-    \underline{$\Up^R_K(\langle M, \salt, c \rangle,\up_{x,b})$}\\[2pt]
-      if $c \geq n$ then return $\bot$\\
+    \underline{$\Up^R_K(\langle M, \salt$\diffminus{$, c$}$\rangle,\up_{x,b})$}\\[2pt]
+      \diffminus{if $c \geq n$ then return $\bot$}\\
+      \diffplus{if $\hw'(M) > \ell$ then return $\bot$}\\
       $M' \gets M$;
       $X \gets R_K(\salt \cat x)$\\
       for $i$ in $[1..k]$ do\\
@@ -28,56 +30,34 @@
       $M \gets M'$;
       return $\langle M, \salt, c+b \rangle$
   }
-  {
-    \underline{$\Rep^R_K(\col)$}\\[2pt]
-      $\salt \getsr \bits^\lambda$\\
-      for $i$ in $[1..k]$ do\\
-        $\tab M[i] \gets 0^m$\\
-      $\pub \gets \langle M, \salt \rangle$
-      for $x \in \col$ do \\
-        $\tab \pub \gets \Up^R_K(\pub, \qry_x)$\\
-        $\tab$if $\pub = \bot$ then return $\bot$\\
-      return $\pub$
-    \\[6pt]
-    \underline{$\Qry^R_K(\langle M, \salt \rangle,\qry_x)$}\\[2pt]
-      $X \gets R_K(\salt \cat x)$;
-      $m \gets \infty$\\
-      for $i$ in $[1..k]$ do\\
-      $\tab m \gets \min(m, M[i][X[i]])$\\
-      return $m$
-    \\[6pt]
-    \underline{$\Up^R_K(\langle M, \salt \rangle,\up_{x,b})$}\\[2pt]
-      if $hw'(M) > \ell$ then return $\bot$\\
-      $M' \gets M$;
-      $X \gets R_K(\salt \cat x)$\\
-      for $i$ in $[1..k]$ do\\
-      $\tab$ if $M'[i][X[i]] = 0$ and $b < 0$ then return $\bot$\\
-      $\tab M'[i][X[i]] \gets M'[i][X[i]] + b$\\
-      return $\langle M', \salt \rangle$
-  }
   \caption{Left: Keyed structure $\sketch[R,n,\lambda]$ given by
   $(\Rep^R,\Qry^R,\Up^R)$ is used to define count min-sketch variants used to
   rerpresent streams of size at most~$n$. The parameters are a function $R:
   \keys\by\bits^* \to [m]^k$ and integers $n, \lambda \geq0$. A concrete scheme
   is given by a particular choice of parameters. Right: The alternate,
-  $\ell$-thresholded construction $\sketch_\mathrm{st}[R,\ell,\lambda]$, which
+  $\ell$-thresholded construction $\sketch_\mathrm{ft}[R,\ell,\lambda]$, which
   uses the number of nonzero counters ($\hw'$, as defined in
   Section~\ref{sec:prelims}) to decide if the filter is full.
   %
   }
   \label{fig:cms-def}
-\end{figure*}
+\end{figure}
 
 The count min-sketch data structure is somewhat similar to a Bloom filter in
 construction, but instead of a length-$m$ array of bits it uses a $k$-by-$m$
 array of counters. Our construction $\sketch[R,n,\lambda]$ described in
 Figure~\ref{fig:bf-def} captures the count-min sketch in what is known as the
-non-negative turnstile model.\todo{DC}{Provide a reference} This means that the
+non-negative turnstile model.~\cite{cormode2005improved}. This means that the
 stream of data handled by the sketch can accomodate both insertions and
 deletions, but the counters themselves are constrained to always be nonnegative.
 While the data structure supports a variety of possible queries, we focus here
 on \emph{frequency} queries, which determine how many times an element is
 present in the sketch.
+
+As in the case of Bloom filters, it is significantly easier to work with an
+alternate $\ell$-thresholded variant. In this case, the threshold places an
+upper bound on the number of nonzero entries in the sketch. While this does not
+change the sketch's behavior much in the 
 
 \heading{Non-adaptive error bound}
 %
@@ -98,9 +78,9 @@ $x \in \bits^*$, we define the error probability for a count-min sketch as
       \big] \,.
   \end{aligned}
 \end{equation}
-%
+
 \cpnote{What's $\col$? What if $x$ is not in the set?}
-%
+
 Informally, $P_{k,m}(n)$ is the probability that some~$x$ is overestimated by a
 non-negligible amount in the representation of some $\setS$ containing a total
 of $n$ elements, when a random function is used for hashing. Cormode and
@@ -161,7 +141,7 @@ simulate, since the adversary can build a lookup table just by watching the
 sketch as it is updated. Instead, we must require that the sketch itself is kept
 secret from the saversary.
 
-\subsection{Private, $\ell$-threshold sketches}
+\subsection{Private, $\ell$-thresholded sketches}
 
 As in the case of Bloom filters, it is possible to tweak the count min-sketch
 definition by placing a bound on how full the filter itself can get. In this
@@ -185,15 +165,16 @@ error function given by
 In other words, the adversary gets credit for producing any degree of
 overestimation, regardless of how significant.
 
-\begin{theorem}[Correctness Bound for Count-Min Sketch]\label{thm:scms-erreps-th}
+\begin{theorem}[\erreps\ security of thresholded BFs]\label{thm:scms-erreps-th}
 Let $p_\ell = ((\ell+1)/m)^k$ and $r' = \lfloor r/(k+1) \rfloor$. For integers $q_R, q_T, q_H, r, t \geq 0$ such
 that $r' > p_\ell q_T$, it holds that
   \begin{equation*}
   \begin{aligned}
     \Adv{\errep}_{\Pi,\delta,r}(t, q_R,q_T,q_U,q_H,q_V) &\leq \\
-     & q_R \cdot \left[\frac{q_H}{2^\lambda} + e^{r'-p_\ell q_T}\left(\frac{p_\ell q_T}{r'}\right)^r\right].
+     & q_R \cdot \left[\frac{q_H}{2^\lambda} + e^{r'-p_\ell q_T}\left(\frac{p_\ell q_T}{r'}\right)^r\right],
   \end{aligned}
 \end{equation*}
+where $H$ is modeled as a random oracle.
 \end{theorem}
 
 \begin{proof}

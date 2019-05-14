@@ -74,6 +74,15 @@ positives.
 \subsection{Private Thresholded Counting Filters}
 
 \begin{theorem}
+Let $p_\ell = ((\ell+1)/m)^k$ and $r' = \lfloor r/(k+1) \rfloor$. For integers $q_R, q_T, q_H, r, t \geq 0$ such
+that $r' > p_\ell q_T$, it holds that
+  \begin{equation*}
+  \begin{aligned}
+   \Adv{\erreps}_{\Pi,\delta,r}(\advA) &\leq\\
+     & q_R \cdot \left[\frac{q_H}{2^\lambda} + e^{r'-p_\ell q_T}\left(\frac{p_\ell q_T}{r'}\right)^{r'}\right],
+  \end{aligned}
+\end{equation*}
+where $H$ is modeled as a random oracle.
 \end{theorem}
 The proof is somewhat similar to that of Theorem~\ref{thm:scms-erreps-tex},
 but a major difference comes from the difference in $\Qry$. In particular,
