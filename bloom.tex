@@ -346,7 +346,7 @@ the adversary learned the salt as soon as the filter was created, and that from
 this it could compute the hash function on its own. Even if the filter is
 mutable, we can prevent this attack from working as long as we require that the
 filter under attack be kept secret from adversaries. In fact, we can attain the
-following \erreps\ bound.
+following \erreps\ bound for $\Pi = \SBF[H,n,\lambda]$.
 
 \begin{theorem}[\erreps\ security of salted BFs]\label{thm:sbf-erreps}
   Let $p' = P_{k,m}(n+r)$.
@@ -406,11 +406,11 @@ integers~$n,\lambda\geq0$, and let $\Pi = \KBF[F,n,\lambda]$.
   \end{equation*}
 \end{theorem}
 
-Though the bound is similar, the details of this proof differ from the
-previous two. In particular, since we are using a PRF, the initial parts of the
-proof deal with the adversary potentially being able to break the PRF and with
-the possibility of the salts repeating rather than with the adversary being able
-to guess the salt.
+Though the bound involves a similar Chernoff approximation to the other proofs,
+the details of this proof differ from the unkeyed structures. In particular,
+since we are using a PRF, the initial parts of the proof deal with the adversary
+potentially being able to break the PRF and with the possibility of the salts
+repeating rather than with the adversary being able to guess the salt.
 
 \begin{proof}
   \input{proof/kbf-errep}
@@ -479,20 +479,21 @@ The general form of this alternate construction is formally defined in
 Figure~\ref{bft-def}. We can define the more specific constructions
 $\BF_\mathrm{ft}[H,\ell]$, $\SBF_\mathrm{ft}[H,\ell,\lambda]$, and
 $\KBF_\mathrm{ft}[H,\ell,\lambda]$ in an exactly analogous way to the $n$-capped
-Bloom filter constructions. Here we only consider the $\SBF_\mathrm{ft}$
-construction and compare it to the $\SBF$ construction.
+Bloom filter constructions. Here we only consider case of
+$\Pi = \SBF_\mathrm{ft}[H,\ell,\lambda]$ and compare it to the $\SBF$
+construction.
 
 %
 \cpnote{When a reviewer read this they'll think: ``why, then, do I care about
 $n$-capped filters if $\ell$-threshold filters perform so much better?''}
 
 %
-\begin{theorem}[\errep\ security of thresholded BFs]\label{thm:bf-thr-bound}
+\begin{theorem}[\erreps\ security of thresholded BFs]\label{thm:bf-thr-bound}
 Let $p_\ell = ((\ell+k)/m)^k$. For integers $q_R, q_T, q_H, r, t \geq 0$ such
 that $r > p_\ell q_T$, it holds that
   \begin{equation*}
     \begin{aligned}
-      \Adv{\errep}_{\Pi,\delta,r}(t, q_R,q_T,q_U,q_H,q_V) &\leq \\
+      \Adv{\erreps}_{\Pi,\delta,r}(t, q_R,q_T,q_U,q_H,q_V) &\leq \\
         & \frac{q_R(q_H+q_R)}{2^\lambda} + e^{r-p_\ell q_T}\left(\frac{p_\ell q_T}{r}\right)^r.
     \end{aligned}
   \end{equation*}
@@ -511,8 +512,6 @@ to place a limit on the adversarial advantage even in this worst-case scenario.
 
 
 \subsection{Discussion}
-
-The several bounds 
 
 \todo{DC}{At a high level, our suggested mitigation is to use salt and to use a
 cryptographically strong hash function, but the exact strategy depends on the
