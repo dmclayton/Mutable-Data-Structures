@@ -14,7 +14,7 @@
       $X \gets \bmap_m(R_K(\salt \cat x))$\\
       return $M \AND X = X$
     \\[6pt]
-    \underline{$\Up^R_K(\langle M, \salt, c \rangle,\qry_x)$}\\[2pt]
+    \underline{$\Up^R_K(\langle M, \salt, c \rangle,\up_x)$}\\[2pt]
       if $c \geq n$ then return $\bot$\\
       $M \gets M \vee \bmap_m(R_K(\salt \cat x))$\\
       return $\langle M, \salt, c+1 \rangle$
@@ -84,8 +84,8 @@ consider the unkeyed and salted construction $\SBF_\mathrm{ft}$ to provide an ex
 of the tighter error bounds this alternate construction can provide.
 
 
-\heading{Non-adaptive false-positive probbility.}
-Let~$\rho$ be a function, $\lambda\geq0$ be an intger, and define
+\heading{Non-adaptive false-positive probability}
+Let~$\rho$ be a function, $\lambda\geq0$ be an integer, and define
 $\bloom[\id^\rho,n,\lambda] = (\Rep^\rho, \Qry^\rho, \Up^\rho)$ as in
 Figure~\ref{fig:bf-def}. (Note the mild abuse of notation by which we write
 ``$\rho$'' instead of ``$\id^\rho$''.)
@@ -124,7 +124,7 @@ of the false positive probability for parameters of practical interest.
 In lieu of a concrete upper bound, we will refer to $P_{k,m}(n)$ as defined in
 Equation~(\ref{eq:bf-pf}) in the remainder of this section.
 
-\heading{Error function for set-mempership queries}
+\heading{Error function for set-membership queries}
 %
 Throughout this section we will use the error function~$\delta$ defined as
 \begin{equation}
@@ -244,11 +244,6 @@ preppended with a salt.
 Fix $H:\bits^*\to[m]^k$ and $n,\lambda\geq0$ and let
 $\Pi = \SBF[H,n,\lambda]$.
 
-\ignore{\todo{DC}{Simplify the description of this attack, as well as the next
-paragraph. Simply say that, given the salt, the adversary can construct the
-representation on its own, just as in the attacks described in the previous
-section.}}
-
 In the mutable setting, we can perform an \errep\ attack against~$\Pi$ in an
 almost identical manner to the previous section. If the adversary calls
 $\REPO(\emptyset)$, the salt will be given to the adversary along with an empty
@@ -270,60 +265,6 @@ of the hash functions to find false positives without needing to make queries,
 in the mutable and public-representation setting the adversary can identically
 exploit its knowledge of the hash functions \textit{and salt} to find false
 positives without needing to make queries.
-
-\ignore{
-The security of this structure depends upon how it is used.
-%
-\todo{DC (lead)}{As concisely as you can, articulate the \errep\ attack against~$\Pi$.
-Remember that the adversarial model (i.e., the security experiment) is supposed
-to reflect how the primitive is supposed to be used. So when giving attacks, try
-to make it clear what the attack is. You should answer the following questions:
-What is the sequence of queries made by the adversary?
-How efficient is the attack?
-Is the attack devastating? Is it a real attack, or is it more theoretical?
-What about the scheme and setting make it possible?
-%
-Note that I've left your text in a ignore\{\} so that you can lift from it as
-needed.
-}
-The use of a salt without a private key in the \errep\ setting is
-insufficient to defeat [the attacka above]. In this setting, the adversary need only
-make its $\REPO$ query for $\setT$ in advance, at which point it will receive
-both the representation $\pub$ and the salt $\salt$ used to construct it. Using
-this known salt, the adversary is still able to simulate $\REPO$ for arbitrary
-singleton representations. The previous attack therefore still works with the
-same (minimal) number of $\QRYO$ calls at the very end of the experiment, after
-it has determined $\setR$ using offline computations.
-\cpnote{I don't think this is true, since each $\ROPO$ query returns a filter
-with a different, independently generated salt.}
-
-The opposite of this, using a private key without a salt, does weaken the attack
-somewhat. Even with public representations, the adversary cannot locally
-simulate $\REPO$ without guessing the private key. However, they can still
-outperform random $\QRYO$ calls by making $\REPO$ queries for singleton elements
-without fixing any $\setT$ in advance. After selecting a random set $\col$ of
-size $q_R-1$, the adversary performs offline computations to find $\setT$,
-$\setR \subseteq \col$ such that the elements of $\setR$ are false positives for
-the representation of $\setT$ (which can be computed from the representations of
-the singleton subsets of $\setT$). The adversary wins if there is a partition
-where $\setR$ produces at least $r$ errors on $\REPO(\setT)$.
-\cpnote{This might be the case, but I don't think it's worth spending too much
-time on. We're going to have other reasons for needing to add salt even when
-there's a key.}
-
-Using a salted Bloom filter in the private representation setting, however, does
-provide some security. At the time a representation is created, the structure
-chooses a salt $\salt$ which it will use for all further queries and updates. In
-order for maximum security to be guaranteed, we must ensure that the
-representation, and in particular the salt, is kept secret from the adversary.
-We define this structure $\SBF[H,k,m,n,\lambda]$ as the Bloom filter structure
-that uses $H(s) = (h_1(s),\ldots,h_k(s))$ for hashing inputs to $k$ values in
-$[m]$. Furthermore, each call of $\Rep$ first involves picking a salt $\salt$
-from the salt space $\bits^\lambda$, and all hashes made to insert or query for
-an element $x$ are determined using $H(x \Vert \salt)$. Finally, the parameter
-$n$ means that any attempts to represent sets with more than $n$ elements fail.
-\todo{DC lead}{Specify what exactly is being analyzed.  What are the updates?}
-}
 
 Without this exploitation of mutability, and in particular the ability to insert
 elements even after the salt has been seen, the above attack fails. Indeed, when

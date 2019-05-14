@@ -13,10 +13,10 @@
     \\[6pt]
     \underline{$\Qry^R_K(\langle M, \salt, c \rangle,\qry_x)$}\\[2pt]
       $X \gets R_K(\salt \cat x)$;
-      $m \gets \infty$\\
+      $a \gets \infty$\\
       for $i$ in $[1..k]$ do\\
-      $\tab m \gets \min(m, M[i][X[i]])$\\
-      return $m$
+      $\tab a \gets \min(a, M[i][X[i]])$\\
+      return $a$
   }
   {
     \underline{$\Up^R_K(\langle M, \salt, c \rangle,\up_{x,b})$}\\[2pt]
@@ -48,9 +48,21 @@ are constrained to always be nonnegative. While the data structure supports a
 variety of possible queries, we focus here on \emph{frequency} queries, which
 determine how many times an element is present in the sketch.
 
+\heading{Non-adaptive error bound}
+%
+The count min-sketch is designed to minimize the number of elements whose
+frequencies are overestimated, while still allowing for reasonably low memory
+usage. For a function $\rho$ and integer $\lambda\ge0$, let
+$\sketch[\id^\rho,n,\lambda]$ as defined previously. Then for
+$\col \in \Func(\bits^*,\N)$ a multiset with %[...]
+
+Cormode and Muthukrishnan~\cite{cormode2005improved} show that this probability
+is bounded above by $e^{-k}$.
+
 \heading{Error function for frequency queries}
 %
-Throughout this section we will use a general error function~$\delta$ defined as
+The most natural error function to correspond with the non-adaptive error bound
+is the~$\delta$ defined as
 \begin{equation}
   \delta(x, y) =
   \begin{cases}
@@ -64,6 +76,8 @@ while underestimates are not. This is in line with the definition of the CMS
 data structure, which provides a tight bound on the number of accidental
 overestimates which are likely to occur (in the absence of an adaptive
 adversary) but does not place any bounds on underestimation.
+
+However, 
 
 \subsection{Insecurity of Public Sketches}
 
@@ -127,6 +141,14 @@ sketches. Even then, the bound is clearly weaker than for Bloom filters. We
 emphasize that data structures which allow for both insertions and deletions of
 arbitrary strings give potential adversaries a great deal more flexibility for
 use in attacks.
+
+Since $n$ is no longer a parameter of the structure, we modify the error
+function to be %[...]
+
+In fact, the exact choice of error function in this case is not as relevant,
+since in the proof we end up moving to a game where the error function returns
+1 for any overestimate, regardless of magnitude, and 0 for an accurate or
+underestimated result.
 
 \begin{theorem}[Correctness Bound for Count-Min Sketch]\label{thm:count-ms-bound}
 Let $p_\ell = ((\ell+1)/m)^k$ and $r' = \lfloor r/(k+1) \rfloor$. For integers $q_R, q_T, q_H, r, t \geq 0$ such
