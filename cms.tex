@@ -1,5 +1,5 @@
 \begin{figure*}
-  \twoColsNoDivide{0.47}
+  \twoCols{0.47}
   {
     \underline{$\Rep^R_K(\col)$}\\[2pt]
       $\salt \getsr \bits^\lambda$\\
@@ -17,8 +17,7 @@
       for $i$ in $[1..k]$ do\\
       $\tab a \gets \min(a, M[i][X[i]])$\\
       return $a$
-  }
-  {
+    \\[6pt]
     \underline{$\Up^R_K(\langle M, \salt, c \rangle,\up_{x,b})$}\\[2pt]
       if $c \geq n$ then return $\bot$\\
       $M' \gets M$;
@@ -29,11 +28,41 @@
       $M \gets M'$;
       return $\langle M, \salt, c+b \rangle$
   }
-  \caption{Keyed structure $\sketch[R,n,\lambda]$ given by
+  {
+    \underline{$\Rep^R_K(\col)$}\\[2pt]
+      $\salt \getsr \bits^\lambda$\\
+      for $i$ in $[1..k]$ do\\
+        $\tab M[i] \gets 0^m$\\
+      $\pub \gets \langle M, \salt \rangle$
+      for $x \in \col$ do \\
+        $\tab \pub \gets \Up^R_K(\pub, \qry_x)$\\
+        $\tab$if $\pub = \bot$ then return $\bot$\\
+      return $\pub$
+    \\[6pt]
+    \underline{$\Qry^R_K(\langle M, \salt \rangle,\qry_x)$}\\[2pt]
+      $X \gets R_K(\salt \cat x)$;
+      $m \gets \infty$\\
+      for $i$ in $[1..k]$ do\\
+      $\tab m \gets \min(m, M[i][X[i]])$\\
+      return $m$
+    \\[6pt]
+    \underline{$\Up^R_K(\langle M, \salt \rangle,\up_{x,b})$}\\[2pt]
+      if $hw'(M) > \ell$ then return $\bot$\\
+      $M' \gets M$;
+      $X \gets R_K(\salt \cat x)$\\
+      for $i$ in $[1..k]$ do\\
+      $\tab$ if $M'[i][X[i]] = 0$ and $b < 0$ then return $\bot$\\
+      $\tab M'[i][X[i]] \gets M'[i][X[i]] + b$\\
+      return $\langle M', \salt \rangle$
+  }
+  \caption{Left: Keyed structure $\sketch[R,n,\lambda]$ given by
   $(\Rep^R,\Qry^R,\Up^R)$ is used to define count min-sketch variants used to
   rerpresent streams of size at most~$n$. The parameters are a function $R:
   \keys\by\bits^* \to [m]^k$ and integers $n, \lambda \geq0$. A concrete scheme
-  is given by a particular choice of parameters.
+  is given by a particular choice of parameters. Right: The alternate,
+  $\ell$-thresholded construction $\sketch_\mathrm{st}[R,\ell,\lambda]$, which
+  uses the number of nonzero counters ($\hw'$, as defined in
+  Section~\ref{sec:prelims}) to decide if the filter is full.
   %
   }
   \label{fig:cms-def}
@@ -121,44 +150,6 @@ sketch as it is updated. Instead, we must require that the sketch itself is kept
 secret from the saversary.
 
 \subsection{Private Thresholded Sketches}
-
-\begin{figure*}
-  \twoColsNoDivide{0.47}
-  {
-    \underline{$\Rep^R_K(\col)$}\\[2pt]
-      $\salt \getsr \bits^\lambda$\\
-      for $i$ in $[1..k]$ do\\
-        $\tab M[i] \gets 0^m$\\
-      $\pub \gets \langle M, \salt \rangle$
-      for $x \in \col$ do \\
-        $\tab \pub \gets \Up^R_K(\pub, \qry_x)$\\
-        $\tab$if $\pub = \bot$ then return $\bot$\\
-      return $\pub$
-    \\[6pt]
-    \underline{$\Qry^R_K(\langle M, \salt \rangle,\qry_x)$}\\[2pt]
-      $X \gets R_K(\salt \cat x)$;
-      $m \gets \infty$\\
-      for $i$ in $[1..k]$ do\\
-      $\tab m \gets \min(m, M[i][X[i]])$\\
-      return $m$
-  }
-  {
-    \underline{$\Up^R_K(\langle M, \salt \rangle,\up_{x,b})$}\\[2pt]
-      if $hw'(M) > \ell$ then return $\bot$\\
-      $M' \gets M$;
-      $X \gets R_K(\salt \cat x)$\\
-      for $i$ in $[1..k]$ do\\
-      $\tab$ if $M'[i][X[i]] = 0$ and $b < 0$ then return $\bot$\\
-      $\tab M'[i][X[i]] \gets M'[i][X[i]] + b$\\
-      return $\langle M', \salt \rangle$
-  }
-  \caption{A slightly modified structure, $\sketch_\mathrm{st}[R,\ell,\lambda]$ given by
-  $(\Rep^R,\Qry^R,\Up^R)$ which uses the number of nonzero counters ($\hw'$, as
-  defined in Section~\ref{sec:prelims}) to decide if the filter is full.
-  %
-  }
-  \label{fig:cmst-def}
-\end{figure*}
 
 As in the case of Bloom filters, it is possible to tweak the count min-sketch
 definition by placing a bound on how full the filter itself can get. In this
