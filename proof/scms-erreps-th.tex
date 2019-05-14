@@ -88,17 +88,6 @@ The key differences between this proof and the Bloom filter proof are the more
 complex response space of $\QRYO$ ($\N$ rather than $\bits$) and the fact that
 both elements of $\col$ and nonelements of $\col$ may produce errors.
 
-%
-\ignore{
-It is difficult to bound the probability that, if $\QRYO(\qry_x)$ finds that $x$
-is overestimated by 1, the adversary can quickly determine which elements to
-re-insert into the sketch in order to increase this error beyond the $n\epsilon$
-threshold of `significance'. We therefore move to~$\game_2$, where the adversary
-gets credit for any response which overestimates the true value, regardless of
-the magnitude of the error. Since this can only increase the probability of a
-query producing an error, we have
-$\Prob{\game_1(\advA) = 1} \le \Prob{\game_2(\advA) = 1}$.}
-
 As a first step in dealing with the $\UPO$ oracle, we want to show that deletion
 is never helpful for the adversary. So, for any $\advA$, we construct an
 adversary $\advB$ that simulates $\advA$, forwarding all oracle queries in the
