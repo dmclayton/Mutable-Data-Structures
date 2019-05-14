@@ -3,7 +3,7 @@
 {
   \vspace{-7pt}
   \experimentv{$\game_{0}(\advA)$}\hfill\diffplus{$\game_1$}\\[2pt]
-    $M^* \gets \bot$;
+    $\v.M^* \gets \bot$;
     $\setS \gets \emptyset$;
     $\salt^* \getsr \bits^\lambda$\\
     $\advB^{\REPO,\QRYO,\UPO,\HASHO_1}$;
@@ -17,39 +17,39 @@
     $T[Z,x] \gets \vv$; return $\vv$
   \\[6pt]
   \oraclev{$\QRYO(\qry_x)$}\\[2pt]
-    $X \gets \HASHO_3(\salt^* \cat x)$;
+    $\v.X \gets \HASHO_3(\salt^* \cat x)$;
     $\setS \gets \setS \cup \{x\}$;
     $a = 1$\\
-    for $i$ in $X$ do\\
-      $\tab$if $M[i] = 0$ then $a = 0$\\
+    for $i$ in $\v.X$ do\\
+      $\tab$if $\v.M[i] = 0$ then $a = 0$\\
     if $\err[x] < \delta(a,\qry_x(\col^*))$ then
           $\err[x] \gets \delta(a,\qry_x(\col^*))$\\
     return $a$
   \\[6pt]
   \oraclev{$\REPO(\col)$}\\[2pt]
-    $M^* \gets 0^m$\\
+    $\v.M^* \gets 0^m$\\
     $\setS^* \gets \col$\\
     for $x \in \col$ do\\
       $\tab\UPO(\up_x)$\\
     return $\top$
   \\[6pt]
   \oraclev{$\UPO(\up_{x,b})$}\\[2pt]
-    if $w'(M^*) > \ell$ then return $\top$\\
-    $X \gets \HASHO_3(\salt^* \cat x)$;
-    $M' \gets M^*$\\
-    for $i$ in $X$ do\\
-      $\tab$ if $M'[i] = 0$ and $b < 0$ then return $\top$\\
-      $\tab M'[i] \gets M'[i] + b$\\
+    if $w'(\v.M^*) > \ell$ then return $\top$\\
+    $\v.X \gets \HASHO_3(\salt^* \cat x)$;
+    $\v.M' \gets \v.M^*$\\
+    for $i$ in $\v.X$ do\\
+      $\tab$ if $\v.M'[i] = 0$ and $b < 0$ then return $\top$\\
+      $\tab \v.M'[i] \gets \v.M'[i] + b$\\
     if $b > 0$ and $\QRYO(\qry_x) = 1$ then $\err_i[x] \gets 0$\\
     if $b < 0$ and $\QRYO(\qry_x) = 0$ then $\err_i[x] \gets 0$\\
-    $M^* \gets M'$;
+    $\v.M^* \gets \v.M'$;
     $\setS^* \gets \up_{x,b}(\setS^*)$;
     return $\top$
 }
 {
   \vspace{-7pt}
   \experimentv{$\game_2(\advA)$}\hfill\diffplus{$\game_2$}\\[2pt]
-    $M^* \gets \bot$;
+    $\v.M^* \gets \bot$;
     $\setS \gets \emptyset$;
     \diffplus{$\setR \gets \emptyset$; $r' \gets \lfloor r/\max(\delta^+,k\delta^-)\rfloor$}\\
     $\salt^* \getsr \bits^\lambda$\\
@@ -57,42 +57,42 @@
     return $\big[\sum_x \err[x] \geq r\big]$
   \\[6pt]
   \oraclev{$\QRYO(\qry_x)$}\\[2pt]
-    $X \gets \HASHO_3(\salt^* \cat x)$;
+    $\v.X \gets \HASHO_3(\salt^* \cat x)$;
     $\setS \gets \setS \cup \{x\}$;
     $a = 1$\\
-    for $i$ in $X$ do\\
-      $\tab$if $M[i] = 0$ then $a = 0$\\
+    for $i$ in $\v.X$ do\\
+      $\tab$if $\v.M[i] = 0$ then $a = 0$\\
     if $\err[x] < \delta(a,\qry_x(\col^*))$ then
           $\err[x] \gets \delta(a,\qry_x(\col^*))$\\
     if $\err[x] > 0$ then $\setR \gets \setR \cup \{x\}$\\
     return $a$
   \\[6pt]
   \oraclev{$\UPO(\up_{x,b})$}\\[2pt]
-    if $w'(M^*) > \ell$\diffplus{$+r'$} then return $\top$\\
+    if $w'(\v.M^*) > \ell$\diffplus{$+r'$} then return $\top$\\
     \diffplus{if $x \in \setR$ and $b < 0$ then return $\top$}\\
-    $X \gets \HASHO_3(\salt^* \cat x)$;
-    $M' \gets M^*$\\
-    for $i$ in $X$ do\\
-      $\tab$ if $M'[i] = 0$ and $b < 0$ then return $\top$\\
-      $\tab M'[i] \gets M'[i] + b$\\
+    $\v.X \gets \HASHO_3(\salt^* \cat x)$;
+    $\v.M' \gets \v.M^*$\\
+    for $i$ in $\v.X$ do\\
+      $\tab$ if $\v.M'[i] = 0$ and $b < 0$ then return $\top$\\
+      $\tab \v.M'[i] \gets \v.M'[i] + b$\\
     if $b > 0$ and $\QRYO(\qry_x) = 1$ then $\err_i[x] \gets 0$\\
     if $b < 0$ and $\QRYO(\qry_x) = 0$ then $\err_i[x] \gets 0$\\
-    $M^* \gets M'$;
+    $\v.M^* \gets \v.M'$;
     $\setS^* \gets \up_{x,b}(\setS^*)$;
     return $\top$
   \vspace{6pt}\hrule\vspace{3pt}
   \oraclev{$\UPO(\up_{x,b})$}\hfill\diffminus{$\game_2$}\diffplus{$\game_3$}\\[2pt]
-    if $w'(M^*) > \ell+r'$ then return $\top$\\
+    if $w'(\v.M^*) > \ell+r'$ then return $\top$\\
     if $x \in \setR$ and $b < 0$ then return $\top$\\
-    $X \gets \HASHO_3(\salt^* \cat x)$;
-    $M' \gets M^*$\\
-    for $i$ in $X$ do\\
-      $\tab$ if $M'[i] = 0$ and $b < 0$ then return $\top$\\
-      \diffminus{$\tab M'[i] \gets M'[i] + b$}\\
-      \diffplus{$\tab M'[i] \gets \min(M'[i] + b, 1)$}\\
+    $\v.X \gets \HASHO_3(\salt^* \cat x)$;
+    $\v.M' \gets \v.M^*$\\
+    for $i$ in $\v.X$ do\\
+      $\tab$ if $\v.M'[i] = 0$ and $b < 0$ then return $\top$\\
+      \diffminus{$\tab \v.M'[i] \gets \v.M'[i] + b$}\\
+      \diffplus{$\tab \v.M'[i] \gets \min(\v.M'[i] + b, 1)$}\\
     if $b > 0$ and $\QRYO(\qry_x) = 1$ then $\err_i[x] \gets 0$\\
     if $b < 0$ and $\QRYO(\qry_x) = 0$ then $\err_i[x] \gets 0$\\
-    $M^* \gets M'$;
+    $\v.M^* \gets \v.M'$;
     $\setS^* \gets \up_{x,b}(\setS^*)$;
     return $\top$
 }
