@@ -7,7 +7,7 @@
         $\tab M[i] \gets 0^m$\\
       $\pub \gets \langle M, \salt, 0 \rangle$
       for $x \in \col$ do \\
-        $\tab \pub \gets \Up^R_K(\pub, \qry_x)$\\
+        $\tab \pub \gets \Up^R_K(\pub, \up_{x,1})$\\
         $\tab$if $\pub = \bot$ then return $\bot$\\
       return $\pub$
     \\[6pt]
@@ -26,11 +26,12 @@
       for $i$ in $[1..k]$ do\\
       $\tab$ if $M'[i][X[i]] = 0$ and $b < 0$ then return $\bot$\\
       $\tab M'[i][X[i]] \gets M'[i][X[i]] + b$\\
-      return $\langle M', \salt, c+b \rangle$
+      $M \gets M'$;
+      return $\langle M, \salt, c+b \rangle$
   }
   \caption{Keyed structure $\sketch[R,n,\lambda]$ given by
   $(\Rep^R,\Qry^R,\Up^R)$ is used to define count min-sketch variants used to
-  rerpresent streams of size at most~$n$. Parameters are a function $R:
+  rerpresent streams of size at most~$n$. The parameters are a function $R:
   \keys\by\bits^* \to [m]^k$ and integers $n, \lambda \geq0$. A concrete scheme
   is given by a particular choice of parameters.
   %
@@ -88,9 +89,9 @@ This means that a non-negligible \emph{overestimate} is considered an error,
 while underestimates are not. This is in line with the definition of the CMS
 data structure, which provides a tight bound on the number of accidental
 overestimates which are likely to occur (in the absence of an adaptive
-adversary) but does not place any bounds on underestimation.
-
-However, in the proof we provide later, 
+adversary) but does not place any bounds on underestimation. In the case of
+$\ell$-thresholded sketches defined later, we will actually move to a stricter
+error function than this.
 
 \subsection{Insecurity of Public Sketches}
 
@@ -109,6 +110,15 @@ coverage attack. The adversary then calls $\UPO$ several more times to insert
 each element of the test set into the sketch at least $(en)/m$ times, and then
 each element of the target set will be overestimated by an unacceptably large
 amount.
+
+In actual use, this specific attack may not be feasible for the adversary.
+However, as long as the sketch is public, the adversary can easily determine the
+exact results of inserting or deleting any element just by seeing which counters
+are incremented or decremented. For this reason it is not enough that the
+function used to perform queries and updates is impossible for the adversary to
+simulate, since the adversary can build a lookup table just by watching the
+sketch as it is updated. Instead, we must require that the sketch itself is kept
+secret from the saversary.
 
 \subsection{Private Thresholded Sketches}
 

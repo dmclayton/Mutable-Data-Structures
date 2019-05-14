@@ -5,7 +5,7 @@
       $\salt \getsr \bits^\lambda$;
       $\pub \gets \langle 0^m, \salt, 0\rangle$\\
       for $x \in \col$ do \\
-        $\tab \pub \gets \Up^R_K(\pub, \qry_x)$\\
+        $\tab \pub \gets \Up^R_K(\pub, \up_x)$\\
         $\tab$if $\pub = \bot$ then return $\bot$\\
       return $\pub$
   }
@@ -21,7 +21,7 @@
   }
   \caption{Keyed structure $\bloom[R,n,\lambda]$ given by
   $(\Rep^R,\Qry^R,\Up^R)$ is used to define Bloom filter variants used to
-  rerpresent sets of at most~$n$ elements.  parameters are a function $R:
+  rerpresent sets of at most~$n$ elements. The parameters are a function $R:
   \keys\by\bits^* \to [m]^k$ and integers $n, \lambda \geq0$. A concrete scheme
   is given by a particular choice of parameters. The function~$\bmap_m$ is
   defined in Section~\ref{sec:prelims}.
@@ -499,14 +499,11 @@ that $r > p_\ell q_T$, it holds that
 \end{theorem}
 
 The distinction between this proof and the proofs for the standard Bloom filter
-construction lies in the fact that pollution attacks cannot set more than
+construction lies in the fact that attacks cannot set more than
 $\ell+k$ bits of the filter to 1, regardless of how the attack is conducted.
 We therefore assume that the adversary will always be able to produce such a
 maximally full filter, and then use a standard binomial-distribution-based bound
 to place a limit on the adversarial advantage even in this worst-case scenario.
-%
-\cpnote{It sounds like you're claiming that pollution attacks are the best the
-adversary can do. If this is the case, then you have to prove this.}
 
 \begin{proof}
   \input{proof/sbf-erreps-th}
@@ -514,6 +511,9 @@ adversary can do. If this is the case, then you have to prove this.}
 
 
 \subsection{Discussion}
+
+The several bounds 
+
 \todo{DC}{At a high level, our suggested mitigation is to use salt and to use a
 cryptographically strong hash function, but the exact strategy depends on the
 setting. If you aren't going to update the structure, then salting is
