@@ -4,32 +4,32 @@
     \underline{$\Rep^R_K(\col)$}\\[2pt]
       $\salt \getsr \bits^\lambda$\\
       for $i$ in $[1..k]$ do\\
-        $\tab M[i] \gets \zeroes(m)$\\
-      $\pub \gets \langle M, \salt\rangle$\\
+        $\tab \v.M[i] \gets \zeroes(m)$\\
+      $\pub \gets \langle \v.M, \salt\rangle$\\
       for $x \in \col$ do \\
         $\tab \pub \gets \Up^R_K(\pub, \up_{x,1})$\\
         $\tab$if $\pub = \bot$ then return $\bot$\\
       return $\pub$
     \\[6pt]
-    \underline{$\Qry^R_K(\langle M, \salt\rangle,\qry_x)$}\\[2pt]
-      $X \gets R_K(\salt \cat x)$;
+    \underline{$\Qry^R_K(\langle \v.M, \salt\rangle,\qry_x)$}\\[2pt]
+      $\v.X \gets R_K(\salt \cat x)$;
       $a \gets \infty$\\
       for $i$ in $[1..k]$ do\\
-      $\tab a \gets \min(a, M[i][X[i]])$\\
+      $\tab a \gets \min(a, \v.M[i][\v.X[i]])$\\
       return $a$
   }
   {
-    \underline{$\Up^R_K(\langle M, \salt\rangle,\up_{x,b})$}\\[2pt]
+    \underline{$\Up^R_K(\langle \v.M, \salt\rangle,\up_{x,b})$}\\[2pt]
       $\mathit{full} \gets \bigvee_{i\in[1..k]} [\hw'(M[i]) > \ell]$\\
       if $\mathit{full}$ then return $\bot$\\
-      $M' \gets M$;
-      $X \gets R_K(\salt \cat x)$\\
+      $\v.M' \gets \v.M$;
+      $\v.X \gets R_K(\salt \cat x)$\\
       for $i$ in $[1..k]$ do\\
-      $\tab a \gets M'[i][X[i]]$\\
+      $\tab a \gets \v.M'[i][\v.X[i]]$\\
       $\tab$ if $a = 0 \wedge b < 0$ then return $\bot$\\
-      $\tab M'[i][X[i]] \gets a + b$\\
-      $M \gets M'$;
-      return $\langle M, \salt, c+b \rangle$
+      $\tab \v.M'[i][\v.X[i]] \gets a + b$\\
+      $\v.M \gets \v.M'$;
+      return $\langle \v.M, \salt, c+b \rangle$
   }
   \caption{Keyed structure $\sketch[R,\ell,\lambda]$ given by
   $(\Rep^R,\Qry^R,\Up^R)$ is used to define count min-sketch variants used to
@@ -43,7 +43,7 @@
 
 The count min-sketch data structure is somewhat similar to a Bloom filter in
 construction, but instead of a length-$m$ array of bits it uses a $k$-by-$m$
-array of counters. Our construction $\sketch[R,n,\lambda]$ described in
+array of counters. Our construction $\sketch[R,\ell,\lambda]$ described in
 Figure~\ref{fig:bf-def} captures the count-min sketch in what is known as the
 non-negative turnstile model.~\cite{cormode2005improved}. This means that the
 stream of data handled by the sketch can accomodate both insertions and
