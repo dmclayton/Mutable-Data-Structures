@@ -24,13 +24,18 @@ Let~$X$ and~$Y$ be equal-length bitstrings. We write $X \OR Y$ for their
 bitwise-OR, $X \AND Y$ for their bitwise-AND, and $X \XOR Y$ for their
 bitwise-XOR. Let $\NOT X = 1^{|X|} \xor X$, and let $\hw(X)$ denote the Hamming
 wieght of (i.e., the number of 1s in)~$X$.
-
-For an array~$M$ of integers, we analagously define $\hw'(X)$ to be the number
+%
+For an array~$\v.M$ of integers, we analogously define $\hw'(\v.m)$ to be the number
 of \emph{nonzero} integers in the array. We also define $\zeroes(m)$ to be a
-function taking a nonnegative integer and returning a length-$m$ integer vector
-with all entries set to 0.
+function taking a non-negative integer and returning a length-$m$ integer vector
+with all entries set to~$0$.
 
-Let $\Func(\setX,\setY)$ denote the set of functions $f:\setX\to\setY$.
+Let $\Func(\setX,\setY)$ denote the set of functions $f:\setX\to\setY$. If
+$\setY$, then we associate to this set the following distribution. For all
+$x\in\setX$ and $y\in\setY$ it holds that
+$\Prob{f\getsr\Func(\setX,\setY):f(x)=y} = |\setY|^{-1}$.
+%
+\todo{TS}{Decide if you're happy with this}
 
 For every function~$f$, define $\id^f$ so that
 $\id^f(\emptystr, x) = f(x)$ for all $x$ in the domain of~$f$.
@@ -38,6 +43,9 @@ $\id^f(\emptystr, x) = f(x)$ for all $x$ in the domain of~$f$.
 \todo{Any (Tom?)}{Define function $\ticks(A,\cdot)$ for algorithm~$A$. Do we need big-O
 notation in bounds?}
 \dcnote{Not sure what this is supposed to mean.}
+\cpnote{IIRC it's a relic of the old paper, one of Jon's contributions. I also
+don't remember what this means, but I can dig it up if need be. It needs to be
+defined or we need to drop it from the \errep1 to \errep\ lemma.}
 
 \heading{Pseudorandom functions}
 %
@@ -49,6 +57,9 @@ the advantage of an adversary $\advA$ to be
 $\Adv{\prf}_F(\advA) = \Prob{\Exp{\prf}_F(\advA) = 1}$, and the advantage
 $\Adv{\prf}_F(t,q)$ to be the maximum advantage of any adversary running for $t$
 steps and making $q$ queries to the PRF oracle.
+5
+\cpnote{We could save a few inches here by changing the definition. I personally
+like a nice, concrete PRF notion like this one, however.}
 
 \begin{figure}
   \twoColsNoDivide{0.22}
@@ -110,17 +121,20 @@ Both~$\Rep$ and the~$\Up$ algorithm can be viewed (informally) as mapping data
 objects to representations ---~explicitly so in the case of~$\Rep$, and
 implicitly in the case of~$\Up$~--- so we allow~$\Up$ to make per-call random
 choices, too.  Many common data structures do not have randomized representation
-updates, but some do, e.g. the Cuckoo filter~\cite{fan2014cuckoo} and the stable
+updates, but some do, e.g. the Cuckoo filter~\cite{fan2014cuckoo}\todo{DC}{Fix
+ref} and the stable
 Bloom filter~\cite{deng2006approximately}.
 
-The query algorithm $\Qry$ is formalized as deterministic.  This reflects the
-overwhelming behavior of data structures in practice, in particular those with
-space-efficient representations.  It also allows us to focus on correctness
+The query algorithm $\Qry$ is deterministic.  This reflects the overwhelming
+behavior of data structures in practice, in particular those with
+space-efficient representations. It also allows us to focus on correctness
 errors caused by the actions of an adaptive adversary, without attending to
 those caused by randomized query responses.  Randomized query responses may be
 of interest from a data privacy perspective, but our focus is on correctness.
 
 \heading{Invertibility}
+\todo{DC}{Decide if we still need this definition. If we don't use it
+anywhere, then we don't need it.}
 %
 Some important data structures admit update operations that are ``inverses'' of
 each other.  For example, the count-min sketch structure supports the addition
@@ -140,10 +154,6 @@ of the counters. This shows that insertion and deletion are not perfect
 inverses.
 }
 
-\todo{Any (Tom?)}{Fix the weird spacing in the last column of
-Figure~\ref{fig:tab-structures}. Also, we need to refer to this \emph{somewhere}
-in the body.}
-
 \begin{figure*}[tp]
 \begin{center}
 \small
@@ -156,29 +166,29 @@ in the body.}
           &  $\up_x(\col) = \col \cup \{x\}$
           & \parbox[c]{4cm}{$n$, max $|\col|$\\$k$, \# hash functions\\$m$, array size (bits)}
           \\\hline
-    \parbox[c]{1.5cm}{Counting\\ filter}
-          & \parbox[c]{2.5cm}{Multisets\\ $\col \in \Func(\bits^*,\N)$}
-          & $\qry_x(\col) = [\col(x) > 0]$
-          & \parbox[c][10ex]{4cm}{$\up_{x,0}(\col)(x) = \col(x)+1$ \\ $\up_{x,1}(\col)(x) = \col(x)-1$ \\ $\up_{x,b}(\col)(y) = \col(y)$ for $x \neq y$}
-          & \parbox[c]{3.5cm}{$n$, max $|\col|$\\$k$, \# hash functions\\$m$, array size (counters)\\ $d$, bits per counter}
-         \\ \hline
-    \parbox[c]{1.5cm}{Cuckoo\\ filter}
-          & \parbox[c]{2.5cm}{Multisets\\ $\col \in \Func(\bits^*,\N)$}
-          & $\qry_x(\col) = [\col(x) > 0]$
-          & \parbox[c][10ex]{4cm}{$\up_{x,0}(\col)(x) = \col(x)+1$ \\ $\up_{x,1}(\col)(x) = \col(x)-1$ \\ $\up_{x,b}(\col)(y) = \col(y)$ for $x \neq y$}
-          & \parbox[c]{3.5cm}{$n$, max $|\col|$\\$m$, \# buckets\\$b$, bucket size (entries)\\$f$, fingerprint size (bits)}
-          \\ \hline
      \parbox[c]{2cm}{Count-min\\ sketch}
           & \parbox[c]{2.5cm}{Multisets\\ $\col \in \Func(\bits^*,\N)$}
           & $\qry_x(\col) = \col(x)$
           & \parbox[c][10ex]{4cm}{$\up_{x,0}(\col)(x) = \col(x)+1$ \\ $\up_{x,1}(\col)(x) = \col(x)-1$ \\ $\up_{x,b}(\col)(y) = \col(y)$ for $x \neq y$}
           & \parbox[c]{3.75cm}{$n$, max $|\col|$\\$k$, \# hash functions and arrays\\$m$, array size (counters)\\$d$, bits per counter}
           \\ \hline
+    \parbox[c]{1.5cm}{Counting\\ filter}
+          & \parbox[c]{2.5cm}{Multisets\\ $\col \in \Func(\bits^*,\N)$}
+          & $\qry_x(\col) = [\col(x) > 0]$
+          & \parbox[c][10ex]{4cm}{$\up_{x,0}(\col)(x) = \col(x)+1$ \\ $\up_{x,1}(\col)(x) = \col(x)-1$ \\ $\up_{x,b}(\col)(y) = \col(y)$ for $x \neq y$}
+          & \parbox[c]{3.5cm}{$n$, max $|\col|$\\$k$, \# hash functions\\$m$, array size (counters)\\ $d$, bits per counter}
+         \\ \hline
+    \ignore{\parbox[c]{1.5cm}{Cuckoo\\ filter}
+          & \parbox[c]{2.5cm}{Multisets\\ $\col \in \Func(\bits^*,\N)$}
+          & $\qry_x(\col) = [\col(x) > 0]$
+          & \parbox[c][10ex]{4cm}{$\up_{x,0}(\col)(x) = \col(x)+1$ \\ $\up_{x,1}(\col)(x) = \col(x)-1$ \\ $\up_{x,b}(\col)(y) = \col(y)$ for $x \neq y$}
+          & \parbox[c]{3.5cm}{$n$, max $|\col|$\\$m$, \# buckets\\$b$, bucket size (entries)\\$f$, fingerprint size (bits)}
+          \\ \hline}
   \end{tabular}
 \caption{The data structrues that we consider. Each data structure yields a
 space-efficient representation of its input data object and, in the presense of
 non-adaptive attacks, provides approximately correct responses to the supported
-queries.  For counting filters, cuckoo filters, and count-min sketch, typical
+queries.  For counting filters and count-min sketches, typical
 implementations prevent updates that would cause $\col(x)-1 < 0$.}
   \label{fig:structures-summary}
   \label{fig:tab-structures}
