@@ -101,6 +101,15 @@ adversarial) updates to~$\col$ and its representation.
   aren't lazy
 \item ...
 \end{itemize}
+
+\begin{itemize}
+  \item We show that some traditional data structures like the Bloom filter
+  are insecure in their usual form. However, they can be made secure by keeping
+  the representation private, using a per-representation random salt, and in
+  some cases by using a simple `thresholding' procedure to ensure that the
+  structures do not become too full. In the case of Bloom filters, it suffices
+  to merely keep a secret key private rather than the full 
+\end{itemize}
 \tsnote{old stuff below here}
 
 \ignore{ %possibly move elsewhere in the intro, or the opening to the

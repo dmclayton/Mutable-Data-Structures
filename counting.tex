@@ -3,34 +3,36 @@
   {
     \underline{$\Rep^R_K(\col)$}\\[2pt]
       $\salt \getsr \bits^\lambda$\\
-      $\pub \gets \langle \zeroes(m), \salt, 0\rangle$\\
+      $\pub \gets \langle \zeroes(m), \salt\rangle$\\
       for $x \in \col$ do \\
         $\tab \pub \gets \Up^R_K(\pub, \up_{x,1})$\\
         $\tab$if $\pub = \bot$ then return $\bot$\\
       return $\pub$
     \\[6pt]
-      \underline{$\Qry^R_K(\langle M, \salt, c \rangle,x)$}\\[2pt]
-      $X \gets R_K(\salt \cat x)$\\
-      for $i \in X$ do\\
-        $\tab$if $M[i] = 0$ then return 0\\
+      \underline{$\Qry^R_K(\langle \v.M, \salt\rangle,x)$}\\[2pt]
+      $\v.X \gets R_K(\salt \cat x)$\\
+      for $i \in \v.X$ do\\
+        $\tab$if $\v.M[i] = 0$ then return 0\\
       return 1
   }
   {
-    \underline{$\Up^R_K(\langle M, \salt, c \rangle, \up_{x,b})$}\\[2pt]
+    \underline{$\Up^R_K(\langle \v.M, \salt\rangle, \up_{x,b})$}\\[2pt]
       if $c \geq n$ then return $\bot$\\
-      $M' \gets M$;
-      $X \gets R_K(\salt \cat x)$\\
-      for $i$ in $X$ do\\
-      $\tab$ if $M'[i] = 0$ and $b < 0$ then return $\bot$\\
-      $\tab M'[i] \gets M'[i] + b$\\
-      $M \gets M'$;
-      return $\langle M, \salt, c+b \rangle$
+      $\v.M' \gets \v.M$;
+      $\v.X \gets R_K(\salt \cat x)$\\
+      for $i$ in $\v.X$ do\\
+      $\tab$ $a \gets \v.M'[i]$\\
+      $\tab$ if $a = 0 \wedge b < 0$ then return $\bot$\\
+      $\tab \v.M'[i] \gets \v.M'[i] + b$\\
+      $\v.M \gets \v.M'$;
+      return $\langle \v.M, \salt, c+b \rangle$
   }
-  \caption{Keyed structure $\countbloom[R,n,\lambda]$ given by
-  $(\Rep^R,\Qry^R,\Up^R)$ is used to define Bloom filter variants used to
-  rerpresent sets of at most~$n$ elements. The parameters are a function $R:
-  \keys\by\bits^* \to [m]^k$ and integers $n, \lambda \geq0$. A concrete scheme
-  is given by a particular choice of parameters.}
+  \caption{Keyed structure $\countbloom[R,\ell,\lambda]$ given by
+  $(\Rep^R,\Qry^R,\Up^R)$ is used to define the $\ell$-thresholded version of a
+  counting filter. The parameters are a function $R:
+  \keys\by\bits^* \to [m]^k$ and integers $\ell, \lambda \geq0$. A concrete scheme
+  is given by a particular choice of parameters. The function $\hw'$, used to
+  determine if the filter is full, is defined in Section~\ref{sec:prelims}.}
   \label{fig:cbf-def}
 \end{figure}
 
@@ -45,7 +47,7 @@ of security properties.
 Unlike with a Bloom filter or count min-sketch, counting filters must account
 for two different types of error: false positives and false negatives. To be as
 general as possible, we define a parametrized error function~$\delta$ for
-$\delta^+, \delta^- \in \R$ as
+positive $\delta^+, \delta^- \in \R$ as
 \begin{equation}
   \delta(x, y) =
   \begin{cases}
@@ -74,11 +76,11 @@ positives.
 \subsection{Private Thresholded Counting Filters}
 
 \begin{theorem}
-Let $p_\ell = ((\ell+1)/m)^k$ and $r' = \lfloor r/(k+1) \rfloor$. For integers $q_R, q_T, q_H, r, t \geq 0$ such
-that $r' > p_\ell q_T$, it holds that
+For integers $q_R, q_T, q_H, r, t \geq 0$, let $p_\ell = ((\ell+1)/m)^k$ and
+$r' = \lfloor r/(k+1) \rfloor$. If $r' > p_\ell q_T$, it holds that
   \begin{equation*}
   \begin{aligned}
-   \Adv{\erreps}_{\Pi,\delta,r}(\advA) &\leq\\
+   \Adv{\erreps}_{\Pi,\delta,r}(t, q_R,q_T,q_U,q_H,q_V) &\leq\\
      & q_R \cdot \left[\frac{q_H}{2^\lambda} + e^{r'-p_\ell q_T}\left(\frac{p_\ell q_T}{r'}\right)^{r'}\right],
   \end{aligned}
 \end{equation*}
