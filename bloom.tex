@@ -85,7 +85,7 @@ of the tighter error bounds this alternate construction can provide.
 
 
 \heading{Non-adaptive false-positive probability}
-Let~$\rho$ be a function, $\lambda\geq0$ be an integer, and define
+Let~$\rho$ be a function, $\lambda\geq0$ be an integer, and
 $\bloom[\id^\rho,n,\lambda] = (\Rep^\rho, \Qry^\rho, \Up^\rho)$ as in
 Figure~\ref{fig:bf-def}. (Note the mild abuse of notation by which we write
 ``$\rho$'' instead of ``$\id^\rho$''.)
@@ -137,9 +137,16 @@ Throughout this section we will use the error function~$\delta$ defined as
 This simply indicates whether the query result matched the correct response.
 
 \subsection{Insecurity of unsalted BFs}
-Fix a hash function $H:\bits^*\to[m]^k$ and integer $n\geq0$ and
-let $\Pi = \BF[H,n]$.
-%
+The classic case of a Bloom filter with no key or salt, i.e. $\BF[H,n]$ for some
+hash function $H: \bits^* \to [m]^k$ and $n \ge 0$, is not secure under either
+correctness notion. In fact, with no per-representation randomness and no secret
+key to be concealed from the adversary, there is no difference between \errep\
+and \erreps\ security, as the adversary can easily compute the representation of
+any set for itself. This ability of the adversary to reconstruct the set without
+making queries allows for various attacks that badly harm the accuracy of the
+filter.
+
+\heading{Example attack setting}
 Suppose the adversary is interacting with a system representing a dataset
 with~$\Pi$ and that it is able to choose some fraction of the input data.  For
 example, consider a web crawler which performs a `crawl' of webpages, following
@@ -158,16 +165,6 @@ during the spider's crawl.
 
 \heading{Pollution attacks}
 %
-\ignore{\cpnote{Overall, I think this part needs to be revised to make it more clear.
-Answer the following questions. (1) How does their attack model compare to ours,
-i.e., are pollution attacks effective in the sense of \errep? (2) What makes
-their attacks possible? Is is it the use of weak (non-cryptographic) hash
-functions? How dependent is their attack on controlling a fraction of the
-inputs? Do they assume that the inputs they don't control are \emph{known} to
-the adversary? (3) Are their mitigigations sufficient for security in the sense
-of \errep, or is their an attack? (The answer is there's an attack: target-set
-coverage)}}
-%
 The goal of the attacks pointed out by Gerbet \etal~~\cite{gerbet2015power} is
 to pollute the filter such that the ``average'' set-membership query yields a
 false positive with high probability; to do so, the attacker chooses a set of
@@ -182,10 +179,11 @@ the false positive rate if they control 200 out of a total of $n = 600$
 insertions.
 
 Significantly, the attack model considered assumes that the representations of
-the filter are always kept private. This gives the adversary less power than in
-our \errep\ or even \erreps\ attack model, since there is no analogue to the
-$\REVO$ oracle. Within this model, Gerbet \etal show various ways to mitigate
-pollution attacks, such as choosing the parameters of the filter pesimistically,
+the filter are always kept private. This in general gives the adversary less
+power than in our \errep\ or even \erreps\ attack model, since there is no
+analogue to the $\REVO$ oracle. However, as noted above, the standard $\BF[H,n]$
+construction is  Within this model, Gerbet \etal show various
+ways to mitigate pollution attacks, such as choosing the parameters of the filter pesimistically,
 so that even if a pollution attack occurs, the false positive rate is kept below
 some threshold of acceptability. This strategy is  potentially viable, but may
 significantly increase the amount of memory required to store the data structure.
@@ -199,7 +197,7 @@ private indefinitely, this suffices to prevent the pollution attack they
 describe. However, under the more general attack models where the representation
 may eventually be recovered (in the private-representation setting) or is simply
 available to potential adversaries (in the public-representation setting).
-Simply using a MAC with a long-term secret key does not suffice to
+Simply using a PRF with a long-term secret key does not suffice to
 secure a Bloom filter in the \errep\ and \erreps\ scenarios we consider.
 
 \heading{Target-set coverage attacks}
@@ -356,7 +354,7 @@ following \erreps\ bound.
   $r > p'q_T$, then it holds that
   \begin{eqnarray*}
     \begin{aligned}
-      \Adv{\erreps}_{\Pi,\delta,r}(t,\,&q_R, q_T, q_U, q_H) \leq \\
+      \Adv{\erreps}_{\Pi,\delta,r}(t,\,&q_R, q_T, q_U, q_H, q_V) \leq \\
           & q_R \cdot \left[
       \frac{q_H}{2^\lambda} +
       \left(\frac{p'q_T}{r}\right)^re^{r-p'q_T}\right]\,,
@@ -367,8 +365,8 @@ following \erreps\ bound.
 
 The proof follows a similar structure to that of
 Theorem~\ref{thm:sbf-errep-immutable}. The primary differences come from arguing
-that without a ``lucky'' guess of the salt the adversary cannot use offline hash
-queries to find false positives, and from having to show that the adversary's
+that without a ``lucky'' guess of the salt the adversary cannot use its random
+oracle to find false positives, and from having to show that the adversary's
 access to $\UPO$ does not substantially change the security bound that can be
 derived. The first of these is straightforward given the private-representation
 setting, but the second requires investigating how much of an advantage the
@@ -483,7 +481,7 @@ Let $p_\ell = ((\ell+k)/m)^k$. For integers $q_R, q_T, q_H, r, t \geq 0$ such
 that $r > p_\ell q_T$, it holds that
   \begin{equation*}
     \begin{aligned}
-      \Adv{\errep}_{\Pi,\delta,r}(t, q_R,q_T,q_U,q_H) &\leq \\
+      \Adv{\errep}_{\Pi,\delta,r}(t, q_R,q_T,q_U,q_H,q_V) &\leq \\
         & \frac{q_R(q_H+q_R)}{2^\lambda} + e^{r-p_\ell q_T}\left(\frac{p_\ell q_T}{r}\right)^r.
     \end{aligned}
   \end{equation*}

@@ -155,20 +155,20 @@ emphasize that data structures which allow for both insertions and deletions of
 arbitrary strings give potential adversaries a great deal more flexibility for
 use in attacks.
 
-Since $n$ is no longer a parameter of the structure, we modify the error
-function to be %[...]
+Since $n$ is no longer a parameter of the structure, the error function
+described above is not well-defined for a thresholded sketch. 
 
 In fact, the exact choice of error function in this case is not as relevant,
 since in the proof we end up moving to a game where the error function returns
 1 for any overestimate, regardless of magnitude, and 0 for an accurate or
 underestimated result.
 
-\begin{theorem}[Correctness Bound for Count-Min Sketch]\label{thm:count-ms-bound}
+\begin{theorem}[Correctness Bound for Count-Min Sketch]\label{thm:scms-erreps-th}
 Let $p_\ell = ((\ell+1)/m)^k$ and $r' = \lfloor r/(k+1) \rfloor$. For integers $q_R, q_T, q_H, r, t \geq 0$ such
 that $r' > p_\ell q_T$, it holds that
   \begin{equation*}
   \begin{aligned}
-    \Adv{\errep}_{\Pi,\delta,r}(t, q_R,q_T,q_U,q_H) &\leq \\
+    \Adv{\errep}_{\Pi,\delta,r}(t, q_R,q_T,q_U,q_H,q_V) &\leq \\
      & q_R \cdot \left[\frac{q_H}{2^\lambda} + e^{r'-p_\ell q_T}\left(\frac{p_\ell q_T}{r'}\right)^r\right].
   \end{aligned}
 \end{equation*}
