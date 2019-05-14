@@ -25,7 +25,7 @@
     $\vv \getsr [m]^k$\\
     if $M^*=\bot$ and $\salt=\salt^*$ and $c=1$ then \com{Caller is~$\advB$}\\
     \tab $\bad_1 \gets 1$; \diffplus{return $\vv$}\\
-    if $T[Z,x] = \bot$ then $\vv \gets T[Z,z]$\\
+    if $T[Z,x] = \bot$ then $\vv \gets T[Z,x]$\\
     $T[Z,x] \gets \vv$; return $\vv$
 }
 {
@@ -88,8 +88,7 @@ and use our own oracles for the remaining query. The best we can do with this
 strategy is to ``guess'' which representation the \errep\ adversary will use in
 its attack, which results in the~$q_R$ factor in the bound.
 %
-We defer the full details to Appendix~\ref{app:iproof/lemma-keyless}
-\todo{DC}{Prove this and fix the reference}.
+We defer the full details to Appendix~\ref{app:deferred}
 
 Let $\advA$ be an \errep\ adversary making~$1$ query to~$\REPO$, $q_T$ queries
 to $\QRYO$, $0$ queries to $\UPO$, and $q_H$ queries to the random

@@ -1,9 +1,10 @@
-\ignore{\begin{figure*}
+\begin{figure*}
 \twoColsNoDivide{0.47}
 {
   \vspace{-7pt}
-  \experimentv{$\game_{0}(\advB)$}\hfill \diffminus{$\game_1$}\diffplus{$\game_2$}\\[2pt]
+  \experimentv{$\game_{0}(\advA)$}\hfill\diffplus{$\game_1$}\\[2pt]
     $M^* \gets \bot$;
+    $\setS \gets \emptyset$;
     $\salt^* \getsr \bits^\lambda$\\
     $\advB^{\REPO,\QRYO,\UPO,\HASHO_1}$;
     return $\big[\sum_x \err[x] \geq r\big]$
@@ -11,34 +12,46 @@
   \oraclev{$\HASHO_c(\salt \cat x)$}\\[2pt]
     $\vv \getsr [m]^k$\\
     if $\salt=\salt^*$ and $c = 1$ then \com{Caller is~$\advB$}\\
-    \tab $\bad_1 \gets 1$; \diffplus{\diffminus{return $\vv$}}\\
-    if $T[Z,x] = \bot$ then $\vv \gets T[Z,z]$\\
+    \tab $\bad_1 \gets 1$; \diffplus{return $\vv$}\\
+    if $T[Z,x] = \bot$ then $\vv \gets T[Z,x]$\\
     $T[Z,x] \gets \vv$; return $\vv$
-}
-{
+  \\[6pt]
   \oraclev{$\QRYO(\qry_x)$}\\[2pt]
-    $X \gets \bmap_m(\HASHO_3(\salt^* \cat x))$;
-    $a \gets X = M^* \AND X$\\
+    $X \gets \HASHO_3(\salt^* \cat x)$;
+    $a \gets \infty$;
+    $\setS \gets \setS \cup \{x\}$\\
+    for $i$ in $[1..k]$ do\\
+      $\tab a \gets \min(a, M[i][X[i]])$\\
     if $\err[x] < \delta(a,\qry_x(\col^*))$ then
           $\err[x] \gets \delta(a,\qry_x(\col^*))$\\
-    \diffplus{$\UPO(\up_x)$}\\
     return $a$
   \\[6pt]
   \oraclev{$\REPO(\col)$}\\[2pt]
-    $M^* \gets \bigvee_{x \in \col} \bmap_m(\HASHO_2(\salt^* \cat x))$;
-    $\setS^* \gets \col$;
+    for $i$ in $[1..k]$ do\\
+      $\tab M^*[i] \gets 0^m$\\
+    $\setS^* \gets \col$\\
+    for $x \in \col$ do\\
+    $\tab\UPO(\up_x)$\\
     return $\top$
   \\[6pt]
-  \oraclev{$\UPO(\up_x)$}\\[2pt]
-    if $w(M) > \ell$ then return $\top$\\
-    if $\QRYO(\qry_x) = 1$ then $\err[x] \gets 0$\\
-    $M^* \gets M^* \vee \bmap_m(\HASHO_2(\salt^* \cat x))$;
-    $\setS^* \gets \up_x(\setS)$;
+  \oraclev{$\UPO(\up_{x,b})$}\\[2pt]
+    if $w'(M^*) > \ell$ then return $\top$\\
+    $M' \gets M^*$\\
+    for $i$ in $[1..k]$ do\\
+      $\tab$ if $M'[i][X[i]] = 0$ and $b < 0$ then return $\top$\\
+      $\tab M'[i][X[i]] \gets M'[i][X[i]] + b$\\
+    $M^* \gets M'$\\
+    if $\err[x] \neq \bot$ then\\
+      $\tab a \gets \QRYO(\qry_x)$\\
+      $\tab\err[x] \gets \min(\delta(a,\qry_x(\col^*)),err[x])$\\
+    $\setS^* \gets \up_{x,b}(\setS)$;
     return $\top$
 }
-\caption{Games 0, 1, and 2 for proof of Theorem~\ref{thm:sbf-erreps}.}
+{
+}
+\caption{Games 0--4 for proof of Theorem~\ref{thm:sbf-erreps}.}
 \label{fig:sbf-erreps/games}
-\end{figure*}}
+\end{figure*}
 
 As with the proof of Theorem~\ref{thm:sbf-errep-immutable}, we derive a bound in
 the \erreps1 case and then use Lemma~\ref{thm:lemma1} to move from \erreps1 to
