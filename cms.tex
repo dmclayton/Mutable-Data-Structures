@@ -53,6 +53,12 @@ the operation of the sketch in a non-adversarial setting, since in general
 $\ell$ can be closely approximated given knowledge of $n$. In the presence of an
 adversary, however, we expect this variation to provide better security bounds.
 
+In the \errep\ setting, the count min-sketch structure is insecure regardless of
+whether $\ell$-thresholding is used or not, and regardless of the details of the
+behavior of the function $R$. On the other hand, we show that \erreps\ security
+is achievable even under the assumption that a salted but unkeyed hash function
+is used, i.e. $\lambda > 0$ but $\keys = \{\emptyset\}$.
+
 \heading{Non-adaptive error bound}
 %
 The count min-sketch is designed to minimize the number of elements whose

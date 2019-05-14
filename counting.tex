@@ -36,11 +36,14 @@
   \label{fig:cbf-def}
 \end{figure}
 
-Counting filters are a modified version of Bloom filters which are designed to
-allow for deletion as well as insertion. Unlike the count min-sketch structure,
-counting filters are designed to handle set membership queries rather than
-frequency queries. Despite this, the two structures are closely related in terms
-of security properties.
+Counting filters are a modified version of Bloom filters which are designed to,
+like a count min-sketch, allow for deletion as well as insertion. Unlike CMSs,
+however, counting filters are designed to handle set membership queries rather
+than frequency queries. Despite this, the two structures are closely related in
+terms of security properties. We show that \errep\ security is similarly
+impossible, but that with the $\ell$-thresholding assumption built into the
+definition presented in Figure~\ref{fig:cbf-def}, a bound for \errep\ can be
+achieved which is very close to the bound for a count min-sketch.
 
 \heading{Error function for frequency queries}
 %
