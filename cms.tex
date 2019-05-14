@@ -70,13 +70,14 @@
 
 The count min-sketch data structure is somewhat similar to a Bloom filter in
 construction, but instead of a length-$m$ array of bits it uses a $k$-by-$m$
-array of counters. Our construction $\sketch[R,n,\lambda]$ described
-in~\ref{fig:bf-def} captures the count-min sketch in what is known as the
-non-negative turnstile model. This means that the stream of data handled by the
-sketch can accomodate both insertions and deletions, but the counters themselves
-are constrained to always be nonnegative. While the data structure supports a
-variety of possible queries, we focus here on \emph{frequency} queries, which
-determine how many times an element is present in the sketch.
+array of counters. Our construction $\sketch[R,n,\lambda]$ described in
+Figure~\ref{fig:bf-def} captures the count-min sketch in what is known as the
+non-negative turnstile model.\todo{DC}{Provide a reference} This means that the
+stream of data handled by the sketch can accomodate both insertions and
+deletions, but the counters themselves are constrained to always be nonnegative.
+While the data structure supports a variety of possible queries, we focus here
+on \emph{frequency} queries, which determine how many times an element is
+present in the sketch.
 
 \heading{Non-adaptive error bound}
 %
@@ -84,7 +85,8 @@ The count min-sketch is designed to minimize the number of elements whose
 frequencies are overestimated, while still allowing for reasonably low memory
 usage. For a function $\rho$ and integer $\lambda\ge0$, let
 $\sketch[\id^\rho,n,\lambda] = (\Rep^\rho,\Qry^\rho,\Up^\rho)$ as defined
-previously. Then for $\col \in \Func(\bits^*,\N)$ a multiset containing a total
+previously. Then for $\col \in \Func(\bits^*,\N)$ \cpnote{What's this? Do you
+mean $\rho$?} a multiset containing a total
 of $n$ elements (counting duplicates as separate elements), and for any
 $x \in \bits^*$, we define the error probability for a count-min sketch as
 \begin{equation}\label{eq:bf-fp}
@@ -96,6 +98,9 @@ $x \in \bits^*$, we define the error probability for a count-min sketch as
       \big] \,.
   \end{aligned}
 \end{equation}
+%
+\cpnote{What's $\col$? What if $x$ is not in the set?}
+%
 Informally, $P_{k,m}(n)$ is the probability that some~$x$ is overestimated by a
 non-negligible amount in the representation of some $\setS$ containing a total
 of $n$ elements, when a random function is used for hashing. Cormode and
@@ -113,7 +118,10 @@ is the~$\delta$ defined as
     0 & \text{otherwise.}
   \end{cases}
 \end{equation}
-
+%
+\todo{DC}{Write $\delta$ as $\delta_{m,n}$ here and below, since it's a value
+that depends on parameters of the structure.}
+%
 This means that a non-negligible \emph{overestimate} is considered an error,
 while underestimates are not. This is in line with the definition of the CMS
 data structure, which provides a tight bound on the number of accidental
