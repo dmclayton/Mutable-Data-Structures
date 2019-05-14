@@ -105,7 +105,10 @@ call $\UPO$ again to delete the element. By doing this repeatedly, an adversary
 can determine the outputs of the PRF for $i$ different inputs using $2i$ calls
 to $\UPO$. Once a sufficiently large number of PRF outputs has been determined,
 the adversary can construct the test and target set used for the target-set
-coverage attack.
+coverage attack. The adversary then calls $\UPO$ several more times to insert
+each element of the test set into the sketch at least $(en)/m$ times, and then
+each element of the target set will be overestimated by an unacceptably large
+amount.
 
 \subsection{Private Thresholded Sketches}
 
@@ -156,12 +159,18 @@ arbitrary strings give potential adversaries a great deal more flexibility for
 use in attacks.
 
 Since $n$ is no longer a parameter of the structure, the error function
-described above is not well-defined for a thresholded sketch. 
-
-In fact, the exact choice of error function in this case is not as relevant,
-since in the proof we end up moving to a game where the error function returns
-1 for any overestimate, regardless of magnitude, and 0 for an accurate or
-underestimated result.
+described above is not well-defined for a thresholded sketch. To be as
+conservative as possible, and to make the proof simpler, we use an alternate
+error function given by
+\begin{equation}
+  \delta(x, y) =
+  \begin{cases}
+    1 & \text{if}\ x - y > 0 \\
+    0 & \text{otherwise.}
+  \end{cases}
+\end{equation}
+In other words, the adversary gets credit for producing any degree of
+overestimation, regardless of how significant.
 
 \begin{theorem}[Correctness Bound for Count-Min Sketch]\label{thm:scms-erreps-th}
 Let $p_\ell = ((\ell+1)/m)^k$ and $r' = \lfloor r/(k+1) \rfloor$. For integers $q_R, q_T, q_H, r, t \geq 0$ such
