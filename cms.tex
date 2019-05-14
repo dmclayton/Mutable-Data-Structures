@@ -1,299 +1,144 @@
-%The fact that queries can test not just for set membership, but for frequency,
-%means that new attacks are possible. For example, an adversary can pick a set
-%$\col$ and an element $x \not\in \col$ and use $\REPO$ to create several
-%different sketches representing $\col$. If the $\QRYO$ oracle reveals that $x$
-%is a false positive (i.e. appears in the filter with nonzero frequency) for any
-%of these, the adversary can use $\UPO$ to insert all the elements of $\col$ an
-%additional $r$ times. Then a single further $\QRYO(x)$ call will produce an
-%error of magnitude $r$, causing the adversary to succeed at the experiment.
+\begin{figure}
+  \twoColsNoDivide{0.22}
+  {
+    \underline{$\Rep^R_K(\col)$}\\[2pt]
+      $\salt \getsr \bits^\lambda$\\
+      for $i$ in $[1..k]$ do\\
+        $\tab M[i] \gets 0^m$\\
+      $\pub \gets \langle M, \salt, 0 \rangle$
+      for $x \in \col$ do \\
+        $\tab \pub \gets \Up^R_K(\pub, \qry_x)$\\
+        $\tab$if $\pub = \bot$ then return $\bot$\\
+      return $\pub$
+    \\[6pt]
+    \underline{$\Qry^R_K(\langle M, \salt, c \rangle,\qry_x)$}\\[2pt]
+      $X \gets R_K(\salt \cat x)$;
+      $m \gets \infty$\\
+      for $i$ in $[1..k]$ do\\
+      $\tab m \gets \min(m, M[i][X[i]])$\\
+      return $m$
+  }
+  {
+    \underline{$\Up^R_K(\langle M, \salt, c \rangle,\up_{x,b})$}\\[2pt]
+      if $c \geq n$ then return $\bot$\\
+      $M' \gets M$;
+      $X \gets R_K(\salt \cat x)$\\
+      for $i$ in $[1..k]$ do\\
+      $\tab$ if $M'[i][X[i]] = 0$ and $b < 0$ then return $\bot$\\
+      $\tab M'[i][X[i]] \gets M'[i][X[i]] + b$\\
+      return $\langle M', \salt, c+b \rangle$
+  }
+  \caption{Keyed structure $\sketch[R,n,\lambda]$ given by
+  $(\Rep^R,\Qry^R,\Up^R)$ is used to define count min-sketch variants used to
+  rerpresent streams of size at most~$n$. Parameters are a function $R:
+  \keys\by\bits^* \to [m]^k$ and integers $n, \lambda \geq0$. A concrete scheme
+  is given by a particular choice of parameters.
+  %
+  }
+  \label{fig:cms-def}
+\end{figure}
 
-%The success rate of this attack depends on $|\col|$. The probability of $x$
-%being a false positive is given by the standard Bloom filter bound,
-%$(1-e^{-k|\col|/m})^k$ for a $k$-by-$m$ count-min sketch. Since the adversary
-%needs $(r-1)|\col|$ calls to $\UPO$ to produce an error of size $r$
+The count min-sketch data structure is somewhat similar to a Bloom filter in
+construction, but instead of a length-$m$ array of bits it uses a $k$-by-$m$
+array of counters. Our construction $\sketch[R,n,\lambda]$ described
+in~\ref{fig:bf-def} captures the count-min sketch in what is known as the
+non-negative turnstile model. This means that the stream of data handled by the
+sketch can accomodate both insertions and deletions, but the counters themselves
+are constrained to always be nonnegative. While the data structure supports a
+variety of possible queries, we focus here on \emph{frequency} queries, which
+determine how many times an element is present in the sketch.
 
-The count-min sketch data structure comes in several varieties which each have
-slightly different security properties. There are also many possible error
-functions which can be considered, unlike with set membership queries where all
-errors are simply false positives or false negatives. Some implementations of
-count-min sketch allow for elements to be assigned negative frequency (so that
-the response space is $\Z$), while others do not (so that the response space is
-$\N$). In the latter case, updates may either include only insertion or may
-include both insertion and deletion. The easiest error function to work with is
-a binary error function which gives the adversary 1 point if it discovers a
-query which is off from the true value by at least some constant $c$, so that
-$\delta(x,y) = [|x - y| \ge c]$.
+\heading{Error function for frequency queries}
+%
+Throughout this section we will use a general error function~$\delta$ defined as
+\begin{equation}
+  \delta(x, y) =
+  \begin{cases}
+    1 & \text{if}\ x - y > n\epsilon \\
+    0 & \text{otherwise.}
+  \end{cases}
+\end{equation}
 
-As in the case of counting filters, we are forced to make use of a thresholding
-assumption, namely that the sum of the counters in the sketch must remain below
-some upper bound $N$.
+This means that a non-negligible \emph{overestimate} is considered an error,
+while underestimates are not. This is in line with the definition of the CMS
+data structure, which provides a tight bound on the number of accidental
+overestimates which are likely to occur (in the absence of an adaptive
+adversary) but does not place any bounds on underestimation.
+
+\subsection{Insecurity of Public Sketches}
+
+Unlike in the Bloom filter case, good security bounds cannot be achieved for a
+count-min sketch in the \errep\ setting even if salts and/or private keys are
+used. Given a stronger $\UPO$ oracle, the adversary can mount an attack similar
+to the target-set coverage attack for a Bloom filter even if a PRF is used for
+hashing. First, the adversary calls $\REPO(\emptyset)$ to get an empty
+representation. The adversary can then call $\UPO$ to insert an element into the
+set, see exactly what the outputs of each of the hash functions are, and then
+call $\UPO$ again to delete the element. By doing this repeatedly, an adversary
+can determine the outputs of the PRF for $i$ different inputs using $2i$ calls
+to $\UPO$. Once a sufficiently large number of PRF outputs has been determined,
+the adversary can construct the test and target set used for the target-set
+coverage attack.
+
+\subsection{Private Thresholded Sketches}
+
+\begin{figure}
+  \twoColsNoDivide{0.22}
+  {
+    \underline{$\Rep^R_K(\col)$}\\[2pt]
+      $\salt \getsr \bits^\lambda$\\
+      for $i$ in $[1..k]$ do\\
+        $\tab M[i] \gets 0^m$\\
+      $\pub \gets \langle M, \salt \rangle$
+      for $x \in \col$ do \\
+        $\tab \pub \gets \Up^R_K(\pub, \qry_x)$\\
+        $\tab$if $\pub = \bot$ then return $\bot$\\
+      return $\pub$
+    \\[6pt]
+    \underline{$\Qry^R_K(\langle M, \salt, c \rangle,\qry_x)$}\\[2pt]
+      $X \gets R_K(\salt \cat x)$;
+      $m \gets \infty$\\
+      for $i$ in $[1..k]$ do\\
+      $\tab m \gets \min(m, M[i][X[i]])$\\
+      return $m$
+  }
+  {
+    \underline{$\Up^R_K(\langle M, \salt, c \rangle,\up_{x,b})$}\\[2pt]
+      if $hw'(M) > \ell$ then return $\bot$\\
+      $M' \gets M$;
+      $X \gets R_K(\salt \cat x)$\\
+      for $i$ in $[1..k]$ do\\
+      $\tab$ if $M'[i][X[i]] = 0$ and $b < 0$ then return $\bot$\\
+      $\tab M'[i][X[i]] \gets M'[i][X[i]] + b$\\
+      return $\langle M', \salt, c+b \rangle$
+  }
+  \caption{A slightly modified structure, $\sketch_\mathrm{st}[R,\ell,\lambda]$ given by
+  $(\Rep^R,\Qry^R,\Up^R)$ which uses the number of nonzero counters ($\hw'$, as
+  defined in Section~\ref{sec:prelims}) to decide if the filter is full.
+  %
+  }
+  \label{fig:cmst-def}
+\end{figure}
+
+As in the case of Bloom filters, it is possible to tweak the count min-sketch
+definition by placing a bound on how full the filter itself can get. In this
+case, we were only able to establish an error bound for these $\ell$-thresholded
+sketches. Even then, the bound is clearly weaker than for Bloom filters. We
+emphasize that data structures which allow for both insertions and deletions of
+arbitrary strings give potential adversaries a great deal more flexibility for
+use in attacks.
 
 \begin{theorem}[Correctness Bound for Count-Min Sketch]\label{thm:count-ms-bound}
-Fix integers $k, m, n, \lambda, r\geq 0$, a threshold ratio $p \in [0,1]$, and
-an error function $\delta(x,y) = [|x - y| > 0]$ for some $c \in \N$.
-  For every $t, q_R, q_T, q_U, q_H \geq 0$, it holds that
-  \begin{eqnarray*}
-    \Adv{\erreps}_{\struct_s,r}(t,&q_R,& q_T, q_U, q_H) \leq \\ && q_R \cdot \left[\frac{q_H}{2^\lambda} + \binom{q_T}{\lceil r/k \rceil}\left(p+\frac{\lceil r/k \rceil}{m}\right)^{k\lceil r/k \rceil}\right] \,,
-\end{eqnarray*}
+Let $p_\ell = ((\ell+1)/m)^k$ and $r' = \lfloor r/(k+1) \rfloor$. For integers $q_R, q_T, q_H, r, t \geq 0$ such
+that $r' > p_\ell q_T$, it holds that
+  \begin{equation*}
+  \begin{aligned}
+    \Adv{\errep}_{\Pi,\delta,r}(t, q_R,q_T,q_U,q_H) &\leq \\
+     & q_R \cdot \left[\frac{q_H}{2^\lambda} + e^{r'-p_\ell q_T}\left(\frac{p_\ell q_T}{r'}\right)^r\right].
+  \end{aligned}
+\end{equation*}
 \end{theorem}
 
-\begin{figure*}
-  \boxThmBFSaltCorrect{0.48}
-  {
-    \underline{$\game_0(\advA)$}\\[2pt]
-      $\col \getsr \advA^H$; $\setC \gets \emptyset$; $\setB \gets \col$; $\err \gets 0$\\
-      $\pub \getsr \Rep[\HASHO](\col)$\\
-      $\bot \getsr \advA^{\HASHO,\QRYO,\UPO,\INTO}$\\
-      return $(\err \geq r)$
-    \\[6pt]
-    \oraclev{$\QRYO(x)$}\\[2pt]
-      $\setB \gets \setB \cup x$\\
-      if $x \in \mathcal{C}$ then return $\bot$\\
-      $\setC \gets \setC \union \{x\}$\\
-      $a \gets \Qry[\HASHO](\pub, x)$\\
-      if $a \neq [x \in \col]$ then $\err \gets \err + 1$\\
-      return~$a$
-    \\[6pt]
-    \oraclev{$\UPO(x,b)$}\\[2pt]
-      $\setB \gets \setB \cup x$\\
-      $\setC \gets \emptyset$\\
-      $a \gets \Qry[\HASHO](\pub, \qry_x)$\\
-      if $x \in \setC$ and $b = a \neq [x \in \col]$ then\\
-      \tab $\err \gets \err-1$\\
-      if $b = 1$ then\\
-      \tab $\col \gets \col + \{x\}$\\
-      else\\
-      \tab $\col \gets \col - \{x\}$\\
-      $\pub \gets \Up[\HASHO](\pub,\up_{x,b})$\\
-      return~$\bot$
-    \\[6pt]
-    \oraclev{$\HASHO(x)$}\\
-      $\hh \getsr [m]^2$; $\vv \gets \fff(\hh$)\\
-      if $T[x]$ is defined then $\vv \gets T[x]$\\
-      $T[x] \gets \vv$;
-      return $\vv$
-  }
-  {
-    \underline{$\game_1(\advA)$}\\[2pt]
-    \oraclev{$\INTO(x,y)$}\\
-      if $x \not\in \col$ or $y \not\in \col$ then\\
-      \tab return $\bot$\\
-      $i \gets 0$\\
-      for $h$ in $\HASHO(x)$ do\\
-      \tab if $h$ in $\HASHO(y)$ then $i \gets i+1$\\
-      return $i$
-    \\[6pt]
-    \underline{$\game_2(\advA)$}\\[2pt]
-    \oraclev{$\UPO(x)$}\\
-      if $\QRYO(x)$ and $x \not\in \col$ then\\
-      \tab $\err \gets \err + \max(k \cdot \delta(0,1), \delta(1,0))$\\
-      $\setB \gets \setB \cup x$\\
-      $\setC \gets \emptyset$\\
-      $a \gets \Qry[H](\pub, \qry_x)$\\
-      if $x \in \setC$ and $a \neq [x \in \col]$ then\\
-      \tab $\err \gets \err-1$\\
-      $\col \gets \col + \{x\}$\\
-      $\pub \gets \Up[H](\pub,\up_{x,b})$\\
-      return~$\bot$
-  }
-  {
-  }
-  {
-  }
-  \caption{Games 0--3 for proof of Theorem~\ref{thm:count-ms-bound}.}
-  \label{fig:count-ms-bound}
-\end{figure*}
-
 \begin{proof}
-
-Applying lemma~\ref{lemma:errep} and lemma~\ref{lemma:salttorand}, we reduce the
-$\erreps$ experiment to the $\erreps1$ experiment with a salted hash function
-replaced by true random sampling from $[m]$ for each of the $k$ distinct hash
-values. This is given in $\game_0$. In $\game_1$, we account for the possibility
-that the adversary can glean information about the overlap between sets by
-querying each of them separately. In particular, we give the adversary an
-additional oracle $\INTO$ that returns the number of locations in which two
-elements overlap. However, we constrain $\INTO$ to only return an answer when
-the element has previously been sent to some other oracle.
-
-Because new $\QRYO$ and $\UPO$ calls are based on random sampling, this does not
-provide the adversary with any additional information about how additional
-elements which might be queried, inserted, or deleted in the future might
-behave. However, any element which is sent to $\QRYO$ or $\UPO$ which acts as a
-false positive will be immediately recognized as such. Because of this, our next
-step will be to move to a game $\game_2$ where any insertion of a false positive
-immediately gives the adversary credit for the worst possible error that could
-be caused by either inserting or deleting that element.
-
-In $\game_2$, we modify the game so that producing a false positive increments
-$\err$ by $k$, but so that elements cannot be removed from the set. Because
-underestimation errors can only be produced by deleting `false positives' (i.e.
-elements that should have 0 frequency but which are reported to have positive
-frequency), and the deletion of $n$ false positives can only produce as many as
-$nk$ underestimation errors, this means that the adversary has no need to cause
-underestimation errors. Doing so can only decrease the chances of producing
-additional errors by reducing the values of counters in the sketch, and so this
-does not decrease the adversary's ability to produce errors. Furthermore, we
-increase the allowed number of nonzero counters from $mp$ to $mp + k\lceil r/k
-\rceil$. The only way in which not being able to remove false positives can
-decrease the adversary's effectiveness is if the maximum capacity of the sketch
-is reached. Since each false positive removed causes at most 1 nonzero counters
-to be returned to zero, and the adversary stops after accumulating $r$ errors,
-an allowance of an extra $\lceil r/k \rceil$ nonzero counters per row is enough
-to make up for this.
-
-Since each new element queried from outside $\col$ has its corresponding indices
-determined by a true random function, the adversary can do no better than
-maximizing the number of nonzero counters in its attempt to produce false
-positives. Assuming the adversary is able to achieve a maximum-capacity number
-of nonzero counters, the probability of any particular counter being nonzero is
-$(mp + \lceil r/k \rceil)/m = p + \frac{1}{m}\lceil\frac{r}{k}\rceil$. Over $k$
-total hashes, the probability of a false positive is $\left((mp + \lceil r/k
-\rceil)/m\right)^k = \left(p + \frac{1}{m}\lceil\frac{r}{k}\rceil\right)^k$.
-Since the adversary needs to accumulate $\lceil\frac{r}{k}\rceil$ errors over
-the course of $q_T$ queries, the probability of the adversary succeeding in this
-game is
-
-$$\Prob{\game_2(\advA) = 1} = \binom{q_U + q_T}{\lceil r/k \rceil}\left(p+\frac{\lceil r/k \rceil}{m}\right)^{k\lceil r/k \rceil}$$
-
-Therefore the advantage of the adversary in the original game is
-
-$$\Adv{\erreps}_{\struct_s,r}(\advA) \le q_R \cdot \left(\frac{q_H}{2^\lambda} + \binom{q_T}{\lceil r/k \rceil}\left(p+\frac{\lceil r/k \rceil}{m}\right)^{k\lceil r/k \rceil}\right).$$
-
-\end{proof}
-
-If a secret key is used in addition to using private representations, we can improve the bound slightly by forcing the adversary to replace offline $q_H$ queries with online $q_R$ queries.
-
-\begin{theorem}[Correctness Bound for Count-Min Sketch]\label{thm:count-ms-bound}
-Fix integers $k, m, n, \lambda, r\geq 0$, a threshold ratio $p \in [0,1]$, and
-an error function $\delta(x,y) = [|x - y| > 0]$ for some $c \in \N$.
-  For every $t, q_R, q_T, q_U, q_H \geq 0$, it holds that
-  \begin{eqnarray*}
-    \Adv{\erreps}_{\struct_s,r}(t,&q_R,& q_T, q_U, q_H) \leq \\ && q_R \cdot \left[\frac{q_H}{2^\lambda} + \binom{q_T}{\lceil r/k \rceil}\left(p+\frac{\lceil r/k \rceil}{m}\right)^{k\lceil r/k \rceil}\right] \,,
-\end{eqnarray*}
-\end{theorem}
-
-\begin{figure*}
-  \boxThmBFSaltCorrect{0.48}
-  {
-    \underline{$\game_0(\advA)$}\\[2pt]
-      $\col \getsr \advA^H$; $\setC \gets \emptyset$; $\setB \gets \col$; $\err \gets 0$\\
-      $\pub \getsr \Rep[\HASHO](\col)$\\
-      $\bot \getsr \advA^{\HASHO,\QRYO,\UPO,\INTO}$\\
-      return $(\err \geq r)$
-    \\[6pt]
-    \oraclev{$\QRYO(x)$}\\[2pt]
-      $\setB \gets \setB \cup x$\\
-      if $x \in \mathcal{C}$ then return $\bot$\\
-      $\setC \gets \setC \union \{x\}$\\
-      $a \gets \Qry[\HASHO](\pub, x)$\\
-      if $a \neq [x \in \col]$ then $\err \gets \err + 1$\\
-      return~$a$
-    \\[6pt]
-    \oraclev{$\UPO(x,b)$}\\[2pt]
-      $\setB \gets \setB \cup x$\\
-      $\setC \gets \emptyset$\\
-      $a \gets \Qry[\HASHO](\pub, \qry_x)$\\
-      if $x \in \setC$ and $b = a \neq [x \in \col]$ then\\
-      \tab $\err \gets \err-1$\\
-      if $b = 1$ then\\
-      \tab $\col \gets \col + \{x\}$\\
-      else\\
-      \tab $\col \gets \col - \{x\}$\\
-      $\pub \gets \Up[\HASHO](\pub,\up_{x,b})$\\
-      return~$\bot$
-    \\[6pt]
-    \oraclev{$\HASHO(x)$}\\
-      $\hh \getsr [m]^2$; $\vv \gets \fff(\hh$)\\
-      if $T[x]$ is defined then $\vv \gets T[x]$\\
-      $T[x] \gets \vv$;
-      return $\vv$
-  }
-  {
-    \underline{$\game_1(\advA)$}\\[2pt]
-    \oraclev{$\INTO(x,y)$}\\
-      if $x \not\in \col$ or $y \not\in \col$ then\\
-      \tab return $\bot$\\
-      $i \gets 0$\\
-      for $h$ in $\HASHO(x)$ do\\
-      \tab if $h$ in $\HASHO(y)$ then $i \gets i+1$\\
-      return $i$
-    \\[6pt]
-    \underline{$\game_2(\advA)$}\\[2pt]
-    \oraclev{$\UPO(x)$}\\
-      if $\QRYO(x)$ and $x \not\in \col$ then\\
-      \tab $\err \gets \err + \max(k \cdot \delta(0,1), \delta(1,0))$\\
-      $\setB \gets \setB \cup x$\\
-      $\setC \gets \emptyset$\\
-      $a \gets \Qry[H](\pub, \qry_x)$\\
-      if $x \in \setC$ and $a \neq [x \in \col]$ then\\
-      \tab $\err \gets \err-1$\\
-      $\col \gets \col + \{x\}$\\
-      $\pub \gets \Up[H](\pub,\up_{x,b})$\\
-      return~$\bot$
-  }
-  {
-  }
-  {
-  }
-  \caption{Games 0--3 for proof of Theorem~\ref{thm:count-ms-bound}.}
-  \label{fig:count-ms-bound}
-\end{figure*}
-
-\begin{proof}
-
-Applying lemma~\ref{lemma:errep} and lemma~\ref{lemma:salttorand}, we reduce the
-$\erreps$ experiment to the $\erreps1$ experiment with a salted hash function
-replaced by true random sampling from $[m]$ for each of the $k$ distinct hash
-values. This is given in $\game_0$. In $\game_1$, we account for the possibility
-that the adversary can glean information about the overlap between sets by
-querying each of them separately. In particular, we give the adversary an
-additional oracle $\INTO$ that returns the number of locations in which two
-elements overlap. However, we constrain $\INTO$ to only return an answer when
-the element has previously been sent to some other oracle.
-
-Because new $\QRYO$ and $\UPO$ calls are based on random sampling, this does not
-provide the adversary with any additional information about how additional
-elements which might be queried, inserted, or deleted in the future might
-behave. However, any element which is sent to $\QRYO$ or $\UPO$ which acts as a
-false positive will be immediately recognized as such. Because of this, our next
-step will be to move to a game $\game_2$ where any insertion of a false positive
-immediately gives the adversary credit for the worst possible error that could
-be caused by either inserting or deleting that element.
-
-In $\game_2$, we modify the game so that producing a false positive increments
-$\err$ by $k$, but so that elements cannot be removed from the set. Because
-underestimation errors can only be produced by deleting `false positives' (i.e.
-elements that should have 0 frequency but which are reported to have positive
-frequency), and the deletion of $n$ false positives can only produce as many as
-$nk$ underestimation errors, this means that the adversary has no need to cause
-underestimation errors. Doing so can only decrease the chances of producing
-additional errors by reducing the values of counters in the sketch, and so this
-does not decrease the adversary's ability to produce errors. Furthermore, we
-increase the allowed number of nonzero counters from $mp$ to $mp + k\lceil r/k
-\rceil$. The only way in which not being able to remove false positives can
-decrease the adversary's effectiveness is if the maximum capacity of the sketch
-is reached. Since each false positive removed causes at most 1 nonzero counters
-to be returned to zero, and the adversary stops after accumulating $r$ errors,
-an allowance of an extra $\lceil r/k \rceil$ nonzero counters per row is enough
-to make up for this.
-
-Since each new element queried from outside $\col$ has its corresponding indices
-determined by a true random function, the adversary can do no better than
-maximizing the number of nonzero counters in its attempt to produce false
-positives. Assuming the adversary is able to achieve a maximum-capacity number
-of nonzero counters, the probability of any particular counter being nonzero is
-$(mp + \lceil r/k \rceil)/m = p + \frac{1}{m}\lceil\frac{r}{k}\rceil$. Over $k$
-total hashes, the probability of a false positive is $\left((mp + \lceil r/k
-\rceil)/m\right)^k = \left(p + \frac{1}{m}\lceil\frac{r}{k}\rceil\right)^k$.
-Since the adversary needs to accumulate $\lceil\frac{r}{k}\rceil$ errors over
-the course of $q_T$ queries, the probability of the adversary succeeding in this
-game is
-
-$$\Prob{\game_2(\advA) = 1} = \binom{q_U + q_T}{\lceil r/k \rceil}\left(p+\frac{\lceil r/k \rceil}{m}\right)^{k\lceil r/k \rceil}$$
-
-Therefore the advantage of the adversary in the original game is
-
-$$\Adv{\erreps}_{\struct_s,r}(\advA) \le q_R \cdot \left(\frac{q_H}{2^\lambda} + \binom{q_T}{\lceil r/k \rceil}\left(p+\frac{\lceil r/k \rceil}{m}\right)^{k\lceil r/k \rceil}\right).$$
-
+  \input{proof/scms-erreps-th}
 \end{proof}
