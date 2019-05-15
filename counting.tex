@@ -42,7 +42,7 @@ however, counting filters are designed to handle set membership queries rather
 than frequency queries. Despite this, the two structures are closely related in
 terms of security properties. We show that \errep\ security is similarly
 impossible, but that with the $\ell$-thresholding assumption built into the
-definition presented in Figure~\ref{fig:cbf-def}, a bound for \errep\ can be
+definition presented in Figure~\ref{fig:cbf-def}, a bound for \erreps\ can be
 achieved which is very close to the bound for a count min-sketch.
 
 \heading{Error function for frequency queries}
@@ -108,3 +108,24 @@ bounds in Theorem~\ref{sbf-erreps-th} to finish the proof.
 \begin{proof}
   \input{proof/scbf-erreps-th}
 \end{proof}
+
+\subsection{Discussion}
+The results for counting filters are similar to the results for count-min
+sketch, as might be expected given the similarities in terms of both the
+supported updates and the structure of the representations themselves (any
+count-min sketch can be transformed into a counting filter by adding all the
+rows together element-wise.) In particular, we again see that counting filters
+which are publicly visible cannot provide good security guarantees. This means
+that counting filters intended for a security-sensitive setting should be kept
+hidden from potential adversaries. Furthermore, our bound relies on
+per-representation random salts and $\ell$-thresholding, so these changes should
+also be taken into account when constructing secure counting filters. The size
+increase of the filters is comparable to the size increase of count
+min-sketches, but is distinct in that it depends on the relative weight of false
+positives as opposed to false negatives. False negatives impact the bound more
+than false positives due to the scaling factor of $k$ that appears in $r'$,
+which indicates that applications seeking to minimize false negatives will
+require larger filters than those seeking to minimize false positives. This is
+distinctly different than in the non-adaptive setting, where false positives are
+much more common in counting filters than false negatives, and therefore much
+more relevant in determining the minimum size of the filter.
