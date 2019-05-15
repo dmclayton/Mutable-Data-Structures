@@ -85,13 +85,14 @@
     $\err[x] \gets a$\\
     return $a$
 }
-\caption{Games 0, 1, and 2 for proof of Theorem~\ref{thm:sbf-erreps}.}
-\label{fig:sbf-erreps/games}
+\caption{Games 0, 1, and 2 for proof of Theorem~\ref{thm:sbf-erreps-th}.}
+\label{fig:sbf-erreps-th/games}
 \end{figure*}
 
-As before, we assume without loss of generality that there are no
-insertions of or queries for elements of $\col$, and we start with a
-game~$\game_0$, defined in Figure~\ref{fig:sbf-erreps/games} that is identical to the \erreps\ game for $\KBF_\mathrm{ft}$.
+As before, we assume without loss of generality that there are no insertions of
+or queries for elements of $\col$, and we start with a game~$\game_0$, defined
+in Figure~\ref{fig:sbf-erreps/games} that is identical to the \erreps\ game for
+$\KBF_\mathrm{ft}$.
 
 To avoid the unfortunate $q_R$ factor in the bound, we do not make use of
 Lemma~\ref{thm:lemma1} in this proof. Because of that, we must find some other
@@ -113,7 +114,7 @@ Next, we want to ensure that the adversary's $\HASHO_1$ queries are independent
 of the $\HASHO_2$ and $\HASHO_3$ queries used for $\REPO$, $\QRYO$, and $\UPO$.
 Since the $\HASHO_c$ oracles use random sampling to fill a shared table, this
 occurs if and only if the adversary calls
-$\HASHO_1(\langle\salt_i \cat x\rangle)$
+$\HASHO_1(\salt_i \cat x)$
 for some salt $\salt_i$ used by one of the representations created by $\REPO$.
 By an argument very similar to that in the previous proofs, the adversary has at
 most $q_H/2^\lambda$ probability of calling $\HASHO_1$ with the salt used by
@@ -141,7 +142,7 @@ $\advC$ for~$\game_3$ that obtains at least as large an advantage by having $\ad
 simulate $\advB$, forwarding all oracle queries in the natural way except that
 $\UPO$ queries are ignored, with $\advC$ simply returning $\top$ to $\advB$ without
 performing any additional computations or oracle calls. (Recall that, in the
-\erreps setting, the adversry expects $\top$ to be the output of~$\UPO$.) Since $\advB$ does not
+\erreps\ setting, the adversry expects $\top$ to be the output of~$\UPO$.) Since $\advB$ does not
 query elements which are already in $\col$, the outputs of $\HASHO_3$ calls are
 independent of any prior $\HASHO_2$ calls.
 %
@@ -171,7 +172,7 @@ independent of the $\HASHO_2$ calls used to construct the representation, each
 $\QRYO$ call made by $D$ has the same chance of producing a hit as the $\QRYO$
 call made by $C$ has of producing a false positive.
 %
-The win conditions differ
+The winning conditions differ
 only in that $D$ wins by accumulating $r$ positive results, whereas $C$ must
 accumulate $r$ false positives within a single representation, and so $D$ wins
 if $\advC$ does. Therefore $\Prob{\game_3(\advC) = 1} \le \Prob{\game_4(D) = 1}$.
@@ -186,8 +187,8 @@ and we can once more apply a Chernoff bound, as long as $p_\ell q_T < r$, to sim
    \Prob{\game_4(D)=1} \le
      e^{r-p_\ell q_T}\left(\frac{p_\ell q_T}{r}\right)^r.
 \end{equation}
-
-Substituting this into our earlier inequalities yields the final bound of
+%
+Substituting this into our earlier inequalities yields
 \begin{equation}
    \Adv{\erreps}_{\Pi,\delta,r}(\advA) \leq
      \frac{q_R(q_H+q_R)}{2^\lambda} + e^{r-p_\ell q_T}\left(\frac{p_\ell q_T}{r}\right)^r.

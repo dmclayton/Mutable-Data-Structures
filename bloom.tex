@@ -508,7 +508,9 @@ this, and because we are able to demonstrate better security bounds for an
 $\ell$-thresholded filter than for a capped filter, we suggest this as a way
 of providing strong security guarantees for even smaller filter sizes.
 
-\begin{theorem}[\erreps\ security of thresholded BFs]\label{thm:bf-thr-bound}
+\begin{theorem}[\erreps\ security of thresholded BFs]
+\label{thm:bf-thr-bound}
+\label{thm:sbf-erreps-th}
 Let $p_\ell = ((\ell+k)/m)^k$. For integers $q_R, q_T, q_H, r, t \geq 0$ such
 that $r > p_\ell q_T$, it holds that
   \begin{equation*}
@@ -527,21 +529,29 @@ to 1, regardless of how the attack is conducted. The thrust of the proof is to
 assume the adversary will always be able to produce such a maximally full
 filter, and then use a standard binomial-distribution-based bound to place a
 limit on the adversarial advantage even in this worst-case scenario.
+%
+See Appendix~\ref{sec:proof/sbf-erreps-th} for details.
 
 \todo{CP}{If time, plot the bound just like before and compare it to
 Theorem~\ref{thm:sbf-erreps}.}
 
-\begin{proof}
-  \input{proof/sbf-erreps-th}
-\end{proof}
+%\begin{proof}
+%  \input{proof/sbf-erreps-th}
+%\end{proof}
 
 
 \subsection{Discussion}
 
+\todo{DC}{Revise this. It should be a summary of all of the results: basic BFs
+are week; salted BFs are fine, but we need bigger ones in the public setting and
+we can't allow mutations (in the private setting we allow mutations and get
+better bounds for smaller filters; keyed BFs perform well in the public, mutable
+setting; thresholding yields better bounds than the usual capped appraoch.}
+%
 These results show that the standard Bloom filter construction is not secure
-against an adaptive adversary. The best mitigation strategy against potential
-attacks depends on the setting. If Bloom filters are designed to be immutable,
-using a per-representation salt and a sufficiently large filter is sufficient.
+against an adaptive adversary. The best defensive strategy against potential
+attacks depends on the setting. If the representation is never updated, then
+using a per-representation salt and a sufficiently large filter is enough.
 Similarly, if the filters are not revealed to potential adversaries (i.e.
 parties that get to choose inputs), salting provides a security guarantee which
 can be further improved by using $\ell$-thresholding. Importantly, if filters
@@ -552,7 +562,7 @@ These requirements are more stringent than the mitigations suggested by Gerbet
 \etal~\cite{gerbet2015power} due to our stronger attack model (where multiple
 filters can be constructed, and sometimes revealed, to the adversary) and our
 goal of establishing a general security bound for any adversary rather than
-mitigating specific attacks. If $q_R$ is small, our \erreps\ guarantee for
+mitigating specific attacks. If~$q_R$ is small, our \erreps\ guarantee for
 $\SBF$ and \errep\ guarantee for $\KBF$ show that filters need not be made much
 larger than Gerbet \etal's in order to provide comparable security against more
 general adversaries. If $q_R$ is large, however, the $q_R$ term in the error
@@ -560,7 +570,3 @@ bounds means that the filters must be made large to provide good error
 guarantees. In this scenario, however, the $\ell$-thresholding class of filter
 provides a way to get strong error guarantees without significantly increasing
 the filter size.
-
-\cpnote{How does the $\ell$-threshold bound compare to that of $n$-capping?}
-\dcnote{This should probably be a graph, but I can't get pylab working for some
-reason...}
