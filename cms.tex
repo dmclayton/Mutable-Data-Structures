@@ -146,6 +146,9 @@ of the $\UPO$ oracle (which can perform insertions as well as deletions) and
 the greater amount of information returned by the $\QRYO$ oracle (frequencies
 rather than binary membership queries).
 
+Formally, we consider the structure given by $\Pi = \sketch[H,\ell,\lambda]$ for
+an unkeyed hash function $H: \bits^* \to [m]^k$.
+
 \begin{theorem}[\erreps\ security of thresholded BFs]\label{thm:scms-erreps-th}
 Let $p_\ell = ((\ell+1)/m)^k$ and $r' = \lfloor r/(k+1) \rfloor$. For integers $q_R, q_T, q_H, r, t \geq 0$ such
 that $r' > p_\ell q_T$, it holds that
