@@ -1,12 +1,10 @@
 \begin{figure*}
-\todo{DC}{nit: Here and throughout the rest of paper, change $ct$ to
-$\mathit{ct}$. The former looks like $c\cdot t$.}
 \twoCols{0.47}
 {
   \vspace{-7pt}
   \experimentv{$\game_{0}(\advA)$}\\[2pt]
     $\key \getsr \keys$;
-    $ct \gets 0$\\
+    $\ct \gets 0$\\
     $i \getsr \advA^{\REPO,\QRYO,\UPO}$;
     return $\big[\sum_x \err_i[x] \geq r\big]$
   \\[6pt]
@@ -24,12 +22,12 @@ $\mathit{ct}$. The former looks like $c\cdot t$.}
     return $a$
   \\[6pt]
   \oraclev{$\REPO(\col)$}\\[2pt]
-    $ct \gets ct+1$;
-    $\setS_{ct} \gets \col$;
-    $\salt_{ct} \getsr \bits^\lambda$;
-    $c_{ct} \gets |\col|$\\
-    $M_{ct} \gets \bigvee_{x \in \col} \bmap_m(\PRFO(\salt_{ct} \cat x))$;
-    return $\langle M_{ct}, \salt_{ct}, c_{ct} \rangle$
+    $\ct \gets \ct+1$;
+    $\setS_{\ct} \gets \col$;
+    $\salt_{\ct} \getsr \bits^\lambda$;
+    $c_{\ct} \gets |\col|$\\
+    $M_{\ct} \gets \bigvee_{x \in \col} \bmap_m(\PRFO(\salt_{\ct} \cat x))$;
+    return $\langle M_{\ct}, \salt_{\ct}, c_{\ct} \rangle$
   \\[6pt]
   \oraclev{$\UPO(i, \up_x)$}\\[2pt]
     if $w(M) > \ell$ then return $\top$\\
@@ -42,19 +40,19 @@ $\mathit{ct}$. The former looks like $c\cdot t$.}
   \vspace{-7pt}
   \experimentv{$\game_2(\advA)$}\hfill\diffplus{$\game_3$}\\[2pt]
     $\key \getsr \keys$;
-    $ct \gets 0$;
+    $\ct \gets 0$;
     $\setZ \gets \emptyset$\\
     $i \getsr \advA^{\REPO,\QRYO,\UPO}$;
     return $\big[\sum_x \err_i[x] \geq r\big]$
   \\[6pt]
   \oraclev{$\REPO(\col)$}\\[2pt]
-    $ct \gets ct+1$;
-    $\setS_{ct} \gets \col$;
-    $\salt_{ct} \getsr \bits^\lambda \setminus \setZ$;
-    $c_{ct} \gets |\col|$\\
-    $\setZ \gets \setZ \cup \{\salt_{ct}\}$\\
-    $M_{ct} \gets \bigvee_{x \in \col} \bmap_m(\PRFO(\salt_{ct} \cat x))$;
-    return $\langle M_{ct}, \salt_{ct}, c_{ct} \rangle$
+    $\ct \gets \ct+1$;
+    $\setS_{\ct} \gets \col$;
+    $\salt_{\ct} \getsr \bits^\lambda \setminus \setZ$;
+    $c_{\ct} \gets |\col|$\\
+    $\setZ \gets \setZ \cup \{\salt_{\ct}\}$\\
+    $M_{\ct} \gets \bigvee_{x \in \col} \bmap_m(\PRFO(\salt_{\ct} \cat x))$;
+    return $\langle M_{\ct}, \salt_{\ct}, c_{\ct} \rangle$
   \\[6pt]
   \oraclev{$\QRYO(i, \qry_x)$}\\[2pt]
     $X \gets \bmap_m(\PRFO(\salt_i \cat x))$;
@@ -76,7 +74,7 @@ $\mathit{ct}$. The former looks like $c\cdot t$.}
     return $a$
     }
     \diffplusbox{
-    for $j \in [ct]$ do\\
+    for $j \in [\ct]$ do\\
     $\tab X \gets \bmap_m(\PRFO(\salt_j \cat x))$;
     $a_j \gets X = M_j \AND X$\\
     $\tab$if $\err_j[x] < \delta(a_j,\qry_x(\col_j))$ then
@@ -91,10 +89,12 @@ $\mathit{ct}$. The former looks like $c\cdot t$.}
 We start with a game~$\game_0$ which is essentially the same as the standard
 \errep\ experiment on a Bloom filter, given the assumption (without loss of
 generality) that the adversary never attempts to construct a representation for
-a set with more than $n$ elements. As with the other proofs, it is easy to see
-that for any such \errep\ adversary we can make an adversary $\advA$
-for~$\game_0$ with the same resources that achieves the same advantage.
-
+a set with more than~$n$ elements.
+%
+%As with the other proofs, it is easy to see
+%that for any such \errep\ adversary we can make an adversary $\advA$
+%for~$\game_0$ with the same resources that achieves the same advantage.
+%
 Unlike in the previous two proofs, we cannot use Lemma~\ref{thm:lemma1} because
 an adversary cannot simulate the oracles without knowing the private key. We use
 an alternate approach to gradually reduce to the standard binomial bound
@@ -105,21 +105,25 @@ The number of times the PRF is evaluated on distinct inputs is bounded by the
 number of queries available to the adversary. In particular, $\QRYO$ and $\UPO$
 each call the PRF once, while $\REPO$ may call the PRF up to $n$ times. If the
 adversary runs in $t$ time steps, then, the probability it can distinguish the
-PRF from a random function is bounded by $\Adv{\prf}_F(t,nq_R+q_T+q_U)$.
+PRF from a random function is bounded by $\Adv{\prf}_F(O(t),nq_R+q_T+q_U)$.
 %
 In~$\game_1$, we have a game which is identical to~$\game_0$ except that it uses
 random sampling in place of the PRF. If $\advA$ cannot distinguish the PRF from
 a random function then these games are indistinguishable from the adversary's
-perspective, so $\Prob{\game_0(\advA) = 1} \le \Adv{\prf}_F(t,nq_R+q_T+q_U) +
-\Prob{\game_1(\advA) = 1}$.
+perspective.
 %
-\cpnote{In fat, this isn't immediate. You show this by a reduction. You want to
-show that for every $\advA$ there exists an adversary~$D$ such that
-$\Prob{\game_0(\advA)=1} - \Prob{\game_1(\advA)=1} \leq \Adv{\prf}_F(D)$. You
-don't need to be super formal about it, but you do need to say how~$D$
-executes~$\advA$ and what outputs.}
+\todo{DC}{Exhibit adversary~$D$ such that $\Prob{\game_0(\advA)=1} -
+\Prob{\game_1(\advA)=1} \leq \Adv{\prf}_F(D)$, and argue that its resoruce are
+as stated by the theorem. You don't need to be super formal about it, but you do
+need to say how~$D$ executes~$\advA$ and what outputs.}
 
-Our goal is to argue, in a similar manner as to the previous theorems, that all of the oracle calls are independent. In order to guarantee this we must deal with the possibility of a salt collision between different representations. In~$\game_2(\advA)$ we require that all salts be distinct between representations. By the birthday bound, collisions between randomly-generated salts occur with frequency at most $q_R^2/2^\lambda$, so $\Prob{\game_1(\advA) = 1} \le q_R^2/2^\lambda + \Prob{\game_2(\advA) = 1}$.
+Our goal is to argue, in a similar manner as to the previous theorems, that all
+of the oracle calls are independent. In order to guarantee this we must deal
+with the possibility of a salt collision between different representations.
+In~$\game_2(\advA)$ we require that all salts be distinct between
+representations. By the birthday bound, collisions between randomly-generated
+salts occur with frequency at most $q_R^2/2^\lambda$, so $\Prob{\game_1(\advA) =
+1} \le q_R^2/2^\lambda + \Prob{\game_2(\advA) = 1}$.
 
 With guaranteed-unique salts, the result of each $\REPO$, $\UPO$, and $\QRYO$
 call for a given representation is independent of the calls for all other
@@ -128,7 +132,8 @@ Theorem~\ref{thm:sbf-erreps}, we can reduce from any $\advA$ to an adversary
 $\advB$ which follows any $\QRYO$ call that finds a true negative with an
 $\UPO$ call to insert that element, and therefore move to~$\game_3(\advB)$,
 which as in the Theorem~\ref{thm:sbf-erreps} proof performs an update after each
-query is made, with the guarantee that $\Prob{\game_1(\advA) = 1} \le \Prob{\game_2(\advB) = 1}$
+query is made, with the guarantee that $\Prob{\game_1(\advA) = 1} \le
+\Prob{\game_2(\advB) = 1}$.
 
 Finally, we must deal with the possibility that the adversary chooses which
 representations to target with $\UPO$ and $\QRYO$ calls based on the result of
@@ -154,13 +159,7 @@ still given by the non-adaptive false positive probability $p'$ for a Bloom
 filter containing $n+r$ elements. Since the representations are independent of
 each other, the probability of a false positive occurring in any of up to $q_R$
 representations is at most $p'q_R$. We can therefore bound the adversary's
-success probability using a binomial distribution, similar to before:
-\begin{equation}
-   \Prob{\game_4(\advB)=1} \le
-     \sum_{i=r}^{q_T} \binom{q_T}{i}(p'q_R)^i(1-p'q_R)^{q_T-i} \,.
-\end{equation}
-
-Applying the usual Chernoff bound, we find
+as before. In particuar,
 \begin{equation}
    \Prob{\game_4(\advB)=1} \le
      e^{r-p'q_Rq_T}\left(\frac{p'q_Rq_T}{r}\right)^r.
@@ -169,9 +168,9 @@ Applying the usual Chernoff bound, we find
 So, substituting this bound back into the earlier advantage inequalities, we find the final bound of
 \begin{equation*}
   \begin{aligned}
-    \Adv{\errep}_{\Pi,\delta,r}(t, q_R,q_T,q_U,q_H) &\leq \\
-      \Adv{\prf}_F(t,nq_R+q_T+q_U) & +
+    \Adv{\errep}_{\Pi,\delta,r}(\advA) &\leq \\
+      \Adv{\prf}_F(D) &  +
     \frac{q_R^2}{2^\lambda} +
-    \left(\frac{p'q_Rq_T}{r}\right)^re^{r-p'q_Rq_T}
+    \left(\frac{p'q_Rq_T}{r}\right)^re^{r-p'q_Rq_T} \,.
   \end{aligned}
 \end{equation*}
