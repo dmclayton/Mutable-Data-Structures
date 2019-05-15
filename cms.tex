@@ -193,13 +193,16 @@ seeks to find $r'$ overestimates by making arbitrary queries.
 
 \subsection{Discussion}
 
-Unlike in the Bloom filter case, there is no simple tweak that can be performed
-to a count min-sketch to provide good \errep\ security bounds. However, the
-bound above shows that in settings where sketches can be assumed secret it is
-possible to place bounds on the number of overestimates an adversary can cause.
-In particular, we recommend the combination of random per-representation salts
-and $\ell$-thresholding in order to mitigate possible attacks in the \erreps\
-setting.
+Unlike Bloom filters, there is no simple tweak that can be performed
+to a count min-sketch to provide good \errep\ security bounds. In particular, it
+does not achieve security even in the immutable setting, and adding a secret key
+does not help.
+%
+However, the bound above shows that in settings where sketches can be assumed
+secret it is possible to prove an upper bound on the number of overestimates an
+adversary can cause. In particular, we recommend the combination of random
+per-representation salts and $\ell$-thresholding in order to mitigate possible
+attacks in the \erreps\ setting.
 
 The bound we achieve is based on the same binomial bound as in the case of Bloom
 filters, but has a notable difference in the form of $r'$ replacing $r$. This
@@ -209,3 +212,5 @@ only $k+1$, the difference should not be unacceptably extreme given reasonable
 parameter choices. We also note that it is possible this bound can be improved
 to reduce the impact on sketch size, since the initial factor of $q_R$ does not
 have an obvious attack associated with it which would make this bound tight.
+%
+(The same is true, of course, of Bloom filters.)
