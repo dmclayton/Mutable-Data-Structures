@@ -71,10 +71,9 @@ representation, insert an element $x$, observe which counters are incremented by
 this insertion, and then delete $x$. By doing this repeatedly, the adversary can
 gain information about which elements overlap with which combinations of other
 elements, and can therefore mount the same target-set coverage attack as in the
-count min-sketch case. In fact, the attack is slightly easier to pull off, since
-once a good test set is found the adversary need only insert each element of the
-set once in order to cause the elements of the target set to become false
-positives.
+count min-sketch case. Because of this attack, we can only hope to demonstrate
+good error bounds in the \erreps\ setting. As before, we turn to the use of
+$\ell$-thresholding to provide good error bounds.
 
 \subsection{Private Thresholded Counting Filters}
 
@@ -83,17 +82,29 @@ For integers $q_R, q_T, q_H, r, t \geq 0$, let $p_\ell = ((\ell+1)/m)^k$ and
 $r' = \lfloor r/\max(\delta^+,k\delta^-) \rfloor$. If $r' > p_\ell q_T$, it holds that
   \begin{equation*}
   \begin{aligned}
-   \Adv{\erreps}_{\Pi,\delta,r}(t, q_R,q_T,q_U,q_H,q_V) &\leq\\
+   \Adv{\erreps}_{\Pi,\delta,r}(O(t), q_R,q_T,q_U,q_H,q_V) &\leq\\
      & q_R \cdot \left[\frac{q_H}{2^\lambda} + e^{r'-p_\ell q_T}\left(\frac{p_\ell q_T}{r'}\right)^{r'}\right],
   \end{aligned}
 \end{equation*}
 where $H$ is modeled as a random oracle.
 \end{theorem}
-The proof is somewhat similar to that of Theorem~\ref{thm:scms-erreps-tex},
-but a major difference comes from the difference in $\Qry$. In particular,
-a string which is an element of the underlying data object cannot
-produce an error through being overestimated, but it can produce an error
-through being \emph{underestimated} if the adversary causes false negatives.
+The proof combines details from the proofs of count min-sketch bounds and the
+proofs of Bloom filter bounds. In particular, we begin by following an argument
+as in the count min-sketch case to limit the advantage the adversary can get
+from deleting elements and from re-inserting elements of the original set. There
+is a difference in the counting filter case in that \emph{inserting} a known
+false positive cannot benefit the adversary, while \emph{deleting} it can. This
+is the opposite of the count min-sketch case, but the effect on the bound is
+quite similar. In each case we give the adversary additional credit for finding
+these false positives while constraining them to not modify false positives they
+find. This causes $r'$ to appear in the proof bound rather than $r$ in each
+case, but because of the different error functions the definitions of $r'$ are
+slightly different.
+
+After this step, we make use of the observation that a counting filter without
+deletion behaves the same as an ordinary Bloom filter in terms of how it
+responds to queries. We can therefore borrow the arguments used to establish the
+bounds in Theorem~\ref{sbf-erreps-th} to finish the proof.
 \begin{proof}
   \input{proof/scbf-erreps-th}
 \end{proof}

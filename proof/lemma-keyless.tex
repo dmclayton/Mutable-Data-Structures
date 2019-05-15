@@ -1,11 +1,8 @@
-\todo{CP}{Check this.}
-\todo{DC}{Fix experiment macros.}
-
-For a fixed $r \ge 0$, let $\advA$ be an $\errep$ or $\erreps$ adversary which runs in $t$ time steps and makes $q_R$ $\REPO$ queries, $q_T$ $\QRYO$ queries, $q_U$ $\UPO$ queries, and $q_H$ RO queries. We construct an adversary $B$ for $\errep1$ or $\erreps1$, respectively, as follows.
+For a fixed $r \ge 0$, let $\advA$ be an \errep\ or \erreps\ adversary which runs in $t$ time steps and makes $q_R$ $\REPO$ queries, $q_T$ $\QRYO$ queries, $q_U$ $\UPO$ queries, and $q_H$ RO queries. We construct an adversary $B$ for \errep1 or \erreps1, respectively, as follows.
 
 First, $\advB$ initializes a counter $ct \gets 0$ and a set $\setC \gets \emptyset$, and samples $q \getsr [q_R]$. Next $\advB$ executes $\advA$, simulating the answers to its oracle queries as follows. When $\advA$ asks the query $\REPO(\col)$, $\advB$ sets $ct \gets ct + 1$ and stores $\col_{ct} \gets \col$. Then, if $ct = q$, $B$ forwards $\col$ to its own $\REPO$ oracle, returning the resulting value ($\pub$ in the public-representation case, or $\top$ in the private-representation case) to $\advA$. Otherwise, $\advB$ computes $\pub_{ct} \getsr \Rep(\col)$ and returns either $\pub_{ct}$ or $\top$. When $\advA$ asks for the query $\QRYO(i,\qry)$, $\advB$ first checks if $(i,\qry) \in \setC$ and returns $\bot$ if this condition holds. Otherwise $\advB$ forwards $(i,\qry)$ to its $\QRYO$ oracle and returns $a$ if $i = q$, and reutrns $\Qry(\pub_i,\qry)$ otherwise. Similarly, when $\advA$ makes an $\UPO(i,\up)$ query, $\advB$ forwards $(i,\up)$ to its $\UPO$ oracle if $i = q$ and evaluates $\Up(\pub_i,\up)$ otherwise. Finally, queries from $\advA$ to its RO are simply forwarded to $\advB$'s RO. When $\advA$ halts and outputs $j$, $\advB$ does the same.
 
-Note that in the $\erreps1$ scenario we need not provide the adversary with a $\REVO$ oracle. If the adversary uses only a single representation, may assume without loss of generality that they make no call to $\REVO$, since doing so would prevent the adversary from having any possibility of winning.
+Note that in the \erreps1 scenario we need not provide the adversary with a $\REVO$ oracle. If the adversary uses only a single representation, may assume without loss of generality that they make no call to $\REVO$, since doing so would prevent the adversary from having any possibility of winning.
 
 If $j = q$, then $B$ wins if $A$ does, since all queries from $A$ to $\pub_j$ were forwarded to $B$'s $\QRYO$ oracle. Given that $q$ is sampled uniformly from the range $[q_R]$, it follows that
 
