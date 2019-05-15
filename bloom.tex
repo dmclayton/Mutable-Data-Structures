@@ -542,21 +542,16 @@ Theorem~\ref{thm:sbf-erreps}.}
 
 \subsection{Discussion}
 
-\todo{DC}{Revise this. It should be a summary of all of the results: basic BFs
-are week; salted BFs are fine, but we need bigger ones in the public setting and
-we can't allow mutations (in the private setting we allow mutations and get
-better bounds for smaller filters; keyed BFs perform well in the public, mutable
-setting; thresholding yields better bounds than the usual capped appraoch.}
-%
-These results show that the standard Bloom filter construction is not secure
-against an adaptive adversary. The best defensive strategy against potential
-attacks depends on the setting. If the representation is never updated, then
-using a per-representation salt and a sufficiently large filter is enough.
-Similarly, if the filters are not revealed to potential adversaries (i.e.
-parties that get to choose inputs), salting provides a security guarantee which
-can be further improved by using $\ell$-thresholding. Importantly, if filters
-cannot be kept private, a secret key must be used alongside the salt to prevent
-potential attacks.
+These results show that the standard Bloom filter construction is weak to
+adaptive adversaries. Moving to the salted $\SBF$ construction mitigates this,
+but if filters are public they must be both large and immutable. In the \erreps\
+setting updates do not break security and the minimum size of the filter to
+guarantee a fixed error rate is considerably reduced. The guarantee (or,
+equivalently, filter size) can be further improved, especially if the number of
+representations constructed is large, by using $\ell$-thresholding.
+Additionally, if the filters themselves cannot be kept private but a secret key
+for the hash functions \emph{can} be concealed from adversaries, the $\KBF$
+construction shows how to provide security in the \errep\ setting.
 
 These requirements are more stringent than the mitigations suggested by Gerbet
 \etal~\cite{gerbet2015power} due to our stronger attack model (where multiple
