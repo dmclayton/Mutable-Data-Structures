@@ -62,47 +62,34 @@ three algorithms take a key~$\ky$ as input, and both~$\Rep$ and~$\Up$ may be
 randomized.
 
 
-\todo{DC}{Make this about counting filters}
 The combination of mutability and rich query spaces has significant
-implications for security.  Consider the count-min
-sketch structure~\cite{cormode2005improved}, which compactly (and approximately)
-represents an updatable multiset~$\col$.  
-Loosely, the representation of~$\col$ is a two-dimensional array
+implications for security. Consider the counting filter
+structure~\cite{fan2000summary}, which compactly (and approximately) represents
+an updatable multiset~$\col$. Loosely, the representation of~$\col$ is an array
 of counters. To add an instance of~$x$, the representation is
 updated by hashing~$x$ to identify particular counters, and then
 incrementing these.  An instance of~$x$ is removed
-by hashing and decrementing the counters.
-The frequency of~$x$ is determined by taking
-the minmum value~$v$ over the counters associated to it. (Counters are
-typically floored at 0.)  Now, if one
-restricts to set-membership queries ---~is $v>0$?~-- there is the
-potential for both false-positive \emph{and} false-negative
+by hashing and decrementing the counters. Whether~$x$ is a member of the
+multiset is determined by checking whether all of the counters associated with
+it are nonzero. (Counters are
+typically floored at 0.) In this setting, with a single type of query ---~is $v>0$?~--
+there is the potential for both false-positive \emph{and} false-negative
 responses.  In particular, if the representation is updated by
 ``removing'' an element~$y$ that does not appear in the
 underlying~$\col$, one or more of the counters associated to~$x$ may
-be decremented.
+be decremented, potentially causing~$x$ to become a false negative.
 
-\todo{TS}{Have another look at the results in Sections 5 and 6. The error
-function for CMS is now simply ``was the response an overestimate''; the
-counting filter is the one that allows for weighting false positives and
-negatives differently.}
-Even though it is two-sided, the notion of error with respect to set-membership
-queries is intuitive, even if one wants to associate different
-fixed costs to false-positives and false negatives.  For frequency
-queries, it is far less obvious.   One could define frequency-estimate
-error in an absolute sense, i.e., the data structure errs if its
-response is not exactly correct.  But even in the non-adaptive
-setting, traditional analyses guarantee only that the response will be
-\emph{close} to the exact frequency, with some probability that is close
-to one.  Thus, our security definitions are parameterized by a
-error-cost function~$\delta$: if the correct response to a query is~$a$ and
-the data structure responds with~$a'$, the cost of the error is
-$\delta(a,a') \geq 0$.
+Although the structures we consider here only have one or two possible types of
+error, we want to capture the idea that in general some types of error may be
+worse than others. Rather than making a simple count of the errors the adversary
+accumulates, then, we use an error-cost function~$\delta$: if the correct
+response to a query is~$a$ and the data structure responds with~$a'$, the cost
+of the error is $\delta(a,a') \geq 0$.
 
-They are also parameterized by an total-cost threshold, and
+Security games are additionally parameterized by an total-cost threshold, and
 the adversary is considered to ``win'' if the total cost of the errors it induces
 is greater than this value.  As we will see, even calculating the
-total cost is not straightforward.  In particular, determining whether
+total cost is not straightforward.  In particular, we must determine whether
 or not the cost of a given error should be carried across (adaptive,
 adversarial) updates to~$\col$ and its representation.
 
