@@ -40,12 +40,12 @@
 \label{fig:sbf-erreps/games}
 \end{figure*}
 
-This proof follows a similar structure to the proof of
-Theorem~\ref{thm:sbf-errep-immutable}.
+%This proof follows a similar structure to the proof of
+%Theorem~\ref{thm:sbf-errep-immutable}.
 %
-The primary distinction is that in the final game, unless the adversary `gets
-lucky' and guesses the salt, they should only be able to produce errors with
-$q_T$ queries, as opposed to both $q_T$ and $q_H$ queries.
+%The primary distinction is that in the final game, unless the adversary ``gets
+%lucky'' and guesses the salt, they should only be able to produce errors with
+%$q_T$ queries, as opposed to both $q_T$ and $q_H$ queries.
 %
 Just as in the proof of Theorem~\ref{thm:sbf-errep-immutable}, we will assume
 the adversary just makes a single call to $\REPO$ and use Lemma~\ref{thm:lemma1}
@@ -56,9 +56,9 @@ necessarily lose if it calls $\REVO$ on that representation. We may therefore
 assume without loss of generality that $\advA$ makes no calls to $\REVO$, and
 because of this we omit $\REVO$ from each of the games.
 %
-\cpnote{Good. Somehwere in the body we'll need to justify why we include~$\REVO$
-in the experiment, since at this point the reader has no reason to believe that
-$\REVO$ captures something useful.}
+%\cpnote{Good. Somehwere in the body we'll need to justify why we include~$\REVO$
+%in the experiment, since at this point the reader has no reason to believe that
+%$\REVO$ captures something useful.}
 
 In addition to the assumptions of Theorem~\ref{thm:sbf-errep-immutable}, we
 assume without loss of generality that the adversary never uses $\UPO$ to insert
@@ -90,13 +90,18 @@ when the queries are made, we can follow nearly the same argument as in the
 previous proof to get the bound
 %
 \begin{eqnarray}
-  \Prob{\game_0(\advB)=1} &\leq&
-    \Prob{\game_1(\advB)=1} + \Prob{\game_1(\advB) \sets \bad_1}\\
-  &\leq&
+  \Prob{\game_0(\advB)=1} \leq
     \Prob{\game_1(\advB)=1} + q_H/2^\lambda \,.
 \end{eqnarray}
 %
-In~$\game_1$, we may now assume that the adversary never guesses the salt in its $\HASHO_1$ queries. This means that none of the inputs to $\HASHO_1$ is ever equal to any input to $\HASHO_2$ or $\HASHO_3$, both of which always use the salt $\salt^*$. Since each $\HASHO$ is modeled as a random oracle, the outputs of $\HASHO_1$ are therefore independent of the outputs of $\HASHO_2$ and $\HASHO_3$.
+\todo{DC}{Don't assume the adversary never guesses the salt; argue that it's
+irrelevant if it does or not.}
+In~$\game_1$, we may now assume that the adversary never guesses the salt in its
+$\HASHO_1$ queries. This means that none of the inputs to $\HASHO_1$ is ever
+equal to any input to $\HASHO_2$ or $\HASHO_3$, both of which always use the
+salt $\salt^*$. Since each $\HASHO$ is modeled as a random oracle, the outputs
+of $\HASHO_1$ are therefore independent of the outputs of $\HASHO_2$ and
+$\HASHO_3$.
 %
 We still cannot move to the binomial distribution for non-adaptive queries,
 however, since $\HASHO_2$ and $\HASHO_3$ queries are not necessarily independent
@@ -113,6 +118,9 @@ $\QRYO(\qry_x)$ call, $\advC$ checks whether $x$ has already been queried. If
 so, $\advC$ randomly selects as $y$ the lexicographically first string such that
 $y \not\in \col$ and such that $y$ has not been previously
 queried, and calls $\QRYO(\qry_y)$ instead of $\QRYO(\qry_x)$.
+%
+\todo{DC}{Minimize the set of assumptions in light of this reduction. (I don't
+think you need all of them.)}
 
 Recall that $\advB$ makes no queries for elements of $\col$, so any repeated
 queries must have returned either false positives or true negatives the first
@@ -141,6 +149,11 @@ immediately calls $\UPO(\up_x)$ unless $q_U$ updates have already been
 performed. Finally, if $\advC$ makes an $\UPO$ call then $D$ forwards the call
 unless it has already made $q_U$ updates, in which case it just returns $\top$
 to $\advC$.
+%
+\todo{DC}{Re-check the bound. From what I can tell, this step means you you need
+to write $q_T+q_U$ in the final bound instead of $q_T$. MAKE SURE TO UPDATE THE
+THEOREM, AS WELL AS THE EQUATIONS IN THE PROOF! I'm not going to look at this
+proof again before submission.}
 
 By our earlier assumptions, there are only two types of update $\advC$ may make:
 %
@@ -197,14 +210,16 @@ insertions can only increase the chance of each following $\QRYO$ call being a
 false positive, it is optimal for the adversary to make all $\UPO$ calls at the
 beginning of the experiment, and then to make all $\QRYO$ calls. But this means
 we can assume without loss of generality that the adversary makes no $\UPO$
-calls at all, since any elements added through $\UPO$ before any $\QRYO$ calls
+calls at all\todo{DC}{That's true for~$E$, but not he adversary you started
+with~$A$. The final bound should account for~$A$'s as well as the overhead of
+the sequence of reductions.}, since any elements added through $\UPO$ before any $\QRYO$ calls
 are made could just as easily have been included in the original call to $\REPO$
 without affecting the adversary's advantage.
 
 We now therefore only consider the case of a $\REPO$ call followed by
 the~$\game_2$ version of $\QRYO$ calls. Let $\setX$ be the set of all queries
 $\qry_x$ which are sent to $\QRYO$ over the course of the experiment. We
-necessarily have $|\setX| \le q_T$, and each $\qry_x \in \setX$ has some
+necessarily have $|\setX| \le q_T$\todo{DC}{Double check this isn't $q_T+q_U$}, and each $\qry_x \in \setX$ has some
 probability of causing an error. Since $\col^*$ never grows to contain more than
 $n+r$ elements, the false positive probability for each such $\qry_x$ is bounded
 above by $p'$, the false-positive probability of a Bloom filter containing $n+r$

@@ -377,7 +377,7 @@ the adversary learned the salt as soon as the filter was created, and that from
 this it could compute the hash function on its own. Even if the filter is
 mutable, we can prevent this attack from working as long as we require that the
 filter under attack be kept secret from adversaries. In fact, we can attain the
-following \erreps\ bound for $\Pi = \SBF[H,n,\lambda]$.
+following \erreps\ bound for $\Pi$.
 
 \begin{theorem}[\erreps\ security of salted BFs]\label{thm:sbf-erreps}
   Let $p' = P_{k,m}(n+r)$.
@@ -395,18 +395,18 @@ following \erreps\ bound for $\Pi = \SBF[H,n,\lambda]$.
 \end{theorem}
 
 The proof follows a similar structure to that of
-Theorem~\ref{thm:sbf-errep-immutable}. The primary differences come from arguing
-that without a ``lucky'' guess of the salt the adversary cannot use its random
-oracle to find false positives, and from having to show that the adversary's
-access to $\UPO$ does not substantially change the security bound that can be
-derived. The first of these is straightforward given the private-representation
-setting, but the second requires investigating how much of an advantage the
-$\UPO$ oracle can give in a pollution attack, and then moving to games where
-this advantage is taken into account.
+Theorem~\ref{thm:sbf-errep-immutable}. The main differences come from arguing
+that without a ``lucky'' guess of the salt, the adversary cannot use $\HASHO$ to
+find false positives, and from having to show that the adversary's access to
+$\UPO$ does not substantially change the security bound that can be derived. The
+first of these is straightforward given the private-representation setting, but
+the second requires investigating how much of an advantage the $\UPO$ oracle can
+give, then moving to games where this advantage is taken into account. We defer
+the full proof to Appendix~\ref{sec:proof/sbf-erreps}.
 
-\begin{proof}[Proof of Theorem~\ref{thm:sbf-erreps}]
-  \input{proof/sbf-erreps}
-\end{proof}
+%\begin{proof}[Proof of Theorem~\ref{thm:sbf-erreps}]
+%  \input{proof/sbf-erreps}
+%\end{proof}
 
 \subsection{Keyed BFs}
 
