@@ -41,14 +41,13 @@ like a count min-sketch, allow for deletion as well as insertion. Unlike CMSs,
 however, counting filters are designed to handle set membership queries rather
 than frequency queries. Despite this, the two structures are closely related in
 terms of security properties. We show that \errep\ security is similarly
-impossible, but that with the $\ell$-thresholding assumption built into the
-definition presented in Figure~\ref{fig:cbf-def}, a bound for \erreps\ can be
-achieved which is very close to the bound for a count min-sketch.
+impossible, but employing $\ell$-thresholding allows for \erreps\ security witha
+bound that is close to count min-sketch.
 
 \heading{Error function for frequency queries}
 %
 Unlike with a Bloom filter or count min-sketch, counting filters must account
-for two different types of error: false positives and false negatives. To be as
+for two different types of errors: false positives and false negatives. To be as
 general as possible, we define a parametrized error function~$\delta$ for
 positive $\delta^+, \delta^- \in \R$ as
 \begin{equation}
@@ -63,7 +62,7 @@ This means that false positives are given a weight of $\delta^+$ while false
 negatives are given a weight of $\delta^-$, and correct responses are given a
 weight of 0.
 
-\subsection{Insecurity of Public Counting Filters}
+\subsection{Insecurity of public counting filters}
 Any counting filter construction necessarily fails to satisfy \errep\
 correctness for the same reasons as in the case of count min-sketch. In
 particular, the adversary can call $\REPO(\emptyset)$ to receive an empty
