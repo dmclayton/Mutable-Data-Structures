@@ -1,43 +1,39 @@
-%
-Data structures are fundamental to essentially all areas of computer science.  
-The traditional approach to analyzing the correctness of a data structure 
-is to assume that all inputs, and all queries, 
-are independent of any internal randomness used to construct it. 
-But as highlighted by Naor and
-Yogev~\cite{naor2015bloom}, there are important use-cases in which the inputs and queries
-may be chosen \emph{adversarially} and \emph{adaptively}, based on partial
-information and prior observations about the data structure. Attacks of this
-sort can be used to dramatically degrade the performance of real systems
+Data structures are fundamental to essentially all areas of computer science.
+The traditional approach to analyzing the correctness of a data structure is to
+assume that all inputs, and all queries, are independent of any internal
+randomness used to construct it.  But as highlighted by Naor and
+Yogev (CRYPTO '15~\cite{naor2015bloom}), there are important use-cases in which the inputs
+and queries may be chosen \emph{adversarially} and \emph{adaptively}, based on
+partial information and prior observations about the data structure. Attacks of
+this sort can be used to disrupt or reduce the availability of real systems
 \cite{crosby2003denial,gerbet2015power,lipton1993clocked}.
 
 Naor and Yogev (NY) formalized a notion of adversarial correctness for
-Bloom-filter-like structures. Recall that
-a Bloom filter provides a compact representation~$\pub$ of a
-set~$\col$. The representation is a length~$m$ bit-array (initally
-all zeros), and elements $x \in \col$ are added to it by computing hash values
-$h_1(x),h_2(x),\ldots,h_k(x)\in [m]$, then setting the indicated array
-positions to~$1$.  A Bloom filter supports set membership queries,
-i.e., \emph{is $y\in\col$?}, by hashing~$y$ and responding positively iff all of
-the indicated positions hold a 1-bit.  When $h_1,\ldots,h_k$ are
+Bloom-filter-like structures. Recall that a Bloom filter provides a compact
+representation, $\pub$, of a set~$\col$. The representation is a length~$m$
+bit-array (initally all zeros), and elements $x \in \col$ are added to it by
+computing hash values $h_1(x),h_2(x),\ldots,h_k(x)\in [m]$, then setting the
+indicated array positions to~$1$.  A Bloom filter supports set membership
+queries, i.e., ``is $x\in\col$?'', by hashing~$x$ and responding positively
+iff all of the indicated positions hold a 1-bit.  When $h_1,\ldots,h_k$ are
 modeled as random functions, and~$\col$ is independent of these, classical
-results relate $|\col|,m,k$ to the probability of false-positive query responses.
+results relate $|\col|,m,k$ to the probability of false-positive query
+responses~\cite{broder2004network,kirsch2006less}.
 %
-Naor and Yogev revisited these results from a security perspective, by
+NY revisited these results from a security perspective, by
 formalizing an attack model in which the adversary specifies a
 (fixed) set~$\col$ that may
 depend on the hash functions, and is then allowed to adaptively query the
 (immutable) representation~$\pub$ in an effort to induce errors.
 
-We expand upon NY in several, practically relevant ways. 
-To begin, our attack model
-allows the adversary to adaptively \emph{update} the
-collection~$\col$, thereby capturing 
-settings in which the target data may change over time, e.g., streaming data applications.
-Correspondingly, we consider data
-structures that natively support \emph{mutable} representations.  Concrete examples of
-these include the counting filter~\cite{xxx}, count-min
-sketch~\cite{xxx}, the cuckoo filter~\cite{xxx}, \tsnote{Add a few
-  more}.
+This work expands upon NY in several, practically relevant ways.  To begin, our
+attack model allows the adversary to adaptively \emph{update} the
+collection~$\col$, thereby capturing settings in which the target data may
+change over time, e.g., streaming data applications.  Correspondingly, we
+consider data structures that natively support \emph{mutable} representations.
+Concrete examples of these include the counting filter~\cite{xxx}, count-min
+sketch~\cite{xxx}, the cuckoo filter~\cite{xxx}, \todo{DC}{Add references and
+add any other data structuers you feel should be named here.}
 %
 Next, while the Bloom filter was designed to represent
 data collections~$\col$ that are sets, streaming data is
@@ -111,7 +107,7 @@ from~$\col$ to representation is unpredictable, even if the
 representation of one or more closely related~$\col'$ are known), or both.
 
 \heading{Security findings.}
-\input{fig-results-overview}
+%\input{fig-results-overview}
 
 \tsnote{Stuff to do, typed up quickly during our Tuesday afternoon meeting...}
 \begin{itemize}
