@@ -108,7 +108,7 @@ That is, $P_{k,m}(n)$ is the probability that some~$x$ is a false positive for
 the representation of some~$\setS$ for which $|\setX|=n$ and $x\not\in\setS$,
 when a random function is used for hashing.
 %
-Findiing a tight, concrete upper bound for $P_{k,m}(n)$ has proven challenging,
+Finding a tight, concrete upper bound for $P_{k,m}(n)$ has proven challenging,
 but we do understand its asymptotic behavior. Kirsch and
 Mitzenmacher~\cite{kirsch2006less} prove that, for certain choices of $k$ and
 $m$ as functions of~$n$, it holds that
@@ -288,8 +288,8 @@ above attack fails. Indeed, when we restrict ourselves to the immutable setting,
 we can prove the following.
 %
 \begin{theorem}[Immutable \errep\ security of salted BFs]\label{thm:sbf-errep-immutable}
-  Let $p=P_{k,m}(n)$. 
-  For all integers $q_R, q_T, q_H, r, t \geq 0$ it holds that
+  Let $p=P_{k,m}(n)$.  For all integers $q_R, q_T, q_H, r, t \geq 0$ it holds
+  that
   \begin{equation*}
     \begin{aligned}
             \Adv{\errep}_{\Pi,\delta,r}(t,\,&q_R,q_T,0,q_H) \leq \\
@@ -310,7 +310,8 @@ the case that $r > pq$.
 Before giving the proof, let us take a moment to unpack the result a bit.  The
 bound can be broken down into three main components. The factor
 of~$q_R$ means that the bound we can prove is weakened somewhat when a number of
-representations are observed by the adversary. The $q_H/2^\lambda$ term
+representations are observed by the adversary. (In Section~\ref{sec:bf-thresh},
+we will show that we can do better by thresholding rather than capping.) The $q_H/2^\lambda$ term
 corresponds to the probability of the adversary guessing the salt before the
 representation is constructed, but this will be negligible as long as $\lambda$
 is chosen to be sufficiently large (say, $\lambda=128$). The final, messier term
@@ -346,10 +347,10 @@ can make~$q =2^{64}$ $\HASHO$ or $\QRYO$ queries.
 We concede that requiring a~$3$KB for a filter a set of $100$ elements may be
 prohibitive in some applications. We would require a substantially smaller
 filter for smaller~$q$, but unfortunately, a query complexity of $q=2^{64}$ in
-the \errep1 setting is quite realistic, since the attack can be carried out
+the \errep\ setting is quite realistic, since the attack can be carried out
 offline.
 %
-In the \erreps setting, or in the \errep\ setting when we use a PRF instead of a
+In the \erreps\ setting, or in the \errep\ setting when we use a PRF instead of a
 hash function, the adversary's attack is largely \emph{online}, rendering
 the~$q$ term quite pessimistic. In these settings, a significantly smaller
 filter will do.
@@ -467,7 +468,7 @@ oracle. Without this assumption that representations are never leaked to the
 adversary, however, we emphasize that merely using a long-term secret key
 without a per-representation salt does not guarantee security.
 
-\subsection{$\ell$-threshold BFs}
+\subsection{$\ell$-threshold BFs}\label{sec:bf-thresh}
 
 \begin{figure}
   \twoColsNoDivide{0.22}
