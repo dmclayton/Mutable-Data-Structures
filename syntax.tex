@@ -123,8 +123,7 @@ Both~$\Rep$ and the~$\Up$ algorithm can be viewed (informally) as mapping data
 objects to representations ---~explicitly so in the case of~$\Rep$, and
 implicitly in the case of~$\Up$~--- so we allow~$\Up$ to make per-call random
 choices, too.  Many common data structures do not have randomized representation
-updates, but some do, e.g. the Cuckoo filter~\cite{fan2014cuckoo}\todo{DC}{Fix
-ref} and the stable
+updates, but some do, e.g. the Cuckoo filter~\cite{fan2014cuckoo} and the stable
 Bloom filter~\cite{deng2006approximately}.
 
 The query algorithm $\Qry$ is deterministic.  This reflects the overwhelming
@@ -133,28 +132,6 @@ space-efficient representations. It also allows us to focus on correctness
 errors caused by the actions of an adaptive adversary, without attending to
 those caused by randomized query responses.  Randomized query responses may be
 of interest from a data privacy perspective, but our focus is on correctness.
-
-\heading{Invertibility}
-\todo{DC}{Decide if we still need this definition. If we don't use it
-anywhere, then we don't need it.}
-%
-Some important data structures admit update operations that are ``inverses'' of
-each other.  For example, the count-min sketch structure supports the addition
-and deletion of elements from the underlying (multi)set that it represents.
-Thus, we say that $\Pi$ is {\em invertible} if, for every representation $\pub$
-, update $\up \in \mathcal{U}$, and key~$K \in \keys$, there is $\up' \in
-\mathcal{U}$ such that \[\Prob{\Up(K,\Up(K,\pub,\up),\up') = \pub} = 1\,.\]
-
-\ignore{
-For example, count-min sketches are invertible, by consequence of being
-deterministic and having both insertion and deletion operations. Counting Bloom
-filters are not quite invertible because the counters have a minimum of 0.
-Consider an element $a$ such that some but not all of the counters associated
-with $a$ are 0. A deletion operation for an element $a$ will decrement only the
-nonzero counters, after which an insertion operation for $a$ would increment all
-of the counters. This shows that insertion and deletion are not perfect
-inverses.
-}
 
 \begin{figure*}[tp]
 \begin{center}
