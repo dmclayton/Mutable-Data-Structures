@@ -30,23 +30,12 @@ of \emph{nonzero} integers in the array. We also define $\zeroes(m)$ to be a
 function taking a non-negative integer and returning a length-$m$ integer vector
 with all entries set to~$0$.
 
-Let $\Func(\setX,\setY)$ denote the set of functions $f:\setX\to\setY$. \tsnote{I have no idea what this
-next sentence is meant to say.  ``If $\setY$, then...'' } If
-$\setY$, then we associate to this set the following distribution. For all
-$x\in\setX$ and $y\in\setY$ it holds that
-$\Prob{f\getsr\Func(\setX,\setY):f(x)=y} = |\setY|^{-1}$. \tsnote{This
-  uniform probability holds for any non-empty~$\setX,\setY$ by virtue of
-  sampling $f \getsr\Func(\setX,\setY)$.  After all, $\Func(\setX,\setY)$ is a
-  finite set, so if you leave the distribution unspecified, it is
-  uniform.  (So you said, just above.)  Ich bin confused.}
+Let $\Func(\setX,\setY)$ denote the set of functions $f:\setX\to\setY$.
 %
-\todo{TS}{Decide if you're happy with this. Note that it's used to define the
-non-adaptive FP prob of stuff.} 
-%
-For every function~$f$, define $\id^f$ so that
+For every function~$f: \setX \to \setY$, define $\id^f: \{\emptystr\} \times \setX \to \setY$ so that
 $\id^f(\emptystr, x) = f(x)$ for all $x$ in the domain
-of~$f$. \tsnote{This is underdefined.  Why does it take the first
-  argument, and how is this defined when the first argument is not~$\emptystring$?}
+of~$f$. This allows us to talk about using unkeyed hash functions $H$ in places where,
+syntactically, a function is required to take a key along with its input.
 
 \heading{Adversaries}
 Adversaries are randomized algorithms that expect access to one or more oracles
