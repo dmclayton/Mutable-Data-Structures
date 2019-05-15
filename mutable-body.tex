@@ -180,11 +180,6 @@
 \label{sec:bloom}
 \input{bloom}
 
-\ignore{
-\section{Cuckoo Filters}
-\label{cuckoo}
-\input{cuckoo}}
-
 \section{Count-Min Sketches}
 \label{cms}
 \input{cms}
@@ -193,21 +188,17 @@
 \label{sec:counting}
 \input{counting}
 
-\ignore{\section{Concrete Data Structures}
-\dctodo{This text needs to be broken up and massaged in to appropriate
-  places in the document, e.g., in the sections on specific
-  structures.  Some of it I will lift to the intro for future work,
-  limitations of our formalisms.}
-\label{sec:structures}
-\input{structures}
-}
-
 %\section{Privacy}
 %\label{sec:privacy}
 %\input{privacy}
 
-\newpage
+%%
+%% The next two lines define the bibliography style to be used, and
+%% the bibliography file.
+\bibliographystyle{ACM-Reference-Format}
+\bibliography{struct-sec}
 
+\newpage
 \appendix
 
 \section{A generic \erreps1 attack against basic Bloom filters}
@@ -216,6 +207,7 @@
 \section{Deferred proofs}
 \label{app:deferred}
 \input{deferred}
+
 
 %\begin{thebibliography}{9}
 %\bibitem{bloomfilter} 
