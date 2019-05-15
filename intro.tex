@@ -29,9 +29,9 @@ depend on the hash functions, and is then allowed to adaptively query the
 This work expands upon NY in several, practically relevant ways.  To begin, our
 attack model allows the adversary to adaptively \emph{update} the
 collection~$\col$, thereby capturing settings in which the target data may
-change over time, e.g., streaming data applications. Several data structures are
-designed to natively support \emph{mutable} representations, such as the
-counting filter~\cite{fan2000summary}, count-min
+change over time, e.g., streaming data applications. Many data structures are
+designed for this setting and natively support \emph{mutable} representations,
+such as the counting filter~\cite{fan2000summary}, count-min
 sketch~\cite{cormode2005improved}, cuckoo filter~\cite{fan2014cuckoo}, and
 stable Bloom filter~\cite{deng2006approximately}, and our syntax is designed to
 capture these data structures in addition to those structures which are
