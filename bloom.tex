@@ -153,7 +153,9 @@ adversary can easily compute the representation of any set for itself. This
 ability of the adversary to reconstruct the set without making queries allows
 for various attacks that badly harm the accuracy of the filter.
 
-\heading{Example attack setting}
+\heading{Pollution attacks}
+Gerbet \etal~\cite{gerbet2015power} provide the following example of an attack
+setting and a potential attack against Bloom filters.
 Suppose the adversary is interacting with a system representing a dataset
 with~$\Pi$ and that it is able to choose some fraction of the input data.  For
 example, consider a web crawler which performs a ``crawl'' of webpages
@@ -161,7 +163,7 @@ example, consider a web crawler which performs a ``crawl'' of webpages
 the links on each page it visits in order to index, archive, or otherwise
 analyze websites. In order to keep track of the set of webpages which have
 already been visited during a crawl, some crawlers use a Bloom filter which is
-updated to include each new page the crawler visits \todo{DC}{Need citation}.
+updated to include each new page the crawler visits.
 Suppose the adversary controls at least one such webpage along the crawl's path
 and wishes to deny the spider access to a different webpage, the `target
 webpage'. The adversary can choose the links present on its own webpage, which
@@ -170,20 +172,10 @@ bits of its Bloom filter to~$1$. If those links are chosen in such a way that th
 produce a false positive for the target webpage, the spider will then
 erroneously believe it has already visited the target webpage. The target
 webpage will therefore never be visited during the spider's crawl.
-%
-\cpnote{This is very interesting! Is it your idea? If not, then you need to cite
-the source.}
 
-\heading{Pollution attacks}
-%
-\todo{DC}{Ensure that we've mentioned Gerbet \etal in the intro or related work,
-or give more context for the paper here. In 1-2 sentences, what did it aim to
-do?}
-%
-The goal of the attacks pointed out by Gerbet \etal~~\cite{gerbet2015power} is
-to pollute the filter such that the ``average'' set-membership query yields a
-false positive with high probability; to do so, the attacker chooses a set of
-inputs that maximize the number of 1s in the filter. This strategy is especially
+In cases where the adversary is able to control at least some of the filter inputs,
+the authors describe an attack where the adversary chooses a set of
+inputs that maximizes the number of 1s in the filter. This strategy is especially
 effective when the structure of the hash function is known to the adversary. In
 particular, as long as the choice of hash function and any associated parameters
 are public, the adversary can compute the hash function on its own in order to
@@ -191,17 +183,8 @@ determine which choices will set the maximum number of bits to 1, or which
 choices will set certain target bits to 1 in order to cause specific false
 positives. They show that with $m = 3200$ and $k = 4$, the adversary can double
 the false positive rate if they control 200 out of a total of $n = 600$
-insertions.
-%
-\cpnote{Is there attack for a particular choice of~$H$ or does it work
-regardless of the choice of~$H$, as long as it's known to the attacker?}
-
-\cpnote{Not sure what this adds, or if it's necessary.}
-Significantly, the attack model considered assumes that the representations of
-the filter are always kept private. This in general gives the adversary less
-power than in our \errep\ or even \erreps\ attack model, since there is no
-analogue to the $\REVO$ oracle. However, as noted above, the standard $\BF[H,n]$
-construction is within this model.
+insertions, under the assumption that~$H$ is arbitrary but known to and
+computable by the attacker.
 
 Gerbet \etal suggest various ways to mitigate pollution attacks, such as choosing
 the parameters $k$, $m$, and $n$ so that even if a pollution attack
