@@ -1,7 +1,4 @@
 \label{app:unsalted-attack}
-\todo{CP}{Decide whether we want to include the simualtion code. Given how
-simple the attack is, I think we can get away with not including it.}
-
 Fix inetgers $\ell, n, \lambda \geq0$, let $H:\bits^*\to[m]^k$ be a function,  and let
 $\Pi = \BF[H,t,\lambda]$ as specified in Figure~\ref{fig:bf-def}.
 %
@@ -78,7 +75,10 @@ branch~$J$ is taken; otherwise it is not.
 This optimization results in a heuristic attack, since the search may miss the
 optimal solution.
 
-We implemented this attack and evaluated its performance.
+We implemented this attack and evaluated its performance.\footnote{\textbf{TO
+THE REVIEWER:} Note that we did not include the source code with our submission;
+we think the attack is simple and enough and adaquetely explained. That siad,
+we'd be happy to provide the source code (written in C for speed) via the PC.}
 Figure~\ref{fig:bf-correct-attk-sim} shows the success rate and average number
 of sets checked for a number of simulations and various parameters.
 %
