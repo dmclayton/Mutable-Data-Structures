@@ -105,7 +105,8 @@ are made public, or kept private, respectively.
 We exercise our syntax and notions by analyzing three important, real-world data
 structures: Bloom filters~\cite{bloom1970space} (Section~\ref{sec:bloom}), count
 min-sketches~\cite{cormode2005improved} (Section~\ref{sec:sketch}), and counting
-filters~\cite{fan2000summary} (Section~\ref{sec:count}). Each of these supports
+filters~\cite{fan2000summary} (Section~\ref{sec:count}), summarized
+in Figure~\ref{fig:tab-structures}. Each of these supports
 different queries and update operations; and taken together, these structures
 exhibit the full range adversarial settings our notions encounter. It may
 initially come as a surprise that \emph{none of these structures meets security
@@ -168,7 +169,7 @@ error bound comparable to the count min-sketch bound.
           &  $\up_x(\col) = \col \cup \{x\}$
           & \parbox[c]{4cm}{$n$, max $|\col|$\\$k$, \# hash functions\\$m$, array size (bits)}
           \\\hline
-    \parbox[c]{1.5cm}{$\ell$-thresholded Bloom\\ filter}
+    \parbox[c]{1.5cm}{Thresholded Bloom\\ filter}
           & \parbox[c][6ex]{2cm}{Sets\\$\col\subseteq \bits^*$} %, or\\ $\col \in \Func(\bits^*,\{0,1\})$}
           & $\qry_x(\col) = [x \in \col]$
           &  $\up_x(\col) = \col \cup \{x\}$
