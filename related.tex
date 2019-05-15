@@ -1,41 +1,30 @@
-\paragraph{Comparison with Naor and Yogev.}
+\paragraph{Comparison with Naor-Yogev}
 As previously noted, Naor and Yogev~\cite{naor2015bloom} were the first to
 formalize adversarial correctness of Bloom filters.  Our work extends theirs
-significantly in several directions. First, we consider abstract data structures
-(rather than only set-membership structures), and consider privacy in addition
-to correctness. Even with respect to the specific case of correctness for
-set-membership structures, our work offers several advantages as compared
-to the Naor-Yogev treatment:
-\begin{itemize}
-  \item Our syntax distinguishes between the (secret) key and the public portion
-    of a data structure, an important distinction that is missing in their work.
+significantly in several directions. First, we consider abstract data
+structures, rather than only set-membership structures.  Even with respect to
+the specific case of correctness for set-membership structures, our work offers
+several advantages as compared to the Naor-Yogev treatment.
+%
+One, our syntax distinguishes between the (secret) key and the public portion of
+a data structure, an important distinction that is missing in their work.
+%
+Two, the Naor-Yogev definition of correctness allows the adversary to make
+several queries, some of which may produce incorrect results; the attacker then
+succeeds if it outputs a \emph{fresh} query that causes an error. This
+separation seems arbitrary, and we propose instead a parameterized definition in
+which the attacker succeeds if it can cause a certain number of (distinct)
+errors during its entire execution.
+%
+Three, Naor and Yogev analyze the correctness of a new Bloom filter variant of
+their own design. In contrast, we are mainly interested in analyzing existing,
+real-world constructions to understand their security.
 
-  \item The Naor-Yogev definition of correctness allows the
-      adversary to make several queries, some of which may
-      produce incorrect results; the attacker then succeeds
-      if it outputs a \emph{fresh} query that causes an
-      error. This separation seems arbitrary, and we
-      propose instead a parameterized definition in which
-      the attacker succeeds if it can cause a certain
-      number of (distinct) errors during its entire
-      execution.
-
-  \item Naor and Yogev analyze the correctness of a new Bloom filter variant of
-    their own design. In contrast, we are mainly interested in analyzing
-    existing, real-world constructions to understand their security.
-      \if{0}{
-        In particular, we analyze the most-common case of Bloom filters in the
-        random-oracle model, something not considered by Naor and~Yogev.
-      }\fi
-\end{itemize}
-We give a more technical comparison of our correctness notion
-and theirs in Appendix~\ref{sec:compare-defs}.
-
-\paragraph{Other related works.}
+\paragraph{Other related works}
 There is a long tradition in computer science of designing structures that
 concisely (but probabilistically) represent data so as to support some set of
-queries, and each of these structures has its own correctness and privacy
-characteristics~\cite{chazelle2004bloomier,cormode2005improved,DP08a,DF03,fredman1984storing,mironov2011sketching}.
+queries, and each of these structures has its own interesting security
+characterisitcs~\cite{chazelle2004bloomier,cormode2005improved,DP08a,DF03,fredman1984storing,mironov2011sketching}.
 
 We have already mentioned the ubiquity of Bloom filters in support of efficient
 network communication and computing protocols.  They also find use in
@@ -44,14 +33,7 @@ denial-of-service attack detection, and deep packet
 inspection~\cite{tarkoma2012theory}.  Recently, Bloom filters were proposed as a
 means of efficient certificate-revocation list (CRL)
 distribution~\cite{larisch2017crlite}, a crucial component of public-key
-infrastructures.  To our knowledge, ours is the first work to propose general
-notions of \emph{privacy} for abstract data structures.  However, a variety of
-data structures with interesting privacy properties have been proposed.  For
-example, variants of Bloom filters that ensure privacy of the \emph{query} have
-been studied~\cite{bellovin2004privacy,nojima2009cryptographically}.
-%
-\jnote{History-independent data structures seem relevant to mention.}
-\cpnote{What does this mean?}
+infrastructures.
 
 % Correctness attacks
 Correctness of data structures in adversarial settings is well-motivated in the
@@ -77,12 +59,13 @@ for good choices of hash functions.
 They suggest revised parameter choices for Bloom filters (i.e., filter length and
 number of hashes) in order to cope with their attacks.
 
-% Naor Yogev
 
+\ignore{
 Finally, we note that the dictionary construction considered in
 Section~\ref{sec:dict} bares resemblance (at least structurally) to
 \emph{garbled Bloom filters}, a tool used recently for efficient private-set
 intersection~\cite{dong2013when,rindal2017improved}.
+}
 
 % NOTE(all) Below are notes and references we considered adding to related work.
 \if{0}{

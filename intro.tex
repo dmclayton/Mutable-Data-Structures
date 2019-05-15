@@ -172,6 +172,51 @@ representation of one or more closely related~$\col'$ are known), or both.
   positives than false negatives. (Interestingly, the opposite is true in the
   non-adpative case.)
 \end{itemize}
+
+
+
+\heading{Future work}
+\todo{TS/CP}{Organize this pile of cruft.}
+%
+\ignore{
+It would be interesting to extend our work to the case of \emph{mutable} data
+structures. Specific examples to consider here are counting Bloom
+filters~\cite{fan2000summary}, scalable Bloom
+filters~\cite{almeida2007scalable}, count-min
+sketches~\cite{cormode2005improved}, and hierarchical Bloom
+filters~\cite{zhu2004hierarchical}, to name just a few in the extended Bloom
+filter family.
+}
+%
+% NOTE(all) Removed these citations: \cite{broder2004network,nojima2009cryptographically}
+Our goal is to establish foundations for the security of  data
+structures. But it would certainly be interesting to analyze high-level
+protocols that use these data structures, e.g.
+content-distribution networks~\cite{byers2002informed}, where many servers
+propagate representations of their local cache to their neighbors. The Bloom
+filter family alone has a wide range of practical applications, for example in
+large database query processing~\cite{broder2004network}, routing algorithms for
+peer-to-peer networks~\cite{reynolds2003efficient}, protocols for establishing
+linkages between medical-record databases~\cite{schnell2011novel}, fair routing
+of TCP packets~\cite{feng2001stochastic}, and Bitcoin wallet
+synchronization~\cite{gervais2014privacy}.
+%
+Analyzing higher-level primitives or protocols will require establishing
+appropriate syntax and security notions for those, too; hence we leave this for
+future work.
+
+To our knowledge, ours is the first work to propose general
+notions of \emph{privacy} for abstract data structures.  However, a variety of
+data structures with interesting privacy properties have been proposed.  For
+example, variants of Bloom filters that ensure privacy of the \emph{query} have
+been studied~\cite{bellovin2004privacy,nojima2009cryptographically}.
+
+\subsection{Related work}
+\input{related}
+
+
+
+\ignore{
 \tsnote{old stuff below here}
 
 \ignore{ %possibly move elsewhere in the intro, or the opening to the
@@ -305,35 +350,4 @@ also apply our definitions to:
     key/value pairs, where the keys are arbitrary bitstrings and the values are
     of length at most~$m$, using just $O(mn)$ bits.
 \end{itemize}
-
-\heading{Future research directions.}
-%
-\ignore{
-It would be interesting to extend our work to the case of \emph{mutable} data
-structures. Specific examples to consider here are counting Bloom
-filters~\cite{fan2000summary}, scalable Bloom
-filters~\cite{almeida2007scalable}, count-min
-sketches~\cite{cormode2005improved}, and hierarchical Bloom
-filters~\cite{zhu2004hierarchical}, to name just a few in the extended Bloom
-filter family.
 }
-
-% NOTE(all) Removed these citations: \cite{broder2004network,nojima2009cryptographically}
-Our goal is to establish foundations for the security of  data
-structures. But it would certainly be interesting to analyze high-level
-protocols that use these data structures, e.g.
-content-distribution networks~\cite{byers2002informed}, where many servers
-propagate representations of their local cache to their neighbors. The Bloom
-filter family alone has a wide range of practical applications, for example in
-large database query processing~\cite{broder2004network}, routing algorithms for
-peer-to-peer networks~\cite{reynolds2003efficient}, protocols for establishing
-linkages between medical-record databases~\cite{schnell2011novel}, fair routing
-of TCP packets~\cite{feng2001stochastic}, and Bitcoin wallet
-synchronization~\cite{gervais2014privacy}.
-%
-Analyzing higher-level primitives or protocols will require establishing
-appropriate syntax and security notions for those, too; hence we leave this for
-future work.
-
-%\heading{Related work.}
-\input{related}
