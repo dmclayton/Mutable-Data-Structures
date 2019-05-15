@@ -108,10 +108,10 @@ That is, $P_{k,m}(n)$ is the probability some~$x$ is a false positive for the
 representation of some~$\setS$ for which $|\setX|=n$ and $x\not\in\setS$, when a
 random function is used for hashing.
 %
-A tight, concrete upper bound is elusive; \todo{DC (or Tom?)}{Briefly comment
-on why this is difficult.} However, we do understand its asymptotic behavior
-quite well. Kirsch and Mitzenmacher~\cite{kirsch2006less} prove that, for
-particular choices of $k$ and $m$ as functions of~$n$, it holds that
+A tight, concrete upper bound has proven elusive, but we do understand its
+asymptotic behavior quite well. Kirsch and Mitzenmacher~\cite{kirsch2006less}
+prove that, for particular choices of $k$ and $m$ as functions of~$n$, it holds
+that
 $
   P_{k,m}(n) = \lim_{n\goesto\infty} (1-e^{-kn/m})^k \,.
 $
@@ -395,13 +395,11 @@ integers~$n,\lambda\geq0$, and let $\Pi = \KBF[F,n,\lambda]$.
   \begin{equation*}
     \begin{aligned}
       \Adv{\errep}_{\Pi,\delta,r}(t,\,&q_R,q_T,q_U,q_H) \leq \\
-        \Adv{\prf}_F(t,nq_R+q_T+q_U) & +
+        \Adv{\prf}_F(O(t),nq_R+q_T+q_U) & +
       \frac{q_R^2}{2^\lambda} +
       \left(\frac{p'q_Rq_T}{r}\right)^re^{r-p'q_Rq_T} \,.
     \end{aligned}
   \end{equation*}
-  \todo{DC}{CP has fixed a convention for accounting for adversaries' resources;
-  please update the bound accordingly. (See Section \ref{sec:prelims}.)}
 \end{theorem}
 
 Though the bound involves a similar Chernoff approximation to the other proofs,
@@ -479,11 +477,13 @@ $\BF_\mathrm{ft}[H,\ell]$, $\SBF_\mathrm{ft}[H,\ell,\lambda]$, and
 $\KBF_\mathrm{ft}[H,\ell,\lambda]$ in an exactly analogous way to the $n$-capped
 Bloom filter constructions. Here we only consider case of
 $\Pi = \SBF_\mathrm{ft}[H,\ell,\lambda]$ and compare it to the $\SBF$
-construction.
-
-%
-\cpnote{When a reviewer read this they'll think: ``why, then, do I care about
-$n$-capped filters if $\ell$-threshold filters perform so much better?''}
+construction. Though this is not the standard Bloom filter construction, it
+behaves almost identically in the absence of an adversary, since the number of
+1 bits in the filter can be closely predicted from the number of elements in a
+randomly-selected underlying set. Because of this, and because we are able to
+demonstrate better security bounds for an $\ell$-thresholded filter than for a
+$n$-capped filter, we suggest this as a way of providing strong security
+guarantees even for small filter sizes.
 
 %
 \begin{theorem}[\erreps\ security of thresholded BFs]\label{thm:bf-thr-bound}
@@ -511,14 +511,29 @@ to place a limit on the adversarial advantage even in this worst-case scenario.
 
 \subsection{Discussion}
 
-\todo{DC}{At a high level, our suggested mitigation is to use salt and to use a
-cryptographically strong hash function, but the exact strategy depends on the
-setting. If you aren't going to update the structure, then salting is
-sufficient. If you're going to update the structure, then salting is still
-efficient as long as the structure is never revealed to attacker (i.e., the
-party or parites choosing the inputs). If keeping the structure secret isn't
-possible, then you need to also use a secret key. How does this mitigation
-strategy compared to the mitigations suggested by Gerbet \etal? In particular,
-are our filters smaller, larger, or about the same length as theirs?}
+These results show that the standard Bloom filter construction is not secure
+against an adaptive adversary. The best mitigation strategy against potential
+attacks depends on the setting. If Bloom filters are designed to be immutable,
+using a per-representation salt and a sufficiently large filter is sufficient.
+Similarly, if the filters are not revealed to potential adversaries (i.e.
+parties that get to choose inputs), salting provides a security guarantee which
+can be further improved by using $\ell$-thresholding. Importantly, if filters
+cannot be kept private, a secret key must be used alongside the salt to prevent
+potential attacks.
+
+These requirements are more stringent than the mitigations suggested by Gerbet
+\etal~\cite{gerbet2015power} due to our stronger attack model (where multiple
+filters can be constructed, and sometimes revealed, to the adversary) and our
+goal of establishing a general security bound for any adversary rather than
+mitigating specific attacks. If $q_R$ is small, our \erreps\ guarantee for
+$\SBF$ and \errep\ guarantee for $\KBF$ show that filters need not be made much
+larger than Gerbet \etal's in order to provide comparable security against more
+general adversaries. If $q_R$ is large, however, the $q_R$ term in the error
+bounds means that the filters must be made large to provide good error
+guarantees. In this scenario, however, the $\ell$-thresholding class of filter
+provides a way to get strong error guarantees without significantly increasing
+the filter size.
 
 \cpnote{How does the $\ell$-threshold bound compare to that of $n$-capping?}
+\dcnote{This should probably be a graph, but I can't get pylab working for some
+reason...}
