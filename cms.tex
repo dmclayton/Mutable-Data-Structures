@@ -32,8 +32,7 @@
       return $\langle \v.M, \salt, c+b \rangle$
   }
   \caption{Keyed structure $\sketch[R,\ell,\lambda]$ given by
-  $(\Rep^R,\Qry^R,\Up^R)$ is used to define count min-sketch variants used to
-  rerpresent streams that never fill the rows of the sketch to more than $\ell$.
+  $(\Rep^R,\Qry^R,\Up^R)$ is used to define count min-sketch variants.
   The parameters are a function $R: \keys\by\bits^* \to [m]^k$ and integers
   $\ell, \lambda \geq0$. A concrete scheme is given by a particular choice of
   parameters. The function $\hw'$, used to determine if the sketch is full, is
@@ -41,27 +40,40 @@
   \label{fig:cms-def}
 \end{figure}
 
-The count min-sketch data structure is somewhat similar to a Bloom filter in
-construction, but instead of a length-$m$ array of bits it uses a $k$-by-$m$
-array of counters. It is designed to deal with streams of data in the
-non-negative turnstile model~\cite{cormode2005improved}, which means the sketch
-accomodates both insertions and deletions but does not allow any entries to have
-a negative frequency. Our construction $\sketch[R,\ell,\lambda]$ described in
-Figure~\ref{fig:bf-def} involves an $\ell$-thresholded variation of this
-structure. As in the case of Bloom filters, this does not significantly change
-the operation of the sketch in a non-adversarial setting, since in general
-$\ell$ can be closely approximated given knowledge of $n$. In the presence of an
-adversary, however, we expect this variation to provide better security bounds.
+The count min-sketch (CMS) data structure is designed to concisely estimate the
+number of times a datum has occurred in a data stream. In other words, it is
+designed to estimate the frequency of each element of a multiset.  The data
+structure is similar to a Bloom filter, but instead of a length-$m$ array of
+bits it uses a $k$-by-$m$ array of counters. It is designed to deal with streams
+of data in the non-negative turnstile model~\cite{cormode2005improved}, which
+means the sketch accomodates both insertions and deletions but does not allow
+any entries to have a negative frequency. Our construction
+$\sketch[R,\ell,\lambda]$ defined in Figure~\ref{fig:bf-def} involves an
+$\ell$-thresholded variation of this structure. As in the case of Bloom filters,
+this does not significantly change the operation of the sketch in a
+non-adversarial setting, since in general~$\ell$ can be closely approximated
+given knowledge of~$n$.
+%
+\cpnote{This isn't clear. What's~$n$? How do I approximate~$\ell$ given ``knowledge'' of~$n$?}
+%
+In the presence of an adversary, however, we expect this variation to provide
+better security bounds.
+%
+\cpnote{Better than what? If you had capped instead of thresholded? This section
+and the previous one should be readable on their own. If you want to bring up
+points you made in the last section, that's totally fine, but you need to point
+the reader to where they can read more.}
 
-In the \errep\ setting, the count min-sketch structure is insecure regardless of
-whether $\ell$-thresholding is used or not, and regardless of the details of the
-behavior of the function $R$. On the other hand, we show that \erreps\ security
-is achievable even under the assumption that a salted but unkeyed hash function
-is used, i.e. $\lambda > 0$ but $\keys = \{\emptyset\}$.
+We will show that, in the \errep\ setting, the count min-sketch structure is
+insecure regardless of whether $\ell$-thresholding is used or not, and
+regardless of the details of the behavior of the function $R$. On the other
+hand, we show that \erreps\ security is achievable even under the assumption
+that a salted but unkeyed hash function is used, i.e. $\lambda > 0$ but $\keys =
+\{\emptyset\}$.
 
 \heading{Non-adaptive error bound}
 %
-The count min-sketch is designed to minimize the number of elements whose
+The CMS is designed to minimize the number of elements whose
 frequencies are overestimated, while still allowing for reasonably low memory
 usage. For a function $\rho$ and integer $\lambda\ge0$, let
 $\sketch[\id^\rho,n,\lambda] = (\Rep^\rho,\Qry^\rho,\Up^\rho)$ as defined
