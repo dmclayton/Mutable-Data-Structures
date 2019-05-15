@@ -44,15 +44,14 @@ in~$\col$?} As with Bloom filters, the challenge is to answer this question with
 as little space consumption as possible, at the cost of admitting a reaosonable
 amount of error.
 
-Thus, our syntatic definition of data structures admits both
-mutability and rich query spaces.
-Formally, a data structure as a triple of algorithms $(\Rep, \Qry, \Up)$ denoting
-the \emph{representation}, \emph{query-evaluation}, and \emph{Update} algorithms, respectively.
-Associated to the data structure is a set of supported
-queries~$\mathcal{Q}$, which are functions~$\qry$ over data objects,
-and a set~$\mathcal{U}$ of allowed update functions.
-For reasons we will elucidate in a moment, all three algorithms take a
-key~$\ky$ as input, and both~$\Rep$ and~$\Qry$ may be randomized.
+Thus, our syntatic definition of data structures admits both mutability and rich
+query spaces.  Formally, a data structure is a triple of algorithms $(\Rep,
+\Qry, \Up)$ denoting the \emph{representation}, \emph{query-evaluation}, and
+\emph{Update} algorithms, respectively. Associated to the data structure is a
+set of supported queries~$\mathcal{Q}$, which are functions~$\qry$ over data
+objects, and a set~$\mathcal{U}$ of allowed update functions.  For reasons we
+will elucidate in a moment, all three algorithms take a key~$\ky$ as input, and
+both~$\Rep$ and~$\Qry$ may be randomized.
 
 
 The combination of mutability and rich query spaces has significant
@@ -74,6 +73,10 @@ responses.  In particular, if the representation is updated by
 underlying~$\col$, one or more of the counters associated to~$x$ may
 be decremented.  
 
+\todo{TS}{Have another look at the results in Sections 5 and 6. The error
+function for CMS is now simply ``was the response an overestimate''; the
+counting filter is the one that allows for weighting false positives and
+negatives differently.}
 Even though it is two-sided, the notion of error with respect to set-membership
 queries is intuitive, even if one wants to associate different
 fixed costs to false-positives and false negatives.  For frequency
