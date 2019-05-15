@@ -235,8 +235,8 @@ In a \emph{target-set coverage attack}, the adversary is given a small target se
 $\setT\subseteq\bits^*$ and searches for a cover set $\setR\subseteq\bits^*$
 such that $\Qry^H(\Rep^H(\setR),\qry_x)=1$ for each $x\in\setT$.
 %
-Once a suitable cover set is found, the adversary queries $\Rep(\setR)$. Then
-for each $x\in\setT$, it asks $\Qry(x)$, achieving a score of $r = |\setT|$.
+Once a suitable cover set is found, the adversary queries $\REPO(\setR)$. Then
+for each $x\in\setT$, it asks $\QRYO(\qry_x)$, achieving a score of $r = |\setT|$.
 
 This \erreps1 attack succeeds with probability~$1$ assuming a covering set can
 be found.  If $|\setT| \leq |\setR|$, then such a set exists; but finding it may be
@@ -248,10 +248,12 @@ attacks are feasible for practical BF parameters. We do so by simulating the
 attack when~$H$ is a random function (i.e., for each distinct input we choose
 $k$ integers from $[m]$ at random) for typical choices of $k$, $m$, and~$n$.
 
+\ignore{
 The key to pollution attacks and target-set coverage attacks is that the
 adversary can compute the representation of the set on its own. In the remainder
 of this section, we examine ways of enhancing the basic BF structure so that it
 avoids this pitfall.
+}
 
 \subsection{Salted BFs in the (im)mutable setting}
 %
@@ -261,33 +263,32 @@ preppended with a salt.
 Fix $H:\bits^*\to[m]^k$ and $n,\lambda\geq0$ and let
 $\Pi = \SBF[H,n,\lambda]$.
 
-In the mutable setting, we can perform an \errep\ attack against~$\Pi$ in an
-almost identical manner to the previous section. If the adversary calls
-$\REPO(\emptyset)$, the salt will be given to the adversary along with an empty
-filter. The adversary can use this salt to construct representations on its own
-just as described in the target-set coverage attack. The only further alteration
-is that the adversary will need to use $\UPO$ to insert the elements of the
-covering set into the filter before making its $\QRYO$ calls to win the game.
-This attack succeeds whenever the original pollution attack succeeds against an
-unsalted filter.
-
-The attack succeeds because the adversary can search for false positives on its
-own as soon as it learns the salt. An adversary in the real world may not be
-able to perform this exact attack, since even in the streaming setting it is
-possible that the salt is not immediately revealed to the adversary. However, as
-soon as the adversary does learn the salt, it can immediately launch a pollution
-attack against the filter, without having to make any queries directly to the
-filter. Just as in the immutable setting the adversary can exploit its knowledge
+If the adversary can update the representation via~$\UPO$, then it can perform
+an \errep\ attack against~$\Pi$ that is closely related to the attacks in the
+previous section.  The adversary calls $\REPO(\emptyset)$, getting an empty
+filter and the salt in response.  It may then use the salt to construct
+representations on its own just as described in the target-set coverage attack.
+%
+The works because the adversary can test for errors on its own because it knows
+the salt.  In practice, an adversary may not be able to perform this exact
+attack, since even in the streaming setting it is possible that the salt is not
+immediately revealed to the adversary. However, as soon as the adversary does
+learn the salt, it can immediately launch a pollution attack against the filter,
+without having to make any queries directly to the filter.
+%
+\ignore{Just as in the immutable setting the adversary can exploit its knowledge
 of the hash functions to find false positives without needing to make queries,
 in the mutable and public-representation setting the adversary can identically
 exploit its knowledge of the hash functions \textit{and salt} to find false
 positives without needing to make queries.
+}
 
-Without this exploitation of mutability, and in particular the ability to insert
-elements even after the salt has been seen, the above attack fails. Indeed, when
-we restrict ourselves to the immutable setting, we can prove the following.
+Without the ability to insert elements even after the salt has been seen, the
+above attack fails. Indeed, when we restrict ourselves to the immutable setting,
+we can prove the following.
 %
 \begin{theorem}[Immutable \errep\ security of salted BFs]\label{thm:sbf-errep-immutable}
+  Let $p=P_{k,m}(n)$. 
   For all integers $q_R, q_T, q_H, r, t \geq 0$ it holds that
   \begin{equation*}
     \begin{aligned}
@@ -296,7 +297,7 @@ we restrict ourselves to the immutable setting, we can prove the following.
         \left(\frac{pq}{r}\right)^re^{r-pq}\right] \,,
     \end{aligned}
   \end{equation*}
-  where $H$ is modeled as a random oracle, $p=P_{k,m}(n)$, $q = q_T + q_H$, and
+  where $H$ is modeled as a random oracle, $q = q_T + q_H$, and
   $r > pq$.
 \end{theorem}
 We consider only the case of $r > pq$ because $pq$ is the expected number of
@@ -306,14 +307,15 @@ possible. Because this simple adversary can get $pq$ successes on average, we
 can only hope to provide good security bounds against arbitrary adversaries in
 the case that $r > pq$.
 
-This bound can be broken down into three main components. The multiplicative
-factor of~$q_R$ means that the bound will be weak in the case that a number of
-representations are used. The $q_H/2^\lambda$ term corresponds to the
-probability of the adversary guessing the salt before the representation is
-constructed, but this will be negligible as long as $\lambda$ is chosen to be
-sufficiently large (say, $\lambda=128$). The final, messier term comes from
-applying a Chernoff bound to the non-adaptive adversary's probability of
-succeeding in the experiment given $q = q_H+q_T$ guesses.
+Before giving the proof, let us take a moment to unpack the result a bit.  The
+bound can be broken down into three main components. The factor
+of~$q_R$ means that the bound we can prove is weakened somewhat when a number of
+representations are observed by the adversary. The $q_H/2^\lambda$ term
+corresponds to the probability of the adversary guessing the salt before the
+representation is constructed, but this will be negligible as long as $\lambda$
+is chosen to be sufficiently large (say, $\lambda=128$). The final, messier term
+comes from applying a Chernoff bound to the non-adaptive adversary's probability
+of succeeding in the experiment given $q = q_H+q_T$ guesses.
 %
 By way of clarifying the performance of our bound, we have plotted the last
 component for various parameters of interest. Let
@@ -339,9 +341,18 @@ capacity.  For example, if one is willing to tolerate up to~$r=10$ false
 positives for a filter representing $n=100$ elements, then picking a filter
 length of $3$ kilobytes is sufficient to ensure that observing~$10$ false
 positives occurs with probability less than $2^{-17}$, even when the adversary
-can make~$2^{64}$ RO queries.
+can make~$q =2^{64}$ $\HASHO$ or $\QRYO$ queries.
+
+We concede that requiring a~$3$KB for a filter a set of $100$ elements may be
+prohibitive in some applications. We would require a substantially smaller
+filter for smaller~$q$, but unfortunately, a query complexity of $q=2^{64}$ in
+the \errep1 setting is quite realistic, since the attack can be carried out
+offline.
 %
-We compare this (rather conservative) result to Gerbet \etal at the end of this section.
+In the \erreps setting, or in the \errep\ setting when we use a PRF instead of a
+hash function, the adversary's attack is largely \emph{online}, rendering
+the~$q$ term quite pessimistic. In these settings, a significantly smaller
+filter will do.
 
 \begin{figure}
   \hspace*{-10pt}
