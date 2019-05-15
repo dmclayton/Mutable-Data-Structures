@@ -103,21 +103,49 @@ want to do is to bound the probability that the adversary can break the PRF.
 
 The number of times the PRF is evaluated on distinct inputs is bounded by the
 number of queries available to the adversary. In particular, $\QRYO$ and $\UPO$
-each call the PRF once, while $\REPO$ may call the PRF up to $n$ times. If the
-adversary runs in $t$ time steps, then, the probability it can distinguish the
-PRF from a random function is bounded by $\Adv{\prf}_F(O(t),nq_R+q_T+q_U)$.
+each call the PRF once, while $\REPO$ may call the PRF up to $n$ times. Thus,
+when executed with~$\advA$, game~$\game_0$ makes at most~$Q = q_T + q_U + nq_R$
+queries to~$\PRFO$.
 %
 In~$\game_1$, we have a game which is identical to~$\game_0$ except that it uses
 random sampling in place of the PRF. If $\advA$ cannot distinguish the PRF from
 a random function then these games are indistinguishable from the adversary's
 perspective.
 %
-\todo{CP}{Exhibit adversary~$D$ such that $\Prob{\game_0(\advA)=1} -
-\Prob{\game_1(\advA)=1} \leq \Adv{\prf}_F(D)$, and argue that its resoruce are
-as stated by the theorem. You don't need to be super formal about it, but you do
-need to say how~$D$ executes~$\advA$ and what outputs.}
-
-Our goal is to argue, in a similar manner as to the previous theorems, that all
+We exhibit a $O(t)$-time, \prf-adversary~$D$ making at most~$Q$ queries to its
+oracle such that
+%
+\begin{equation}
+  \Adv{\prf}_F(D) = \Prob{\game_0(\advA)=1} - \Prob{\game_1(\advA)=1} \,.
+\end{equation}
+%
+Adversary~$D^{\,\PRFO}$ works by executing~$\advA$ in game~$\game_1$, except
+that whenever the game calls \emph{its}~$\PRFO$, adversary~$D$ uses its
+own oracle to compute the response.
+%
+Finaly, when~$\advA$ halts, if the winning condition in~$\game_1$ is satisfied,
+then~$D$ outputs~$1$ as its guess; otherwise it outputs~$0$.
+%
+Then conditioning on the outcome of the coin flip~$b$ in~$D$'s game, we have that
+%
+\begin{eqnarray}
+  \Adv{\prf}_F(D) &=&
+    2\Prob{\Exp{\prf}_F(D)=1}-1 \\
+  &=&
+    2\,\Big(
+      1/2\Prob{\Exp{\prf}_F(D)=1 \given b=1} \\
+  && +\hspace{4pt}
+      1/2\Prob{\Exp{\prf}_F(D)=1 \given b=0}
+    \Big) - 1 \\
+  &=&
+    \Prob{\Exp{\prf}_F(D)=1 \given b=1} \\
+  && +\hspace{4pt}
+      \Prob{\Exp{\prf}_F(D)=1 \given b=0}
+     - 1 \\
+  &=& \Prob{\game_0(\advA)=1} - \Prob{\game_1(\advA)=1} \,.
+\end{eqnarray}
+%
+Next, our goal is to argue, in a similar manner as to the previous theorems, that all
 of the oracle calls are independent. In order to guarantee this we must deal
 with the possibility of a salt collision between different representations.
 In~$\game_2(\advA)$ we require that all salts be distinct between
