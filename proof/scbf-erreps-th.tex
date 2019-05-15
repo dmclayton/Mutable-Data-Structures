@@ -97,6 +97,7 @@
     return $\top$
 }
 \caption{Games 0--3 for proof of Theorem~\ref{thm:counting-erreps}.}
+\label{fig:cbf-erreps/games}
 \end{figure*}
 
 As with the proof of Theorem~\ref{thm:sbf-errep-immutable}, we derive a bound in
@@ -106,7 +107,7 @@ assume without loss of generality that the adversary does not call $\REVO$,
 since revealing the only representation automatically prevents the adversary
 from winning.
 
-We begin with a game~$\game_0$ which has identical behavior to the \erreps1
+We begin with a game~$\game_0$, shown in Figure~\ref{fig:cbf-erreps/games}, which has identical behavior to the \erreps1
 experiment for a counting filter. As in the proof of
 Theorem~\ref{thm:sbf-errep-immutable}, we have a
 $\bad_1$ flag that gets set if the adversary ever calls $\HASHO_1$ with the
