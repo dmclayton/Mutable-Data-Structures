@@ -93,6 +93,8 @@ total cost is not straightforward.  In particular, we must determine whether
 or not the cost of a given error should be carried across (adaptive,
 adversarial) updates to~$\col$ and its representation.
 
+\todo{TS}{Name and summarize the security notions.}
+
 To summarize, our high-level contributions are: formal syntax for
 mutable data structures, and two notions of adversarial
 correctness for these.  Our notions capture settings in which representations
@@ -101,16 +103,17 @@ are made public, or kept private, respectively.
 We exercise our syntax and notions by analyzing three important, real-world data
 structures: Bloom filters~\cite{bloom1970space} (Section~\ref{sec:bloom}), count
 min-sketches~\cite{cormode2005improved} (Section~\ref{sec:sketch}), and counting
-filters~\cite{fan2000summary} (Section~\ref{sec:count}), summarized
-in Figure~\ref{fig:tab-structures}. Each of these supports
-different queries and update operations; and taken together, these structures
-exhibit the full range adversarial settings our notions encounter. It may
-initially come as a surprise that \emph{none of these structures meets security
-in our setting}, at least as they are usually deployed. In particular, if choice
-of hash functions are public, each of these structures is susceptible to a class
-of attacks we call \emph{target-set coverage attacks}, whcih we describe in
-Section~\ref{sec:bad-bfs}. However, these structures can be refined in simple,
-intuitive ways that allow us to prove upper bounds.
+filters~\cite{fan2000summary} (Section~\ref{sec:count}), summarized in
+Figure~\ref{fig:tab-structures}. Each of these supports different queries and
+update operations, and taken together, these structures exhibit the full range
+adversarial settings our notions encounter. It may initially come as a surprise
+that \emph{none of these structures meets security in our setting}, at least as
+they are usually deployed. In particular, if the data being represented,
+updates, and queris all may depend on the choice of hash function, then each of
+these structures is susceptible to a class of attacks we call \emph{target-set
+coverage attacks}, which we describe in Section~\ref{sec:bad-bfs}. However,
+these structures can be refined in simple, intuitive ways that allow us to prove
+upper bounds.
 
 \heading{Bloom filters}
 We show an efficient attack against the standard Bloom filter construction,
@@ -199,69 +202,6 @@ implementations prevent updates that would cause $\col(x)-1 < 0$.}
   \label{fig:tab-structures}
 \end{center}
 \end{figure*}
-
-\ignore{
-\tsnote{Stuff to do, typed up quickly during our Tuesday afternoon meeting...}
-\begin{itemize}
-\item $n$-capped does not imply $\ell$-thresholded for any
-  particular~$\ell$ except in the non-adaptive setting
-\item \dctodo{Summary of Results!  Break out into items, here.}
-\item \dctodo{A paragraph that summarizes the summary of results --
-    the elevator pitch}
-\item \dctodo{Add Section/sub-section summary blurbs to intro, to
-    shape final intro story}
-\item \anytodo{We need to tie our analytical settings to reality --
-    what do salts imply in practice?  Keys?}
-\item \dctodo{How do representation sizes compare to prior work?  What
-    can we say about them in a concrete sense (not compared to prior
-    work)?}
-\item Make sure to hit the online vs. offline query issue
-\item For parallel structure and completeness, there are a bunch of
-  things we could consider, but don't.  Why?  Any reasons we can give
-  for skipped cases (other than ``because it's hard'', and ``because
-  it takes to much space'') will help convince reviewers that we
-  aren't lazy
-\item ...
-\end{itemize}
-
-\dcnote{Summaries follow:}
-\begin{itemize}
-  \item Overall pitch: We construct general definitions to capture the idea of a
-  probabilistic data structure and define notions of what it means for these
-  structures to be secure against an adversary attempting to force the
-  structures to produce errors when queried. We show that three traditional data
-  structures, the Bloom filter, the count-min sketch, and the counting filter,
-  are insecure in their usual form. Any of these can be kept secure by keeping
-  the representation private, adding a per-representation random salt to the
-  hash functions, and introducing a simple `thresholding' procedure to ensure
-  that the structures do not become too full. With Bloom filters, we can get
-  away with not using thresholding, and even with only keeping a key
-  for the hash functions secret rather than the entire filter, but the
-  security bounds are weaker. If the filter is assumed to be immutable after
-  construction, we can even get away with not keeping anything secret, though
-  the security bound is \emph{much} weaker.
-  \item Standard Bloom filters (4.1): With no salt or key there is no security
-  in either sense.
-  \item Salted Bloom filters (4.2): If the filters are immutable, we find a weak
-  ($q_H$ features prominently) \errep\ bound. If the filters are mutable, we
-  show an attack in the \errep\ setting and provide a decent bound for \erreps\
-  security.
-  \item Keyed Bloom filters (4.3): We get a decent bound for the \errep\
-  setting.
-  \item Salted, $\ell$-thresholded Bloom filters (4.4): We get a better
-  \erreps\ bound than in the $n$-capped case.
-  \item Count min-sketch (5.1-2): We show that \errep\ security is impossible
-  regardless of which construction you use (key, threshold, etc.), but that
-  \erreps\ security is achievable using a salt and $\ell$-thresholding.
-  \item Counting filter (6.1-2): Same results as count min-sketch, with a
-  slightly different security bound. This bound is given in terms of $\delta^+$
-  and $\delta^-$, which describe the relative `badness' of false positives and
-  false negatives. A large value of $\delta^-$ is more harmful than a large
-  value of $\delta^+$, i.e. counting filters are better for avoiding false
-  positives than false negatives. (Interestingly, the opposite is true in the
-  non-adpative case.)
-\end{itemize}
-}
 
 
 \heading{Future work}
