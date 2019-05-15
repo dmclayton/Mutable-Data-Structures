@@ -31,9 +31,10 @@ attack model allows the adversary to adaptively \emph{update} the
 collection~$\col$, thereby capturing settings in which the target data may
 change over time, e.g., streaming data applications.  Correspondingly, we
 consider data structures that natively support \emph{mutable} representations.
-Concrete examples of these include the counting filter~\cite{xxx}, count-min
-sketch~\cite{xxx}, the cuckoo filter~\cite{xxx}, \todo{DC}{Add references and
-add any other data structuers you feel should be named here.}
+Concrete examples of these include the counting filter~\cite{fan2000summary},
+count-min sketch~\cite{cormode2005improved}, cuckoo filter~\cite{fan2014cuckoo},
+and stable Bloom filter~\cite{deng2006approximately}.
+
 %
 Next, while the Bloom filter was designed to represent data collections~$\col$
 that are sets, streaming data is better modeled as a multiset.  Natural
