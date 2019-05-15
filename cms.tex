@@ -28,7 +28,7 @@
       $\tab a \gets \v.M'[i][\v.X[i]]$\\
       $\tab$ if $a = 0 \wedge b < 0$ then return $\bot$\\
       $\tab \v.M'[i][\v.X[i]] \gets a + b$\\
-      $\v.M \gets \v.M'$;
+      $\v.M \gets \v.M'$\\
       return $\langle \v.M, \salt \rangle$
   }
   \caption{Keyed structure $\sketch[R,\ell,\lambda]$ given by
@@ -119,7 +119,7 @@ as
   \end{cases}
 \end{equation}
 
-\subsection{Insecurity of public sketches}
+\subsection{Insecurity of public sketches}\label{sec:pub-sketch-bad}
 
 Unlike in the Bloom filter case, good security bounds cannot be achieved for a
 count-min sketch in the \errep\ setting even if salts and/or private keys are
