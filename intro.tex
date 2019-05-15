@@ -176,25 +176,25 @@ fulllness this way allos us to exhbit substantially tighter bounds.
 Following the deep dive into Bloom filters in Section~\ref{sec:bloom}, we then
 consider count min-sketches (CMSes), which provide a compact representation of a
 multiset, allowing additions and deletions, and yielding approximate queires for
-approximate frequency of an element in the multiset.
-%
-\todo{DC}{Don't describe the structure; quickly say what's different from Bloom
-filters and what's the same. Mention that it hashes in much the same way.}
+approximate frequency of an element in the multiset. While a count-min sketch
+hashes in much the same way as a Bloom filter, it uses a 2D array of nonnegative
+integer counters rather than a linear array of bits, allowing the structure to
+keep track of how many times each counter is incremented.
 %
 Despite its similarity to Bloom filters, CMSes are not secure in the
 public-representation setting, even if we use a salt or use a PRF in place of
-the hash function.
-%
-\todo{DC}{In one sentence, give the intution of why this is the case. Don't just
-say ``there's an attack''; talk about the informatino that's available here, but
-not when attacking a BF.}
+the hash function. The fact that the adversary can see exactly which filters are
+incremented or decremented each update, along with the fact that updates can be
+trivially reversed (deletion undoes insertion and vice versa) allows the
+adversary to mount attacks by trial and error even if it lacks the ability to
+predict in advance where an element will be sent by the hash functions.
 %
 However, we are able to derive a good correctness in the mutable/private setting
-(Thereom~\ref{thm:scms-erreps-th}), using a per-representation salt and a a
+(Theorem~\ref{thm:scms-erreps-th}), using a per-representation salt and a a
 notion of ``fullness'' similar to threshold Bloom filters.
 
 \heading{Counting filters}
-We conclude in Section~\ref{sec:count} with counting filters (already elluded
+We conclude in Section~\ref{sec:count} with counting filters (already alluded
 to above).
 %
 Like CMSes, these also support both additions and deletions, but count filters
