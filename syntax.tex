@@ -130,7 +130,6 @@ those caused by randomized query responses.  Randomized query responses may be
 of interest from a data privacy perspective, but our focus is on correctness.
 
 \begin{figure*}[tp]
-\todo{Any}{Look at parameters column again}
 \begin{center}
 \small
   \begin{tabular}{ |p{1.75cm} | p{2.5cm} | p{2.95cm} | p{4cm} | p{3.7cm}|}
@@ -142,17 +141,23 @@ of interest from a data privacy perspective, but our focus is on correctness.
           &  $\up_x(\col) = \col \cup \{x\}$
           & \parbox[c]{4cm}{$n$, max $|\col|$\\$k$, \# hash functions\\$m$, array size (bits)}
           \\\hline
+    \parbox[c]{1.5cm}{$\ell$-thresholded Bloom\\ filter}
+          & \parbox[c][6ex]{2cm}{Sets\\$\col\subseteq \bits^*$} %, or\\ $\col \in \Func(\bits^*,\{0,1\})$}
+          & $\qry_x(\col) = [x \in \col]$
+          &  $\up_x(\col) = \col \cup \{x\}$
+          & \parbox[c]{4cm}{$\ell$, max number of 1 bits in array\\$k$, \# hash functions\\$m$, array size (bits)}
+          \\\hline
      \parbox[c]{2cm}{Count-min\\ sketch}
           & \parbox[c]{2.5cm}{Multisets\\ $\col \in \Func(\bits^*,\N)$}
           & $\qry_x(\col) = \col(x)$
           & \parbox[c][10ex]{4cm}{$\up_{x,0}(\col)(x) = \col(x)+1$ \\ $\up_{x,1}(\col)(x) = \col(x)-1$ \\ $\up_{x,b}(\col)(y) = \col(y)$ for $x \neq y$}
-          & \parbox[c]{3.75cm}{$n$, max $|\col|$\\$k$, \# hash functions and arrays\\$m$, array size (counters)}
+          & \parbox[c]{3.75cm}{$\ell$, max number of nonzero counters\\$k$, \# hash functions and arrays\\$m$, array size (counters)}
           \\ \hline
     \parbox[c]{1.5cm}{Counting\\ filter}
           & \parbox[c]{2.5cm}{Multisets\\ $\col \in \Func(\bits^*,\N)$}
           & $\qry_x(\col) = [\col(x) > 0]$
           & \parbox[c][10ex]{4cm}{$\up_{x,0}(\col)(x) = \col(x)+1$ \\ $\up_{x,1}(\col)(x) = \col(x)-1$ \\ $\up_{x,b}(\col)(y) = \col(y)$ for $x \neq y$}
-          & \parbox[c]{3.5cm}{$n$, max $|\col|$\\$k$, \# hash functions\\$m$, array size (counters)}
+          & \parbox[c]{3.5cm}{$\ell$, max number of nonzero counters\\$k$, \# hash functions\\$m$, array size (counters)}
          \\ \hline
     \ignore{\parbox[c]{1.5cm}{Cuckoo\\ filter}
           & \parbox[c]{2.5cm}{Multisets\\ $\col \in \Func(\bits^*,\N)$}
