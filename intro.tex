@@ -29,16 +29,13 @@ depend on the hash functions, and is then allowed to adaptively query the
 This work expands upon NY in several, practically relevant ways.  To begin, our
 attack model allows the adversary to adaptively \emph{update} the
 collection~$\col$, thereby capturing settings in which the target data may
-change over time, e.g., streaming data applications.
-%
-\todo{DC}{Is there a suitable reference for this? If so, then add it here. If
-it's not already in related work, then add it.}
-%
-Correspondingly, we consider data structures that natively support
-\emph{mutable} representations. Concrete examples of these include the counting
-filter~\cite{fan2000summary}, count-min sketch~\cite{cormode2005improved},
-cuckoo filter~\cite{fan2014cuckoo}, and stable Bloom
-filter~\cite{deng2006approximately}.
+change over time, e.g., streaming data applications. Several data structures are
+designed to natively support \emph{mutable} representations, such as the
+counting filter~\cite{fan2000summary}, count-min
+sketch~\cite{cormode2005improved}, cuckoo filter~\cite{fan2014cuckoo}, and
+stable Bloom filter~\cite{deng2006approximately}, and our syntax is designed to
+capture these data structures in addition to those structures which are
+immutable once constructed.
 
 What all of these have in common is that they are designed to \emph{compactly}
 represent the data so that certain types of mutations and queries are supported,
