@@ -1,6 +1,4 @@
 \begin{figure*}
-\todo{DC}{Fix the transciprtional errors here. (Remeber that we replaced
-``$0^m$'' with $\zeroes(m)$. Take your time.}
 \twoCols{0.47}
 {
   \vspace{-7pt}
@@ -139,10 +137,10 @@ the maximum number of errors these insertions could cause in addition to the
 credit for the original overestimate, $D$ accumulates at least as many errors as
 $\advC$ does, and so $\Prob{\game_1(\advC) = 1} \le \Prob{\game_2(D) = 1}$.
 
-\todo{DC}{Re-check this argument from this point to the QED. There are some obvious errors, and it feels
-like you moved fast through it. Take your time, and make sure you understand
-it. (Try reading it out loud.)}
-Analagously to the proof of Thereorem~\ref{thm:sbf-erreps-th}, we now move to a
+We are now dealing with an adversary that gains points when it finds any
+overestimate, but which only makes queries to $x\not\in\col$. This means that an
+error is simply a query that returns a value greater than 1.
+Analagously to the proof of Theorem~\ref{thm:sbf-erreps-th}, we now move to a
 game~$\game_3$ where $\REPO$ randomly fills the sketch to capacity after
 inserting the elements of $\col$, so that each row has $\ell+1$ non-zero
 counters. For any $D$ for~$\game_2$ we construct $E$ for~$\game_3$ that
@@ -151,15 +149,15 @@ $\UPO$ calls. Analogously to Theorem~\ref{thm:sbf-erreps-th}, adversary $E$ achi
 advantage as $D$ by having a maximally full sketch as soon as $\REPO$ is called,
 and so $\Prob{\game_2(D) = 1} \le \Prob{\game_3(E) = 1}$.
 
-The probability of $E$ winning can now be given by another binomial bound. Since
-each row of the sketch is a uniformly\todo{DC}{It's not uniformly random.} random bitmap \todo{DC}{Fix this. It's not
-a bitmap} with $\ell+1$ out of $m$
-bits set to 1, the probability of any particular $\QRYO$ call causing a
+The probability of $E$ winning can now be given by another binomial bound. The
+set of nonzero counters in each row is a uniformly random subset of $[m]$ of
+size $\ell+1$. Since any query returning a nonzero value is a success for the
+adversary, the probability of any particular $\QRYO$ call causing a
 collision within a single row $i$ is $(\ell+1)/m$, and the probability of a
 collision in every row (i.e. an error) is $((\ell+1)/m)^k$. The adversary has a
 total of $q_T$ attempts, and wins if it accumulates $\lfloor r/(k+1) \rfloor$
-successes. So, letting $p_\ell = ((\ell+1)/m)^k$ and
-$r' = \lfloor r/(k+1) \rfloor$, we have
+successes, since each error gives it $k+1$ points. So, letting
+$p_\ell = ((\ell+1)/m)^k$ and $r' = \lfloor r/(k+1) \rfloor$, we have
 \begin{equation}
    \Prob{\game_3(E)=1} \le
      \sum_{i=r'}^{q_T} \binom{q_T}{i}p_\ell^i(1-p_\ell)^{q_T-i} \,.
