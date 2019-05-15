@@ -49,20 +49,17 @@ of data in the non-negative turnstile model~\cite{cormode2005improved}, which
 means the sketch accomodates both insertions and deletions but does not allow
 any entries to have a negative frequency. Our construction
 $\sketch[R,\ell,\lambda]$ defined in Figure~\ref{fig:bf-def} involves an
-$\ell$-thresholded variation of this structure. As in the case of Bloom filters,
-this does not significantly change the operation of the sketch in a
-non-adversarial setting, since in general~$\ell$ can be closely approximated
-given knowledge of~$n$.
+$\ell$-thresholded variation of this structure. The traditional description of
+a count min-sketch involves a parameter $n$ describing the size of the input
+stream, whereas our $\ell$ describes the maximum number of nonzero counters. As
+in the case of Bloom filters, this does not significantly change the operation
+of the sketch in a non-adversarial setting, since for random input streams the
+number of nonzero counters is closely related to the number of elements in the
+stream.
 %
-\cpnote{This isn't clear. What's~$n$? How do I approximate~$\ell$ given ``knowledge'' of~$n$?}
-%
-In the presence of an adversary, however, we expect this variation to provide
-better security bounds.
-%
-\cpnote{Better than what? If you had capped instead of thresholded? This section
-and the previous one should be readable on their own. If you want to bring up
-points you made in the last section, that's totally fine, but you need to point
-the reader to where they can read more.}
+In the presence of an adversary, however, we expect $\ell$-thresholding to
+provide better security bounds than the traditional definition would provide by
+handicapping pollution attacks and similar adversarial strategies.
 
 We will show that, in the \errep\ setting, the count min-sketch structure is
 insecure regardless of whether $\ell$-thresholding is used or not, and
