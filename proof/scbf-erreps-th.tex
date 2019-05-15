@@ -96,8 +96,7 @@
     $\setS^* \gets \up_{x,b}(\setS^*)$;
     return $\top$
 }
-\caption{Games 0--3 for proof of Theorem~\ref{thm:scbf-erreps-th}.}
-\label{fig:sbf-erreps/games}
+\caption{Games 0--3 for proof of Theorem~\ref{thm:counting-erreps}.}
 \end{figure*}
 
 As with the proof of Theorem~\ref{thm:sbf-errep-immutable}, we derive a bound in
@@ -128,7 +127,7 @@ finds a false positive, but where the adversary cannot delete any false
 positives that it finds. We let $r' = \lfloor r/\max(\delta^+,k\delta^-)\rfloor$
 represent the number of false positives the adversary has to find in~$\game_2$
 in order to win. In order to prevent the adversary from being penalized by the
-filter becoming full too early, we also raise the thresold from $\ell$ to
+filter becoming full too early, we also raise the threshold from $\ell$ to
 $\ell+r'$ in~$\game_2$. Now for any $\advA$ for~$\game_1$, we can construct
 $\advB$ for~$\game_2$ that simulates $\advA$, keeping track of all query
 responses and forwarding all oracle queries in the natural way, except that
@@ -162,5 +161,6 @@ where $p_\ell$ is now defined to be $((\ell+k+r')/m)^k$. Then the standard
 Chernoff bound, along with Lemma~\ref{thm:lemma1}, yields the final bound of
 \begin{equation}
    \Adv{\erreps}_{\Pi,\delta,r}(\advA) \leq
-     q_R \cdot \left[\frac{q_H}{2^\lambda} + e^{r'-p_\ell q_T}\left(\frac{p_\ell q_T}{r'}\right)^{r'}\right]s.
+     q_R \cdot \left[\frac{q_H}{2^\lambda} + e^{r'-p_\ell q_T}\left(\frac{p_\ell
+     q_T}{r'}\right)^{r'}\right] \,.
 \end{equation}
