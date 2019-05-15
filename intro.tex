@@ -98,7 +98,11 @@ total cost is not straightforward.  In particular, we must determine whether
 or not the cost of a given error should be carried across (adaptive,
 adversarial) updates to~$\col$ and its representation.
 
-\todo{TS}{Name and summarize the security notions.}
+\todo{TS}{Name and summarize the security notions. (Im)mutability being captured in
+the atatck, not the syntax. Explain that \errep\ is stronger \erreps, and
+therefore the more desirable target; but we find that certain structures are
+only secure in the \erreps\ setting. Argue that this setting is of practical
+interest.}
 
 To summarize, our high-level contributions are: formal syntax for
 mutable data structures, and two notions of adversarial
@@ -114,49 +118,91 @@ update operations, and taken together, these structures exhibit the full range
 adversarial settings our notions encounter. It may initially come as a surprise
 that \emph{none of these structures meets security in our setting}, at least as
 they are usually deployed. In particular, if the data being represented,
-updates, and queris all may depend on the choice of hash function, then each of
+the updates, and the queries all may depend on the choice of hash function, then each of
 these structures is susceptible to a class of attacks we call \emph{target-set
-coverage attacks}, which we describe in Section~\ref{sec:bad-bfs}. However,
-these structures can be refined in simple, intuitive ways that allow us to prove
-upper bounds.
+coverage attacks} (described in Section~\ref{sec:bad-bfs}). (These are closely
+related to \emph{pollution attacks} against standard Bloom
+filters~\cite{gerbet2015power}, which we will discuss in some detail.)
+%
+However, depending on the security setting (whether the representatino is
+public, and whether updates are permitted), these structures can be refined in
+simple, intuitive ways that allow us to achieve security in our setting.
 
 \heading{Bloom filters}
-We show an efficient attack against the standard Bloom filter construction,
-where the adversary is able to cause target elements to become false positives
-for the filter. We show that, if the filter is immutable but publicly available
-after construction, using a per-representation randomly-generated salt provides
-a security bound, though to achieve small error rates it may also be necessary
-to increase the size of the filter. In settings where the filter may be updated
-after its original construction, we show that it is necessary to either use a
-secret key or to keep the filter itself private in addition to using salts.
-Finally, we show how thresholding the number of 1s in the filter is an
-alternative to capping the number of elements in the underlying set, and
-establish better error bounds for the private salted filter when thresholding is
-used.
+%
+It is well-known that standard Bloom filters do not perform well in adversarial
+settings~\cite{naor2015bloom,gerbet2015power}; we first corroborate these
+findings via an explicit, \erreps\ attack (Section~\ref{sec:bad-bfs}).
+%
+We then consider the security of several variants of the basic Bloom
+filter for which we can derive correctness bounds.
+%
+The first idea is to generate a short, random \emph{salt}, which we prepend to
+the input of the hash. Thus, instead of computing $h_i(x)$ for each $1\leq i
+\leq k$ we compute $h_i(Z \cat x)$, where~$Z$ is a short (say, 128-bit) string
+chosen by the representation algorithm.
+%
+Our first positive result is for this \emph{salted} Bloom filter in the
+immutable/public-representation setting (Theorem~\ref{thm:sbf-errep-immutable}).
+%
+In the analysis we model the hashing algorithm as a random oracle
+(ROM)~\cite{BR93}. In fact, this is closely aligned with the usual analysis,
+which models the hash as a random function~\cite{broder2004network}. Because of
+modeling choice, however, our security argument must account for the
+precomputation performed by the adversary via the random oracle. This leads to
+fairly weak bounds, which means that larger filters must be used to achieve a
+reasoanble, correctness upper bound (Figure~\ref{fig:bf-bound}). On the other
+hand we show that we can do much better if the representation is kept private
+(Theorem~\ref{thm:sbf-erreps}). This result is also in the mutable setting.
+%
+We derive a similar bound for \emph{keyed} Bloom filters, which in addition to a
+salt, use a pseudorandom function (PRF) instead of a hash function. This result is
+in the mutable \emph{and} public-representation setting
+(Theorem~\ref{thm:kbf-errep}).
+
+Normally, Bloom filters are considered to be ``full'' when some pre-determined
+\emph{capacity} is reached; indeed, Bloom filter parameters are generally chosen
+as a function of this maximum capacity~\cite{kirsch2006less}.
+%
+We also consider a differnt notion of fullness whereby the filter is deemed full
+once the Hamming weight of the filter (i.e., the number of 1s) crosses a
+pre-determined \emph{threshold}. We show that this approach has substantial
+analytical value: with Theorem~\ref{thm:sbf-erreps-th}, we re-consider the
+security of salted BFs in the mutable/private setting and show that defining
+fulllness this way allos us to exhbit substantially tighter bounds.
+
 
 \heading{Count min-sketches}
-Count min-sketches use a two-dimensional array of counters to support
-representations of data streams along with more complex queries than Bloom
-filters allow, such as frequency queries. Inserting an element into the sketch
-increments a single counter in each row of the array, determined using a hash
-function. Unlike with Bloom filters, elements can also be deleted from the
-sketch by decrementing the relevant counters. First, we show that public
-sketches are intrinsically insecure, since the more flexible queries and updates
-provide potential adversaries with attacks that are impossible in the case of
-ordinary Bloom filters. We then establish an error bound for the
-private-representation setting, using the modifications of a per-representation
-random salt and a thresholding technique similar to that used for Bloom filters.
+Following the deep dive into Bloom filters in Section~\ref{sec:bloom}, we then
+consider count min-sketches (CMSes), which provide a compact representation of a
+multiset, allowing additions and deletions, and yielding approximate queires for
+approximate frequency of an element in the multiset.
+%
+\todo{DC}{Don't describe the structure; quickly say what's different from Bloom
+filters and what's the same. Mention that it hashes in much the same way.}
+%
+Despite its similarity to Bloom filters, CMSes are not secure in the
+public-representation setting, even if we use a salt or use a PRF in place of
+the hash function.
+%
+\todo{DC}{In one sentence, give the intution of why this is the case. Don't just
+say ``there's an attack''; talk about the informatino that's available here, but
+not when attacking a BF.}
+%
+However, we are able to derive a good correctness in the mutable/private setting
+(Thereom~\ref{thm:scms-erreps-th}), using a per-representation salt and a a
+notion of ``fullness'' similar to threshold Bloom filters.
 
 \heading{Counting filters}
-Counting filters are a simple modification of Bloom filters which allow for
-deletion, given by replacing each bit in the filter with a counter. Each
-insertion increments the counters indicated by the hash functions, while
-deletion decrements the same counters. We find that counting filters are
-insecure if they are visible to the adversary, and in fact they are vulnerable
-to the same attack we describe for the count min-sketch. We then once more apply
-the modifications of using a per-representation random salt and a thresholding
-assumption to prevent the filter from becoming too full, and demonstrate an
-error bound comparable to the count min-sketch bound.
+We conclude in Section~\ref{sec:count} with counting filters (already elluded
+to above).
+%
+Like CMSes, these also support both additions and deletions, but count filters
+only support set-membership queries (and not multiset frequency).
+%
+In spite of this semantic difference, CMSes and counting filters are
+so structurally related that they exhibit similar security properties
+(Theorem~\ref{thm:counting-erreps}).
 
 \heading{Conclusion}
 \todo{CP}{...}
