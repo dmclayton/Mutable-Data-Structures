@@ -62,7 +62,7 @@ Loosely, the representation of~$\col$ is a two-dimensional array
 of counters. To add an instance of~$x$, the representation is
 updated by hashing~$x$ to identify particular counters, and then
 incrementing these.  An instance of~$x$ is removed
-by hashing and decrementing the counters.  
+by hashing and decrementing the counters.
 The frequency of~$x$ is determined by taking
 the minmum value~$v$ over the counters associated to it. (Counters are
 typically floored at 0.)  Now, if one
@@ -71,7 +71,7 @@ potential for both false-positive \emph{and} false-negative
 responses.  In particular, if the representation is updated by
 ``removing'' an element~$y$ that does not appear in the
 underlying~$\col$, one or more of the counters associated to~$x$ may
-be decremented.  
+be decremented.
 
 \todo{TS}{Have another look at the results in Sections 5 and 6. The error
 function for CMS is now simply ``was the response an overestimate''; the
@@ -88,7 +88,7 @@ setting, traditional analyses guarantee only that the response will be
 to one.  Thus, our security definitions are parameterized by a
 error-cost function~$\delta$: if the correct response to a query is~$a$ and
 the data structure responds with~$a'$, the cost of the error is
-$\delta(a,a') \geq 0$.  
+$\delta(a,a') \geq 0$.
 
 They are also parameterized by an total-cost threshold, and
 the adversary is considered to ``win'' if the total cost of the errors it induces
@@ -98,23 +98,22 @@ or not the cost of a given error should be carried across (adaptive,
 adversarial) updates to~$\col$ and its representation.
 
 To summarize, our high-level contributions are: formal syntax for
-mutable data structures, and two notions of adversarial 
+mutable data structures, and two notions of adversarial
 correctness for these.  Our notions capture settings in which representations
 are made public, or kept private, respectively.
 
-We exercise our syntax and notions by
-analyzing three important, real-world data structures: Bloom
-filters~\cite{bloom1970space}, counting filters~\cite{fan2000summary}, and count-min
-sketches~\cite{cormode2005improved}. 
-In addition to the basic version of these, we
-explore variations that allow for ``salted'' representations (i.e.,
-per-representation randomness), secret keys (so that the mapping
-from~$\col$ to representation is unpredictable, even if the
-representation of one or more closely related~$\col'$ are known), or both.
+We exercise our syntax and notions by analyzing three important, real-world data
+structures: Bloom filters~\cite{bloom1970space} (Section~\ref{sec:bloom}), count
+min-sketches~\cite{cormode2005improved} (Section~\ref{sec:sketch}), and counting
+filters~\cite{fan200summary} (Section~\ref{sec:count}). Each of these supports
+different queries and update operations, and taken together, these structures
+exhibit the full range adversarial settings our notions encounter. It may
+initially come as a surprise that \emph{none} of these structures meets security
+in our setting \emph{as they are usually deployed}. In particular, each of these
+structures is susceptible to a class of attacks we call \emph{target-set
+coverage attacks}, described in Section~\ref{sec:bad-bfs}.
 
-\heading{Security findings.}
-%\input{fig-results-overview}
-
+\ignore{
 \tsnote{Stuff to do, typed up quickly during our Tuesday afternoon meeting...}
 \begin{itemize}
 \item $n$-capped does not imply $\ell$-thresholded for any
@@ -175,7 +174,7 @@ representation of one or more closely related~$\col'$ are known), or both.
   positives than false negatives. (Interestingly, the opposite is true in the
   non-adpative case.)
 \end{itemize}
-
+}
 
 
 \heading{Future work}
