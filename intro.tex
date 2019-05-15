@@ -11,72 +11,106 @@ sort can be used to dramatically degrade the performance of real systems
 \cite{crosby2003denial,gerbet2015power,lipton1993clocked}.
 
 Naor and Yogev (NY) formalized a notion of adversarial correctness for
-Bloom-filter-like structures. (Recall that
-a Bloom filter provides a compact representation of a set~$\col$, and supports
-set-membership queries.)
-In their notion, the adversary must choose~$\col$ all at once,
-and then adaptively queries the data structure in order to induce
-erroneous responses. 
+Bloom-filter-like structures. Recall that
+a Bloom filter provides a compact representation~$\pub$ of a
+set~$\col$. The representation is a length~$m$ bit-array (initally
+all zeros), and elements $x \in \col$ are added to it by computing hash values
+$h_1(x),h_2(x),\ldots,h_k(x)\in [m]$, then setting the indicated array
+positions to~$1$.  A Bloom filter supports set membership queries,
+i.e., \emph{is $y\in\col$?}, by hashing~$y$ and responding positively iff all of
+the indicated positions hold a 1-bit.  When $h_1,\ldots,h_k$ are
+modeled as random functions, and~$\col$ is independent of these, classical
+results relate $|\col|,m,k$ to the probability of false-positive query responses.
 %
-But many modern applications require data structures to (compactly) represent \emph{streams} of
-data, not static collections (typicallly, sets) whose size is bounded by some number that is
-fixed \emph{a priori}.  
-%
-For example, the count-min
-sketch structure~\cite{xxx} is used to compactly represent the number
-of times a particular object~$x$ has appeared, so far, in the input
-stream.  This is done by incrementing a collection of counters that
-are associated with~$x$ (deterministically, via hash functions) each
-time~$x$ is seen.  Some applications require the ability to
-add \emph{and remove} elements from effective~$\col$ that the structure
-represents.  
+Naor and Yogev revisited these results from a security perspective, by
+formalizing an attack model in which the adversary specifies a
+(fixed) set~$\col$ that may
+depend on the hash functions, and is then allowed to adaptively query the
+(immutable) representation~$\pub$ in an effort to induce errors.
 
-As such, we significantly expand upon NY to consider data structure
-correctness in the presense of adversaries that adaptively create and
-mutate~$\col$, in an effort to induce query-response errors.  We
-define a syntax for mutable data structures, formalize two notions of
-correctness (capturing settings in which representations
-are public/private, respectively), and exercise these by
-considering a collection of real-world data structures: Bloom
-filters~\cite{xxx}, counting filters~\cite{xxx}, cuckoo
-filters~\cite{xxx}, and count-min sketches~\cite{xxx}. \tsnote{Update
-  if we add more.}  In addition to the basic version of these, we
+We expand upon NY in several, practically relevant ways. 
+To begin, our attack model
+allows the adversary to adaptively \emph{update} the
+collection~$\col$, thereby capturing 
+settings in which the target data may change over time, e.g., streaming data applications.
+Correspondingly, we consider data
+structures that natively support \emph{mutable} representations.  Concrete examples of
+these include the counting filter~\cite{xxx}, count-min
+sketch~\cite{xxx}, the cuckoo filter~\cite{xxx}, \tsnote{Add a few
+  more}.
+%
+Next, while the Bloom filter was designed to represent
+data collections~$\col$ that are sets, streaming data is
+better modeled as a multiset.  Natural questions about multisets
+extend beyond set-membership; for example, an important question in practice is
+\emph{how many times does~$x$ appear in~$\col$?}  
+
+Thus, our syntatic definition of data structures admits both
+mutability and rich query spaces.
+Formally, a data structure as a triple of algorithms $(\Rep, \Qry, \Up)$ denoting
+the \emph{representation}, \emph{query-evaluation}, and \emph{Update} algorithms, respectively.
+Associated to the data structure is a set of supported
+queries~$\mathcal{Q}$, which are functions~$\qry$ over data objects,
+and a set~$\mathcal{U}$ of allowed update functions.
+For reasons we will elucidate in a moment, all three algorithms take a
+key~$\ky$ as input, and both~$\Rep$ and~$\Qry$ may be randomized.
+
+
+The combination of mutability and rich query spaces has significant
+implications for security.  Consider the count-min
+sketch structure~\cite{xxx}, which compactly (and approximately)
+represents an updatable multiset~$\col$.  
+Loosely, the representation of~$\col$ is a two-dimensional array
+of counters. To add an instance of~$x$, the representation is
+updated by hashing~$x$ to identify particular counters, and then
+incrementing these.  An instance of~$x$ is removed
+by hashing and decrementing the counters.  
+The frequency of~$x$ is determined by taking
+the minmum value~$v$ over the counters associated to it. (Counters are
+typically floored at 0.)  Now, if one
+restricts to set-membership queries ---~is $v>0$?~-- there is the
+potential for both false-positive \emph{and} false-negative
+responses.  In particular, if the representation is updated by
+``removing'' an element~$y$ that does not appear in the
+underlying~$\col$, one or more of the counters associated to~$x$ may
+be decremented.  
+
+Even though it is two-sided, the notion of error with respect to set-membership
+queries is intuitive, even if one wants to associate different
+fixed costs to false-positives and false negatives.  For frequency
+queries, it is far less obvious.   One could define frequency-estimate
+error in an absolute sense, i.e., the data structure errs if its
+response is not exactly correct.  But even in the non-adaptive
+setting, traditional analyses guarantee only that the response will be
+\emph{close} to the exact frequency, with some probability that is close
+to one.  Thus, our security definitions are parameterized by a
+error-cost function~$\delta$: if the correct response to a query is~$a$ and
+the data structure responds with~$a'$, the cost of the error is
+$\delta(a,a') \geq 0$.  
+
+They are also parameterized by an total-cost threshold, and
+the adversary is considered to ``win'' if the total cost of the errors it induces
+is greater than this value.  As we will see, even calculating the
+total cost is not straightforward.  In particular, determining whether
+or not the cost of a given error should be carried across (adaptive,
+adversarial) updates to~$\col$ and its representation.
+
+To summarize, our high-level contributions are: formal syntax for
+mutable data structures, and two notions of adversarial 
+correctness for these.  Our notions capture settings in which representations
+are made public, or kept private, respectively.
+
+We exercise our syntax and notions by
+analyzing three important, real-world data structures: Bloom
+filters~\cite{xxx}, counting filters~\cite{xxx}, and count-min
+sketches~\cite{xxx}. 
+In addition to the basic version of these, we
 explore variations that allow for ``salted'' representations (i.e.,
 per-representation randomness), secret keys (so that the mapping
 from~$\col$ to representation is unpredictable, even if the
 representation of one or more closely related~$\col'$ are known), or both.
 
-The notion of query-response error becomes considerably more
-general in our setting.   The ubiquitous Bloom filter, designed to
-compactly represent a fixed set~$\col$ and to provide approximately
-correct responses to set-membership queries, suffers only
-false-positive errors, i.e., saying that $y \in \col$ when it isn't.
-Counting filters ---~loosely, Bloom filters
-with an array of counters rather than single bits~--- support updates
-of the form \emph{remove~$x$ from the representation of~$\col$}.  If
-$x \in \col$ when this update is processed, then the appropriate
-counters are decremented.  If $x \not\in \col$, however, counters will
-be erroneously decremented, leading to the possibility of
-false-\emph{negative} errors when set-membership queries are made for some $y
-\in \col$.  False-positive errors remain, too.
-More generally, the count-min sketch supports queries of the
-form \emph{how many times has~$x$ appeared, so far?}  One could define
-error in an absolute sense, i.e., the data structure errs if its
-response is not exactly correct.  But even in the non-adaptive
-setting, traditional analyses guarantee only that the response will be
-\emph{close} to the exact number, with some probability that is close
-to one.  Thus, our security notions are parameterized by a
-error-cost function~$d$: if the correct response to a query is~$a$ and
-the data structure responds with~$a'$, the cost of the error is
-$d(a,a') \geq 0$.  
-%
-They are also parameterized by an total-cost threshold, and
-the adversary is considered to win if the total cost of induced
-errors is greater than this value.  As we will see, calculating the
-total cost is not straightforward; in particular, determining whether
-or not the cost of a given error should be carried across (adaptive,
-adversarial) updates to~$\col$ and its representation.
-
+\heading{Security findings.}
 \input{fig-results-overview}
 
 \tsnote{Stuff to do, typed up quickly during our Tuesday afternoon meeting...}
