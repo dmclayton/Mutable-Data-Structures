@@ -135,33 +135,50 @@ Throughout this section we will use the error function~$\delta$ defined as
 This simply indicates whether the query result matched the correct response.
 
 \subsection{Insecurity of unsalted BFs}
-The classic case of a Bloom filter with no key or salt, i.e. $\BF[H,n]$ for some
-hash function $H: \bits^* \to [m]^k$ and $n \ge 0$, is not secure under either
-correctness notion. In fact, with no per-representation randomness and no secret
-key to be concealed from the adversary, there is no difference between \errep\
-and \erreps\ security, as the adversary can easily compute the representation of
-any set for itself. This ability of the adversary to reconstruct the set without
-making queries allows for various attacks that badly harm the accuracy of the
-filter.
+The performance of basic Bloom filters is well-understood assuming the choice of
+set~$\S$ being represented is independent of the choice of hash function. When
+this assumption is violated, however, their performance can be substantially
+degraded~\cite{gerbet2015power}.
+%
+Here we show that, even when we (optimistically) model the hash function as a
+random oracle, basic BFs cannot achieve security in our setting.
+%
+The basic Bloom filter has no salt and no secret key.
+Let $H:\bits^*\to[m]^k$ be a function, fix $n\geq0$, and let
+$\Pi = \BF[H,n]=(\Rep^H,\Qry^H,\Up^H)$ as defined above.
+%
+With no per-representation randomness and no secret key to be concealed from the
+adversary, there is no difference between \errep\ and \erreps\ security, as the
+adversary can easily compute the representation of any set for itself. This
+ability of the adversary to reconstruct the set without making queries allows
+for various attacks that badly harm the accuracy of the filter.
 
 \heading{Example attack setting}
 Suppose the adversary is interacting with a system representing a dataset
 with~$\Pi$ and that it is able to choose some fraction of the input data.  For
-example, consider a web crawler which performs a `crawl' of webpages, following
+example, consider a web crawler which performs a ``crawl'' of webpages
+\cpnote{Maybe we should cite Google's white paper on Search?}, following
 the links on each page it visits in order to index, archive, or otherwise
 analyze websites. In order to keep track of the set of webpages which have
 already been visited during a crawl, some crawlers use a Bloom filter which is
-updated to include each new page the crawler visits. Suppose the adversary
-controls at least one such webpage along the crawl's path and wishes to deny the
-spider access to a different webpage, the `target webpage'. The adversary can
-choose the links present on its own webpage, which will cause the spider to
-visit the chosen webpages and set the corresponding bits of its Bloom filter to
-1. If those links are chosen in such a way that they produce a false positive
-for the target webpage, the spider will then erroneously believe it has already
-visited the target webpage. The target webpage will therefore never be visited
-during the spider's crawl.
+updated to include each new page the crawler visits \todo{DC}{Need citation}.
+Suppose the adversary controls at least one such webpage along the crawl's path
+and wishes to deny the spider access to a different webpage, the `target
+webpage'. The adversary can choose the links present on its own webpage, which
+will cause the spider to visit the chosen webpages and set the corresponding
+bits of its Bloom filter to~$1$. If those links are chosen in such a way that they
+produce a false positive for the target webpage, the spider will then
+erroneously believe it has already visited the target webpage. The target
+webpage will therefore never be visited during the spider's crawl.
+%
+\cpnote{This is very interesting! Is it your idea? If not, then you need to cite
+the source.}
 
 \heading{Pollution attacks}
+%
+\todo{DC}{Ensure that we've mentioned Gerbet \etal in the intro or related work,
+or give more context for the paper here. In 1-2 sentences, what did it aim to
+do?}
 %
 The goal of the attacks pointed out by Gerbet \etal~~\cite{gerbet2015power} is
 to pollute the filter such that the ``average'' set-membership query yields a
@@ -175,28 +192,34 @@ choices will set certain target bits to 1 in order to cause specific false
 positives. They show that with $m = 3200$ and $k = 4$, the adversary can double
 the false positive rate if they control 200 out of a total of $n = 600$
 insertions.
+%
+\cpnote{Is there attack for a particular choice of~$H$ or does it work
+regardless of the choice of~$H$, as long as it's known to the attacker?}
 
+\cpnote{Not sure what this adds, or if it's necessary.}
 Significantly, the attack model considered assumes that the representations of
 the filter are always kept private. This in general gives the adversary less
 power than in our \errep\ or even \erreps\ attack model, since there is no
 analogue to the $\REVO$ oracle. However, as noted above, the standard $\BF[H,n]$
-construction is  Within this model, Gerbet \etal show various
-ways to mitigate pollution attacks, such as choosing the parameters of the filter pesimistically,
-so that even if a pollution attack occurs, the false positive rate is kept below
-some threshold of acceptability. This strategy is  potentially viable, but may
-significantly increase the amount of memory required to store the data structure.
-The bounds we provide show how the parameters of a filter can be tweaked to keep
-the error rate low not just in the presence of this specific type of attack, but
-in the presence of any adversary covered by our more general attack model.
+construction is within this model.
+
+Gerbet \etal suggest various ways to mitigate pollution attacks, such as choosing
+the parameters $k$, $m$, and $n$ so that even if a pollution attack
+occurs, the false positive rate is kept below some threshold of acceptability.
+This strategy is  potentially viable, but may significantly increase the amount
+of memory required to store the data structure.  The bounds we provide show how
+the parameters of a filter can be tweaked to keep the error rate low not just in
+the presence of this specific type of attack, but in the presence of any
+adversary covered by our more general attack model; doing so, however, will
+require altering the structure.
 
 The authors also discuss the possibility of using a secretly-keyed
 hash function. In the attack model they consider, where representations are kept
 private indefinitely, this suffices to prevent the pollution attack they
 describe. However, under the more general attack models where the representation
-may eventually be recovered (in the private-representation setting) or is simply
-available to potential adversaries (in the public-representation setting).
-Simply using a PRF with a long-term secret key does not suffice to
-secure a Bloom filter in the \errep\ and \erreps\ scenarios we consider.
+may eventually be recovered (in the private-representation setting via~$\REVO$)
+or is public.  Simply using a PRF \emph{without per-representation randomness}
+does not suffice for security in our setting.
 
 \heading{Target-set coverage attacks}
 %
