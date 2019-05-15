@@ -65,10 +65,10 @@ The count min-sketch is designed to minimize the number of elements whose
 frequencies are overestimated, while still allowing for reasonably low memory
 usage. For a function $\rho$ and integer $\lambda\ge0$, let
 $\sketch[\id^\rho,n,\lambda] = (\Rep^\rho,\Qry^\rho,\Up^\rho)$ as defined
-previously. Then for $\col \in \Func(\bits^*,\N)$ \cpnote{What's this? Do you
-mean $\rho$?} a multiset containing a total
-of $n$ elements (counting duplicates as separate elements), and for any
-$x \in \bits^*$, we define the error probability for a count-min sketch as
+previously. If $\col$ is a multiset containing a total of $n$ elements
+(counting duplicates as separate elements), i.e. $\col \in \Func(\bits^*,\N)$ in
+our syntax, and $x \in \bits^*$ is any string, possibly but not necessarily a
+member of $\col$, we define the error probability for a count-min sketch as
 \begin{equation}\label{eq:bf-fp}
   \begin{aligned}
     P_{k,m}(n) =
@@ -79,8 +79,6 @@ $x \in \bits^*$, we define the error probability for a count-min sketch as
   \end{aligned}
 \end{equation}
 
-\cpnote{What's $\col$? What if $x$ is not in the set?}
-
 Informally, $P_{k,m}(n)$ is the probability that some~$x$ is overestimated by a
 non-negligible amount in the representation of some $\setS$ containing a total
 of $n$ elements, when a random function is used for hashing. Cormode and
@@ -89,37 +87,31 @@ above by $e^{-k}$. CMS does not provide a bound for underestimation of
 frequencies, since it is designed for use cases where overestimates are
 considered harmful but underestimates are not.
 
-\heading{Error function for frequency queries}
-%
-\cpnote{This isn't used anywhere, so why are we defining it?}
-%
-The most natural error function to correspond with the non-adaptive error bound
-is the~$\delta$ defined as
+\heading{Error function for frequencyqueries}
+
+The count min-sketch is designed for settings where overestimation in particular
+is undesirable, and so provides tight bounds on the size of overestimates, but
+makes no guarantees about underestimates. To make the bounds simpler while
+staying conservative in our assumptions, we will use an error function that
+counts \emph{any} overestimate as an error, not just overestimates larger than
+some lower bound of significance. In particular, we define~$\delta$ as
 \begin{equation}
   \delta(x, y) =
   \begin{cases}
-    1 & \text{if}\ x - y > \frac{en}{m} \\
+    1 & \text{if}\ x > y \\
     0 & \text{otherwise.}
   \end{cases}
 \end{equation}
-%
-\todo{DC}{Write $\delta$ as $\delta_{m,n}$ here and below, since it's a value
-that depends on parameters of the structure.}
-%
-This means that a non-negligible \emph{overestimate} is considered an error,
-while underestimates are not. This is in line with the definition of the CMS
-data structure, which provides a tight bound on the number of accidental
-overestimates which are likely to occur (in the absence of an adaptive
-adversary) but does not place any bounds on underestimation. In the case of
-$\ell$-thresholded sketches defined later, we will actually move to a stricter
-error function than this.
 
 \subsection{Insecurity of public sketches}
 
 Unlike in the Bloom filter case, good security bounds cannot be achieved for a
 count-min sketch in the \errep\ setting even if salts and/or private keys are
-used. Given a stronger $\UPO$ oracle \cpnote{Do you mean ``given that the $\UPO$
-oracle is more poweerful''? If so, then say why it is.} the adversary can mount
+used. The insecurity is due to the relative power of the $\UPO$ oracle compared
+to the case of a Bloom filter. Not only does it allow for deletion as well as
+insertion, but since updates are \emph{added} to the representation rather than
+being combined with bitwise `or', the adversary gains more information from
+seeing updates occur. Because of these differences, the adversary can mount
 an attack similar to the target-set coverage attack for a Bloom filter even if a
 PRF is used for
 hashing. First, the adversary calls $\REPO(\emptyset)$ to get an empty
@@ -130,9 +122,8 @@ can determine the outputs of the PRF for $i$ different inputs using $2i$ calls
 to $\UPO$. Once a sufficiently large number of PRF outputs has been determined,
 the adversary can construct the test and target set used for the target-set
 coverage attack. The adversary then calls $\UPO$ several more times to insert
-each element of the test set into the sketch at least $(en)/m$ times, and then
-each element of the target set will be overestimated by an unacceptably large
-amount.
+each element of the test set into the sketch, and then
+each element of the target set will be overestimated.
 
 In actual use, this specific attack may not be feasible for the adversary.
 However, as long as the sketch is public, the adversary can easily determine the
