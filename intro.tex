@@ -167,25 +167,25 @@ error bound comparable to the count min-sketch bound.
   \begin{tabular}{ |p{1.75cm} | p{2.5cm} | p{2.95cm} | p{4cm} | p{3.7cm}|}
     \hline
     {\bf Structure} & {\bf Data Objects} & {\bf Supported Queries} & {\bf Supported Updates} & {\bf Parameters} \\ \hline
-    \parbox[c]{1.5cm}{Bloom\\ filter}
+    \parbox[c]{1.5cm}{Bloom\\ filter (Fig.~\ref{fig:bf-def})}
           & \parbox[c][6ex]{2cm}{Sets\\$\col\subseteq \bits^*$} %, or\\ $\col \in \Func(\bits^*,\{0,1\})$}
           & $\qry_x(\col) = [x \in \col]$
           &  $\up_x(\col) = \col \cup \{x\}$
           & \parbox[c]{4cm}{$n$, max $|\col|$\\$k$, \# hash functions\\$m$, array size (bits)}
           \\\hline
-    \parbox[c]{1.5cm}{Thresholded Bloom\\ filter}
-          & \parbox[c][6ex]{2cm}{Sets\\$\col\subseteq \bits^*$} %, or\\ $\col \in \Func(\bits^*,\{0,1\})$}
+     \parbox[c]{2cm}{$\ell$-thresholded\\ Bloom filter\\ (Fig.~\ref{fig:bft-def})}
+          & \parbox[c]{2.5cm}{Sets\\ $\col \subseteq \bits^*$}
           & $\qry_x(\col) = [x \in \col]$
-          &  $\up_x(\col) = \col \cup \{x\}$
-          & \parbox[c]{4cm}{$\ell$, max no. 1s in array\\$k$, \# hash functions\\$m$, array size (bits)}
-          \\\hline
-     \parbox[c]{2cm}{Count-min\\ sketch}
+          & \parbox[c][10ex]{4cm}{$\up_x(\col) = \col \cup \{x\}$}
+          & \parbox[c]{3.75cm}{$\ell$, max no. 1s in array\\$k$, \# hash functions\\$m$, array size (bits)}
+          \\ \hline
+     \parbox[c]{2cm}{Count-min\\ sketch (Fig.~\ref{fig:cms-def})}
           & \parbox[c]{2.5cm}{Multisets\\ $\col \in \Func(\bits^*,\N)$}
           & $\qry_x(\col) = \col(x)$
           & \parbox[c][10ex]{4cm}{$\up_{x,0}(\col)(x) = \col(x)+1$ \\ $\up_{x,1}(\col)(x) = \col(x)-1$ \\ $\up_{x,b}(\col)(y) = \col(y)$ for $x \neq y$}
           & \parbox[c]{3.75cm}{$\ell$, max no. nonzero counters\\$k$, \# hash functions and arrays\\$m$, array size (counters)}
           \\ \hline
-    \parbox[c]{1.5cm}{Counting\\ filter}
+    \parbox[c]{1.5cm}{Counting\\ filter (Fig.~\ref{fig:cbf-def})}
           & \parbox[c]{2.5cm}{Multisets\\ $\col \in \Func(\bits^*,\N)$}
           & $\qry_x(\col) = [\col(x) > 0]$
           & \parbox[c][10ex]{4cm}{$\up_{x,0}(\col)(x) = \col(x)+1$ \\ $\up_{x,1}(\col)(x) = \col(x)-1$ \\ $\up_{x,b}(\col)(y) = \col(y)$ for $x \neq y$}
