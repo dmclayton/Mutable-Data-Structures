@@ -56,7 +56,7 @@ both~$\Rep$ and~$\Qry$ may be randomized.
 
 The combination of mutability and rich query spaces has significant
 implications for security.  Consider the count-min
-sketch structure~\cite{xxx}, which compactly (and approximately)
+sketch structure~\cite{cormode2005improved}, which compactly (and approximately)
 represents an updatable multiset~$\col$.  
 Loosely, the representation of~$\col$ is a two-dimensional array
 of counters. To add an instance of~$x$, the representation is
@@ -104,8 +104,8 @@ are made public, or kept private, respectively.
 
 We exercise our syntax and notions by
 analyzing three important, real-world data structures: Bloom
-filters~\cite{xxx}, counting filters~\cite{xxx}, and count-min
-sketches~\cite{xxx}. 
+filters~\cite{bloom1970space}, counting filters~\cite{fan2000summary}, and count-min
+sketches~\cite{cormode2005improved}. 
 In addition to the basic version of these, we
 explore variations that allow for ``salted'' representations (i.e.,
 per-representation randomness), secret keys (so that the mapping
