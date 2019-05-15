@@ -105,13 +105,31 @@ are made public, or kept private, respectively.
 We exercise our syntax and notions by analyzing three important, real-world data
 structures: Bloom filters~\cite{bloom1970space} (Section~\ref{sec:bloom}), count
 min-sketches~\cite{cormode2005improved} (Section~\ref{sec:sketch}), and counting
-filters~\cite{fan200summary} (Section~\ref{sec:count}). Each of these supports
-different queries and update operations, and taken together, these structures
+filters~\cite{fan2000summary} (Section~\ref{sec:count}). Each of these supports
+different queries and update operations; and taken together, these structures
 exhibit the full range adversarial settings our notions encounter. It may
-initially come as a surprise that \emph{none} of these structures meets security
-in our setting \emph{as they are usually deployed}. In particular, each of these
-structures is susceptible to a class of attacks we call \emph{target-set
-coverage attacks}, described in Section~\ref{sec:bad-bfs}.
+initially come as a surprise that \emph{none of these structures meets security
+in our setting}, at least as they are usually deployed. In particular, if choice
+of hash functions are public, each of these structures is susceptible to a class
+of attacks we call \emph{target-set coverage attacks}, whcih we describe in
+Section~\ref{sec:bad-bfs}. However, these structures can be refined in simple,
+intuitive ways that allow us to prove upper bounds.
+
+\heading{Bloom filters}
+\todo{DC}{No need to describe these, as they will definitely appear above.
+Describe our results, one sentence per theorem and one sentence per attack.}
+
+\heading{Count min-sketches}
+\todo{DC}{Give a high level overview of this structure, since it may not appear
+above. Then give our main result. What's different here? What did we learn}
+
+\heading{Counting filters}
+\todo{DC}{Give a high level overview of this structure. Then give our main
+result. What's different here? What did we learn}
+
+\heading{Conclusion}
+\todo{CP}{...}
+
 
 \ignore{
 \tsnote{Stuff to do, typed up quickly during our Tuesday afternoon meeting...}
