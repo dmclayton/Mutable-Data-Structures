@@ -9,15 +9,15 @@ this sort can be used to disrupt or reduce the availability of real systems
 \cite{crosby2003denial,gerbet2015power,lipton1993clocked}.
 
 Naor and Yogev (NY) formalized a notion of adversarial correctness for
-Bloom-filter-like structures. Recall that a Bloom filter provides a compact
-representation, $\pub$, of a set~$\col$. The representation is a length~$m$
+Bloom-filter-like structures. A Bloom filter provides a compact representation,
+which we denote by $\pub$, of a set~$\col$. The representation is a length-$m$
 bit-array (initally all zeros), and elements $x \in \col$ are added to it by
 computing hash values $h_1(x),h_2(x),\ldots,h_k(x)\in [m]$, then setting the
 indicated array positions to~$1$.  A Bloom filter supports set membership
-queries, i.e., ``is $x\in\col$?'', by hashing~$x$ and responding positively
-iff all of the indicated positions hold a 1-bit.  When $h_1,\ldots,h_k$ are
-modeled as random functions, and~$\col$ is independent of these, classical
-results relate $|\col|,m,k$ to the probability of false-positive query
+queries, i.e., ``is $x\in\col$?'', by hashing~$x$ and responding positively iff
+all of the indicated positions hold a 1-bit.  When $h_1,\ldots,h_k$ are modeled
+as random functions, and~$\col$ is independent of these, classical results
+relate $|\col|,m,k$ to the probability of false-positive query
 responses~\cite{broder2004network,kirsch2006less}.
 %
 NY revisited these results from a security perspective, by
@@ -29,14 +29,22 @@ depend on the hash functions, and is then allowed to adaptively query the
 This work expands upon NY in several, practically relevant ways.  To begin, our
 attack model allows the adversary to adaptively \emph{update} the
 collection~$\col$, thereby capturing settings in which the target data may
-change over time, e.g., streaming data applications.  Correspondingly, we
-consider data structures that natively support \emph{mutable} representations.
-Concrete examples of these include the counting filter~\cite{fan2000summary},
-count-min sketch~\cite{cormode2005improved}, cuckoo filter~\cite{fan2014cuckoo},
-and stable Bloom filter~\cite{deng2006approximately}.
-
+change over time, e.g., streaming data applications.
 %
-Next, while the Bloom filter was designed to represent data collections~$\col$
+\todo{DC}{Is there a suitable reference for this? If so, then add it here. If
+it's not already in related work, then add it.}
+%
+Correspondingly, we consider data structures that natively support
+\emph{mutable} representations. Concrete examples of these include the counting
+filter~\cite{fan2000summary}, count-min sketch~\cite{cormode2005improved},
+cuckoo filter~\cite{fan2014cuckoo}, and stable Bloom
+filter~\cite{deng2006approximately}.
+
+What all of these have in common is that they are designed to \emph{compactly}
+represent the data so that certain types of mutations and queries are supported,
+but a small amount of error is permitted.
+%
+While the Bloom filter was designed to represent data collections~$\col$
 that are sets, streaming data is better modeled as a multiset.  Natural
 questions about multisets extend beyond set-membership; for example, an
 important question in practice is \emph{how many times does~$x$ appear
@@ -48,12 +56,13 @@ Thus, our syntatic definition of data structures admits both mutability and rich
 query spaces.  Formally, a data structure is a triple of algorithms $(\Rep,
 \Qry, \Up)$ denoting the \emph{representation}, \emph{query-evaluation}, and
 \emph{Update} algorithms, respectively. Associated to the data structure is a
-set of supported queries~$\mathcal{Q}$, which are functions~$\qry$ over data
-objects, and a set~$\mathcal{U}$ of allowed update functions.  For reasons we
-will elucidate in a moment, all three algorithms take a key~$\ky$ as input, and
-both~$\Rep$ and~$\Qry$ may be randomized.
+set of supported query \emph{functions}~$\mathcal{Q}$, and a set~$\mathcal{U}$
+of allowed update functions.  For reasons we will elucidate in a moment, all
+three algorithms take a key~$\ky$ as input, and both~$\Rep$ and~$\Up$ may be
+randomized.
 
 
+\todo{DC}{Make this about counting filters}
 The combination of mutability and rich query spaces has significant
 implications for security.  Consider the count-min
 sketch structure~\cite{cormode2005improved}, which compactly (and approximately)
