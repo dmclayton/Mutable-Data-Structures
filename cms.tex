@@ -29,7 +29,7 @@
       $\tab$ if $a = 0 \wedge b < 0$ then return $\bot$\\
       $\tab \v.M'[i][\v.X[i]] \gets a + b$\\
       $\v.M \gets \v.M'$;
-      return $\langle \v.M, \salt, c+b \rangle$
+      return $\langle \v.M, \salt \rangle$
   }
   \caption{Keyed structure $\sketch[R,\ell,\lambda]$ given by
   $(\Rep^R,\Qry^R,\Up^R)$ is used to define count min-sketch variants.

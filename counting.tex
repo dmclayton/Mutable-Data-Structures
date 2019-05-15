@@ -25,7 +25,7 @@
       $\tab$ if $a = 0 \wedge b < 0$ then return $\bot$\\
       $\tab \v.M'[i] \gets \v.M'[i] + b$\\
       $\v.M \gets \v.M'$;
-      return $\langle \v.M, \salt, c+b \rangle$
+      return $\langle \v.M, \salt \rangle$
   }
   \caption{Keyed structure $\countbloom[R,\ell,\lambda]$ given by
   $(\Rep^R,\Qry^R,\Up^R)$ is used to define the $\ell$-thresholded version of a
