@@ -75,9 +75,10 @@ Section~\ref{sec:pub-sketch-bad}.
 \subsection{Private Thresholded Counting Filters}
 
 \begin{theorem}\label{thm:counting-erreps}
-Fix integers $q_R, q_T, q_H, q_V, r, t \geq 0$, let $p_\ell = ((\ell+1)/m)^k$ and
-$r' = \lfloor r/\max(\delta^+,k\delta^-) \rfloor$. For all such $q_R, q_T, q_H,
-r$, and~$t$, if $r' > p_\ell q_T$ then
+Fix integers $q_R,q_T,q_U,q_H,q_V, r, t \geq 0$, let $p_\ell = ((\ell+1)/m)^k$,
+and let
+$r' = \lfloor r/\max(\delta^+,k\delta^-) \rfloor$. For all such
+$q_R,q_T,$ $q_U,q_H,q_V,r$, and~$t$, if $r' > p_\ell q_T$ then
   \begin{equation*}
   \begin{aligned}
    \Adv{\erreps}_{\Pi,\delta,r}(O(t),\,&q_R,q_T,q_U,q_H,q_V) \leq\\
@@ -103,9 +104,11 @@ After this step, we observe that a counting filter without
 deletion behaves the same as an ordinary Bloom filter in terms of how it
 responds to queries. We can therefore borrow the arguments used to establish the
 bounds in Theorem~\ref{thm:sbf-erreps-th} to finish the proof.
-\begin{proof}
-  \input{proof/scbf-erreps-th}
-\end{proof}
+%
+We defer the details of the proof to Appendix~\ref{sec:proof/counting-erreps}.
+%\begin{proof}
+%  \input{proof/scbf-erreps-th}
+%\end{proof}
 
 \subsection{Discussion}
 The results for counting filters are similar to the results for count-min
