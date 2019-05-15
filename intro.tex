@@ -35,11 +35,13 @@ Concrete examples of these include the counting filter~\cite{xxx}, count-min
 sketch~\cite{xxx}, the cuckoo filter~\cite{xxx}, \todo{DC}{Add references and
 add any other data structuers you feel should be named here.}
 %
-Next, while the Bloom filter was designed to represent
-data collections~$\col$ that are sets, streaming data is
-better modeled as a multiset.  Natural questions about multisets
-extend beyond set-membership; for example, an important question in practice is
-\emph{how many times does~$x$ appear in~$\col$?}  
+Next, while the Bloom filter was designed to represent data collections~$\col$
+that are sets, streaming data is better modeled as a multiset.  Natural
+questions about multisets extend beyond set-membership; for example, an
+important question in practice is \emph{how many times does~$x$ appear
+in~$\col$?} As with Bloom filters, the challenge is to answer this question with
+as little space consumption as possible, at the cost of admitting a reaosonable
+amount of error.
 
 Thus, our syntatic definition of data structures admits both
 mutability and rich query spaces.
