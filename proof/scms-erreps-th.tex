@@ -137,17 +137,21 @@ the maximum number of errors these insertions could cause in addition to the
 credit for the original overestimate, $D$ accumulates at least as many errors as
 $\advC$ does, and so $\Prob{\game_1(\advC) = 1} \le \Prob{\game_2(D) = 1}$.
 
+\todo{DC}{Re-check this argument. There are some obvious errors, and it feels
+like you moved fast through it. Take your time, and make sure you understand
+it. (Try reading it out loud.)}
 Analagously to the proof of Thereorem~\ref{thm:sbf-erreps-th}, we now move to a
 game~$\game_3$ where $\REPO$ randomly fills the sketch to capacity after
-inserting the elements of $\col$, so that each row has $\ell+1$ nonzero
-counters. For any $D$ for~$\game_3$ we construct $E$ for~$\game_4$ that
+inserting the elements of $\col$, so that each row has $\ell+1$ non-zero
+counters. For any $D$ for~$\game_2$ we construct $E$ for~$\game_3$ that
 simulates $D$, forwarding $\REPO$, $\QRYO$, and $\HASHO_1$ calls but ignoring
-$\UPO$ calls. By a very similar argument, $E$ achieves at least the same
+$\UPO$ calls. Analogously to Theorem~\ref{thm:sbf-erreps-th}, adversary $E$ achieves at least the same
 advantage as $D$ by having a maximally full sketch as soon as $\REPO$ is called,
-and so $\Prob{\game_2(D) = 1} \le \Prob{\game_3{E} = 1}$.
+and so $\Prob{\game_2(D) = 1} \le \Prob{\game_3(E) = 1}$.
 
 The probability of $E$ winning can now be given by another binomial bound. Since
-each row of the sketch is a uniformly random bitmap with $\ell+1$ out of $m$
+each row of the sketch is a uniformly\todo{DC}{It's not uniformly random.} random bitmap \todo{DC}{Fix this. It's not
+a bitmap} with $\ell+1$ out of $m$
 bits set to 1, the probability of any particular $\QRYO$ call causing a
 collision within a single row $i$ is $(\ell+1)/m$, and the probability of a
 collision in every row (i.e. an error) is $((\ell+1)/m)^k$. The adversary has a
