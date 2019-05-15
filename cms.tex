@@ -80,7 +80,7 @@ $\sketch[\id^\rho,n,\lambda] = (\Rep^\rho,\Qry^\rho,\Up^\rho)$ as defined
 previously. If $\col$ is a multiset containing a total of $n$ elements
 (counting duplicates as separate elements), i.e. $\col \in \Func(\bits^*,\N)$ in
 our syntax, and $x \in \bits^*$ is any string, possibly but not necessarily a
-member of $\col$, we define the error probability for a count-min sketch as
+member of $\col$, we define the error probability as
 \begin{equation}\label{eq:bf-fp}
   \begin{aligned}
     P_{k,m}(n) =
@@ -90,23 +90,27 @@ member of $\col$, we define the error probability for a count-min sketch as
       \big] \,.
   \end{aligned}
 \end{equation}
-
+%
+(Here as above, $e$ denotes the base of the natural logarithm.)
+%
 Informally, $P_{k,m}(n)$ is the probability that some~$x$ is overestimated by a
 non-negligible amount in the representation of some $\setS$ containing a total
 of $n$ elements, when a random function is used for hashing. Cormode and
 Muthukrishnan~\cite{cormode2005improved} show that this probability is bounded
-above by $e^{-k}$. CMS does not provide a bound for underestimation of
-frequencies, since it is designed for use cases where overestimates are
+above by $e^{-k}$. This structure does not provide a bound for underestimation
+of frequencies, since it is designed for use cases where overestimates are
 considered harmful but underestimates are not.
 
 \heading{Error function for frequency queries}
-
+%
 The count min-sketch is designed for settings where overestimation in particular
-is undesirable, and so provides tight bounds on the size of overestimates, but
-makes no guarantees about underestimates. To make the bounds simpler while
-staying conservative in our assumptions, we will use an error function that
-counts \emph{any} overestimate as an error, not just overestimates larger than
-some lower bound of significance. In particular, we define~$\delta$ as
+is undesirable, and so we aim to provide tight bounds on the size of
+overestimates but makes no guarantees about underestimates. To make the bounds
+simpler while staying conservative in our assumptions, we will use an error
+function that counts \emph{any} overestimate as an error, not just overestimates
+larger than some lower bound of significance. In particular, we define~$\delta$
+as
+%
 \begin{equation}
   \delta(x, y) =
   \begin{cases}
@@ -120,9 +124,9 @@ some lower bound of significance. In particular, we define~$\delta$ as
 Unlike in the Bloom filter case, good security bounds cannot be achieved for a
 count-min sketch in the \errep\ setting even if salts and/or private keys are
 used. The insecurity is due to the relative power of the $\UPO$ oracle compared
-to the case of a Bloom filter. Not only does it allow for deletion as well as
+to the Bloom filter. Not only does it allow for deletion as well as
 insertion, but since updates are \emph{added} to the representation rather than
-being combined with bitwise `or', the adversary gains more information from
+being combined with bitwise-OR, the adversary gains more information from
 seeing updates occur. Because of these differences, the adversary can mount
 an attack similar to the target-set coverage attack for a Bloom filter even if a
 PRF is used for
@@ -130,10 +134,10 @@ hashing. First, the adversary calls $\REPO(\emptyset)$ to get an empty
 representation. The adversary can then call $\UPO$ to insert an element into the
 set, see exactly what the outputs of each of the hash functions are, and then
 call $\UPO$ again to delete the element. By doing this repeatedly, an adversary
-can determine the outputs of the PRF for $i$ different inputs using $2i$ calls
+can determine the outputs of the PRF for $u$ different inputs using $2u$ calls
 to $\UPO$. Once a sufficiently large number of PRF outputs has been determined,
 the adversary can construct the test and target set used for the target-set
-coverage attack. The adversary then calls $\UPO$ several more times to insert
+coverage attack (Section~\ref{sec:bad-bfs}). The adversary then calls $\UPO$ several more times to insert
 each element of the test set into the sketch, and then
 each element of the target set will be overestimated.
 
