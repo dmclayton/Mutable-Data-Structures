@@ -82,7 +82,9 @@ representation is eventually leaked, we also give the adversary a $\REVO$ oracle
 that reveals a given representation. However, to prevent this from being
 trivially equivalent to the public-representation case we do not allow the
 adversary to win by finding errors in a representation which has been revealed
-using $\REVO$.
+using $\REVO$. Since the \errep\ adversary gets access to the same information
+that \erreps\ does without the need for $\REVO$ calls, \errep\ security is a
+stronger notion than \erreps\ security.
 
 We define the advantage of an \errep-adversary~$\advA$ as
 \[\Adv{\errep}_{\struct,\delta,r}(\advA) =
@@ -99,6 +101,7 @@ sometimes use \errep1 or \erreps1 to refer to the restriction of the \errep\ or
 \erreps\ games to the case of $q_R = 1$; for these we remove the~$q_R$ parameter
 from the advantage function.
 
+\ignore{
 The first observation we make is that security in the public setting is a
 stronger notion than security in the private setting. The following proof
 follows from a simple simulation argument.
@@ -140,3 +143,4 @@ private-representation setting, we know that the attack will also work in the
 public-representation setting, and conversely that if we can establish a security
 bound in the public-representation setting then the same bound holds in the
 private-representation setting.
+}
