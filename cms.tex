@@ -147,8 +147,8 @@ exact results of inserting or deleting any element just by seeing which counters
 are incremented or decremented. For this reason it is not enough that the
 function used to perform queries and updates is impossible for the adversary to
 simulate, since the adversary can build a lookup table just by watching the
-sketch as it is updated. Instead, we must require that the sketch itself is kept
-secret from the saversary.
+sketch as it is updated. Instead, we must require that the sketch itself be kept
+secret from the adversary.
 
 \subsection{Private, $\ell$-thresholded sketches}
 
@@ -158,23 +158,23 @@ thresholding and the use of a per-representation random salt, we are able to
 establish an upper bound on the number of overestimates in a count min-sketch.
 However, the bound is not quite as good as in the case of a salted and
 thresholded Bloom filter, which is unsurprising given the increased flexibility
-of the $\UPO$ oracle (which can perform insertions as well as deletions) and
-the greater amount of information returned by the $\QRYO$ oracle (frequencies
-rather than binary membership queries).
-
+provided by the update algorithm coupled with the additional
+information returned by the query evaluation algorithm.
+%
 Formally, we consider the structure given by $\Pi = \sketch[H,\ell,\lambda]$ for
-an unkeyed hash function $H: \bits^* \to [m]^k$.
+a hash function $H: \bits^* \to [m]^k$, which we will model as a random oracle.
 
-\begin{theorem}[\erreps\ security of thresholded BFs]\label{thm:scms-erreps-th}
-Let $p_\ell = ((\ell+1)/m)^k$ and $r' = \lfloor r/(k+1) \rfloor$. For integers $q_R, q_T, q_H, r, t \geq 0$ such
-that $r' > p_\ell q_T$, it holds that
+\begin{theorem}[\erreps\ security of thresholded CMS]\label{thm:scms-erreps-th}
+Let $p_\ell = ((\ell+1)/m)^k$. For all $q_R, q_T, q_H, r, t \geq 0$
+it holds that
   \begin{equation*}
   \begin{aligned}
-    \Adv{\errep}_{\Pi,\delta,r}(O(t), q_R,q_T,q_U,q_H,q_V) &\leq \\
+    \Adv{\erreps}_{\Pi,\delta,r}(O(t),\,&q_R,q_T,q_U,q_H,q_V) \leq \\
      & q_R \cdot \left[\frac{q_H}{2^\lambda} + e^{r'-p_\ell q_T}\left(\frac{p_\ell q_T}{r'}\right)^r\right],
   \end{aligned}
 \end{equation*}
-where $H$ is modeled as a random oracle.
+where $H$ is modeled as a random oracle, $r' = \lfloor r/(k+1) \rfloor$, and $r'
+> p_\ell q_T$.
 \end{theorem}
 
 The theorem uses several reductions to gradually whittle away at the flexibility

@@ -23,7 +23,7 @@
     for $i$ in $[1..k]$ do\\
       $\tab a \gets \min(a, \v.M[i][\v.X[i]])$\\
     if $\err[x] < \delta(a,\qry_x(\col^*))$ then
-          $\err[x] \gets \delta(a,\qry_x(\col^*))\diffplus{+k}$\\
+          $\err[x] \gets \delta(a,\qry_x(\col^*))\diffplus{$+k$}$\\
     return $a$
   \\[6pt]
   \oraclev{$\REPO(\col)$}\\[2pt]
@@ -65,16 +65,14 @@
 \label{fig:sbf-erreps/games}
 \end{figure*}
 
-As with the proof of Theorem~\ref{thm:sbf-errep-immutable}, we derive a bound in
-the \erreps1 case and then use Lemma~\ref{thm:lemma1} to move from \erreps1 to
-the more general \erreps case. Because we are in the \erreps1 case, we may
-assume without loss of generality that the adversary does not call $\REVO$,
-since revealing the only representation automatically prevents the adversary
-from winning.
+We derive a bound in the \erreps1 case and then use Lemma~\ref{thm:lemma1} to
+move from \erreps1 to the more general \erreps\ case. Because we are in the
+\erreps1 case, we may assume without loss of generality that the adversary does
+not call $\REVO$, since revealing the only representation automatically prevents
+the adversary from winning.
 
 We begin with a game~$\game_0$ which has identical behavior to the \erreps1
-experiment for a salted CMS. As in the proofs of
-Theorems~\ref{thm:sbf-errep-immutable} and~\ref{thm:sbf-erreps}, we have a
+experiment for~$\Pi$. As usual, we have a
 $\bad_1$ flag that gets set if the adversary ever calls $\HASHO_1$ with the
 actual salt used by the representation. By an almost identical argument, we can
 move to~$\game_1$, where the behavior is different only when the $\bad_1$ flag
@@ -86,12 +84,12 @@ is set, with a bound of
 
 The key differences between this proof and the Bloom filter proof are the more
 complex response space of $\QRYO$ ($\N$ rather than $\bits$) and the fact that
-both elements of $\col$ and nonelements of $\col$ may produce errors.
+both elements of $\col$ and non-elements of $\col$ may produce errors.
 
 As a first step in dealing with the $\UPO$ oracle, we want to show that deletion
 is never helpful for the adversary. So, for any $\advA$, we construct an
 adversary $\advB$ that simulates $\advA$, forwarding all oracle queries in the
-natural way, except that it ignores any $\UPO(\up_{x,-1})$ calls, i.e. any
+natural way, except that it ignores any $\UPO(\up_{x,-1})$ calls, i.e., any
 deletions. Because deleting $x$ does not change whether $x$ is overestimated or
 not, ignoring deletions does not affect whether later calls of the form
 $\QRYO(\qry_x)$ will produce an error. Furthermore, if $y \neq x$, then the
@@ -103,8 +101,8 @@ to the case of an adversary whose $\UPO$ calls only consist of insertions.
 
 %%
 
-Next, we move from $\advB$ to an $\advC$ that never inserts an element more than
-once. Similarly to the previous step, $\advC$ simulates $\advB$, tracking the
+Next, we move from $\advB$ to an adversary $\advC$ that never inserts an element more than
+once. Similarly to the previous step, $\advC$ simulates~$\advB$, tracking the
 elements of $\col$ and forwarding $\advB$'s oracle queries in
 the natural way, except that any $\UPO$ queries to insert an element already
 present in $\col$ are ignored. First, inserting $x$ does not
@@ -116,7 +114,7 @@ true frequency of $y$, and $\QRYO(\qry_y)$ will find an overestimate if these
 counters are all strictly greater than the true frequency. Since updates are
 deterministic, re-inserting $x$ can only increment the same counters that were
 incremented by the original insertion of $x$, and so this re-insertion cannot
-cause $y$ to become overestimated if it was not already. So all $\QRYO$ calls
+cause~$y$ to become overestimated if it was not already. So all $\QRYO$ calls
 are just as likely to produce an error for $\advC$ as they are for $\advB$, and
 $\Prob{\game_1(\advB) = 1} = \Prob{\game_1(\advC) = 1}$.
 
@@ -139,7 +137,7 @@ the maximum number of errors these insertions could cause in addition to the
 credit for the original overestimate, $D$ accumulates at least as many errors as
 $\advC$ does, and so $\Prob{\game_1(\advC) = 1} \le \Prob{\game_2(D) = 1}$.
 
-Analagously to the proof of~\ref{thm:sbf-erreps-th}, we now move to a
+Analagously to the proof of Thereorem~\ref{thm:sbf-erreps-th}, we now move to a
 game~$\game_3$ where $\REPO$ randomly fills the sketch to capacity after
 inserting the elements of $\col$, so that each row has $\ell+1$ nonzero
 counters. For any $D$ for~$\game_3$ we construct $E$ for~$\game_4$ that
