@@ -49,7 +49,7 @@ bits it uses a $k$-by-$m$ array of counters. It is designed to deal with streams
 of data in the non-negative turnstile model~\cite{cormode2005improved}, which
 means the sketch accomodates both insertions and deletions but does not allow
 any entries to have a negative frequency. Our construction
-$\sketch[R,\ell,\lambda]$ defined in Figure~\ref{fig:bf-def} involves an
+$\sketch[R,\ell,\lambda]$ defined in Figure~\ref{fig:cms-def} involves an
 $\ell$-thresholded variation of this structure. The traditional description of
 a count min-sketch involves a parameter $n$ describing the size of the input
 stream, whereas our $\ell$ describes the maximum number of nonzero counters. As
