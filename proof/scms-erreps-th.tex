@@ -58,7 +58,7 @@
     \diffplusbox{for $i$ in $[1..k]$ do\\
       $\tab$while $w(\v.M[i]) < \ell+1$ do\\
         $\tab\tab j \getsr [m]$;
-        $\v.M[i][j] \gets 1$}
+        $\v.M[i][j] \gets \v.M[i][j] + 1$}
     return $\top$
 }
 \caption{Games 0--3 for proof of Theorem~\ref{thm:scms-erreps-th}.}
