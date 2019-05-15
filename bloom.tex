@@ -364,7 +364,7 @@ following \erreps\ bound for $\Pi$.
 
 \begin{theorem}[\erreps\ security of salted BFs]\label{thm:sbf-erreps}
   Let $p' = P_{k,m}(n+r)$.
-  For all integers $q_R, q_T, q_H, r, t \geq 0$, if
+  For all integers $q_R, q_T, q_U q_H, q_V, r, t \geq 0$, if
   $r > p'q_T$, then it holds that
   \begin{eqnarray*}
     \begin{aligned}
@@ -410,7 +410,7 @@ integers~$n,\lambda\geq0$, and let $\Pi = \KBF[F,n,\lambda]$.
 \begin{theorem}[\errep\ security of keyed BFs]
 \label{thm:bf-key-bound}
 \label{thm:kbf-errep}
-  Let $p' = P_{k,m}(n+r)$.  For integers $q_R, q_T, q_H, r, t \geq 0$ such that
+  Let $p' = P_{k,m}(n+r)$.  For integers $q_R, q_T, q_U, q_H, r, t \geq 0$ such that
   $r > p'q_T$, it holds that
   \begin{equation*}
     \begin{aligned}
@@ -511,7 +511,7 @@ of providing strong security guarantees for even smaller filter sizes.
 \begin{theorem}[\erreps\ security of thresholded BFs]
 \label{thm:bf-thr-bound}
 \label{thm:sbf-erreps-th}
-Let $p_\ell = ((\ell+k)/m)^k$. For integers $q_R, q_T, q_H, r, t \geq 0$ such
+Let $p_\ell = ((\ell+k)/m)^k$. For integers $q_R, q_T, q_U, q_H, q_V, r, t \geq 0$ such
 that $r > p_\ell q_T$, it holds that
   \begin{equation*}
     \begin{aligned}
