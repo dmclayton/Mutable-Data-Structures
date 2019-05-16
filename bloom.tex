@@ -20,7 +20,7 @@
       return $\langle M, \salt, c+1 \rangle$
   }
   \caption{Keyed structure $\bloom[R,n,\lambda] = (\Rep^R,\Qry^R,\Up^R)$ is used
-  to define Bloom filter variants used to rerpresent sets of at most~$n$
+  to define Bloom filter variants used to represent sets of at most~$n$
   elements. The parameters are a function $R: \keys\by\bits^* \to [m]^k$ and
   integers $n, \lambda \geq0$. A concrete scheme is given by a particular choice
   of parameters. The function~$\bmap_m$ is defined in Section~\ref{sec:prelims}.
@@ -31,7 +31,7 @@
 In this section we consider two classes of Bloom filters, each employing a
 different strategy to determine when the filter reaches full capacity. The first
 class is specified in Figure~\ref{fig:bf-def}. This class of $n$-capped filters
-captures the classical setting in which the filter is used to rperesent some
+captures the classical setting in which the filter is used to represent some
 fixed number of elements $n\geq0$. Our construction $\bloom[R,n,\lambda] =
 (\Rep^R,\Qry^R,\Up^R)$ has two additional parameters besides the cap: a
 function~$R:\keys\by\bits^*\to[m]^k$ and the \emph{salt length}~$\lambda\geq0$.
@@ -41,7 +41,7 @@ integers.
 %
 The standard Bloom filter is the structure $\BF[H,n] =
 \bloom[\id^H,n,0]$, which we will term the \emph{basic} Bloom filter. It
-has no key (the key sapce of $\id^H$ is $\{\emptystr\}$, see
+has no key (the key space of $\id^H$ is $\{\emptystr\}$, see
 Section~\ref{sec:prelims}) and does not use a salt.
 %
 The \emph{salted} Bloom filter $\SBF[H,n,\lambda] =
@@ -69,7 +69,7 @@ when updates are needed, $\KBF$ must be used instead.
 At the end of the section, we discuss the second class of filters that we call the
 \emph{$\ell$-thresholded}. Instead of rejecting updates after a pre-determined
 number of elements are added to the set, for these we decide the filter is full
-once at leeast $\ell\geq0$ bits of the filter are set.
+once at least $\ell\geq0$ bits of the filter are set.
 %
 In the usual, non-adaptive setting, this strategy performs
 similarly to the standard Bloom filter, but we find that a filter threshold
@@ -240,7 +240,7 @@ avoids this pitfall.
 \subsection{Salted BFs in the (im)mutable setting}\label{sec:sbf}
 %
 Here we consider the correctness of Bloom filters when the hashed input is
-preppended with a salt.
+prepended with a salt.
 %
 Fix $H:\bits^*\to[m]^k$ and $n,\lambda\geq0$ and let
 $\Pi = \SBF[H,n,\lambda]$.
