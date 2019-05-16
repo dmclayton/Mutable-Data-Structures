@@ -47,7 +47,7 @@ designed to estimate the frequency of each element of a multiset.  The data
 structure is similar to a Bloom filter, but instead of a length-$m$ array of
 bits it uses a $k$-by-$m$ array of counters. It is designed to deal with streams
 of data in the non-negative turnstile model~\cite{cormode2005improved}, which
-means the sketch accomodates both insertions and deletions but does not allow
+means the sketch accommodates both insertions and deletions but does not allow
 any entries to have a negative frequency. Our construction
 $\sketch[R,\ell,\lambda]$ defined in Figure~\ref{fig:cms-def} involves an
 $\ell$-thresholded variation of this structure. The traditional description of
