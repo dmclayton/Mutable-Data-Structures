@@ -79,7 +79,7 @@ multiset~$\col$ as an array of~$m$ integers; these serve as counters.
 To add~$x$ to~$\col$, hash values $h_1(x), \ldots,
 h_k(x)\in[m]$ are computed, and the indicated counters are
 incremented.  Decrementing the counters implements\emph{deletion} of
-an occurence of~$x$ from~$\col$. (Counters are typically floored at 0.)
+an occurrence of~$x$ from~$\col$. (Counters are typically floored at 0.)
 %
 Like Bloom filters, counting filters provide approximately correct
 answers to set-membership queries.  (Indeed, they were initially
@@ -100,7 +100,7 @@ When admitted queries may return non-binary results, e.g.,
 frequency-of-element queries, fixing a notion of `error' is less
 intuitive.  Even in the traditional, non-adaptive setting, one is
 typically only guaranteed that responses will be close to correct,
-with probabilty close to one. 
+with probability close to one. 
 %In general, more structures with more complex data objects and queries may require a more sophisticated classification of errors than a simple binary indicator.
 We therefore parameterize our security experiments with a specifiable
 \emph{error} function~$\delta$.  If the correct response to an adversarial
@@ -129,7 +129,7 @@ via a query-oracle~$\QRYO$. The adversary is given credit (determined
 by~$\delta$) for each $\QRYO$-query that results in an error.
 
 The \erreps\ game is defined in much the same way, except that representations
-are not shown to the adversary unless it explictly asks for them to be
+are not shown to the adversary unless it explicitly asks for them to be
 revealed.
 
 Intuitively, \errep\
@@ -208,7 +208,7 @@ as a function of this maximum capacity~\cite{kirsch2006less}.
 %
 We explore an alternative definition of fullness, whereby the filter is deemed full
 once the Hamming weight of the filter (i.e., the number of 1s) crosses a
-pre-determined \emph{threshold}.  While the two defintions are more or
+pre-determined \emph{threshold}.  While the two definitions are more or
 less interchangeable in the non-adaptive, traditional setting, we show
 that this alternative definition has substantial
 analytical value in adversarial environments.  In
@@ -265,7 +265,7 @@ applicability of our framework.
 
 The security story is nuanced, and multi-dimensional.  Whether or not
 a given data structure is secure depends not only on
-the cyrptographic primitives it employs (i.e., hash functions or PRF), but also on what
+the cryptographic primitives it employs (i.e., hash functions or PRF), but also on what
 sort of queries the data structure supports, and what sorts of updates are
 allowed (and how these interact).  Moreover, highly similar structures
 can exhibit structural similarities among different schemes does not always
