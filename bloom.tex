@@ -571,9 +571,12 @@ the filter size.
 Figure~\ref{fig:bf-th} shows the dominant terms in the \erreps\ bounds for
 $n$-capped and $\ell$-threholded salted BFs (Theorem~\ref{thm:sbf-erreps}
 and~\ref{thm:sbf-erreps-th} respectively). This shows us that the bounds are
-comparable for $\ell=nk$; however, when we take into account the factor
-of~$q_R$, the bound for thresholding is much better than what we are able to
-prove for capping.
+comparable for $\ell=nk$, which is a reasonable choice of $\ell$ given that a
+set of size $n$ can set at most $nk$ bits to 1, and this upper bound only occurs
+in the unlikely circumstance that there are no hash collisions during insertion.
+When we take into account the factor of~$q_R$ present in the $n$-capped security
+bound, we conclude that thresholding provides significantly more security if the
+adversary is allowed a non-negligible number of calls to $q_R$.
 
 
 \begin{figure}

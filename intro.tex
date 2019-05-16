@@ -182,7 +182,12 @@ once the Hamming weight of the filter (i.e., the number of 1s) crosses a
 pre-determined \emph{threshold}. We show that this approach has substantial
 analytical value: with Theorem~\ref{thm:sbf-erreps-th}, we re-consider the
 security of salted BFs in the mutable/private setting and show that defining
-fullness this way allows us to exhibit substantially tighter bounds.
+fullness this way allows us to exhibit substantially tighter bounds. In
+particular, we find that as long as a reasonably large salt is used, we can use
+a 1 kilobyte filter to store 100 objects with a less than one in a million
+chance of a single false positive occurring even if the adversary is allowed
+to completely control the filter's construction and make up to $2^{16}$ queries
+(see Figure~\ref{fig:bf-th}).
 
 
 \heading{Count min-sketches}
