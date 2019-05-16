@@ -1,20 +1,22 @@
-Data structures that provide an approximate representation of their inputs, such
-as Bloom filters or count min-sketches, are relied upon in a wide variety of
-systems. A certain amount of error is usually tolerable, and the designers of
-these structures often prove rigorous bounds on how much error can be expected,
-so long as the inputs are chosen independently of the randomness used to
-construct it. There are any number of settings in which this assumption can
-be violated by an adversary attacking the system.
-%
+Probabilistic data structures use space-efficient representations of data in order to
+(approximately) respond to queries about the data. 
+Traditionally, these structures are accompanied by probabilistic bounds on
+query-response errors. These bounds implicitly assume benign attack
+models, in which the data and the queries are inputs are chosen
+non-adaptively, and independent of the randomness used to
+construct the representation. Yet probabilistic data structures are
+increasingly used in settings where these assumptions may be violated.
+
 This work provides a provable security treatment of probabilistic data
-structures in adversarial environments. Our syntax is applicable to a wide
-variety of structures, and our security notions capture the performance of a
-structure under attack in a variety of settings.
+structures in adversarial environments. We give a syntax that captures a wide
+variety of in-use structures, and our security notions support
+development of error bounds in the presense of powerful attacks.
 %
-We apply our definitional viewpoint to the study of a variety of widely used
-data structures that aim to provide a compact, but approximate representation.
-We demonstrate that, when carefully specified, such structures can provide good
-performance in the presence of adversaries.
+Concretely, we examine the widely used Bloom filter, counting (Bloom)
+filter, and count-min sketch data structures.  For the traditional
+version of these, our security findings are largely negative; however,
+we show that simple embellishments (e.g., using salts, or secret keys)
+yields structures that provide provable security, and with little overhead.
 
 
 \ignore{
