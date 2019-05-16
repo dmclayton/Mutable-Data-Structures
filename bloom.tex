@@ -565,3 +565,28 @@ bounds means that the filters must be made large to provide good error
 guarantees. In this scenario, however, the $\ell$-thresholding class of filter
 provides a way to get strong error guarantees without significantly increasing
 the filter size.
+
+\heading{Comparison to $n$-capping}
+%
+Figure~\ref{fig:bf-th} shows the dominant terms in the \erreps\ bounds for
+$n$-capped and $\ell$-threholded salted BFs (Theorem~\ref{thm:sbf-erreps}
+and~\ref{thm:sbf-erreps-th} respectively). This shows us that the bounds are
+comparable for $\ell=nk$; however, when we take into account the factor
+of~$q_R$, the bound for thresholding is much better than what we are able to
+prove for capping.
+
+
+\begin{figure}
+  \hspace*{-10pt}
+  \includegraphics{fig/bf-th}
+  \vspace{-24pt}
+  \caption{
+    Performance of $n$-capped versus $\ell$-thresholded Bloom
+    filters. The solid orange line shows the value of $\zeta_{k,m,n}(q,r)$ for
+    $k=16$, $n=100$, $q=2^{16}$, $r=1$, and varying $m$ (on the x-axis).
+    %
+    The dotted blue line shows the dominate term in the bound of
+    Theorem~\ref{thm:sbf-erreps-th} for $\ell=nk$.
+  }
+  \label{fig:bf-th}
+\end{figure}

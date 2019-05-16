@@ -20,7 +20,7 @@ def Mitz(k, n, m):
 
 
 def Thresh(q, r, k, l, m):
-    p = (float(l+k)/m)**k
+    p = (float(l+k)/float(m))**k
     x = p * q
     if r <= x:
         return 1.0
@@ -37,15 +37,15 @@ def Us(q, r, k, n, m):
 
 
 # Fixed parameters
-qorder = 64
+qorder = 16
 q = 1<<qorder
 n = 100
 k = 16
 r = 1
 
 # Range of filter length
-start = 19500
-end   = start + 35000
+start = 1024
+end   = start + 8192
 M = np.linspace(start, end, (end-start)/10)
 
 # Which parameter do you want to plot on the x-axis?
@@ -53,15 +53,15 @@ N = range(100,1100,100)
 R = range(1,11,1)
 param = R
 
-figure(figsize=(3.6,1.75))
-lines = []
+figure(figsize=(3.6,1.5))
 yscale('log', basey=2)
-for (i, r) in enumerate(param):
-    a = 1.0 #0.5 + (0.4* (len(param)-i) / len(param))
-    line, = plot(M/kb, map(lambda X:Us(q,r,k,n,X), M),
-                 color=((65+(20*i))/256.0,115/256.0,150/256.0), alpha=a, lw=0.8)
-    lines.append(line)
-legend([lines[0], lines[-1]], ['$r=%d$' % param[0], '$r=%d$' % param[-1]])
+
+r = 1
+k = 16
+l = (n * k)
+th, = plot(M/kb, map(lambda X:Thresh(q,r,k,l,X), M), ':', lw=0.8)
+bf, = plot(M/kb, map(lambda X:Us(q,r,k,n,X), M), lw=0.8)
+legend([bf, th], ['$n$-capped', '$\ell$-thresholded'])
 xticks(np.arange(0,int(end/kb+1),0.5))
 xlabel('Filter length (KB)')
 xlim(start/kb, end/kb)
@@ -70,8 +70,6 @@ grid(lw=0.25)
 tight_layout()
 
 # Threshold
-#r = 1
-#plot(M/kb, map(lambda X:Thresh(q,r,k,1000,X), M))
 
 # Show it in a new window
-savefig('bf-bound.pdf')
+savefig('bf-th.pdf')
