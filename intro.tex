@@ -84,22 +84,38 @@ negative.
 
 Because the structures we consider may err in many ways, it is necessary to
 account for errors in a general way. Thus, we parameterize our experiments by an
-\emph{error-cost} function~$\delta$ such that, if the correct response to a
+\emph{error} function~$\delta$ such that, if the correct response to a
 query is~$a$ and the data structure responds with~$a'$, the cost of the error is
 $\delta(a,a') \geq 0$.
 %
-Security games are additionally parameterized by an total-cost threshold, and
-the adversary is considered to ``win'' if the total cost of the errors it induces
-is greater than this value.  As we will see, even calculating the
-total cost is not straightforward.  In particular, we must determine whether
+Security games are additionally parameterized by an \emph{error capacity}
+$r\geq0$, and the adversary is considered to ``win'' if the total cost of the
+errors it induces is greater than this value.  As we will see, even calculating
+the total cost is not straightforward.  In particular, we must determine whether
 or not the cost of a given error should be carried across (adaptive,
 adversarial) updates to~$\col$ and its representation.
 
-\todo{TS}{Name and summarize the security notions. (Im)mutability being captured in
-the atatck, not the syntax. Explain that \errep\ is stronger \erreps, and
-therefore the more desirable target; but we find that certain structures are
-only secure in the \erreps\ setting. Argue that this setting is of practical
-interest.}
+We define two experiments, both parameterized by an error-cost function and
+error capacity.
+%
+In th \errep\ game, the adversary is given the representation of a chosen set
+via an oracle~$\REPO$. (In the case of keyed structures, the representations
+would be computed using the same secret key, but they might have their own,
+per-representation randomness.) It may then update a given representation
+via~$\UPO$ or query query it via~$\QRYO$. The adversary is given credit for each
+$\QRYO$-query that results in an error; in the experiment, we must carefully
+track the set represented by each structure at any given time. (We will
+elaborate in Section~\ref{sec:correctness}.)
+%
+The \erreps\ game is defined in much the same way, except that represntations
+\emph{under attack} by the adversary are kept secret. Intuitively, \errep\
+security is stronger than \erreps, so would seem to be more desirable target;
+but for many of the structures we analyze here, security is only achievalbe in
+the \erreps\ setting.
+%
+Still, this setting is certainly of practical interest, as there are many
+applications in which the adversary would not have access to the
+structure~\cite{gerbet2015power}.
 
 To summarize, our high-level contributions are: formal syntax for
 mutable data structures, and two notions of adversarial
