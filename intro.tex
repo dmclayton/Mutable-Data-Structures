@@ -109,7 +109,7 @@ are made public, or kept private, respectively.
 We exercise our syntax and notions by analyzing three important, real-world data
 structures: Bloom filters~\cite{bloom1970space} (Section~\ref{sec:bloom}), count
 min-sketches~\cite{cormode2005improved} (Section~\ref{sec:sketch}), and counting
-filters~\cite{fan2000summary} (Section~\ref{sec:count}), summarized in
+filters~\cite{fan2000summary} (Appendix~\ref{sec:count}), summarized in
 Figure~\ref{fig:tab-structures}. Each of these supports different queries and
 update operations, and taken together, these structures exhibit the full range
 adversarial settings our notions encounter. It may initially come as a surprise
@@ -191,8 +191,8 @@ However, we are able to derive a good correctness in the mutable/private setting
 notion of ``fullness'' similar to threshold Bloom filters.
 
 \heading{Counting filters}
-We conclude in Section~\ref{sec:count} with counting filters (already alluded
-to above).
+In Appendix~\ref{sec:count}, we include a discussion of counting filters
+(already alluded to above).
 %
 Like CMSes, these also support both additions and deletions, but count filters
 only support set-membership queries (and not multiset frequency).
