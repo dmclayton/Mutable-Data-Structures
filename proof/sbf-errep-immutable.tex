@@ -106,13 +106,13 @@ Fourth, we assume that all of~$\advA$'s $\HASHO$ queries are of the form $Z\cat
 x$, where $|Z| = \lambda$.
 
 We begin with a game-playing argument~\cite{bellare2006triple}, then obtain the
-final bound via applicaition of Lemma~\ref{thm:lemma1}.
+final bound via application of Lemma~\ref{thm:lemma1}.
 %
 The high-level goal is to rewrite the game so that the probability that one
 of~$\advA$'s queries runs up the score is precisely the non-adaptive false
 positive probability.
 %
-In other words, our goal is to transistion into a setting in which the Bloom
+In other words, our goal is to transition into a setting in which the Bloom
 filter output by~$\REPO$ is independent of the outcome of~$\advA$'s other
 queries.
 
@@ -157,7 +157,7 @@ oracle maintains a set~$\Ans$ such that $\Ans[x] = \Qry^{\HASHO_3}(M^*, \qry_x)$
 each query $\salt^* \cat x$; on input of $\qry_x$, oracle~$\QRYO$ simply runs
 $\HASHO_3(\salt^* \cat x)$ and returns $\Ans[x]$.
 %
-We are effectively giving the adverseary credit for RO queries that result in
+We are effectively giving the adversary credit for RO queries that result in
 false positives for the representation of~$\setS^*$, but which it does not
 explicitly ask of~$\QRYO$. Because~$\advB$'s advantage in the new game is at
 least as much as it gets in the old one, we have that.

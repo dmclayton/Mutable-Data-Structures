@@ -123,7 +123,7 @@ Adversary~$D^{\,\PRFO}$ works by executing~$\advA$ in game~$\game_1$, except
 that whenever the game calls \emph{its}~$\PRFO$, adversary~$D$ uses its
 own oracle to compute the response.
 %
-Finaly, when~$\advA$ halts, if the winning condition in~$\game_1$ is satisfied,
+Finally, when~$\advA$ halts, if the winning condition in~$\game_1$ is satisfied,
 then~$D$ outputs~$1$ as its guess; otherwise it outputs~$0$.
 %
 Then conditioning on the outcome of the coin flip~$b$ in~$D$'s game, we have that
@@ -187,7 +187,7 @@ still given by the non-adaptive false positive probability $p'$ for a Bloom
 filter containing $n+r$ elements. Since the representations are independent of
 each other, the probability of a false positive occurring in any of up to $q_R$
 representations is at most $p'q_R$. We can therefore bound the adversary's
-as before. In particuar,
+as before. In particular,
 \begin{equation}
    \Prob{\game_4(\advB)=1} \le
      e^{r-p'q_Rq_T}\left(\frac{p'q_Rq_T}{r}\right)^r.
