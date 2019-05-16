@@ -12,7 +12,7 @@ Naor and Yogev (NY) formalized a notion of adversarial correctness for
 Bloom-filter-like structures. A Bloom filter provides a compact representation,
 which we denote by $\pub$, of a set~$\col$. The representation is a length-$m$
 bit-array (initially all zeros), and elements $x \in \col$ are added to it by
-computing hash values $h_1(x),h_2(x),\ldots,h_k(x)\in [m]$, then setting the
+computing several independent hash values $h_1(x),h_2(x),\ldots,h_k(x)\in [m]$, then setting the
 indicated array positions to~$1$.  A Bloom filter supports set membership
 queries, i.e., ``is $x\in\col$?'', by hashing~$x$ and responding positively iff
 all of the indicated positions hold a 1-bit.  When $h_1,\ldots,h_k$ are modeled
@@ -82,8 +82,9 @@ that does not appear in the underlying~$\col$, one or more of the counters
 associated to~$x$ may be decremented, potentially causing~$x$ to become a false
 negative.
 
-Because the structures we consider may err in many ways, it is necessary to
-account for errors in a general way. Thus, we parameterize our experiments by an
+When admitted queries may return non-binary results, e.g., frequency-of-element queries, fixing a notion of `error' is less intuitive.  Even in the traditional, non-adaptive setting, one is typically only guaranteed that responses will be close to correct, with probabilty close to one. In general,
+more structures with more complex data objects and queries may require a more sophisticated classification of errors than a simple binary indicator.
+We therefore parameterize our experiments by an
 \emph{error} function~$\delta$ such that, if the correct response to a
 query is~$a$ and the data structure responds with~$a'$, the cost of the error is
 $\delta(a,a') \geq 0$.
