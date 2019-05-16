@@ -1,4 +1,14 @@
-Data structures are fundamental to essentially all areas of computer science.
+Probabilistic data structures, which use space-efficient
+representations of data to provide (approximately correct) answers to
+queries about the data, find myriad uses in modern communication,
+storage, and computational systems.  The Bloom
+filter~\cite{bloom1970space}, for example, are
+ubiquitous in distributed computing, including web caches (e.g., Squid) and hash
+tables (e.g., BigTable and Hadoop), resource and packet routing, and network
+measurement. (We refer the reader to the
+surveys~\cite{broder2004network,tarkoma2012theory} for a comprehensive list of
+applications.) 
+
 The traditional approach to analyzing the correctness of a data structure is to
 assume that all inputs, and all queries, are independent of any internal
 randomness used to construct it.  But as highlighted by Naor and
@@ -9,13 +19,16 @@ this sort can be used to disrupt or reduce the availability of real systems
 \cite{crosby2003denial,gerbet2015power,lipton1993clocked}.
 
 Naor and Yogev (NY) formalized a notion of adversarial correctness for
-Bloom-filter-like structures. A Bloom filter provides a compact representation,
-which we denote by $\pub$, of a set~$\col$. The representation is a length-$m$
-bit-array (initially all zeros), and elements $x \in \col$ are added to it by
-computing several independent hash values $h_1(x),h_2(x),\ldots,h_k(x)\in [m]$, then setting the
+Bloom-filter-like structures. A Bloom filter represents a given
+set~$\col$ with a length-$m$ bit-array (initially all zeros),
+where~$m$ is much less than the number of bits needed to store~$\col$
+in full.  Elements $x \in \col$ are added to the representation by
+computing multiple hash values $h_1(x),h_2(x),\ldots,h_k(x)\in [m]$, then setting the
 indicated array positions to~$1$.  A Bloom filter supports set membership
 queries, i.e., ``is $x\in\col$?'', by hashing~$x$ and responding positively iff
-all of the indicated positions hold a 1-bit.  When $h_1,\ldots,h_k$ are modeled
+all of the indicated positions hold a 1-bit.  Because the
+representation is compact, query-response errors are admitted.
+When $h_1,\ldots,h_k$ are modeled
 as random functions, and~$\col$ is independent of these, classical results
 relate $|\col|,m,k$ to the probability of false-positive query
 responses~\cite{broder2004network,kirsch2006less}.
@@ -23,8 +36,8 @@ responses~\cite{broder2004network,kirsch2006less}.
 NY revisited these results from a security perspective, by
 formalizing an attack model in which the adversary specifies a
 (fixed) set~$\col$ that may
-depend on the hash functions, and is then allowed to adaptively query the
-(immutable) representation~$\pub$ in an effort to induce errors.
+depend on the hash functions, and is then allowed to make adaptive
+set-membership queries, in an effort to induce errors.
 
 This work expands upon NY in several, practically relevant ways.  To begin, our
 attack model allows the adversary to adaptively \emph{update} the
@@ -34,21 +47,21 @@ designed for this setting and natively support \emph{mutable} representations,
 such as the counting filter~\cite{fan2000summary}, count-min
 sketch~\cite{cormode2005improved}, cuckoo filter~\cite{fan2014cuckoo}, and
 stable Bloom filter~\cite{deng2006approximately}, and our syntax is designed to
-capture these data structures in addition to those structures which are
-immutable once constructed.
+capture these data structures. Attacks that treat representations as
+immutable (after creation) are captured as a special case.
 
-What all of these have in common is that they are designed to \emph{compactly}
-represent the data so that certain types of mutations and queries are supported,
-but a small amount of error is permitted.
+%What all of these have in common is that they are designed to \emph{compactly}
+%represent the data so that certain types of mutations and queries are supported,
+%but a small amount of error is permitted.
 %
 While the Bloom filter was designed to represent data collections~$\col$
-that are sets, streaming data is better modeled as a multiset.  Natural
-questions about multisets extend beyond set-membership; for example, an
+that are sets, streaming data (for example) is more accurately 
+modeled as a multiset.  Natural questions about multisets extend beyond set-membership; an
 important question in practice is \emph{how many times does~$x$ appear
-in~$\col$?} As with Bloom filters, the challenge is to answer this question with
-as little space consumption as possible, at the cost of admitting a reasonable
-amount of error.
-
+in~$\col$?} 
+%As with Bloom filters, the challenge is to answer this question with
+%as little space consumption as possible, at the cost of admitting a reasonable
+%amount of error.
 Thus, our syntactic definition of data structures admits both mutability and rich
 query spaces.  Formally, a data structure is a triple of algorithms $(\Rep,
 \Qry, \Up)$ denoting the \emph{representation}, \emph{query-evaluation}, and
@@ -58,23 +71,24 @@ of allowed update functions.  For reasons we will elucidate in a moment, all
 three algorithms take a key~$\ky$ as input, and both~$\Rep$ and~$\Up$ may be
 randomized.
 
-
 The combination of mutability and rich query spaces has significant implications
-for security. Consider the counting filter structure~\cite{fan2000summary},
-which compactly (and approximately) represents an updatable multiset~$\col$.
-Instead of bit array, a counting filter represents a set~$\col$ as an array
-of~$m$ integers, which we will call \emph{counters}. To add~$x$ to the set, the
-representation is updated by hashing~$x$ to get $h_1(x), \ldots, h_k(x)\in[m]$,
-just as we do for Bloom filters. We increment the corresponding counter in the
-array for each of these. Unlike Bloom filters, counting filters also support
-\emph{deletions}. To delete $x$, we hash~$x$ just as before, but decrement the
-counters instead of incrementing them.
+for security. Consider the counting filter
+structure~\cite{fan2000summary}.  It is similar to a Bloom filter, but 
+Instead of bit array, a counting filter represents an updatable
+multiset~$\col$ as an array of~$m$ integers; these serve as counters.
+To add~$x$ to~$\col$, hash values $h_1(x), \ldots,
+h_k(x)\in[m]$ are computed, and the indicated counters are
+incremented.  Decrementing the counters implements\emph{deletion} of
+an occurence of~$x$ from~$\col$. (Counters are typically floored at 0.)
 %
-Thus, whether~$x$ is a member of the
-multiset is determined by checking that all of the counters associated with
-it are non-zero.%
+Like Bloom filters, counting filters provide approximately correct
+answers to set-membership queries.  (Indeed, they were initially
+introduced to support deletions from a \emph{set}, without having to
+rebuild the representation, as one would for a Bloom filter.) 
+The membership of~$x\in\col$ determined by checking that all of the
+associated counters are at least one.%
 %
-(Counters are typically floored at 0.)
+
 %
 This structure admits both false-positive \emph{and} false-negative responses.
 In particular, if the representation is updated by ``removing'' an element~$y$
@@ -82,55 +96,66 @@ that does not appear in the underlying~$\col$, one or more of the counters
 associated to~$x$ may be decremented, potentially causing~$x$ to become a false
 negative.
 
-When admitted queries may return non-binary results, e.g., frequency-of-element queries, fixing a notion of `error' is less intuitive.  Even in the traditional, non-adaptive setting, one is typically only guaranteed that responses will be close to correct, with probabilty close to one. In general,
-more structures with more complex data objects and queries may require a more sophisticated classification of errors than a simple binary indicator.
-We therefore parameterize our experiments by an
-\emph{error} function~$\delta$ such that, if the correct response to a
-query is~$a$ and the data structure responds with~$a'$, the cost of the error is
-$\delta(a,a') \geq 0$.
+When admitted queries may return non-binary results, e.g.,
+frequency-of-element queries, fixing a notion of `error' is less
+intuitive.  Even in the traditional, non-adaptive setting, one is
+typically only guaranteed that responses will be close to correct,
+with probabilty close to one. 
+%In general, more structures with more complex data objects and queries may require a more sophisticated classification of errors than a simple binary indicator.
+We therefore parameterize our security experiments with a specifiable
+\emph{error} function~$\delta$.  If the correct response to an adversarial
+query is~$a$ and the data structure responds with~$a'$, the
+experiments award the adversary with an error weight $\delta(a,a') \geq 0$.
 %
-Security games are additionally parameterized by an \emph{error capacity}
+Our experiments are additionally parameterized by an \emph{error capacity}
 $r\geq0$, and the adversary is considered to ``win'' if the total cost of the
 errors it induces is greater than this value.  As we will see, even calculating
 the total cost is not straightforward.  In particular, we must determine whether
 or not the cost of a given error should be carried across (adaptive,
 adversarial) updates to~$\col$ and its representation.
 
-We define two experiments, both parameterized by an error-cost function and
-error capacity.
+We define two experiments, one in which representations are shown to
+the adversary, and one in which they are not.
 %
-In the \errep\ game, the adversary is given the representation of a chosen set
-via an oracle~$\REPO$. (In the case of keyed structures, the representations
-would be computed using the same secret key, but they might have their own,
-per-representation randomness.) It may then update a given representation
-via~$\UPO$ or query query it via~$\QRYO$. The adversary is given credit for each
-$\QRYO$-query that results in an error; in the experiment, we must carefully
-track the set represented by each structure at any given time. (We will
-elaborate in Section~\ref{sec:correctness}.)
-%
+In the \errep\ game, the adversary is given a
+representation-oracle~$\REPO$ that, on input a collection~$\col$,
+returns the resulting representation $\Rep_K(\col)$. Note that the
+key~$K$ (which may be the empty string, to capture unkeyed structures)
+is fixed across all calls; however, per-representation randomness
+(e.g. salts) may be present.  The adversary is permitted to
+(adaptively) update any established representation via an
+update-oracle~$\UPO$ and, at any time, it may query a representation
+via a query-oracle~$\QRYO$. The adversary is given credit (determined
+by~$\delta$) for each $\QRYO$-query that results in an error.
+
 The \erreps\ game is defined in much the same way, except that representations
-\emph{under attack} by the adversary are kept secret. Intuitively, \errep\
-security is stronger than \erreps, so would seem to be more desirable target;
-but for many of the structures we analyze here, security is only achievable in
+are not shown to the adversary unless it explictly asks for them to be
+revealed.
+
+Intuitively, \errep\
+security is stronger than \erreps, so would seem the more desirable
+target.  But for many of the structures we analyze here, security is only achievable in
 the \erreps\ setting.
 %
-Still, this setting is certainly of practical interest, as there are many
-applications in which the adversary would not have access to the
+We note that the \erreps\ setting is of significant practical interest, as there are many
+applications in which the adversary should not have unfettered access to the
 structure~\cite{gerbet2015power}.
 
-To summarize, our high-level contributions are: formal syntax for
-mutable data structures, and two notions of adversarial
-correctness for these.  Our notions capture settings in which representations
-are made public, or kept private, respectively.
+%To summarize, our high-level contributions are: formal syntax for
+%mutable data structures, and two notions of adversarial
+%correctness for these.  Our notions capture settings in which representations
+%are made public, or kept private, respectively.
 
 We exercise our syntax and notions by analyzing three important, real-world data
 structures: Bloom filters~\cite{bloom1970space} (Section~\ref{sec:bloom}), count
 min-sketches~\cite{cormode2005improved} (Section~\ref{sec:sketch}), and counting
 filters~\cite{fan2000summary} (Appendix~\ref{sec:count}), summarized in
 Figure~\ref{fig:tab-structures}. Each of these supports different queries and
-update operations, and taken together, these structures exhibit the full range
-adversarial settings our notions encounter. It may initially come as a surprise
-that \emph{none of these structures meets security in our setting}, at least as
+update operations; taken together, they provide interesting coverage
+of the structure/attack model landscape. 
+
+We find
+that \emph{none of these structures meets either of our security notions}, at least as
 they are usually deployed. In particular, if the data being represented,
 the updates, and the queries all may depend on the choice of hash function, then each of
 these structures is susceptible to a class of attacks we call \emph{target-set
@@ -138,69 +163,74 @@ coverage attacks} (described in Section~\ref{sec:bad-bfs}). (These are closely
 related to \emph{pollution attacks} against standard Bloom
 filters~\cite{gerbet2015power}, which we will discuss in some detail.)
 %
-However, depending on the security setting (whether the representation is
-public, and whether updates are permitted), these structures can be refined in
-simple, intuitive ways that allow us to achieve security in our setting.
+However, depending on the security setting (public vs.\ private
+representation, updates allowed vs. not), these structures can be refined in
+simple, intuitive ways that allow us to prove security.
 
 \heading{Bloom filters}
 %
 It is well-known that standard Bloom filters do not perform well in adversarial
 settings~\cite{naor2015bloom,gerbet2015power}; we first corroborate these
-findings via an explicit, \erreps\ attack (Section~\ref{sec:bad-bfs}).
+findings via an explicit \erreps\ attack (Section~\ref{sec:bad-bfs}).
 %
 We then consider the security of several variants of the basic Bloom
-filter for which we can derive correctness bounds.
+filter for which we can derive correctness (i.e., security) bounds.
 %
 The first idea is to generate a short, random \emph{salt}, which we prepend to
 the input of the hash. Thus, instead of computing $h_i(x)$ for each $1\leq i
 \leq k$ we compute $h_i(Z \cat x)$, where~$Z$ is a short (say, 128-bit) string
 chosen by the representation algorithm.
 %
-Our first positive result is for this \emph{salted} Bloom filter in the
-immutable/public-representation setting (Theorem~\ref{thm:sbf-errep-immutable}).
+This leads to our first positive result, for this \emph{salted} Bloom filter, in the
+public-representation setting when attacks treat representations as
+immutable (i.e., updates are forbidden); this is Theorem~\ref{thm:sbf-errep-immutable}.
 %
-In the analysis we model the hashing algorithm as a random oracle
-(ROM)~\cite{BR93}. In fact, this is closely aligned with the usual analysis,
-which models the hash as a random function~\cite{broder2004network}. Because of
-modeling choice, however, our security argument must account for the
+Following the traditional approach~\cite{broder2004network}, we model the hash functions as random oracles
+(ROM)~\cite{BR93}.  Our security argument must account for any hash-exploiting
 precomputation performed by the adversary via the random oracle. This leads to
 fairly weak bounds, which means that larger filters must be used to achieve a
-reasonable correctness upper bound (Figure~\ref{fig:bf-bound}). On the other
-hand we show that we can do much better if the representation is kept private
-(Theorem~\ref{thm:sbf-erreps}). This result is also in the mutable setting.
+reasonable correctness upper bound (Figure~\ref{fig:bf-bound}). 
 %
-We derive a similar bound for \emph{keyed} Bloom filters, which in addition to a
-salt, use a pseudorandom function (PRF) instead of a hash function. This result is
-in the mutable \emph{and} public-representation setting
-(Theorem~\ref{thm:kbf-errep}).
+On the other
+hand we far better bounds, even in the mutable setting, if the
+representation is kept private (Theorem~\ref{thm:sbf-erreps}). 
 
-Normally, Bloom filters are considered to be ``full'' when some pre-determined
-\emph{capacity} is reached; indeed, Bloom filter parameters are generally chosen
+We derive a similar good bound for \emph{keyed} Bloom filters, which use a
+secretly-keyed pseudorandom function (PRF) instead of a hash function
+(in addition to salts). This result is in the mutable \emph{and}
+public-representation setting (Theorem~\ref{thm:kbf-errep}), the
+strongest attack model we formalize.
+
+Normally, Bloom filters are considered to be ``full'' when some
+pre-determined set size, or
+\emph{capacity}, is reached.  Indeed, Bloom filter parameters are generally chosen
 as a function of this maximum capacity~\cite{kirsch2006less}.
 %
-We also consider a different notion of fullness whereby the filter is deemed full
+We explore an alternative definition of fullness, whereby the filter is deemed full
 once the Hamming weight of the filter (i.e., the number of 1s) crosses a
-pre-determined \emph{threshold}. We show that this approach has substantial
-analytical value: with Theorem~\ref{thm:sbf-erreps-th}, we re-consider the
-security of salted BFs in the mutable/private setting and show that defining
-fullness this way allows us to exhibit substantially tighter bounds. In
-particular, we find that as long as a reasonably large salt is used, we can use
-a 1 kilobyte filter to store 100 objects with a less than one in a million
-chance of a single false positive occurring even if the adversary is allowed
+pre-determined \emph{threshold}.  While the two defintions are more or
+less interchangeable in the non-adaptive, traditional setting, we show
+that this alternative definition has substantial
+analytical value in adversarial environments.  In
+Theorem~\ref{thm:sbf-erreps-th}, we reconsider the security of salted
+BFs in the mutable, private setting, and exhibit substantially tighter bounds. In
+particular, we find that as long as salts are reasonably large, we can use
+a 1 kilobyte filter to store 100 objects, while incurring less than one in a million
+chance of a \emph{single} false positive.  This holding even if the adversary is allowed
 to completely control the filter's construction and make up to $2^{16}$ queries
 (see Figure~\ref{fig:bf-th}).
 
 
 \heading{Count min-sketches}
 Following the deep dive into Bloom filters in Section~\ref{sec:bloom}, we then
-consider count min-sketches (CMSes), which provide a compact representation of a
+consider count min-sketches (CMS), which provide a compact representation of a
 multiset, allowing additions and deletions, and yielding approximate queries for
 approximate frequency of an element in the multiset. While a count-min sketch
 hashes in much the same way as a Bloom filter, it uses a 2D array of non-negative
 integer counters rather than a linear array of bits, allowing the structure to
 keep track of how many times each counter is incremented.
 %
-Despite its similarity to Bloom filters, CMSes are not secure in the
+We find that, CMSes are not secure in the
 public-representation setting, even if we use a salt or use a PRF in place of
 the hash function. The fact that the adversary can see exactly which filters are
 incremented or decremented each update, along with the fact that updates can be
@@ -213,32 +243,37 @@ However, we are able to derive a good correctness in the mutable/private setting
 notion of ``fullness'' similar to threshold Bloom filters.
 
 \heading{Counting filters}
-In Appendix~\ref{sec:count}, we include a discussion of counting filters
-(already alluded to above).
+In Appendix~\ref{sec:count}, we include a discussion of the security
+of counting filters.
 %
-Like CMSes, these also support both additions and deletions, but count filters
-only support set-membership queries (and not multiset frequency).
+In a loose sense, these fall somewhere between the CMS and Bloom
+filters: they admit both addition and deletion
+updates to the representation (like CMS), but only support set-membership queries.
 %
-In spite of this semantic difference, CMSes and counting filters are
-so structurally related that they exhibit similar security properties
-(Theorem~\ref{thm:counting-erreps}).
+Due to their structural similarities, CMS and counting filters are
+exhibit similar security properties (Theorem~\ref{thm:counting-erreps}).
 
-\heading{Conclusion}
+\ignore{
 %
-The main goal of this work is to provide feasibility results for probabilistic
-data structures in adversarial environments. Our treatment of Bloom filters
-demonstrates depth of the design space for concrete structures, while our
+The central aim of this work is to provide a formal framework for
+analyzing probabilistic data structures in adversarial environments,
+and to establish the first provable security results for real-world
+structures. Our treatment of Bloom filters explores, somewhat deeply,
+a neighborhood of designs around the classic structure.  Our
 analysis of count min-sketches and counting filters exhibit the broader
-applicability of our definitional framework.
-%
-We find that the setting in which we can achieve security depends not only on
-the cryptographic primitives (i.e., the choice of hash or PRF), but also on what
-sort of queries the data structure supports and how it might be updated. On the
-other hand, structural similarities among different schemes does not always
+applicability of our framework.
+
+The security story is nuanced, and multi-dimensional.  Whether or not
+a given data structure is secure depends not only on
+the cyrptographic primitives it employs (i.e., hash functions or PRF), but also on what
+sort of queries the data structure supports, and what sorts of updates are
+allowed (and how these interact).  Moreover, highly similar structures
+can exhibit structural similarities among different schemes does not always
 correspond to similar security properties.
 %
 It is our hope that our work will catalyze further exploration of these kinds of
 structures.
+}
 
 \begin{figure*}[tp]
 \begin{center}
@@ -290,7 +325,12 @@ implementations prevent updates that would cause $\col(x)-1 < 0$.}
 
 \heading{Future work}
 %
-The focus of this work is the data structures themselves; future work should
+The focus of this work is the data structures themselves.  Even so, we
+were only able to consider a handful of (important, real-world)
+examples.  We hope that future work will apply our formalisms to the
+many probabilistic data structures that exist.
+
+Gong a different direction, future work should
 also address how adversarial correctness impacts high-level protocols that use
 these probabilistic data structures. A good example is content-distribution
 networks~\cite{byers2002informed}, where many servers propagate representations
@@ -314,6 +354,7 @@ Bloom filters that ensure privacy of the \emph{query} have been
 studied~\cite{bellovin2004privacy,nojima2009cryptographically}. These prior work
 leave open the security of more conventional data structures, like those studied
 in this paper.
+
 
 \subsection{Related work}
 \input{related}
