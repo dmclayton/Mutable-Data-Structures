@@ -47,8 +47,8 @@ designed for this setting and natively support \emph{mutable} representations,
 such as the counting filter~\cite{fan2000summary}, count-min
 sketch~\cite{cormode2005improved}, cuckoo filter~\cite{fan2014cuckoo}, and
 stable Bloom filter~\cite{deng2006approximately}, and our syntax is designed to
-capture these data structures. Attacks that treat representations as
-immutable (after creation) are captured as a special case.
+capture these data structures. 
+%Attacks that treat representations as immutable (after creation) are captured as a special case.
 
 %What all of these have in common is that they are designed to \emph{compactly}
 %represent the data so that certain types of mutations and queries are supported,
@@ -65,7 +65,7 @@ in~$\col$?}
 Thus, our syntactic definition of data structures admits both mutability and rich
 query spaces.  Formally, a data structure is a triple of algorithms $(\Rep,
 \Qry, \Up)$ denoting the \emph{representation}, \emph{query-evaluation}, and
-\emph{Update} algorithms, respectively. Associated to the data structure is a
+\emph{update} algorithms, respectively. Associated to the data structure is a
 set of supported query \emph{functions}~$\mathcal{Q}$, and a set~$\mathcal{U}$
 of allowed update functions.  For reasons we will elucidate in a moment, all
 three algorithms take a key~$\ky$ as input, and both~$\Rep$ and~$\Up$ may be
@@ -74,7 +74,7 @@ randomized.
 The combination of mutability and rich query spaces has significant implications
 for security. Consider the counting filter
 structure~\cite{fan2000summary}.  It is similar to a Bloom filter, but 
-Instead of bit array, a counting filter represents an updatable
+instead of a bit array, a counting filter represents an updatable
 multiset~$\col$ as an array of~$m$ integers; these serve as counters.
 To add~$x$ to~$\col$, hash values $h_1(x), \ldots,
 h_k(x)\in[m]$ are computed, and the indicated counters are
