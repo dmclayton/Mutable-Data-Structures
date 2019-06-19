@@ -47,7 +47,7 @@ designed for this setting and natively support \emph{mutable} representations,
 such as the counting filter~\cite{fan2000summary}, count-min
 sketch~\cite{cormode2005improved}, cuckoo filter~\cite{fan2014cuckoo}, and
 stable Bloom filter~\cite{deng2006approximately}, and our syntax is designed to
-capture these data structures. 
+capture these data structures.
 %Attacks that treat representations as immutable (after creation) are captured as a special case.
 
 %What all of these have in common is that they are designed to \emph{compactly}
@@ -78,14 +78,14 @@ instead of a bit array, a counting filter represents an updatable
 multiset~$\col$ as an array of~$m$ integers; these serve as counters.
 To add~$x$ to~$\col$, hash values $h_1(x), \ldots,
 h_k(x)\in[m]$ are computed, and the indicated counters are
-incremented.  Decrementing the counters implements\emph{deletion} of
+incremented.  Decrementing the counters implements \emph{deletion} of
 an occurrence of~$x$ from~$\col$. (Counters are typically floored at 0.)
 %
 Like Bloom filters, counting filters provide approximately correct
 answers to set-membership queries.  (Indeed, they were initially
 introduced to support deletions from a \emph{set}, without having to
 rebuild the representation, as one would for a Bloom filter.) 
-The membership of~$x\in\col$ determined by checking that all of the
+The membership of~$x\in\col$ is determined by checking that all of the
 associated counters are at least one.%
 %
 
@@ -103,7 +103,7 @@ typically only guaranteed that responses will be close to correct,
 with probability close to one. 
 %In general, more structures with more complex data objects and queries may require a more sophisticated classification of errors than a simple binary indicator.
 We therefore parameterize our security experiments with a specifiable
-\emph{error} function~$\delta$.  If the correct response to an adversarial
+\emph{error function}~$\delta$.  If the correct response to an adversarial
 query is~$a$ and the data structure responds with~$a'$, the
 experiments award the adversary with an error weight $\delta(a,a') \geq 0$.
 %
@@ -152,7 +152,7 @@ min-sketches~\cite{cormode2005improved} (Section~\ref{sec:sketch}), and counting
 filters~\cite{fan2000summary} (Appendix~\ref{sec:count}), summarized in
 Figure~\ref{fig:tab-structures}. Each of these supports different queries and
 update operations; taken together, they provide interesting coverage
-of the structure/attack model landscape. 
+of the structure/attack-model landscape. 
 
 We find
 that \emph{none of these structures meets either of our security notions}, at least as
@@ -192,10 +192,10 @@ fairly weak bounds, which means that larger filters must be used to achieve a
 reasonable correctness upper bound (Figure~\ref{fig:bf-bound}). 
 %
 On the other
-hand we far better bounds, even in the mutable setting, if the
+hand, we find far better bounds, even in the mutable setting, if the
 representation is kept private (Theorem~\ref{thm:sbf-erreps}). 
 
-We derive a similar good bound for \emph{keyed} Bloom filters, which use a
+We derive a similarly good bound for \emph{keyed} Bloom filters, which use a
 secretly-keyed pseudorandom function (PRF) instead of a hash function
 (in addition to salts). This result is in the mutable \emph{and}
 public-representation setting (Theorem~\ref{thm:kbf-errep}), the
@@ -233,7 +233,7 @@ keep track of how many times each counter is incremented.
 We find that, CMSes are not secure in the
 public-representation setting, even if we use a salt or use a PRF in place of
 the hash function. The fact that the adversary can see exactly which filters are
-incremented or decremented each update, along with the fact that updates can be
+incremented or decremented with each update, along with the fact that updates can be
 trivially reversed (deletion undoes insertion and vice versa) allows the
 adversary to mount attacks by trial and error even if it lacks the ability to
 predict in advance where an element will be sent by the hash functions.
@@ -250,7 +250,7 @@ In a loose sense, these fall somewhere between the CMS and Bloom
 filters: they admit both addition and deletion
 updates to the representation (like CMS), but only support set-membership queries.
 %
-Due to their structural similarities, CMS and counting filters are
+Due to their structural similarities, CMS and counting filters
 exhibit similar security properties (Theorem~\ref{thm:counting-erreps}).
 
 \ignore{
@@ -330,7 +330,7 @@ were only able to consider a handful of (important, real-world)
 examples.  We hope that future work will apply our formalisms to the
 many probabilistic data structures that exist.
 
-Gong a different direction, future work should
+Going a different direction, future work should
 also address how adversarial correctness impacts high-level protocols that use
 these probabilistic data structures. A good example is content-distribution
 networks~\cite{byers2002informed}, where many servers propagate representations
