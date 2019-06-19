@@ -88,15 +88,14 @@ define $\bloom[\id^\rho,n,\lambda] = (\Rep^\rho, \Qry^\rho, \Up^\rho)$ as in
 Figure~\ref{fig:bf-def}. (Note the mild abuse of notation by which we write
 ``$\rho$'' instead of ``$\id^\rho$''.)
 %
-Let $\setS\subseteq\bits^*$ be a set of length~$n$ and let
-$x\in\bits^*\setminus\setS$. We define the non-adaptive, false positive
+Let $\setS\subseteq\bits^*$ be a set of length~$n$. We define the non-adaptive, false positive
 probability for Bloom filters as
 \begin{equation}\label{eq:bf-fp}
   \begin{aligned}
     P_{k,m}(n) =
       \Pr\big[&\rho \getsr \Func(\bits^*,[m]^k);
-              \pub \getsr \Rep^\rho(\setS): \\
-              &\Qry^\rho(\pub, \qry_x) = 1 \given \pub \ne \bot
+              \pub \getsr \Rep^\rho(\setS); \\
+              &x \getsr \bits^*\setminus\setS: \Qry^\rho(\pub, \qry_x) = 1 \given \pub \ne \bot
       \big] \,.
   \end{aligned}
 \end{equation}
