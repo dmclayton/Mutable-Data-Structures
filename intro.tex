@@ -154,7 +154,26 @@ Figure~\ref{fig:tab-structures}. Each of these supports different queries and
 update operations; taken together, they provide interesting coverage
 of the structure/attack-model landscape.
 
-\dcnote{Include table that makes following results clear.}
+\begin{figure}[tp]
+\begin{center}
+\small
+  \begin{tabular}{ |p{2.5cm} | p{5cm}|}
+    \hline
+    {\bf Structure} & {\bf Results}\\ \hline
+    \parbox[c][2.4cm]{2.5cm}{Bloom filter (Fig.~\ref{fig:bf-def}, Fig.~\ref{fig:bft-def})}
+          & \parbox[c][2cm]{5cm}{Traditional implementation insecure.\\\emph{Immutable} structures can be secured with per-representation salt. \emph{Mutable} structures additionally require a secret key or\\keeping representations private, and benefit from thresholding.}
+          \\ \hline
+     \parbox[c]{2cm}{Count-min sketch (Fig.~\ref{fig:cms-def})}
+          & \parbox[c][1.6cm]{5cm}{Traditional implementation insecure.\\Security can be achieved by combining a per-representation salt, thresholding, and private representations.}
+          \\ \hline
+    \parbox[c]{2cm}{Counting filter (Fig.~\ref{fig:cbf-def})}
+          & \parbox[c][1.6cm]{5cm}{Traditional implementation insecure.\\Security can be achieved by combining a per-representation salt, thresholding, and private representations.}
+         \\ \hline
+  \end{tabular}
+\caption{A summary of the results found in the paper.}
+  \label{fig:results-summary}
+\end{center}
+\end{figure}
 
 We find
 that \emph{none of these structures meets either of our security notions}, at least as
