@@ -1,0 +1,148 @@
+\input{correctness-experiment}
+
+%We will measure error with the help of an error function $d: \mathcal{R}^2 \to
+%[0,\infty)$, which may depend on the application rather than being given by the
+%specification of a data structure alone. The value $\delta(x,y)$ represents the
+%`badness' of getting an erroneous result of $x$ from $\Qry$ when $y$ should
+%actually have been returned. In general we require $\delta(x,x) = 0$, but otherwise
+%place no restrictions on what the error function might look like.
+
+Let $\struct=(\Rep,\Up,\Qry)$ be a data structure with response space~$\results$.
+%
+We define two adversarial notions of correctness given by a pair of related
+experiments for~$\struct$, \emph{error function} $\delta:\results^2 \to \R$,
+and \emph{error capacity}~$r$. The values $\delta(x,y)$ of the error function
+represent the ``badness'' of getting an erroneous result of $x$ from $\Qry$ when
+$y$ should actually have been returned. In general we require
+$\delta(x,y) \geq 0$ and $\delta(x,x) = 0$ for all $x$ and $y$, but otherwise
+place no restrictions on what the error function might look like. For example,
+in the case of Bloom filters we use a very simply error function:
+$\delta(x,y) = 1$ for any $x \ne y$.
+
+The two correctness notions are given by the experiments in
+Figure~\ref{fig:security}. One corresponds to cases where the representations of
+the true data are public (\errep) and the other to where they are private
+(\erreps). We will describe the former and then give a brief explanation of how
+the latter differs, as the two are closely related to each other.
+
+Both experiments aim to capture the total \emph{weight} of the errors caused by
+the adversary's queries. However, because we consider mutable data objects and
+representations, we only give the adversary credit for $\QRYO$ calls that
+produce errors in the ``current'' data objects $\col_i$ and their
+representations $\pub_i$. Because we consider mutable data objects and
+representations, the notion of ``current'' is defined by calls to the $\REPO$
+and $\UPO$ oracles. In the case of Bloom filters, for example, we want to
+keep track of all the false positives which have been found so far, except for
+those false positives which have since been turned into true positives.
+
+To track errors, both experiments maintain an array $\err_i[]$ for every data
+object~$\col_i$ that has been defined.  Initially, $\err_i[]$ is implicitly
+assigned the value of~$\undefn$ at every index. (We will silently adopt the
+same convention for all uninitialized arrays.) For purposes of value
+comparison, we adopt the convention that $\undefn < n$ for all $n \in \R$.
+%
+Now, the array~$\err_i$ is indexed by query functions~$\qry$, and the value of
+$\err_i[\qry]$ is the weight of the error caused by~$\qry$, with respect to
+the \emph{current} data object~$\col_i$ and \emph{current}
+representation~$\pub_i$ (of~$\col_i$).
+%
+The value of~$\err_i[\qry]$ is updated within the $\QRYO$- and $\UPO$-oracles,
+but observe that $\err_i[\qry] = \undefn$ until $(i,\qry)$ is queried to the
+$\QRYO$-oracle.  Intuitively, a representation~$\pub_i$ of data object~$\col_i$
+cannot surface errors until it is queried.
+
+When~$\QRYO(i,\qry)$ executes, the value in $\err_i[\qry]$ is overwritten iff
+the error caused by~$\qry$ is larger than the existing value of $\err_i[\qry]$.
+The first time $(i,\qry)$ is queried to~$\QRYO$ this is guaranteed, since the
+minimum possible value output by~$\delta$ is~$0$. After this, the adversary gets
+credit only for making a worse error than the one already found. This prevents
+the adversary from trivially winning by repeatedly sending the same
+error-producing query to $\QRYO$. In our Bloom filter example, if $\QRYO$ finds
+that $\qry$ is a new false positive, it will set $\err_i[\qry]$ to 1, showing
+that an additional error has been produced.
+
+When a query $\UPO(i,\up)$ is made, the oracle first updates the data
+object~$\col_i$ and its corresponding representation.
+%
+Now, for each defined value~$\err_i[\qry]$, we re-evaluate the error that
+\emph{would} be caused by the previously asked~$\qry$ WRT the newly updated
+$\col_i$ and $\pub_i$. If the existing value of $\err_i[\qry]$ is larger than
+the error that~$\qry$ would cause to WRT the newly updated~$\col_i$ and
+$\pub_i$, then we overwrite $\err_i[\qry]$ with the smaller value.  Doing so
+ensures that the array~$\err_i$ does not overcredit the attacker for errors
+against the current data object and representation. For example, if $x$ was
+previously found to be a false positive for a Bloom filter, and the adversary
+then inserts $x$ into the data structure, we set $\err_i[\qry_x]$ to 0. Since
+$x$ is now a true positive rather than a false positive, it should no longer
+be counted as an error.
+
+\erreps\ differs from \errep\ only in that the $\REPO$ and $\UPO$ oracles do not
+reveal the representation to the adversary. This models the case where the data
+structure is stored privately, where the adversary can ask queries but not see
+the full representation. To model the possibility that information about a
+representation is eventually leaked, we also give the adversary a $\REVO$ oracle
+that reveals a given representation. However, to prevent this from being
+trivially equivalent to the public-representation case we do not allow the
+adversary to win by finding errors in a representation which has been revealed
+using $\REVO$. Since the \errep\ adversary gets access to the same information
+that \erreps\ does without the need for $\REVO$ calls, \errep\ security is a
+stronger notion than \erreps\ security.
+
+We define the advantage of an \errep-adversary~$\advA$ as
+\[\Adv{\errep}_{\struct,\delta,r}(\advA) =
+\Prob{\Exp{\errep}_{\struct,\delta,r}(\advA) = 1} \,\]
+and write
+$\Adv{\errep}_{\struct,\delta,r}(t,q_R,q_T,q_U,q_H)$ as the maximum advantage of
+any \errep-adversary running in~$t$ time steps and making~$q_R$ calls to
+$\REPO$, $q_T$ calls to $\QRYO$, $q_U$ calls to $\UPO$, and~$q_H$ calls
+to~$\HASHO$ in the ROM.
+%
+We define \erreps\ advantage in kind, except that
+we add an extra parameter~$q_V$ representing the number of calls to $\REVO$. We
+sometimes use \errep1 or \erreps1 to refer to the restriction of the \errep\ or
+\erreps\ games to the case of $q_R = 1$; for these we remove the~$q_R$ parameter
+from the advantage function.
+
+\ignore{
+The first observation we make is that security in the public setting is a
+stronger notion than security in the private setting. The following proof
+follows from a simple simulation argument.
+
+\begin{lemma}[\errep\ implies \erreps]\label{thm:errep-to-erreps}
+  For every structure~$\Gamma$ and error function $\delta$ and any parameters
+  $q_R, q_T, q_U, q_H, r, t \geq 0$, it holds that
+  \begin{eqnarray*}
+    \begin{aligned}
+      \Adv{\erreps}_{\Gamma,\delta,r}(t, q_R, q_T, q_U, q_H, q_V) &\leq \\
+      & \Adv{\errep}_{\Gamma,\delta,r}(t, q_R, q_T, q_U, q_H) \,,
+    \end{aligned}
+  \end{eqnarray*}
+  where $f(t) = t + (q_R-1)\ticks(\Rep,t) + q_T\ticks(\Qry,t) + q_U\ticks(\Up,t)$.
+\end{lemma}
+
+\begin{proof}
+Given an adversary $\advA$ for the \erreps\ game, we construct an adversary
+$\advB$ for \errep\ that obtains at least the same advantage. At the beginning
+of the experiment, $\advB$ initializes a list $L$ and integer $ct = 0$. It then
+begins simulating $\advA$, answering its oracle queries as follows. Whenever
+$\advA$ makes a $\REPO(\col)$ call, $\advB$ increments $ct$ and forwards the
+request to its own oracle, setting $L[ct] \getsr \REPO(\col)$ and returning
+$\top$ to $\advA$. Similarly, when $\advA$ makes an $\UPO(i,\up)$ call, $\advB$
+sets $L[i] \getsr \UPO(i,\up)$ and returns $\top$. Any $\QRYO(i,\qry)$ calls
+made by $\advA$ are directly forwarded to $\advB$'s own $\QRYO$ oracle, with the
+response returned to $\advA$. Finally, when $\advA$ makes a $\REVO(i)$ call,
+$\advB$ returns $L[i]$. When $\advA$ halts and returns $i$, $\advB$ does the
+same. Since $\advB$ knows the actual representations at all times, it is able
+to perfectly simulate the $\REVO$ oracle, and since all other oracle queries are
+handled by forwarding to $\advB$'s oracle, the simulation of $\advA$ is perfect.
+Then, because $\advB$ produces the exact same representations and makes the
+exact same queries that $\advA$ does and produces the same final output, $\advB$
+wins whenever $\advA$ wins.
+\end{proof}
+
+This lemma shows that if we can demonstrate an attack in the
+private-representation setting, we know that the attack will also work in the
+public-representation setting, and conversely that if we can establish a security
+bound in the public-representation setting then the same bound holds in the
+private-representation setting.
+}

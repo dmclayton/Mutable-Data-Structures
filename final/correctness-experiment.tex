@@ -1,0 +1,91 @@
+\begin{figure*}[t]
+\fourColsNoDivide{0.22}{.18}{.275}{.25}
+{
+  \raisebox{-5pt}{\experimentv{$\Exp{\errep}_{\struct,\delta,r}(\advA)$
+          \diffminus{$\Exp{\erreps}_{\struct,\delta,r}(\advA)$}}}\\[2pt]
+    $\setP \gets \emptyset$; $\ct \gets 0$; $\key \getsr \keys$\\
+    $i \getsr \advA^{\REPO,\UPO,\QRYO,\highlighto{\REVO}}$\\
+    \diffminus{if $i \in \setP$ then return 0} \\[2.0pt]
+    return $[\sum_\qry \err_i[\qry] \geq r]$
+  \\[8pt]
+  \diffplusbox{
+  \oraclev{$\HASHO(X)$}\\[2pt]
+    if $X \not\in \setX$ then return $\bot$\\
+    if $T[X]=\bot$ then $T[X] \getsr \setY$\\
+    return $T[X]$
+  }\vspace{-4pt}
+}
+{
+  \oraclev{$\REPO(\col)$}\\[2pt]
+    $\pub \getsr \Rep_\key(\col)$\\
+    if $\pub = \bot$ return $\bot$\\
+    $\ct\gets\ct+1$ \\
+    $\pub_\ct \gets \pub$\\
+    %$\setC_\ct \gets \emptyset$\\
+    $\col_\ct \gets \col$\\
+    $\mathsf{rv} \gets \pub_\ct$; \diffminus{$\mathsf{rv} \gets \top$}\\
+    return $\mathsf{rv}$
+}
+{
+  \oraclev{$\UPO(i, \up)$}\\[2pt]
+    %$X \gets \col^{v[i]}_i
+    %$v[i] \gets v[i]+1$\\
+    $\pub \getsr \Up_\key(\pub_i, \up)$\\
+    if $\pub = \bot$ return $\bot$\\
+    $\col_i \gets \up(\col_i)$\\
+    $\pub_i \gets \pub$\\
+    for $\qry$ in $\err_i$ do\\
+    \tab $a \gets \Qry_K(\pub_i, \qry)$\\
+    \tab if $\err_i[\qry] > \delta(a,\qry(\col_i))$ then\\
+    \tab\tab$\err_i[\qry] \gets \delta(a,\qry(\col_i))$\\
+    $\mathsf{rv} \gets \pub_i$; \diffminus{$\mathsf{rv} \gets \top$}\\
+    return $\mathsf{rv}$
+}
+{
+  \oraclev{$\QRYO(i, \qry)$}\\[2pt]
+    $a \gets \Qry_K(\pub_i, \qry)$\\
+    if $\err_i[\qry] < \delta(a,\qry(\col_i))$ then\\
+    \tab$\err_i[\qry] \gets \delta(a,\qry(\col_i))$\\
+    return $a$
+  \\[6pt]
+  \oraclev{$\REVO(i)$}\\[2pt]
+    $\setP \gets \setP \cup \{i\}$ \\
+    return $\pub_i$
+}
+  \caption{Two notions of adversarial correctness. The \errep\ notion captures
+  correctness when the representation is always known to the adversary, while
+  the \erreps\ notion captures correctness when the representation is secret.
+  When modeling a function $H:\setX\to\setY$ as a random oracle, the $\HASHO$
+  oracle is given to $\advA$, $\Rep$, $\Up$ and $\Qry$.}
+  %\vspace{6pt}\hrule
+  \label{fig:security}
+\end{figure*}
+
+
+\newcommand{\oneColCCS}[2]{
+  \makebox[.3\textwidth]{
+    \begin{tabular}{|@{\gamespadleft}l@{\gamespad}|}
+    \hline
+    \rule{0pt}{1\normalbaselineskip}
+    \begin{minipage}[t]{#1\textwidth}\gamesfontsize
+      #2 \vspace{6pt}
+    \end{minipage} \\
+    \hline
+  \end{tabular}
+  }
+}
+
+\ignore{
+\begin{figure}[t]
+\oneColCCS{0.25}
+{
+\oraclev{$R(X)$}\\[2pt]
+$V \getsr \mathcal{V}$\\
+if $\mathrm{T}[X] \neq \undefn$ then $V \gets \mathrm{T}[X]$\\
+$\mathrm{T}[X]\gets V$\\
+return~$V$
+}
+\caption{Pseudocode for a Random Oracle~$R$ with outputs in set $\mathcal{V}$}
+\label{fig:ROM}
+\end{figure}
+}

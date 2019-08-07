@@ -1,0 +1,216 @@
+\label{sec:sketch}
+\begin{figure}
+  \twoColsNoDivide{0.22}
+  {
+    \underline{$\Rep^R_K(\col)$}\\[2pt]
+      $\salt \getsr \bits^\lambda$ \com{Choose a salt $\salt$}\\
+      for $i$ in $[1..k]$ do\\
+        $\tab \v.M[i] \gets \zeroes(m)$\\
+      $\pub \gets \langle \v.M, \salt\rangle$\\
+      for $x \in \col$ do \\
+        $\tab \pub \gets \Up^R_K(\pub, \up_{x,1})$\\
+        $\tab$if $\pub = \bot$ then return $\bot$\\
+      return $\pub$
+    \\[6pt]
+    \underline{$\Qry^R_K(\langle \v.M, \salt\rangle,\qry_x)$}\\[2pt]
+      $\v.X \gets R_K(\salt \cat x)$;
+      $a \gets \infty$\\
+      for $i$ in $[1..k]$ do\\
+      $\tab a \gets \min(a, \v.M[i][\v.X[i]])$\\
+      return $a$
+  }
+  {
+    \underline{$\Up^R_K(\langle \v.M, \salt\rangle,\up_{x,b})$}\\[2pt]
+      $\mathit{full} \gets \bigvee_{i\in[1..k]} [\hw'(M[i]) > \ell]$\\
+      if $\mathit{full}$ then return $\bot$\\
+      $\v.M' \gets \v.M$;
+      $\v.X \gets R_K(\salt \cat x)$\\
+      for $i$ in $[1..k]$ do\\
+      $\tab a \gets \v.M'[i][\v.X[i]]$\\
+      $\tab$ if $a = 0 \wedge b < 0$ then return $\bot$\\
+      $\tab \v.M'[i][\v.X[i]] \gets a + b$\\
+      $\v.M \gets \v.M'$\\
+      return $\langle \v.M, \salt \rangle$
+  }
+  \caption{Keyed structure $\sketch[R,\ell,\lambda]$ given by
+  $(\Rep^R,\Qry^R,\Up^R)$ is used to define count min-sketch variants.
+  The parameters are a function $R: \keys\by\bits^* \to [m]^k$ and integers
+  $\ell, \lambda \geq0$. A concrete scheme is given by a particular choice of
+  parameters. The function $\hw'$, used to determine if the sketch is full, is
+  defined in Section~\ref{sec:prelims}.}
+  \label{fig:cms-def}
+\end{figure}
+
+The count min-sketch (CMS) data structure is designed to concisely estimate the
+number of times a datum has occurred in a data stream. In other words, it is
+designed to estimate the frequency of each element of a multiset.  The data
+structure is similar to a Bloom filter, but instead of a length-$m$ array of
+bits it uses a $k$-by-$m$ array of counters. It is designed to deal with streams
+of data in the non-negative turnstile model~\cite{cormode2005improved}, which
+means the sketch accommodates both insertions and deletions but does not allow
+any entries to have a negative frequency. Our construction
+$\sketch[R,\ell,\lambda]$ defined in Figure~\ref{fig:cms-def} involves an
+$\ell$-thresholded variation of this structure. The traditional description of
+a count min-sketch involves a parameter $n$ describing the size of the input
+stream, whereas our $\ell$ describes the maximum number of nonzero counters. As
+in the case of Bloom filters, this does not significantly change the operation
+of the sketch in a non-adversarial setting, since for random input streams the
+number of nonzero counters is closely related to the number of elements in the
+stream.
+%
+In the presence of an adversary, however, we expect $\ell$-thresholding to
+provide better security bounds than the traditional definition would provide by
+handicapping pollution attacks and similar adversarial strategies.
+
+We will show that, in the \errep\ setting, the count min-sketch structure is
+insecure regardless of whether $\ell$-thresholding is used or not, and
+regardless of the details of the behavior of the function $R$. On the other
+hand, we show that \erreps\ security is achievable even under the assumption
+that a salted but unkeyed hash function is used, i.e. $\lambda > 0$ but $\keys =
+\{\emptyset\}$.
+
+\heading{Non-adaptive error bound}
+%
+The CMS is designed to minimize the number of elements whose
+frequencies are overestimated, while still allowing for reasonably low memory
+usage. For a function $\rho$ and integer $\lambda\ge0$, let
+$\sketch[\id^\rho,n,\lambda] = (\Rep^\rho,\Qry^\rho,\Up^\rho)$ as defined
+previously. If $\col$ is a multiset containing a total of $n$ elements
+(counting duplicates as separate elements), i.e. $\col \in \Func(\bits^*,\N)$ in
+our syntax, and $x \in \bits^*$ is any string, possibly but not necessarily a
+member of $\col$, we define the error probability as
+\begin{equation}\label{eq:bf-fp}
+  \begin{aligned}
+    P_{k,m}(n) =
+      \Pr\big[&\rho \getsr \Func(\bits^*,[m]^k);
+              \pub \getsr \Rep^\rho(\setS): \\
+              &\Qry^\rho(\pub, \qry_x) > \qry_x(\setS)+\frac{en}{m} \given \pub \ne \bot
+      \big] \,.
+  \end{aligned}
+\end{equation}
+%
+(Here as above, $e$ denotes the base of the natural logarithm.)
+%
+Informally, $P_{k,m}(n)$ is the probability that some~$x$ is overestimated by a
+non-negligible amount in the representation of some $\setS$ containing a total
+of $n$ elements, when a random function is used for hashing. Cormode and
+Muthukrishnan~\cite{cormode2005improved} show that this probability is bounded
+above by $e^{-k}$. This structure does not provide a bound for underestimation
+of frequencies, since it is designed for use cases where overestimates are
+considered harmful but underestimates are not.
+
+\heading{Error function for frequency queries}
+%
+The count min-sketch is designed for settings where overestimation in particular
+is undesirable, and so we aim to provide tight bounds on the size of
+overestimates but makes no guarantees about underestimates. To make the bounds
+simpler while staying conservative in our assumptions, we will use an error
+function that counts \emph{any} overestimate as an error, not just overestimates
+larger than some lower bound of significance. In particular, we define~$\delta$
+as
+%
+\begin{equation}
+  \delta(x, y) =
+  \begin{cases}
+    1 & \text{if}\ x > y \\
+    0 & \text{otherwise.}
+  \end{cases}
+\end{equation}
+
+\subsection{Insecurity of public sketches}\label{sec:pub-sketch-bad}
+
+Unlike in the Bloom filter case, good security bounds cannot be achieved for a
+count-min sketch in the \errep\ setting even if salts and/or private keys are
+used. The insecurity is due to the relative power of the $\UPO$ oracle compared
+to the Bloom filter. Not only does it allow for deletion as well as
+insertion, but since updates are \emph{added} to the representation rather than
+being combined with bitwise-OR, the adversary gains more information from
+seeing updates occur. Because of these differences, the adversary can mount
+an attack similar to the target-set coverage attack for a Bloom filter even if a
+PRF is used for
+hashing. First, the adversary calls $\REPO(\emptyset)$ to get an empty
+representation. The adversary can then call $\UPO$ to insert an element into the
+set, see exactly what the outputs of each of the hash functions are, and then
+call $\UPO$ again to delete the element. By doing this repeatedly, an adversary
+can determine the outputs of the PRF for $u$ different inputs using $2u$ calls
+to $\UPO$. Once a sufficiently large number of PRF outputs has been determined,
+the adversary can construct the test and target set used for the target-set
+coverage attack (Section~\ref{sec:bad-bfs}). The adversary then calls $\UPO$ several more times to insert
+each element of the test set into the sketch, and then
+each element of the target set will be overestimated.
+
+In actual use, this specific attack may not be feasible for the adversary.
+However, as long as the sketch is public, the adversary can easily determine the
+exact results of inserting or deleting any element just by seeing which counters
+are incremented or decremented. For this reason it is not enough that the
+function used to perform queries and updates is impossible for the adversary to
+simulate, since the adversary can build a lookup table just by watching the
+sketch as it is updated. Instead, we must require that the sketch itself be kept
+secret from the adversary.
+
+\subsection{Private, $\ell$-thresholded sketches}
+
+Given the success of $\ell$-thresholding in the case of Bloom filters, we
+continue using this tweak in the case of count min-sketches. Between
+thresholding and the use of a per-representation random salt, we are able to
+establish an upper bound on the number of overestimates in a count min-sketch.
+However, the bound is not quite as good as in the case of a salted and
+thresholded Bloom filter, which is unsurprising given the increased flexibility
+provided by the update algorithm coupled with the additional
+information returned by the query evaluation algorithm.
+%
+Formally, we consider the structure given by $\Pi = \sketch[H,\ell,\lambda]$ for
+a hash function $H: \bits^* \to [m]^k$, which we will model as a random oracle.
+
+\begin{theorem}[\erreps\ security of thresholded CMS]\label{thm:scms-erreps-th}
+Let $p_\ell = ((\ell+1)/m)^k$. For all $q_R, q_T, q_U, q_H, q_V, r, t \geq 0$
+it holds that
+  \begin{equation*}
+  \begin{aligned}
+    \Adv{\erreps}_{\Pi,\delta,r}(O(t),\,&q_R,q_T,q_U,q_H,q_V) \leq \\
+     & q_R \cdot \left[\frac{q_H}{2^\lambda} + e^{r'-p_\ell q_T}\left(\frac{p_\ell q_T}{r'}\right)^r\right],
+  \end{aligned}
+\end{equation*}
+where $H$ is modeled as a random oracle, $r' = \lfloor r/(k+1) \rfloor$, and $r'
+> p_\ell q_T$.
+\end{theorem}
+
+The theorem uses several reductions to gradually whittle away at the flexibility
+the adversary has in performing repeated insertions, deletions, and queries to
+the same elements. The $r'$ in place of $r$ in the bound comes from the fact
+that, if the adversary finds that some $x$ is overestimated, it may be able to
+produce as many as $k$ additional overestimates by inserting $x$. We take this
+into account by automatically giving the adversary credit for all $k$ additional
+overestimates as soon as it discovers the false positive. After taking this into
+account, we can reduce to the standard binomial argument in which the adversary
+seeks to find $r'$ overestimates by making arbitrary queries.
+%
+We defer the proof to Appendix~\ref{sec:proof/scms-erreps-th}.
+
+%\begin{proof}
+%  \input{proof/scms-erreps-th}
+%\end{proof}
+
+\subsection{Discussion}
+
+Unlike Bloom filters, there is no simple tweak that can be performed
+to a count min-sketch to provide good \errep\ security bounds. In particular, it
+does not achieve security even in the immutable setting, and adding a secret key
+does not help.
+%
+However, the bound above shows that in settings where sketches can be assumed
+secret it is possible to prove an upper bound on the number of overestimates an
+adversary can cause. In particular, we recommend the combination of random
+per-representation salts and $\ell$-thresholding in order to mitigate possible
+attacks in the \erreps\ setting.
+
+The bound we achieve is based on the same binomial bound as in the case of Bloom
+filters, but has a notable difference in the form of $r'$ replacing $r$. This
+negatively impacts the amount of space the filter must take up in order to
+provide low error bounds, but because the scaling factor between $r$ and $r'$ is
+only $k+1$, the difference should not be unacceptably extreme given reasonable
+parameter choices. We also note that it is possible this bound can be improved
+to reduce the impact on sketch size, since the initial factor of $q_R$ does not
+have an obvious attack associated with it which would make this bound tight.
+%
+(The same is true, of course, of Bloom filters.)

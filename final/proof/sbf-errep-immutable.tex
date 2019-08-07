@@ -1,0 +1,170 @@
+\ignore{\begin{figure*}
+\threeColsOneDivideUnbalanced{0.40}{0.27}{0.27}
+{
+  \vspace{-7pt}
+  \experimentv{$\game_{0}(\advB)$}
+      \hfill \diffplus{$\game_1$}\\[2pt]
+    $M^* \gets \bot$;
+    $\salt^* \getsr \bits^\lambda$\\
+    $\advB^{\REPO,\QRYO,\HASHO_1}$;
+    return $\big[\sum_x \err[x] \geq r\big]$
+  \\[6pt]
+  \oraclev{$\REPO(\col)$}\\[2pt]
+    $M^* \gets \bigvee_{x \in \col} \bmap_m(\HASHO_2(\salt^* \cat x))$;
+    $\setS^* \gets \col$;
+    return $\langle M^*, Z^* \rangle$
+  \\[6pt]
+  \oraclev{$\QRYO(\qry_x)$}\\[2pt]
+    $X \gets \bmap_m(\HASHO_3(\salt^* \cat x))$;
+    $a \gets X = M^* \AND X$\\
+    if $\err[x] < \delta(a,\qry_x(\col^*))$ then
+          $\err[x] \gets \delta(a,\qry_x(\col^*))$\\
+    return $a$
+  \\[6pt]
+  \oraclev{$\HASHO_c(\salt \cat x)$}\\[2pt]
+    $\vv \getsr [m]^k$\\
+    if $M^*=\bot$ and $\salt=\salt^*$ and $c=1$ then \com{Caller is~$\advB$}\\
+    \tab $\bad_1 \gets 1$; \diffplus{return $\vv$}\\
+    if $T[Z,x] = \bot$ then $\vv \gets T[Z,x]$\\
+    $T[Z,x] \gets \vv$; return $\vv$
+}
+{
+  \vspace{-2pt}
+  \oraclev{$\HASHO_c(\salt \cat x)$}\\[2pt]
+    $\vv \getsr [m]^k$\\
+    if $M^*=\bot$ and $\salt=\salt^*$ and $c=1$ then\\
+    \tab $\bad_1 \gets 1$; return $\vv$\\
+    if $T[Z,x] = \bot$ then $\vv \gets T[Z,z]$\\
+    $T[Z,x] \gets \vv$\\[2pt]
+    \diffplusbox{
+    \com{Caller is~$\advB$ or $\QRYO$}\\
+    if $c=1$ or $c=3$ then\\
+    \tab if $\salt \ne \salt^*$  then return $\vv$\\
+    \tab $\Ans[x] \gets \bmap_m(\vv) = M^* \AND \bmap_m(\vv)$\\
+    \tab if $\err[x] < \delta(\Ans[x],\qry_x(\col^*))$ then
+    \tab\tab $\err[x] \gets \delta(\Ans[x],\qry_x(\col^*))$
+    }
+    return $\vv$
+}
+{
+  \vspace{-7pt}
+  \oraclev{$\QRYO(\qry_x)$}\
+      \hfill \diffminus{$\game_1$} \diffplus{$\game_2$}\\[2pt]
+    \diffminusbox{%
+      $X \gets \bmap_m(\HASHO_3(\salt^* \cat x))$\\
+      $a \gets X = M^* \AND X$\\
+      if $\err[x] < \delta(a,\qry_x(\col^*))$ then\\
+      \tab $\err[x] \gets \delta(a,\qry_x(\col^*))$
+    }\\[2pt]
+    \diffplusbox{
+      $\HASHO_3(Z^* \cat x)$\\
+      $a \gets \Ans[x]$
+    }
+    return $a$
+}
+\caption{Games 0, 1, and 2 for proof of Theorem~\ref{thm:sbf-errep-immutable}.}
+\label{fig:sbf-errep-immutable/games}
+\end{figure*}}
+
+The proof makes use of the following lemma for keyless structures, which is
+proved formally in the full version of the paper.
+
+\begin{lemma}\label{thm:lemma1}
+  For every $q_R, q_T, q_U, q_H, r, t \geq 0$ and keyless structure~$\Gamma$ it
+  holds that
+  \begin{eqnarray*}
+    \begin{aligned}
+      \Adv{\errep}_{\Gamma,\delta,r}(t,\,&q_R, q_T, q_U, q_H) \leq \\
+      & q_R \cdot \Adv{\errep1}_{\Gamma,\delta,r}(O(t), q_T, q_U, q_H) \,,
+    \end{aligned}
+  \end{eqnarray*}
+\end{lemma}
+%
+\noindent
+The proof is by a fairly straightforward hybrid argument.
+Because~$\Gamma$ is keyless, an \errep1 adversary can simulate $\REPO$, $\UPO$,
+and $\QRYO$ calls itself. In the reduction, we choose a random $i \in [q_R]$ and
+forward only the $i$th $\REPO$ call to our $\REPO$ oracle, simulating all other
+$\REPO$ queries. Similarly, $\UPO$ and $\QRYO$ calls are forwarded only if they
+relate to the $i$th representation, and otherwise are simulated. The \errep1
+adversary wins in at least those cases where the \errep\ adversary outputs $i$
+and then wins. Since there is a $1/q_R$ chance of the randomly-chosen $i$
+matching the \errep\ adversary's output we obtain the factor of~$q_R$ in the
+bound.
+
+We begin the argument for the full theorem with $\advA$, an \errep\ adversary
+making~$1$ query to~$\REPO$, $q_T$ queries to $\QRYO$, $0$ queries to $\UPO$,
+and $q_H$ queries to the random oracle~$\HASHO$.
+%
+We make the following assumptions, all of which are without loss of generality.
+%
+First, all of~$\advA$'s $\QRYO$ queries follow its $\REPO$ query.
+%
+Second, we assume that $x\not\in\setS$ for all queries $\qry_x$ to $\QRYO$,
+where~$\setS$ was the input to~$\advA$'s $\REPO$ query. This is without loss
+because Bloom filters admit false positives, but not false negatives.
+%
+Third, we we assume that $|\setS| \leq n$; this is without loss because
+otherwise~$\REPO$ outputs~$\bot$ and~$\advA$ gets no advantage.
+%
+Fourth, we assume that all of~$\advA$'s $\HASHO$ queries are of the form $Z\cat
+x$, where $|Z| = \lambda$.
+
+We next make a game-playing argument~\cite{bellare2006triple}, and then obtain the
+final bound via application of Lemma~\ref{thm:lemma1}.
+%
+The high-level goal is to rewrite the game so that the probability that one
+of~$\advA$'s queries runs up the score is precisely the non-adaptive false
+positive probability.
+%
+In other words, our goal is to transition into a setting in which the Bloom
+filter output by~$\REPO$ is independent of the outcome of~$\advA$'s other
+queries.
+
+The first new game we move to is $\game_0$, where the salt $\salt$ for the
+representation of~$\setS$ is generated prior to executing~$\advB$, and
+the~$\HASHO$ oracle sets a bad flag if~$\advB$ calls $\HASHO(\salt \cat x)$
+before calling $\REPO$. Since this occurs with probability $q_H/2^\lambda$, we
+can bound away the probability of the adversary prematurely guessing the salt
+with a term of $q_H/2^\lambda$, as seen in the final bound.
+
+With this probability established, we can move to a game $\game_1$ where the
+adversary's random oracle is independent of the hash functions used to respond
+to oracle calls. In this game the adversary's random oracle is incapable of
+providing useful information.
+
+In game $\game_2$, we alter the $\HASHO$ and $\QRYO$ oracles so that
+the winning condition is computed by $\HASHO$ instead of $\QRYO$. The former
+oracle maintains a table~$\Ans$, setting $\Ans[x] = \Qry^\HASHO(M, \qry_x)$
+whenever $\salt \cat x$ is hashed and giving the adversary credit for an error
+if this $\Qry$ does not match with the correct output. The $\QRYO$ oracle in
+$\game_2$ simply runs $\HASHO$ and returns $\Ans[x]$ when $x$ is queried.
+%
+We are effectively giving the adversary credit for RO queries that result in
+false positives for the representation of~$\setS$, but which it does not
+explicitly ask of~$\QRYO$. Note that this change can only increase the
+adversary's chance of success.
+
+In $\game_2$, the adversary may produce an error through either $\HASHO$ or
+$\QRYO$, so the number of chances the adversary has to produce an error is no
+greater than $q = q_H + q_T$. Since the outputs of $\HASHO$ are uniformly
+randomly distributed and independent of the adversary's random oracle, the
+probability of any of these calls producing an error is equal to the
+non-adaptive error probability for a Bloom filter, $P_{k,m}(n)$. The adversary's
+chances of success are given by a binomial distribution, to which we can apply a
+Chernoff bound:
+%
+\begin{equation}
+  \Adv{\errep1}_{\Pi,\delta,r}(\advA) < \frac{q_H}{2^\lambda} + \left(\frac{pq}{r}\right)^re^{r-pq}
+  \,.
+\end{equation}
+%
+Applying Lemma~\ref{thm:lemma1} to move from the single-representation case to the
+general case, we get our final bound of
+\begin{equation}
+  \Adv{\errep}_{\Pi,\delta,r}(\advA) \leq
+    q_R \cdot \left[
+      \frac{q_H}{2^\lambda} +
+      \left(\frac{pq}{r}\right)^re^{r-pq}
+    \right] \,.
+\end{equation}
