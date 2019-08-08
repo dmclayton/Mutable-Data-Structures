@@ -1,0 +1,167 @@
+\begin{figure*}
+\twoCols{0.47}
+{
+  \vspace{-7pt}
+  \experimentv{$\game_{0}(\advA)$}\hfill\diffplus{$\game_1$}\\[2pt]
+    $\v.M^* \gets \bot$;
+    $\setS \gets \emptyset$;
+    $\salt^* \getsr \bits^\lambda$\\
+    $\advB^{\REPO,\QRYO,\UPO,\HASHO_1}$;
+    return $\big[\sum_x \err[x] \geq r\big]$
+  \\[6pt]
+  \oraclev{$\HASHO_c(\salt \cat x)$}\\[2pt]
+    $\vv \getsr [m]^k$\\
+    if $\salt=\salt^*$ and $c = 1$ then \com{Caller is~$\advB$}\\
+    \tab $\bad_1 \gets 1$; \diffplus{return $\vv$}\\
+    if $T[Z,x] = \bot$ then $\vv \gets T[Z,x]$\\
+    $T[Z,x] \gets \vv$; return $\vv$
+  \\[6pt]
+  \oraclev{$\QRYO(\qry_x)$}\\[2pt]
+    $\v.X \gets \HASHO_3(\salt^* \cat x)$;
+    $\setS \gets \setS \cup \{x\}$;
+    $a = 1$\\
+    for $i$ in $\v.X$ do\\
+      $\tab$if $\v.M[i] = 0$ then $a = 0$\\
+    if $\err[x] < \delta(a,\qry_x(\col^*))$ then
+          $\err[x] \gets \delta(a,\qry_x(\col^*))$\\
+    return $a$
+  \\[6pt]
+  \oraclev{$\REPO(\col)$}\\[2pt]
+    $\v.M^* \gets 0^m$\\
+    $\setS^* \gets \col$\\
+    for $x \in \col$ do\\
+      $\tab\UPO(\up_x)$\\
+    return $\top$
+  \\[6pt]
+  \oraclev{$\UPO(\up_{x,b})$}\\[2pt]
+    if $w'(\v.M^*) > \ell$ then return $\top$\\
+    $\v.X \gets \HASHO_3(\salt^* \cat x)$;
+    $\v.M' \gets \v.M^*$\\
+    for $i$ in $\v.X$ do\\
+      $\tab$ if $\v.M'[i] = 0$ and $b < 0$ then return $\top$\\
+      $\tab \v.M'[i] \gets \v.M'[i] + b$\\
+    if $b > 0$ and $\QRYO(\qry_x) = 1$ then $\err_i[x] \gets 0$\\
+    if $b < 0$ and $\QRYO(\qry_x) = 0$ then $\err_i[x] \gets 0$\\
+    $\v.M^* \gets \v.M'$;
+    $\setS^* \gets \up_{x,b}(\setS^*)$;
+    return $\top$
+}
+{
+  \vspace{-7pt}
+  \experimentv{$\game_2(\advA)$}\hfill\diffplus{$\game_2$}\\[2pt]
+    $\v.M^* \gets \bot$;
+    $\setS \gets \emptyset$;
+    \diffplus{$\setR \gets \emptyset$; $r' \gets \lfloor r/\max(\delta^+,k\delta^-)\rfloor$}\\
+    $\salt^* \getsr \bits^\lambda$\\
+    $\advB^{\REPO,\QRYO,\UPO,\HASHO_1}$;
+    return $\big[\sum_x \err[x] \geq r\big]$
+  \\[6pt]
+  \oraclev{$\QRYO(\qry_x)$}\\[2pt]
+    $\v.X \gets \HASHO_3(\salt^* \cat x)$;
+    $\setS \gets \setS \cup \{x\}$;
+    $a = 1$\\
+    for $i$ in $\v.X$ do\\
+      $\tab$if $\v.M[i] = 0$ then $a = 0$\\
+    if $\err[x] < \delta(a,\qry_x(\col^*))$ then
+          $\err[x] \gets \delta(a,\qry_x(\col^*))$\\
+    if $\err[x] > 0$ then $\setR \gets \setR \cup \{x\}$\\
+    return $a$
+  \\[6pt]
+  \oraclev{$\UPO(\up_{x,b})$}\\[2pt]
+    if $w'(\v.M^*) > \ell$\diffplus{$+r'$} then return $\top$\\
+    \diffplus{if $x \in \setR$ and $b < 0$ then return $\top$}\\
+    $\v.X \gets \HASHO_3(\salt^* \cat x)$;
+    $\v.M' \gets \v.M^*$\\
+    for $i$ in $\v.X$ do\\
+      $\tab$ if $\v.M'[i] = 0$ and $b < 0$ then return $\top$\\
+      $\tab \v.M'[i] \gets \v.M'[i] + b$\\
+    if $b > 0$ and $\QRYO(\qry_x) = 1$ then $\err_i[x] \gets 0$\\
+    if $b < 0$ and $\QRYO(\qry_x) = 0$ then $\err_i[x] \gets 0$\\
+    $\v.M^* \gets \v.M'$;
+    $\setS^* \gets \up_{x,b}(\setS^*)$;
+    return $\top$
+  \vspace{6pt}\hrule\vspace{3pt}
+  \oraclev{$\UPO(\up_{x,b})$}\hfill\diffminus{$\game_2$}\diffplus{$\game_3$}\\[2pt]
+    if $w'(\v.M^*) > \ell+r'$ then return $\top$\\
+    if $x \in \setR$ and $b < 0$ then return $\top$\\
+    $\v.X \gets \HASHO_3(\salt^* \cat x)$;
+    $\v.M' \gets \v.M^*$\\
+    for $i$ in $\v.X$ do\\
+      $\tab$ if $\v.M'[i] = 0$ and $b < 0$ then return $\top$\\
+      \diffminus{$\tab \v.M'[i] \gets \v.M'[i] + b$}\\
+      \diffplus{$\tab \v.M'[i] \gets \min(\v.M'[i] + b, 1)$}\\
+    if $b > 0$ and $\QRYO(\qry_x) = 1$ then $\err_i[x] \gets 0$\\
+    if $b < 0$ and $\QRYO(\qry_x) = 0$ then $\err_i[x] \gets 0$\\
+    $\v.M^* \gets \v.M'$;
+    $\setS^* \gets \up_{x,b}(\setS^*)$;
+    return $\top$
+}
+\caption{Games 0--3 for proof of Theorem~\ref{thm:counting-erreps}.}
+\label{fig:cbf-erreps/games}
+\end{figure*}
+
+As with the proof of Theorem~\ref{thm:sbf-errep-immutable}, we derive a bound in
+the \erreps1 case and then use Lemma~\ref{thm:lemma1} to move from \erreps1 to
+the more general \erreps case. Because we are in the \erreps1 case, we may
+assume without loss of generality that the adversary does not call $\REVO$,
+since revealing the only representation automatically prevents the adversary
+from winning.
+
+We begin with a game~$\game_0$, shown in Figure~\ref{fig:cbf-erreps/games}, which has identical behavior to the \erreps1
+experiment for a counting filter. As in the proof of
+Theorem~\ref{thm:sbf-errep-immutable}, we have a
+$\bad_1$ flag that gets set if the adversary ever calls $\HASHO_1$ with the
+actual salt used by the representation. By a very similar argument, we can
+move to~$\game_1$, where the behavior is different only when the $\bad_1$ flag
+is set, with a bound of
+\begin{equation}
+  \Prob{\game_0(\advA)=1} \leq
+    q_H/2^\lambda + \Prob{\game_1(\advA)=1} \,.
+\end{equation}
+
+Unlike in the case of a count min-sketch, it is entirely possible for deletions
+to benefit the adversary in this game. In particular, if $x$ is found to be a
+false positive, deleting $x$ may cause up to $k$ elements of $\col$ to become
+false negatives. We therefore move to a game~$\game_2$ where the adversary gets
+credit for either a single false positive or for $k$ false negatives whenever it
+finds a false positive, but where the adversary cannot delete any false
+positives that it finds. We let $r' = \lfloor r/\max(\delta^+,k\delta^-)\rfloor$
+represent the number of false positives the adversary has to find in~$\game_2$
+in order to win. In order to prevent the adversary from being penalized by the
+filter becoming full too early, we also raise the threshold from $\ell$ to
+$\ell+r'$ in~$\game_2$. Now for any $\advA$ for~$\game_1$, we can construct
+$\advB$ for~$\game_2$ that simulates $\advA$, keeping track of all query
+responses and forwarding all oracle queries in the natural way, except that
+calls to delete false positives are ignored. Since $\UPO$ never fails for
+$\advB$ due to the increased threshold, and since $\advB$ gets automatic credit
+for any false negatives that might have been caused by deleting false positives,
+$\advB$ succeeds whenever $\advA$ does, i.e.
+$\Prob{\game_1(\advA)=1} \le \Prob{\game_2(\advB) = 1}$.
+
+Since the remaining deletions do not cause errors, we can use the same argument
+as in the proof of Theorem~\ref{thm:scms-erreps-th} to reduce from $\advB$ to an
+adversary $\advC$ which does not make deletions at all. In~$\game_3$, we further
+reduce from a counting filter to a normal Bloom filter by capping each of the
+counters in the filter at 1. Since no deletions are performed, a counter
+in~$\game_3(\advC)$ is nonzero if and only if the same counter
+in~$\game_2(\advC)$ is nonzero. So $\QRYO$ behaves the same in~$\game_3$ as it
+did in~$\game_2$, and $\Prob{\game_2(\advC)=1} \le \Prob{\game_3(\advC) = 1}$.
+
+Note that~$\game_3$ is actually simulating an ordinary Bloom filter, since all
+`counters' in the filter are restricted to the range $\bits$, there are no
+deletions, and any insertions just set the corresponding bits to 1. In fact,
+this game is identical to~$\game_2$ in the proof of
+Theorem~\ref{thm:sbf-erreps-th} except that the adversary need only accumulate
+$r'$ errors instead of $r$ errors and the threshold is $\ell+r'$ instead of
+$\ell$. An identical argument allows us to reach the binomial bound of
+\begin{equation}
+   \Prob{\game_3(\advC)=1} \le
+     \sum_{i=r'}^{q_T} \binom{q_T}{i}p_\ell^i(1-p_\ell)^{q_T-i} \,,
+\end{equation}
+where $p_\ell$ is now defined to be $((\ell+k+r')/m)^k$. Then the standard
+Chernoff bound, along with Lemma~\ref{thm:lemma1}, yields the final bound of
+\begin{equation}
+   \Adv{\erreps}_{\Pi,\delta,r}(\advA) \leq
+     q_R \cdot \left[\frac{q_H}{2^\lambda} + e^{r'-p_\ell q_T}\left(\frac{p_\ell
+     q_T}{r'}\right)^{r'}\right] \,.
+\end{equation}

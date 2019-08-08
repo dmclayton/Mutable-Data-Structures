@@ -107,11 +107,18 @@ After this step, we observe that a counting filter without
 deletion behaves the same as an ordinary Bloom filter in terms of how it
 responds to queries. We can therefore borrow the arguments used to establish the
 bounds in Theorem~\ref{thm:sbf-erreps-th} to finish the proof.
-%
-We defer the details of the proof to Appendix~\ref{sec:proof/counting-erreps}.
-%\begin{proof}
-%  \input{proof/scbf-erreps-th}
-%\end{proof}
+
+\proc{
+  \begin{proof}[Proof Sketch of Theorem~\ref{thm:counting-erreps}]
+  \input{proof/scbf-erreps-th}
+\end{proof}
+}
+
+\full{
+  \begin{proof}[Proof Sketch of Theorem~\ref{thm:counting-erreps}]
+  \input{fullproof/scbf-erreps-th}
+\end{proof}
+}
 
 \subsection{Discussion}
 The results for counting filters are similar to the results for count-min

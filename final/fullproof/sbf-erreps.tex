@@ -1,10 +1,64 @@
+\begin{figure*}
+\twoColsNoDivide{0.47}
+{
+  \vspace{-7pt}
+  \experimentv{$\game_{0}(\advB)$}\hfill \diffminus{$\game_1$}\diffplus{$\game_2$}\\[2pt]
+    $M^* \gets \bot$;
+    $\salt^* \getsr \bits^\lambda$\\
+    $\advB^{\REPO,\QRYO,\UPO,\HASHO_1}$;
+    return $\big[\sum_x \err[x] \geq r\big]$
+  \\[6pt]
+  \oraclev{$\HASHO_c(\salt \cat x)$}\\[2pt]
+    $\vv \getsr [m]^k$\\
+    if $\salt=\salt^*$ and $c = 1$ then \com{Caller is~$\advB$}\\
+    \tab $\bad_1 \gets 1$; \diffplus{\diffminus{return $\vv$}}\\
+    if $T[Z,x] = \bot$ then $\vv \gets T[Z,x]$\\
+    $T[Z,x] \gets \vv$; return $\vv$
+}
+{
+  \oraclev{$\QRYO(\qry_x)$}\\[2pt]
+    $X \gets \bmap_m(\HASHO_3(\salt^* \cat x))$;
+    $a \gets X = M^* \AND X$\\
+    if $\err[x] < \delta(a,\qry_x(\col^*))$ then
+          $\err[x] \gets \delta(a,\qry_x(\col^*))$\\
+    \diffplus{$\UPO(\up_x)$}\\
+    return $a$
+  \\[6pt]
+  \oraclev{$\REPO(\col)$}\\[2pt]
+    $M^* \gets \bigvee_{x \in \col} \bmap_m(\HASHO_2(\salt^* \cat x))$;
+    $\setS^* \gets \col$;
+    return $\top$
+  \\[6pt]
+  \oraclev{$\UPO(\up_x)$}\\[2pt]
+    if $w(M) > \ell$ then return $\top$\\
+    if $\QRYO(\qry_x) = 1$ then $\err[x] \gets 0$\\
+    $M^* \gets M^* \vee \bmap_m(\HASHO_2(\salt^* \cat x))$;
+    $\setS^* \gets \up_x(\setS^*)$;
+    return $\top$
+}
+\caption{Games 0, 1, and 2 for proof of Theorem~\ref{thm:sbf-erreps}.}
+\label{fig:sbf-erreps/games}
+\end{figure*}
+
+%This proof follows a similar structure to the proof of
+%Theorem~\ref{thm:sbf-errep-immutable}.
+%
+%The primary distinction is that in the final game, unless the adversary ``gets
+%lucky'' and guesses the salt, they should only be able to produce errors with
+%$q_T$ queries, as opposed to both $q_T$ and $q_H$ queries.
+%
 Just as in the proof of Theorem~\ref{thm:sbf-errep-immutable}, we will assume
 the adversary just makes a single call to $\REPO$ and use Lemma~\ref{thm:lemma1}
 to complete the bound. Let $\advA$ be an \erreps\ adversary making exactly 1
 call to $\REPO$, $q_T$ calls to $\QRYO$, $q_U$ calls to $\UPO$, and $q_H$ calls
 to $\HASHO$. Because $\advA$ creates only a single representation, it will
 necessarily lose if it calls $\REVO$ on that representation. We may therefore
-assume without loss of generality that $\advA$ makes no calls to $\REVO$.
+assume without loss of generality that $\advA$ makes no calls to $\REVO$, and
+because of this we omit $\REVO$ from each of the games.
+%
+%\cpnote{Good. Somehwere in the body we'll need to justify why we include~$\REVO$
+%in the experiment, since at this point the reader has no reason to believe that
+%$\REVO$ captures something useful.}
 
 In addition to the assumptions of Theorem~\ref{thm:sbf-errep-immutable}, we
 assume without loss of generality that the adversary never uses $\UPO$ to insert
@@ -15,29 +69,50 @@ filter, the adversary would gain no advantage from performing these updates.
 Furthermore, we assume without loss of generality that an adversary halts as
 soon as it determines it has accumulated enough errors to win the experiment.
 
+We begin with a game~$\game_0(\advB)$
+(Figure~\ref{fig:sbf-erreps/games}) similar to the first game in the
+proof of Theorem~\ref{thm:sbf-errep-immutable}, except that it also defines
+an~$\UPO$ oracle. Again, we observe that for every~$\advA$ there exists
+a~$\advB$ such that
+\begin{equation}
+  \Adv{\errep}_{\Pi,\delta,r}(\advA) \leq \Prob{\game_0(\advB) = 1}
+\end{equation}
+and~$\advB$ has the same query resources as~$\advA$.
+
 Since we are seeking a stronger bound, we now wish to isolate the possibility
 that the adversary \emph{ever} guesses the salt, as opposed to just guessing the
 salt before calling $\REPO$. This is no longer a trivial task for the adversary
 because the representations are private, and so $\REPO$ does not directly reveal
-the salt. We therefore set a bad flag whenever the adversary manages to guess
-the salt. However, since the adversary is still limited to a total of $q_H$
-$\HASHO$ queries, regardless of when the queries are made, we can follow nearly
-the same argument as in the previous proof to bound away the probability of the
-bad flag being set at $q_H/2^\lambda$. This is the same probability because the
-probability of the adversary guessing the salt at any time in this experiment is
-equal to the probability of the adversary guessing the salt in advance (before
-$\REPO$ is called) in the previous game, and the previous game's adversary could
-choose to make all of its random oracle queries before calling $\REPO$.
-
-Once we have done this, we have a game $\game_1$ where the adversary's $\HASHO$
-queries are independent of the $\HASHO$ queries made by the oracle: it is
-irrelevant whether the adversary guesses the salt.
+the salt. We therefore set the~$\bad_1$ flag whenever the adversary manages to
+guess the salt, without the requirement that $M^* = \bot$. However, since the
+adversary is still limited to a total of $q_H$ $\HASHO$ queries, regardless of
+when the queries are made, we can follow nearly the same argument as in the
+previous proof to get the bound
 %
-By our starting assumptions, the same element is
-never inserted twice. We also want to show that we can assume no element is ever
-queried twice. To do this, we take a general adversary $\advA$ for $\game_1$ and
-construct $\advB$ that mimics $\advA$ but making new queries in place of repeat
-queries. % trim from here:
+\begin{eqnarray}
+  \Prob{\game_0(\advB)=1} \leq
+    \Prob{\game_1(\advB)=1} + q_H/2^\lambda \,.
+\end{eqnarray}
+%
+In~$\game_1$, $\HASHO_1$ queries are always independent of $\HASHO_2$ and
+$\HASHO_3$ queries. In particular, it is irrelevant whether the adversary
+guesses the salt.
+%
+We still cannot move to the binomial distribution for non-adaptive queries,
+however, since $\HASHO_2$ and $\HASHO_3$ queries are not necessarily independent
+of each other. By one of our starting assumptions, the same input is never
+provided twice to $\HASHO_2$ because the adversary never tries to insert an
+element which is already in $\col$. We also want to show that an adversary never
+queries the same element twice. To do this, let $\advB$ be an adversary
+for~$\game_1$. We construct an adversary $\advC$ that achieves at least the same
+advantage without making repeated queries. This $\advC$ simulates $\advB$,
+maintaining a list of queries that have been made so far during the
+game. Any $\REPO$, $\UPO$, or $\HASHO_1$ queries from $\advB$ are forwarded to $\advC$'s
+oracles without performing additional computations. When $\advB$ makes a
+$\QRYO(\qry_x)$ call, $\advC$ checks whether $x$ has already been queried. If
+so, $\advC$ selects as $y$ the lexicographically first string such that
+$y \not\in \col$ and such that $y$ has not been previously
+queried, and calls $\QRYO(\qry_y)$ instead of $\QRYO(\qry_x)$.
 
 Recall that $\advB$ makes no queries for elements of $\col$, so any repeated
 queries must have returned either false positives or true negatives the first

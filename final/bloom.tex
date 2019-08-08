@@ -356,7 +356,7 @@ filter will do.
 }
 \full{
 \begin{proof}[Proof of Theorem~\ref{thm:sbf-errep-immutable-full}]
-  \input{proof/sbf-errep-immutable}
+  \input{fullproof/sbf-errep-immutable}
 \end{proof}
 }
 
@@ -389,12 +389,17 @@ find false positives, and from having to show that the adversary's access to
 $\UPO$ does not substantially change the security bound that can be derived. The
 first of these is straightforward given the private-representation setting, but
 the second requires investigating how much of an advantage the $\UPO$ oracle can
-give, then moving to games where this advantage is taken into account. \full{We defer
-the full proof to Appendix~\ref{sec:proof/sbf-erreps}.}
+give, then moving to games where this advantage is taken into account.
 
 \proc{
   \begin{proof}[Proof Sketch of Theorem~\ref{thm:sbf-erreps}]
   \input{proof/sbf-erreps}
+\end{proof}
+}
+
+\full{
+  \begin{proof}[Proof Sketch of Theorem~\ref{thm:sbf-erreps}]
+  \input{fullproof/sbf-erreps}
 \end{proof}
 }
 
@@ -439,12 +444,18 @@ the case of keyless Bloom filters.  In particular, since we are using a PRF, the
 initial parts of the proof deal with the adversary potentially being able to
 break the PRF and with the possibility of the salts repeating rather than with
 the adversary being able to guess the salt.
-%
-We defer the details to Appendix~\ref{sec:proof/kbf-errep}.
 
-%\begin{proof}
-%  \input{proof/kbf-errep}
-%\end{proof}
+\proc{
+  \begin{proof}[Proof Sketch of Theorem~\ref{thm:kbf-errep}]
+  \input{proof/kbf-errep}
+\end{proof}
+}
+
+\full{
+  \begin{proof}[Proof Sketch of Theorem~\ref{thm:kbf-errep}]
+  \input{fullproof/kbf-errep}
+\end{proof}
+}
 
 The fact that both a key and a salt are used in the $\KBF$ construction is
 critical. In particular, without the per-representation randomness given by the
@@ -541,15 +552,18 @@ to 1, regardless of how the attack is conducted. The thrust of the proof is to
 assume the adversary will always be able to produce such a maximally full
 filter, and then use a standard binomial-distribution-based bound to place a
 limit on the adversarial advantage even in this worst-case scenario.
-%
-See Appendix~\ref{sec:proof/sbf-erreps-th} for details.
 
-%\todo{CP}{If time, plot the bound just like before and compare it to
-%Theorem~\ref{thm:sbf-erreps}.}
+\proc{
+  \begin{proof}[Proof Sketch of Theorem~\ref{thm:sbf-erreps-th}]
+  \input{proof/sbf-erreps-th}
+\end{proof}
+}
 
-%\begin{proof}
-%  \input{proof/sbf-erreps-th}
-%\end{proof}
+\full{
+  \begin{proof}[Proof Sketch of Theorem~\ref{thm:sbf-erreps-th}]
+  \input{fullproof/sbf-erreps-th}
+\end{proof}
+}
 
 
 \subsection{Discussion}

@@ -1,0 +1,223 @@
+\begin{figure*}
+\threeColsOneDivideUnbalanced{0.40}{0.27}{0.27}
+{
+  \vspace{-7pt}
+  \experimentv{$\game_{0}(\advB)$}
+      \hfill \diffplus{$\game_1$}\\[2pt]
+    $M^* \gets \bot$;
+    $\salt^* \getsr \bits^\lambda$\\
+    $\advB^{\REPO,\QRYO,\HASHO_1}$;
+    return $\big[\sum_x \err[x] \geq r\big]$
+  \\[6pt]
+  \oraclev{$\REPO(\col)$}\\[2pt]
+    $M^* \gets \bigvee_{x \in \col} \bmap_m(\HASHO_2(\salt^* \cat x))$;
+    $\setS^* \gets \col$;
+    return $\langle M^*, Z^* \rangle$
+  \\[6pt]
+  \oraclev{$\QRYO(\qry_x)$}\\[2pt]
+    $X \gets \bmap_m(\HASHO_3(\salt^* \cat x))$;
+    $a \gets X = M^* \AND X$\\
+    if $\err[x] < \delta(a,\qry_x(\col^*))$ then
+          $\err[x] \gets \delta(a,\qry_x(\col^*))$\\
+    return $a$
+  \\[6pt]
+  \oraclev{$\HASHO_c(\salt \cat x)$}\\[2pt]
+    $\vv \getsr [m]^k$\\
+    if $M^*=\bot$ and $\salt=\salt^*$ and $c=1$ then \com{Caller is~$\advB$}\\
+    \tab $\bad_1 \gets 1$; \diffplus{return $\vv$}\\
+    if $T[Z,x] = \bot$ then $\vv \gets T[Z,x]$\\
+    $T[Z,x] \gets \vv$; return $\vv$
+}
+{
+  \vspace{-2pt}
+  \oraclev{$\HASHO_c(\salt \cat x)$}\\[2pt]
+    $\vv \getsr [m]^k$\\
+    if $M^*=\bot$ and $\salt=\salt^*$ and $c=1$ then\\
+    \tab $\bad_1 \gets 1$; return $\vv$\\
+    if $T[Z,x] = \bot$ then $\vv \gets T[Z,z]$\\
+    $T[Z,x] \gets \vv$\\[2pt]
+    \diffplusbox{
+    \com{Caller is~$\advB$ or $\QRYO$}\\
+    if $c=1$ or $c=3$ then\\
+    \tab if $\salt \ne \salt^*$  then return $\vv$\\
+    \tab $\Ans[x] \gets \bmap_m(\vv) = M^* \AND \bmap_m(\vv)$\\
+    \tab if $\err[x] < \delta(\Ans[x],\qry_x(\col^*))$ then
+    \tab\tab $\err[x] \gets \delta(\Ans[x],\qry_x(\col^*))$
+    }
+    return $\vv$
+}
+{
+  \vspace{-7pt}
+  \oraclev{$\QRYO(\qry_x)$}\
+      \hfill \diffminus{$\game_1$} \diffplus{$\game_2$}\\[2pt]
+    \diffminusbox{%
+      $X \gets \bmap_m(\HASHO_3(\salt^* \cat x))$\\
+      $a \gets X = M^* \AND X$\\
+      if $\err[x] < \delta(a,\qry_x(\col^*))$ then\\
+      \tab $\err[x] \gets \delta(a,\qry_x(\col^*))$
+    }\\[2pt]
+    \diffplusbox{
+      $\HASHO_3(Z^* \cat x)$\\
+      $a \gets \Ans[x]$
+    }
+    return $a$
+}
+\caption{Games 0, 1, and 2 for proof of Theorem~\ref{thm:sbf-errep-immutable}.}
+\label{fig:sbf-errep-immutable/games}
+\end{figure*}
+
+We will use the following lemma for keyless structures, which is proved in
+Appendix~\ref{sec:keyless-proof}.
+
+\begin{lemma}\label{thm:lemma1}
+  For every $q_R, q_T, q_U, q_H, r, t \geq 0$ and keyless structure~$\Gamma$ it
+  holds that
+  \begin{eqnarray*}
+    \begin{aligned}
+      \Adv{\errep}_{\Gamma,\delta,r}(t,\,&q_R, q_T, q_U, q_H) \leq \\
+      & q_R \cdot \Adv{\errep1}_{\Gamma,\delta,r}(O(t), q_T, q_U, q_H) \,,
+    \end{aligned}
+  \end{eqnarray*}
+\end{lemma}
+%
+\noindent
+The proof is by a fairly straightforward hybrid argument. Because~$\Gamma$ is
+keyless, in the reduction we simulate $q_R-1$ of the calls to $\REPO$ experiment
+and use our own oracles for the remaining query. The best we can do with this
+strategy is to guess the representation the \errep\ adversary will use in
+its attack, which results in the~$q_R$ factor in the bound.
+
+Let $\advA$ be an \errep\ adversary making~$1$ query to~$\REPO$, $q_T$ queries
+to $\QRYO$, $0$ queries to $\UPO$, and $q_H$ queries to the random
+oracle~$\HASHO$.
+%
+We make the following assumptions, all of which are without loss of generality.
+%
+First, all of~$\advA$'s $\QRYO$ queries follow its $\REPO$ query.
+%
+Second, we assume that $x\not\in\setS$ for all queries $\qry_x$ to $\QRYO$,
+where~$\setS$ was the input to~$\advA$'s $\REPO$ query. This is without loss
+because Bloom filters admit false positives, but not false negatives.
+%
+Third, we we assume that $|\setS| \leq n$; this is without loss because
+otherwise~$\REPO$ outputs~$\bot$ and~$\advA$ gets no advantage.
+%
+Fourth, we assume that all of~$\advA$'s $\HASHO$ queries are of the form $Z\cat
+x$, where $|Z| = \lambda$.
+
+We begin with a game-playing argument~\cite{bellare2006triple}, then obtain the
+final bound via application of Lemma~\ref{thm:lemma1}.
+%
+The high-level goal is to rewrite the game so that the probability that one
+of~$\advA$'s queries runs up the score is precisely the non-adaptive false
+positive probability.
+%
+In other words, our goal is to transition into a setting in which the Bloom
+filter output by~$\REPO$ is independent of the outcome of~$\advA$'s other
+queries.
+
+Consider the game~$\game_0(\advB)$ defined in
+Figure~\ref{fig:sbf-errep-immutable/games}. It is similar to the \errep\
+experiment when executed with~$\advA$, $\Pi$, $\delta$, and~$r$, but the
+pseudocode has been simplified to clarify our argument. Indeed, it is not
+difficult to see that for every~$\advA$ there exists an adversary~$\advB$ such
+that
+\begin{equation}
+  \Adv{\errep}_{\Pi,\delta,r}(\advA) \leq \Prob{\game_0(\advB) = 1}
+\end{equation}
+and~$\advB$ has the same resources as~$\advA$.
+%
+Adversary~$\advB$ executes~$\advA$, forwarding~$\advA$'s oracle queries
+to its own oracles in the natural way.
+
+Observe that in game~$\game_0$ the salt used for the representation of~$\setS^*$
+is generated prior to executing~$\advB$. Game~$\game_1$ is identical
+to~$\game_0$ until the flag~$\bad_1$ gets set by oracle~$\HASHO$. This occurs
+if~$\advB$ asks $\HASHO_1(\salt^* \cat x)$, where~$\salt^*$ is the salt generated
+at the beginning of the game, and it has not yet called its $\QRYO$ oracle (i.e.,
+$M^*=\bot$).
+%
+By the Fundamental Lemma of Game Playing~\cite{bellare2006triple} it follows
+that
+%
+\begin{eqnarray}
+  \Prob{\game_0(\advB)=1} &\leq&
+    \Prob{\game_1(\advB)=1} + \Prob{\game_1(\advB) \sets \bad_1}\\
+  &\leq&
+    \Prob{\game_1(\advB)=1} + q_H/2^\lambda \,.
+\end{eqnarray}
+%
+Note that in $\game_1$, the value of~$M^*$ is independent of~$\advB$'s
+$\HASHO_1$ queries. In particular, the probability that some bit of~$M^*$ is set
+is independent of random coins of~$\advB$.
+
+In game $\game_2$ the $\HASHO$ and $\QRYO$ oracles have been rewritten so that
+the winning condition is computed by $\HASHO$ instead of $\QRYO$. The former
+oracle maintains a set~$\Ans$ such that $\Ans[x] = \Qry^{\HASHO_3}(M^*, \qry_x)$ for
+each query $\salt^* \cat x$; on input of $\qry_x$, oracle~$\QRYO$ simply runs
+$\HASHO_3(\salt^* \cat x)$ and returns $\Ans[x]$.
+%
+We are effectively giving the adversary credit for RO queries that result in
+false positives for the representation of~$\setS^*$, but which it does not
+explicitly ask of~$\QRYO$. Because~$\advB$'s advantage in the new game is at
+least as much as it gets in the old one, we have that.
+%
+\begin{equation}
+  \Prob{\game_1(\advB)=1} \leq \Prob{\game_2(\advB)=1} \,.
+\end{equation}
+
+We now consider $\Prob{\game_2(\advB)=1}$.
+%
+Let $\setX$ be the set $\{ x \in \bits^* : \Ans[x] \ne \bot \}$ and $\setT = \{x
+\in\setX: \Ans[x] = 1\}$, where $\Ans$ is at is defined when~$\advB$ halts. We
+will call~$\setX$ the set of attempts and~$\setT$ the set of false positives.
+%
+Note that $\setX\intersection\setS^*=\emptyset$ by assumption, and
+$|\setX| \leq q_H + q_T$ by definition.
+%
+Hence, the probability that~$\game_2(\advB)=1$ is equal to the probability
+that~$|\setT| \geq r$.
+
+For each $x\in\setX$, let $T(x)$ denote the event that $x\in\setT$.
+%
+In the random oracle model for~$H$, the set of random random variables $T(x)$
+for each $x\in X$ are independently and identically distributed.
+%
+Hence, the probability that~$\advB$ succeeds is binomially distributed:
+%
+\begin{equation}
+   \Prob{\game_2(\advB)=1} = \Prob{ |\setT| \geq r } =
+     \sum_{i=r}^{q} \binom{q}{i}p^i(1-p)^{q-i} \,,
+\end{equation}
+%
+where $q \leq q_H + q_T$ and $p = \Pr[T(x)=1]$. Here we can apply a Chernoff
+bound which states that, for any $\delta > 0$,
+%
+\begin{equation}
+  \Prob{X \geq (1+\delta)\mu} < \left(\frac{e^\delta}{(1+\delta)^{1+\delta}}\right)^\mu
+  \,.
+\end{equation}
+%
+We set $\delta = r\mu^{-1}-1$ and note that $\mu = pq$.
+This yields
+%
+\begin{equation}
+ \Prob{|\setT| \geq r} < \left(\frac{e^{r\mu^{-1}-1}}{(r\mu^{-1})^{r\mu^{-1}}}\right)^\mu = \left(\frac{e^{r-\mu}}{(r\mu^{-1})^r}\right) = e^{r-pq}\left(\frac{pq}{r}\right)^r
+\end{equation}
+%
+and so
+%
+\begin{equation}
+  \Adv{\errep}_{\Pi,\delta,r}(\advA) < \frac{q_H}{2^\lambda} + \left(\frac{pq}{r}\right)^re^{r-pq}
+  \,.
+\end{equation}
+%
+Applying Lemma~\ref{thm:lemma1} to move from the single-representation case to the
+general case, we get our final bound of
+\begin{equation}
+  \Adv{\errep}_{\Pi,\delta,r}(\advA) \leq
+    q_R \cdot \left[
+      \frac{q_H}{2^\lambda} +
+      \left(\frac{pq}{r}\right)^re^{r-pq}
+    \right] \,.
+\end{equation}
