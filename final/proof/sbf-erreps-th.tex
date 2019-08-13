@@ -1,99 +1,6 @@
-\begin{figure*}
-\twoCols{0.47}
-{
-  \vspace{-7pt}
-  \experimentv{$\game_{0}(\advA)$}\hfill\diffminus{$\game_0(\advA)$}\diffplus{$\game_1(\advB)$}\\[2pt]
-    $ct \gets 0$;
-    $\setZ \gets \emptyset$;
-    $\setP \gets \emptyset$\\
-    \diffminus{$i \gets \advA^{\REPO,\QRYO,\UPO,\HASHO_1,\REVO}$}\\
-    \diffplus{$i \gets \advB^{\REPO,\QRYO,\UPO,\HASHO_1}$}\\
-    return $\big[\sum_x \err_i[x] \geq r\big] \wedge i \not\in \setP$
-  \\[6pt]
-  \oraclev{$\HASHO_c(\salt \cat x)$}\\[2pt]
-    $\vv \getsr [m]^k$\\
-    if $\salt \in \setZ$ and $c = 1$ then \com{Caller is adversary}\\
-    \tab $\bad_1 \gets 1$\\
-    if $T[Z,x] = \bot$ then $\vv \gets T[Z,x]$\\
-    $T[Z,x] \gets \vv$; return $\vv$
-  \\[6pt]
-  \oraclev{$\QRYO(i, \qry_x)$}\\[2pt]
-    $X \gets \bmap_m(\HASHO_3(\salt_i \cat x))$;
-    $a \gets X = M_i \AND X$\\
-    if $\err_i[x] < \delta(a,\qry_x(\col_i))$ then
-          $\err_i[x] \gets \delta(a,\qry_x(\col_i))$\\
-    return $a$
-  \\[6pt]
-  \oraclev{$\REPO(\col)$}\hfill \diffplus{$\game_1$}\\[2pt]
-    $ct \gets ct+1$;
-    $M_{ct} \gets 0^m$;
-    $\salt_{ct} \gets \bits^\lambda$\diffplus{$\setminus \setZ$}\\
-    \diffplus{$\setZ \gets \setZ \cup \{\salt_{ct}\}$;}
-    $\setS_{ct} \gets \col$\\
-    for $x \in \col$ do\\
-    $\tab\UPO(ct, \up_x)$\\
-    return $\top$
-  \\[6pt]
-  \oraclev{$\UPO(i, \up_x)$}\\[2pt]
-    if $w(M) > \ell$ then return $\top$\\
-    if $\QRYO(\qry_x) = 1$ then $\err_i[x] \gets 0$\\
-    $M_i \gets M_i \vee \bmap_m(\HASHO_2(\salt^* \cat x))$;
-    $\setS_i \gets \up_x(\setS_i)$
-    return $\top$
-  \\[6pt]
-  \oraclev{$\REVO(i)$}\\[2pt]
-    $\setP \gets \setP \cup \{i\}$\\
-    return $\langle M_i, \salt_i\rangle$
-}
-{
-  \vspace{-7pt}
-  \oraclev{$\HASHO_c(\salt \cat x)$}\hfill\diffplus{$\game_2$}\\[2pt]
-    $\vv \getsr [m]^k$\\
-    if $\salt \in \setZ$ and $c = 1$ then \com{Caller is adversary}\\
-    \tab $\bad_1 \gets 1$; \diffplus{return $\vv$}\\
-    if $T[Z,x] = \bot$ then $\vv \gets T[Z,z]$\\
-    $T[Z,x] \gets \vv$; return $\vv$
-
-  \vspace{6pt}\hrule\vspace{3pt}
-
-  \oraclev{$\REPO(\col)$}\hfill\diffplus{$\game_3$}\\[2pt]
-    $ct \gets ct+1$;
-    $M_{ct} \gets 0^m$;
-    $\salt_{ct} \gets \bits^\lambda\setminus \setZ$\\
-    $\setZ \gets \setZ \cup \{\salt_{ct}\}$;
-    $\setS_{ct} \gets \col$\\
-    for $x \in \col$ do\\
-    $\tab\UPO(ct, \up_x)$\\
-    \diffplusbox{while $w(M_{ct}) < \ell+k$ do\\
-    $\tab i \getsr [m]$;
-    $M_{ct}[i] \gets 1$}
-    return $\top$
-
-  \vspace{6pt}\hrule\vspace{3pt}
-
-  \experimentv{$\game_4(D)$}\\[2pt]
-    $M \gets 0^m$\\
-    while $w(M_{ct}) < \ell+k$ do\\
-    $\tab i \getsr [m]$;
-    $M_{ct}[i] \gets 1$\\
-    $D^{\QRYO,\HASHO_1}$;
-    return $\big[\sum_x \err[x] \geq r\big]$
-  \\[6pt]
-  \oraclev{$\QRYO(\qry_x)$}\\[2pt]
-    $X \gets \bmap_m(\HASHO_3(\salt_i \cat x))$\\
-    $a \gets X = M \AND X$\\
-    $\err[x] \gets a$\\
-    return $a$
-}
-\caption{Games 0, 1, and 2 for proof of Theorem~\ref{thm:sbf-erreps-th}.}
-\label{fig:sbf-erreps-th/games}
-\end{figure*}
-
 As before, we assume without loss of generality that there are no insertions of
-or queries for elements of $\col$, and we start with a game~$\game_0$, defined
-in Figure~\ref{fig:sbf-erreps-th/games}, that is identical to the \erreps\ game for
-$\KBF_\mathrm{ft}$.
-
+or queries for elements of $\col$.
+%
 To avoid the unfortunate $q_R$ factor in the bound, we do not make use of
 Lemma~\ref{thm:lemma1} in this proof. Because of that, we must find some other
 way to ensure that $\REVO$ is not useful to the adversary. In particular, if
@@ -102,93 +9,51 @@ calls for one representation will be independent of those for other
 representations, since the unique salt is passed as part of the input. Therefore
 in~$\game_1$ we specify that all salts created will be unique, but deny access
 to $\REVO$. By the birthday bound, the probability of salts repeating
-in~$\game_0$ is no more than $q_R^2/2^\lambda$. If the representations are
-independent, calling $\REVO$ would provide no information about other
-representations, and would in fact only weaken the adversary by causing some
-possible outputs $i \in [q_R]$ to be automatic losses. So we have
-$\Prob{\game_0(\advA) = 1} \le q_R^2/2^\lambda + \Prob{\game_1(\advB) = 1}$,
-where $\advB$ is an adversary that performs identically to $\advA$ but is
-syntactically distinct because it lacks a $\REVO$ oracle.
+in the original game is no more than $q_R^2/2^\lambda$. Since $\REVO$ still does
+not help the adversary, we can also remove the adversary's access to the $\REVO$
+oracle in~$\game_1$.
 
-Next, we want to ensure that the adversary's $\HASHO_1$ queries are independent
-of the $\HASHO_2$ and $\HASHO_3$ queries used for $\REPO$, $\QRYO$, and $\UPO$.
-Since the $\HASHO_c$ oracles use random sampling to fill a shared table, this
-occurs if and only if the adversary calls
-$\HASHO_1(\salt_i \cat x)$
+Next, we want to ensure that the adversary's direct $\HASHO$ queries are
+independent of those made indirectly through $\REPO$, $\QRYO$, and $\UPO$.
+Since $\HASHO$ uses random sampling to fill a shared table, this
+occurs if and only if the adversary hashes $\salt_i \cat x$
 for some salt $\salt_i$ used by one of the representations created by $\REPO$.
 By an argument very similar to that in the previous proofs, the adversary has at
-most $q_H/2^\lambda$ probability of calling $\HASHO_1$ with the salt used by
-some specific representation. However, since there are now $q_R$
+most $q_H/2^\lambda$ probability of doing this for
+each representation. However, since there are now $q_R$
 representations, each with a distinct salt, there is at most a
 $q_Rq_H/2^\lambda$ probability of the adversary correctly guessing a salt.
-In~$\game_1(\advB)$, we set the $\bad_1$ flag if the adversary succeeds in
-guessing the salt in this manner, but the flag does not affect the game. The
-case of~$\game_2(\advB)$ is identical until the $\bad_1$ flag is set, which
-occurs only when a salt is guessed, so we have $\Prob{\game_1(\advB) = 1} \le
-q_Rq_H/2^\lambda + \Prob{\game_2(\advB) = 1}$.
+We therefore add a bad flag which is set if the adversary guesses a salt in this
+manner, and bound away the probability as $q_Rq_H/2^\lambda$.
 
 Now the adversary derives no advantage from guessing the salts of the
-representations, in the sense that the outputs of $\HASHO_1$ are independent of the results
-of all calls to $\REPO$, $\QRYO$, and $\UPO$. The next oracle we want to target
+representations, in the sense that the outputs of $\HASHO$ are independent of the results
+of the outputs of $\REPO$, $\QRYO$, and $\UPO$. The next oracle we want to target
 is $\UPO$. Now that we have a filter threshold, we want to argue that the
 adversary cannot use $\UPO$ to mount an effective attack.
 %
-In~$\game_3(\advC)$, the $\REPO$ oracle creates the filter as normal and then
+To do this, we move to a game where the $\REPO$ oracle creates the filter as normal and then
 randomly sets bits until filter is full (i.e., its Hamming weight is at least
 $\ell$), which is $\ell+k$ (since
 updates are not allowed when more than $\ell$ bits are set, and a single update
-may set at most $k$ bits to 1). For any $\advB$ in~$\game_2$, we can construct
-$\advC$ for~$\game_3$ that obtains at least as large an advantage by having $\advC$
-simulate $\advB$, forwarding all oracle queries in the natural way except that
-$\UPO$ queries are ignored, with $\advC$ simply returning $\top$ to $\advB$ without
-performing any additional computations or oracle calls. (Recall that, in the
-\erreps\ setting, the adversary expects $\top$ to be the output of~$\UPO$.) Since $\advB$ does not
-query elements which are already in $\col$, the outputs of $\HASHO_3$ calls are
-independent of any prior $\HASHO_2$ calls.
-%
-The probability of such an output producing a false positive is strictly a
-function of the number of bits in the filter which have been set to 1.
-%
-Since at least as many bits have been set to 1 in~$\game_3$ as in~$\game_2$,
-every $\QRYO$ call is at least as likely to produce a false positive. Therefore
-$\Prob{\game_2(\advB) = 1} \le \Prob{\game_3(\advC) = 1}$.
+may set at most $k$ bits to 1). Due to the independence results for the different oracles,
+we can argue that this does not decrease the adversary's probability of winning. % Trim from here:
 
-In~$\game_3$, $\UPO$ calls do not actually change the representation. Since each
-representation is created using independent $\HASHO_2$ outputs and then filled
+We next change the game so that calls do not actually change the representation.
+Since each
+representation is created using independent $\HASHO$ outputs and then filled
 in a uniform random manner until $\ell+k$ bits are set to 1, and is never
 modified afterwards, the representations
 themselves are random bitmaps which are uniformly distributed over the set of
 $m$-length bitmaps with $\ell+k$ bits set to 1. This allows us to move
-to~$\game_4(D)$, where the adversary is given a single arbitrary bitmap $\pub$
+a game where the adversary is given a single arbitrary bitmap $\pub$
 of length $m$ with $\ell+k$ bits set to 1 and makes $\QRYO$ calls exclusively
-for $\pub$, winning if it produces $r$ errors for that `representation'. Given
-an adversary $\advC$ for~$\game_3$, we construct a $D$ for~$\game_4$ that simulates
-$\advC$. When $\advC$ makes a $\REPO$ call, $D$ immediately returns $\top$ to $\advC$, and
-when $\advC$ makes a $\QRYO(i,\qry_x)$ call, $D$ selects the lexicographically first
-$y$ that has not yet been queried and calls $\QRYO(y)$, returning the result to
-$\advC$. Random oracle calls are forwarded to $D$'s own random oracle.
-Since representations are uniformly distributed and $\HASHO_3$ calls are
-independent of the $\HASHO_2$ calls used to construct the representation, each
-$\QRYO$ call made by $D$ has the same chance of producing a hit as the $\QRYO$
-call made by $C$ has of producing a false positive.
-%
-The winning conditions differ
-only in that $D$ wins by accumulating $r$ positive results, whereas $C$ must
-accumulate $r$ false positives within a single representation, and so $D$ wins
-if $\advC$ does. Therefore $\Prob{\game_3(\advC) = 1} \le \Prob{\game_4(D) = 1}$.
+for $\pub$, winning if it produces $r$ errors for that `representation'. Since
+the hashes used to construct the representation are independent of the hashes
+used to query the representation, this does not decrease the adversary's
+probability of winning.
 
-However, since $\QRYO$ calls with distinct inputs have independent outputs, each $\QRYO$ call made by $D$ has the same probability of producing a false positive. In particular, the probability of any one of the $k$ outputs of $\HASHO_3$ colliding with a 1 bit is $(\ell+k)/m$, and the probability of all $k$ outputs doing so is then $((\ell+k)/m)^k$. If we let $\setX$ be the set of all inputs made to $\QRYO$, we again have a binomial distribution where $q_T$ queries are made. Letting $p_\ell = ((\ell+k)/m)^k$, we have
-\begin{equation}
-   \Prob{\game_4(D)=1} \le
-     \sum_{i=r}^{q_T} \binom{q_T}{i}p_\ell^i(1-p_\ell)^{q_T-i} \,,
-\end{equation}
-and we can once more apply a Chernoff bound, as long as $p_\ell q_T < r$, to simplify this to
-\begin{equation}
-   \Prob{\game_4(D)=1} \le
-     e^{r-p_\ell q_T}\left(\frac{p_\ell q_T}{r}\right)^r.
-\end{equation}
-%
-Substituting this into our earlier inequalities yields
+Since $\QRYO$ calls with distinct inputs have independent outputs, each $\QRYO$ call made by $D$ has the same probability of producing a false positive. In particular, the probability of any one of the $k$ hashes colliding with a 1 bit is $(\ell+k)/m$, and the probability of all $k$ outputs doing so is then $((\ell+k)/m)^k$. If we let $\setX$ be the set of all inputs made to $\QRYO$, we again have a binomial distribution where $q_T$ queries are made. We can once more apply a Chernoff bound, as long as $p_\ell q_T < r$, to get the final bound of:
 \begin{equation}
    \Adv{\erreps}_{\Pi,\delta,r}(\advA) \leq
      \frac{q_R(q_H+q_R)}{2^\lambda} + e^{r-p_\ell q_T}\left(\frac{p_\ell q_T}{r}\right)^r.

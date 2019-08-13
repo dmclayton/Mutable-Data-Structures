@@ -1,125 +1,22 @@
-\begin{figure*}
-\twoCols{0.47}
-{
-  \vspace{-7pt}
-  \experimentv{$\game_{0}(\advA)$}\\[2pt]
-    $\key \getsr \keys$;
-    $\ct \gets 0$\\
-    $i \getsr \advA^{\REPO,\QRYO,\UPO}$;
-    return $\big[\sum_x \err_i[x] \geq r\big]$
-  \\[6pt]
-  \oraclev{$\PRFO(\salt \cat x)$}\hfill\diffminus{$\game_0$}\diffplus{$\game_1$}\\[2pt]
-    \diffminus{$\vv \gets F_K(\salt \cat x)$}\\
-    \diffplusbox{$\vv \getsr [m]^k$\\
-    if $T[Z,x] = \bot$ then $\vv \gets T[Z,x]$\\
-    $T[Z,x] \gets \vv$; return $\vv$}
-  \\[6pt]
-  \oraclev{$\QRYO(i, \qry_x)$}\\[2pt]
-    $X \gets \bmap_m(\PRFO(\salt_i \cat x))$;
-    $a \gets X = M_i \AND X$\\
-    if $\err_i[x] < \delta(a,\qry_x(\col_i))$ then
-          $\err_i[x] \gets \delta(a,\qry_x(\col_i))$\\
-    return $a$
-  \\[6pt]
-  \oraclev{$\REPO(\col)$}\\[2pt]
-    $\ct \gets \ct+1$;
-    $\setS_{\ct} \gets \col$;
-    $\salt_{\ct} \getsr \bits^\lambda$;
-    $c_{\ct} \gets |\col|$\\
-    $M_{\ct} \gets \bigvee_{x \in \col} \bmap_m(\PRFO(\salt_{\ct} \cat x))$;
-    return $\langle M_{\ct}, \salt_{\ct}, c_{\ct} \rangle$
-  \\[6pt]
-  \oraclev{$\UPO(i, \up_x)$}\\[2pt]
-    if $w(M) > \ell$ then return $\top$\\
-    if $\QRYO(\qry_x) = 1$ then $\err_i[x] \gets 0$\\
-    $M_i \gets M_i \vee \bmap_m(\PRFO(\salt_i \cat x))$;
-    $\setS_i \gets \up_x(\setS_i)$;
-    return $\langle M_i, \salt_i, c_i+1\rangle$
-}
-{
-  \vspace{-7pt}
-  \experimentv{$\game_2(\advA)$}\hfill\diffplus{$\game_3$}\\[2pt]
-    $\key \getsr \keys$;
-    $\ct \gets 0$;
-    $\setZ \gets \emptyset$\\
-    $i \getsr \advA^{\REPO,\QRYO,\UPO}$;
-    return $\big[\sum_x \err_i[x] \geq r\big]$
-  \\[6pt]
-  \oraclev{$\REPO(\col)$}\\[2pt]
-    $\ct \gets \ct+1$;
-    $\setS_{\ct} \gets \col$;
-    $\salt_{\ct} \getsr \bits^\lambda \setminus \setZ$;
-    $c_{\ct} \gets |\col|$\\
-    $\setZ \gets \setZ \cup \{\salt_{\ct}\}$\\
-    $M_{\ct} \gets \bigvee_{x \in \col} \bmap_m(\PRFO(\salt_{\ct} \cat x))$;
-    return $\langle M_{\ct}, \salt_{\ct}, c_{\ct} \rangle$
-  \\[6pt]
-  \oraclev{$\QRYO(i, \qry_x)$}\\[2pt]
-    $X \gets \bmap_m(\PRFO(\salt_i \cat x))$;
-    $a \gets X = M_i \AND X$\\
-    if $\err_i[x] < \delta(a,\qry_x(\col_i))$ then
-          $\err_i[x] \gets \delta(a,\qry_x(\col_i))$\\
-    \diffplus{$\UPO(i, \up_x)$;}
-    return $a$
-  \\[4pt]
-  \hrule
-  \vspace{2pt}
-  \oraclev{$\QRYO(i, \qry_x)$}\hfill\diffminus{$\game_3$}\diffplus{$\game_4$}\\[2pt]
-    \diffminusbox{
-    $X \gets \bmap_m(\PRFO(\salt_i \cat x))$;
-    $a \gets X = M_i \AND X$\\
-    if $\err_i[x] < \delta(a,\qry_x(\col_i))$ then
-          $\err_i[x] \gets \delta(a,\qry_x(\col_i))$\\
-    $\UPO(i, \up_x)$;
-    return $a$
-    }
-    \diffplusbox{
-    for $j \in [\ct]$ do\\
-    $\tab X \gets \bmap_m(\PRFO(\salt_j \cat x))$;
-    $a_j \gets X = M_j \AND X$\\
-    $\tab$if $\err_j[x] < \delta(a_j,\qry_x(\col_j))$ then
-          $\err_j[x] \gets \delta(a_j,\qry_x(\col_j))$\\
-    $\tab\UPO(j, \up_x)$\\
-    return $a_i$}
-}
-\caption{Games 0--4 for proof of Theorem~\ref{thm:bf-key-bound}.}
-\label{fig:kbf-errep/games}
-\end{figure*}
-
-We start with a game~$\game_0$, shown in Figure~\ref{fig:kbf-errep/games}, which is essentially the same as the standard
-\errep\ experiment on a Bloom filter, given the assumption (without loss of
-generality) that the adversary never attempts to construct a representation for
-a set with more than~$n$ elements.
-%
-%As with the other proofs, it is easy to see
-%that for any such \errep\ adversary we can make an adversary $\advA$
-%for~$\game_0$ with the same resources that achieves the same advantage.
-%
 Unlike in the previous two proofs, we cannot use Lemma~\ref{thm:lemma1} because
-an adversary cannot simulate the oracles without knowing the private key. We use
-an alternate approach to gradually reduce to the standard binomial bound
-deriving from the non-adaptive false positive probabilities. The first thing we
+an adversary cannot simulate the oracles without knowing the private key. Instead,
+the first thing we
 want to do is to bound the probability that the adversary can break the PRF.
 
 The number of times the PRF is evaluated on distinct inputs is bounded by the
 number of queries available to the adversary. In particular, $\QRYO$ and $\UPO$
-each call the PRF once, while $\REPO$ may call the PRF up to $n$ times. Thus,
-when executed with~$\advA$, game~$\game_0$ makes at most~$Q = q_T + q_U + nq_R$
+each call the PRF once, while $\REPO$ may call the PRF up to $n$ times. Thus
+there are at most~$Q = q_T + q_U + nq_R$
 queries to~$\PRFO$.
 %
-In~$\game_1$, we have a game which is identical to~$\game_0$ except that it uses
+In~$\game_1$, we have a game which is identical to the original except that it
+uses
 random sampling in place of the PRF. If $\advA$ cannot distinguish the PRF from
 a random function then these games are indistinguishable from the adversary's
 perspective.
 %
 We exhibit a $O(t)$-time, \prf-adversary~$D$ making at most~$Q$ queries to its
-oracle such that
-%
-\begin{equation}
-  \Adv{\prf}_F(D) = \Prob{\game_0(\advA)=1} - \Prob{\game_1(\advA)=1} \,.
-\end{equation}
-%
-Adversary~$D^{\,\PRFO}$ works by executing~$\advA$ in game~$\game_1$, except
+oracle. Adversary~$D^{\PRFO}$ works by executing~$\advA$ in game~$\game_1$, except
 that whenever the game calls \emph{its}~$\PRFO$, adversary~$D$ uses its
 own oracle to compute the response.
 %
@@ -129,20 +26,7 @@ then~$D$ outputs~$1$ as its guess; otherwise it outputs~$0$.
 Then conditioning on the outcome of the coin flip~$b$ in~$D$'s game, we have that
 %
 \begin{eqnarray}
-  \Adv{\prf}_F(D) &=&
-    2\Prob{\Exp{\prf}_F(D)=1}-1 \\
-  &=&
-    2\,\Big(
-      1/2\Prob{\Exp{\prf}_F(D)=1 \given b=1} \\
-  && +\hspace{4pt}
-      1/2\Prob{\Exp{\prf}_F(D)=1 \given b=0}
-    \Big) - 1 \\
-  &=&
-    \Prob{\Exp{\prf}_F(D)=1 \given b=1} \\
-  && +\hspace{4pt}
-      \Prob{\Exp{\prf}_F(D)=1 \given b=0}
-     - 1 \\
-  &=& \Prob{\game_0(\advA)=1} - \Prob{\game_1(\advA)=1} \,.
+  \Adv{\prf}_F(D) &=& \Prob{\game_0(\advA)=1} - \Prob{\game_1(\advA)=1} \,.
 \end{eqnarray}
 %
 Next, our goal is to argue, in a similar manner as to the previous theorems, that all
@@ -173,21 +57,10 @@ representations that are not already full. Since all $\UPO$ calls are
 identically and independently distributed, and having more elements in a filter
 cannot decrease the false positive rate, the fact that some representations may
 become full more quickly than they otherwise would have can only help the
-adversary. Similarly, having $\QRYO$ count errors across all representations
-never harms the adversary, and so the adversary's advantage may only increase
-when moving to~$\game_4$,
-i.e. $\Prob{\game_3(\advB) = 1} \le \Prob{\game_4(\advB) = 1}$.
+adversary.
 
-We are now in a situation where we can apply the standard, non-adaptive error
-bound. Let $\setX$ be the set of all queries $\qry_x$ made by the adversary over
-the course of the game. As in the previous proof, we have $|\setX| \le q_T$.
-However, $\qry_x$ may now cause a false positive in any of the representations.
-The probability of causing a false positive in a specific representation is
-still given by the non-adaptive false positive probability $p'$ for a Bloom
-filter containing $n+r$ elements. Since the representations are independent of
-each other, the probability of a false positive occurring in any of up to $q_R$
-representations is at most $p'q_R$. We can therefore bound the adversary's
-as before. In particular,
+We come again in a situation where we can apply the standard, non-adaptive error
+bound, using the same sort of bound for the binomail distribution:
 \begin{equation}
    \Prob{\game_4(\advB)=1} \le
      e^{r-p'q_Rq_T}\left(\frac{p'q_Rq_T}{r}\right)^r.
