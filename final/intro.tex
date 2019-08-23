@@ -193,7 +193,9 @@ of the structure/attack-model landscape.
     \hline
     {\bf Structure} & {\bf Results}\\ \hline
     \parbox[c][2.4cm]{2.5cm}{Bloom\;filter\\(Fig.~\ref{fig:bf-def}, Fig.~\ref{fig:bft-def})}
-          & \parbox[c][2cm]{5cm}{Traditional implementation insecure.\\\emph{Immutable} structures can be secured with per-representation salt. \emph{Mutable} structures additionally require a secret key or\\keeping representations private, and benefit from thresholding.}
+          & \parbox[c][2cm]{5cm}{Traditional implementation
+            insecure.\\\emph{Immutable case:} structure can be secured
+    with per-representation salt. \emph{Mutable case:} structure additionally require a secret key or\\keeping representations private, and benefit from thresholding.}
           \\ \hline
     \parbox[c]{2.5cm}{Counting filter (Fig.~\ref{fig:cbf-def})}
           & \parbox[c][1.6cm]{5cm}{Traditional implementation insecure.\\Security can be achieved by combining a per-representation salt, thresholding, and private representations.}
