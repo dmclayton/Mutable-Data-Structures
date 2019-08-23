@@ -2,7 +2,7 @@ Probabilistic data structures, which use space-efficient
 representations of data to provide (approximately correct) answers to
 queries about the data, find myriad uses in modern communication,
 storage, and computational systems.  The Bloom
-filter~\cite{bloom1970space}, for example, are
+filter~\cite{bloom1970space}, for example, is
 ubiquitous in distributed computing, including web caches (e.g., Squid) and hash
 tables (e.g., BigTable and Hadoop), resource and packet routing, and network
 measurement. (We refer the reader to the
@@ -18,55 +18,62 @@ partial information and prior observations about the data structure. Attacks of
 this sort can be used to disrupt or reduce the availability of real systems
 \cite{crosby2003denial,gerbet2015power,lipton1993clocked}.
 
-Naor and Yogev (NY) formalized a notion of adversarial correctness for
-Bloom-filter-like structures. A Bloom filter acts as a representation
-of a set~$\col$. Instead of storing exact containment information, the filter is
-a length-$m$ bit-array (initially all zeros), where~$m$ is much less than the
-number of bits needed to store~$\col$ in full.  Elements $x \in \col$ are added
-to the representation by computing multiple hash values
+Naor and Yogev (hereafter NY) formalized a notion of adversarial correctness for 
+Bloom-filter-like structures.  Recall that a Bloom filter encodes a
+set~$\col$ into a length-$m$ array of bits (initially all zeros), where~$m$ is much less than the
+number of bits needed to store~$\col$ in full.  Elements $x \in \col$
+are encoded by computing multiple hash values
 $h_1(x),h_2(x),\ldots,h_k(x)\in [m]$, then setting the indicated array positions
-to~$1$.  A Bloom filter supports set membership queries, i.e., ``is
-$x\in\col$?'', by hashing~$x$ and responding positively iff all of the indicated
-positions hold a 1-bit. We will often refer to Bloom filters and similar
-structures as `representations' because they represent the data from a set or
-multiset without actually storing the entire (multi)set in full. Because of the
-compact nature of a Bloom filter, query-response errors are admitted.
-When $h_1,\ldots,h_k$ are modeled
-as random functions, and~$\col$ is independent of these, classical results
-relate $|\col|,m,k$ to the probability of false-positive query
-responses~\cite{broder2004network,kirsch2006less}.
+to~$1$.  This bit-array representation of~$\col$ allows for
+set membership queries, i.e., ``is $x\in\col$?'', 
+by hashing~$x$ and responding positively iff all of the indicated
+positions hold a 1-bit. 
+%We will often refer to Bloom filters and similar
+%structures as `representations' because they represent the data from a set or
+%multiset without actually storing the entire (multi)set in full. 
+False-negative respones are not possible, but false-positive responses
+are.  Classical results relate $|\col|,m,k$ to the probability of false-positive query
+responses~\cite{broder2004network,kirsch2006less}, where the
+probability is over the sampling of the hash functions.  (These are
+usually modeled as independent random functions.)  
+Crucially, these results assume that $\col$ and the $h_1,\ldots,h_k$ are independent of
+each other.  Said another way, even if~$\col$ is adversarially chosen,
+this choice cannot depend on particular hash functions that are used
+to produce the Bloom filter and compute the query responses.
 %
-NY revisited these results from a security perspective, by
-formalizing an attack model in which the adversary specifies a
-(fixed) set~$\col$ that may
-depend on the hash functions, and is then allowed to make adaptive
-set-membership queries, in an effort to induce errors.
+The conceptual innovation of NY was remove this assumption an explore
+the consequences upon the probability of Bloom filter query-response errors.  In
+particular, NY allowed the adversary to specify a (fixed)
+set~$\col$ that may depend on the hash functions, and then attempt to
+induce errors via set-membership queries.
 
-This work expands upon NY in several, practically relevant ways.  To begin, our
+We expand upon NY in several ways.  First, our
 attack model allows the adversary to adaptively \emph{update} the
-collection~$\col$, thereby capturing settings in which the target data may
-change over time, e.g., streaming data applications. Many data structures are
-designed for this setting and natively support \emph{mutable} representations,
-such as the counting filter~\cite{fan2000summary}, count-min
+collection~$\col$ during its attack.  This captures settings in which
+the data to be represented may change over time, e.g., streaming data applications.
+Many data structures are designed for such settings ---~e.g.,
+the counting filter~\cite{fan2000summary}, count-min
 sketch~\cite{cormode2005improved}, cuckoo filter~\cite{fan2014cuckoo}, and
-stable Bloom filter~\cite{deng2006approximately}, and our syntax is designed to
-capture these data structures.
+stable Bloom filter~\cite{deng2006approximately}~--- by providing
+updatable, or\emph{mutable}, representations.  Our syntactic formalization of
+data structures captures this reality. 
 %Attacks that treat representations as immutable (after creation) are captured as a special case.
 
 %What all of these have in common is that they are designed to \emph{compactly}
 %represent the data so that certain types of mutations and queries are supported,
 %but a small amount of error is permitted.
 %
-While the Bloom filter was designed to represent data collections~$\col$
+Next, while the Bloom filter was designed to represent data collections~$\col$
 that are sets, streaming data (for example) is more accurately 
-modeled as a multiset.  Natural questions about multisets extend beyond set-membership; an
-important question in practice is \emph{how many times does~$x$ appear
-in~$\col$?} 
+modeled as a multiset.  Here, one is often interested in information
+about frequency, e.g., ``how many times does~$x$ appear
+in~$\col$?''
 %As with Bloom filters, the challenge is to answer this question with
 %as little space consumption as possible, at the cost of admitting a reasonable
 %amount of error.
-Thus, our syntactic definition of data structures admits both mutability and rich
-query spaces.  Formally, a data structure is a triple of algorithms $(\Rep,
+Thus, in addition to admiting mutable respresentation, our
+formalization of data structures allows for rich
+query spaces.  Specifically, we define a data structure to be a triple of algorithms $(\Rep,
 \Qry, \Up)$ denoting the \emph{representation}, \emph{query-evaluation}, and
 \emph{update} algorithms, respectively. Associated to the data structure is a
 set of supported query \emph{functions}~$\mathcal{Q}$, and a set~$\mathcal{U}$
