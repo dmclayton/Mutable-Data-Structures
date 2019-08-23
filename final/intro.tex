@@ -47,14 +47,19 @@ particular, NY allowed the adversary to specify a (fixed)
 set~$\col$ that may depend on the hash functions, and then attempt to
 induce errors via set-membership queries.
 
+We expand upon NY in several ways, providing syntax and security
+notions that allow analysis of a large class of data structures (not
+only Bloom filters), in settings where the data may not be a set and
+may change over time, and where the structure's representation of the data may (or may not) be publicly visible.
+ 
+\paragraph{Beyond sets and Bloom filters}
 We expand upon NY in several ways.  First, our
 attack model allows the adversary to adaptively \emph{update} the
 collection~$\col$ during its attack.  This captures settings in which
 the data to be represented may change over time, e.g., streaming data applications.
-Many data structures are designed for such settings ---~e.g.,
-the counting filter~\cite{fan2000summary}, count-min
+Many data structures are designed for such settings ---~the counting filter~\cite{fan2000summary}, count-min
 sketch~\cite{cormode2005improved}, cuckoo filter~\cite{fan2014cuckoo}, and
-stable Bloom filter~\cite{deng2006approximately}~--- by providing
+stable Bloom filter~\cite{deng2006approximately}, to name a few~--- by providing
 updatable, or\emph{mutable}, representations.  Our syntactic formalization of
 data structures captures this reality. 
 %Attacks that treat representations as immutable (after creation) are captured as a special case.
@@ -65,7 +70,7 @@ data structures captures this reality.
 %
 Next, while the Bloom filter was designed to represent data collections~$\col$
 that are sets, streaming data (for example) is more accurately 
-modeled as a multiset.  Here, one is often interested in information
+modeled as a multiset.  Here one is often interested in information
 about frequency, e.g., ``how many times does~$x$ appear
 in~$\col$?''
 %As with Bloom filters, the challenge is to answer this question with
@@ -89,37 +94,40 @@ multiset~$\col$ as an array of~$m$ integers; these serve as counters.
 To add~$x$ to~$\col$, hash values $h_1(x), \ldots,
 h_k(x)\in[m]$ are computed, and the indicated counters are
 incremented.  Decrementing the counters implements \emph{deletion} of
-an occurrence of~$x$ from~$\col$. (Counters are typically floored at 0.)
+an occurrence of~$x$ from~$\col$. %(Counters are typically floored at 0.)
 %
-Like Bloom filters, counting filters provide approximately correct
-answers to set-membership queries.  (Indeed, they were initially
+Like a Bloom filter, a counting filter provide approximately correct
+answers to set-membership queries\footnote{Indeed, they were initially
 introduced to support deletions from a \emph{set}, without having to
-rebuild the representation, as one would for a Bloom filter.) 
-The membership of~$x\in\col$ is determined by checking that all of the
-associated counters are at least one.%
+rebuild the representation, as one would for a Bloom filter.}, where a
+query about~$x$ results in a positive response iff all of the
+hash-indicated counters are at least one.%
 %
-
 %
-This structure admits both false-positive \emph{and} false-negative responses.
+%
+Unlike a Bloom filter, this structure admits both false-positive \emph{and} false-negative responses.
 In particular, if the representation is updated by ``removing'' an element~$y$
 that does not appear in the underlying~$\col$, one or more of the counters
 associated to~$x$ may be decremented, potentially causing~$x$ to become a false
 negative.
 
-In this paper, we consider the behavior of these structures in adversarial
-environments: under what circumstances can an adaptive adversary produce a large
-number of errors? We show that the standard implementations of these structures
-are not secure, but that with a series of simple and efficient embellishments we
-can establish reasonable provable security bounds. While we focus primarily on
-the familiar case of Bloom filters, we also show that our syntax and security
-notions can be used to capture other probabilistic structures by looking at the
-case of the count min-sketch.
+%In this paper, we consider the behavior of these structures in adversarial
+%environments: under what circumstances can an adaptive adversary produce a large
+%number of errors? We show that the standard implementations of these structures
+%are not secure, but that with a series of simple and efficient embellishments we
+%can establish reasonable provable security bounds. While we focus primarily on
+%the familiar case of Bloom filters, we also show that our syntax and security
+%notions can be used to capture other probabilistic structures by looking at the
+%case of the count min-sketch.
 
-When admitted queries may return non-binary results, e.g.,
-frequency-of-element queries, defining a notion of `error' becomes non-obvious.
-Even in the traditional, non-adaptive setting, one is
-typically only guaranteed that responses will be close to correct,
-with probability close to one. 
+Both the Bloom and counting filters have binary query responses,
+making the notion of response error easy to define: the response is
+correct, or it isn't.  But practically important structures, like the count-min sketch, admit
+frequency-of-element queries, which have integer responses.  What
+constitutes an error is less clear, when this is the case.
+Even in the traditional analyses (i.e., non-adaptive attacks) one is
+guaranteed only that responses will be ``close'' to correct,
+with probability ``close'' to one. 
 %In general, more structures with more complex data objects and queries may require a more sophisticated classification of errors than a simple binary indicator.
 We therefore parameterize our security experiments with a specifiable
 \emph{error function}~$\delta$.  If the correct response to an adversarial
@@ -128,11 +136,12 @@ experiments award the adversary with an error weight $\delta(a,a') \geq 0$.
 %
 Our experiments are additionally parameterized by an \emph{error capacity}
 $r\geq0$, and the adversary is considered to ``win'' if the total cost of the
-errors it induces is greater than this value.  As we will see, even calculating
-the total cost is not straightforward.  In particular, we must determine whether
+errors it induces is greater than this value.  As it turns out, even calculating
+this total cost is not straightforward in our setting: one must determine whether
 or not the cost of a given error should be carried across (adaptive,
 adversarial) updates to~$\col$ and its representation.
 
+\paragraph{Public vs.\ Private Representations}
 We define two experiments, one in which representations are shown to
 the adversary, and one in which they are not.
 %
@@ -165,6 +174,7 @@ structure~\cite{gerbet2015power}.
 %correctness for these.  Our notions capture settings in which representations
 %are made public, or kept private, respectively.
 
+\paragraph{Case studies and our findings}
 We exercise our syntax and notions by analyzing three important, real-world data
 structures: Bloom filters~\cite{bloom1970space} (Section~\ref{sec:bloom}), count
 min-sketches~\cite{cormode2005improved} (Section~\ref{sec:sketch}), and counting
@@ -189,7 +199,7 @@ of the structure/attack-model landscape.
           & \parbox[c][1.6cm]{5cm}{Traditional implementation insecure.\\Security can be achieved by combining a per-representation salt, thresholding, and private representations.}
           \\ \hline
   \end{tabular}
-\caption{A summary of the results found in the paper.}
+\caption{A high-level, informal summary of our results.}
   \label{fig:results-summary}
 \end{center}
 \end{figure}
@@ -207,7 +217,7 @@ However, depending on the security setting (public vs.\ private
 representation, updates allowed vs. not), these structures can be refined in
 simple, intuitive ways that allow us to prove security.
 
-\heading{Bloom filters}
+\paragraph{Bloom filters, our in-depth study}
 %
 It is well-known that standard Bloom filters do not perform well in adversarial
 settings~\cite{naor2015bloom,gerbet2015power}; we first corroborate these
