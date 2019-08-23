@@ -179,7 +179,10 @@ We exercise our syntax and notions by analyzing three important, real-world data
 structures: Bloom filters~\cite{bloom1970space} (Section~\ref{sec:bloom}), count
 min-sketches~\cite{cormode2005improved} (Section~\ref{sec:sketch}), and counting
 filters~\cite{fan2000summary} (Appendix~\ref{sec:count}), summarized in
-Figure~\ref{fig:tab-structures}. Each of these supports different queries and
+Figure~\ref{fig:tab-structures}. Our studies examine the basic
+versions of each, as well as variants that may take a key or a
+per-representation random salt, and variants that incorporate measures
+of representation saturation.  Each of the basic structures supports different queries and
 update operations; taken together, they provide interesting coverage
 of the structure/attack-model landscape.
 
@@ -205,17 +208,18 @@ of the structure/attack-model landscape.
 \end{figure}
 
 We find
-that \emph{none of these structures meets either of our security notions}, at least as
-they are usually deployed. In particular, if the data being represented,
+that \emph{none of the (basic) structures meets either of our security
+  notions}.  In particular, if the data being represented,
 the updates, and the queries all may depend on the choice of hash function, then each of
 these structures is susceptible to a class of attacks we call \emph{target-set
-coverage attacks} (described in Section~\ref{sec:bad-bfs}). (These are closely
+coverage attacks} (described in Section~\ref{sec:bad-bfs}).  These are closely
 related to \emph{pollution attacks} against standard Bloom
-filters~\cite{gerbet2015power}, which we will discuss in some detail.)
-%
-However, depending on the security setting (public vs.\ private
-representation, updates allowed vs. not), these structures can be refined in
-simple, intuitive ways that allow us to prove security.
+filters~\cite{gerbet2015power}, which we will discuss in some detail.
+
+On the positive side, we show how these structures can be
+modified in order to prove security.  These modification are conceptually
+straightforward and intuitive; we do not, however, study the deployment
+implications of these modifcations.
 
 \paragraph{Bloom filters, our in-depth study}
 Due to their wide-spread and varied use (and following NY), we begin
