@@ -218,6 +218,8 @@ representation, updates allowed vs. not), these structures can be refined in
 simple, intuitive ways that allow us to prove security.
 
 \paragraph{Bloom filters, our in-depth study}
+Due to their wide-spread and varied use (and following NY), we begin
+with a deep look at Bloom filters.
 %
 It is well-known that standard Bloom filters do not perform well in adversarial
 settings~\cite{naor2015bloom,gerbet2015power}; we first corroborate these
@@ -235,7 +237,8 @@ This leads to our first positive result, for this \emph{salted} Bloom filter, in
 public-representation setting when attacks treat representations as
 immutable (i.e., updates are forbidden); this is Theorem~\ref{thm:sbf-errep-immutable}.
 %
-Following the traditional approach~\cite{broder2004network}, we model the hash functions as random oracles
+Following the traditional approach~\cite{broder2004network}, we model
+the hash functions as random oracles 
 (ROM)~\cite{BR93}.  Our security argument must account for any hash-exploiting
 precomputation performed by the adversary via the random oracle. This leads to
 fairly weak bounds, which means that larger filters must be used to achieve a
@@ -271,7 +274,7 @@ to completely control the filter's construction and make up to $2^{16}$ queries
 (see Figure~\ref{fig:bf-th}).
 
 
-\heading{Count min-sketches}
+\paragraph{Count min-sketches}
 Following the deep dive into Bloom filters in Section~\ref{sec:bloom}, we then
 consider count min-sketches (CMS), which provide a compact representation of a
 multiset, allowing additions and deletions, and yielding approximate queries for
