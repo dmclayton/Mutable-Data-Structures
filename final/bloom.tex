@@ -337,6 +337,18 @@ hash function, the adversary's attack is largely \emph{online}, rendering
 the~$q$ term quite pessimistic. In these settings, a significantly smaller
 filter will do.
 
+Figure~\ref{fig:bf-bound} shows filters comparable in size to those discussed
+in~\cite{gerbet2015power}, but Bloom filters used in practice are sometimes much
+larger, on the order of $2^{20}$ or $2^{30}$. We also find benefits in these
+settings. For example, we can use a~$32$GB filter to store $2^{30}$ elements,
+each hashed~$16$ times, in
+such a way that an adversary making $2^{64}$ queries has a less than
+$2.2 \times 10^{-3}$ probability of producing~$5$ or more errors, and less than
+an~$8.3 \times 10^{-9}$ probability of producing~$10$ or more errors. Again, in
+the \erreps\ setting or when using a PRF, the number of adversarial queries is
+likely to be much smaller than this, and so the filter itself can also be made
+much smaller.
+
 \begin{figure}
   \hspace*{-10pt}
   \includegraphics{fig/bf-bound}

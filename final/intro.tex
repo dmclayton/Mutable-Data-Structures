@@ -160,14 +160,16 @@ The \erreps\ game is defined in much the same way, except that representations
 are not shown to the adversary unless it explicitly asks for them to be
 revealed.
 
-Intuitively, \errep\
-security is stronger than \erreps, so would seem the more desirable
-target.  But for many of the structures we analyze here, security is only achievable in
-the \erreps\ setting.
-%
-We note that the \erreps\ setting is of significant practical interest, as there are many
-applications in which the adversary should not have unfettered access to the
-structure~\cite{gerbet2015power}.
+There are many applications in which the adversary would not have unfettered
+access to the structure~\cite{gerbet2015power}, and for which the assumption of
+a private data structure is most fitting. However, we do not want to rule out
+the possibility that the adversary may eventually learn the contents of some
+data structures, which are likely to have looser access controls than long-term
+private keys or similar critical data. When possible, we would also like to
+account for cases where the adversary may be able to freely view the data
+structures as well, such as in the cases where Bloom filters are used for
+distributed computations. This corresponds to the \errep\ case, though this is a
+much stronger notion which we will find is not always achievable.
 
 %To summarize, our high-level contributions are: formal syntax for
 %mutable data structures, and two notions of adversarial

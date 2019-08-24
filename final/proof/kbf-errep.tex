@@ -24,10 +24,7 @@ Finally, when~$\advA$ halts, if the winning condition in~$\game_1$ is satisfied,
 then~$D$ outputs~$1$ as its guess; otherwise it outputs~$0$.
 %
 Then conditioning on the outcome of the coin flip~$b$ in~$D$'s game, we have that
-%
-\begin{eqnarray}
-  \Adv{\prf}_F(D) &=& \Prob{\game_0(\advA)=1} - \Prob{\game_1(\advA)=1} \,.
-\end{eqnarray}
+$\Adv{\prf}_F(D) = \Prob{\game_0(\advA)=1} - \Prob{\game_1(\advA)=1}$.
 %
 Next, our goal is to argue, in a similar manner as to the previous theorems, that all
 of the oracle calls are independent. In order to guarantee this we must deal
