@@ -53,8 +53,7 @@ only Bloom filters), in settings where the data may not be a set and
 may change over time, and where the structure's representation of the data may (or may not) be publicly visible.
  
 \paragraph{Beyond sets and Bloom filters}
-We expand upon NY in several ways.  First, our
-attack model allows the adversary to adaptively \emph{update} the
+Our first significant extension of NY is that our attack model allows the adversary to adaptively \emph{update} the
 collection~$\col$ during its attack.  This captures settings in which
 the data to be represented may change over time, e.g., streaming data applications.
 Many data structures are designed for such settings ---~the counting filter~\cite{fan2000summary}, count-min
