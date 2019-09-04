@@ -33,7 +33,7 @@
     if $w(M) > \ell$ then return $\top$\\
     if $\QRYO(\qry_x) = 1$ then $\err_i[x] \gets 0$\\
     $M_i \gets M_i \vee \bmap_m(\PRFO(\salt_i \cat x))$;
-    $\setS_i \gets \up_x(\setS_i)$;
+    $\setS_i \gets \up_x(\setS_i)$\\
     return $\langle M_i, \salt_i, c_i+1\rangle$
 }
 {
@@ -68,8 +68,8 @@
     \diffminusbox{
     $X \gets \bmap_m(\PRFO(\salt_i \cat x))$;
     $a \gets X = M_i \AND X$\\
-    if $\err_i[x] < \delta(a,\qry_x(\col_i))$ then
-          $\err_i[x] \gets \delta(a,\qry_x(\col_i))$\\
+    if $\err_i[x] < \delta(a,\qry_x(\col_i))$ then\\
+    \tab$\err_i[x] \gets \delta(a,\qry_x(\col_i))$\\
     $\UPO(i, \up_x)$;
     return $a$
     }
@@ -77,8 +77,8 @@
     for $j \in [\ct]$ do\\
     $\tab X \gets \bmap_m(\PRFO(\salt_j \cat x))$;
     $a_j \gets X = M_j \AND X$\\
-    $\tab$if $\err_j[x] < \delta(a_j,\qry_x(\col_j))$ then
-          $\err_j[x] \gets \delta(a_j,\qry_x(\col_j))$\\
+    $\tab$if $\err_j[x] < \delta(a_j,\qry_x(\col_j))$ then\\
+    \tab\tab$\err_j[x] \gets \delta(a_j,\qry_x(\col_j))$\\
     $\tab\UPO(j, \up_x)$\\
     return $a_i$}
 }
@@ -133,14 +133,10 @@ Then conditioning on the outcome of the coin flip~$b$ in~$D$'s game, we have tha
     2\Prob{\Exp{\prf}_F(D)=1}-1 \\
   &=&
     2\,\Big(
-      1/2\Prob{\Exp{\prf}_F(D)=1 \given b=1} \\
-  && +\hspace{4pt}
-      1/2\Prob{\Exp{\prf}_F(D)=1 \given b=0}
+      1/2\Prob{\Exp{\prf}_F(D)=1 \given b=1} + 1/2\Prob{\Exp{\prf}_F(D)=1 \given b=0}
     \Big) - 1 \\
   &=&
-    \Prob{\Exp{\prf}_F(D)=1 \given b=1} \\
-  && +\hspace{4pt}
-      \Prob{\Exp{\prf}_F(D)=1 \given b=0}
+    \Prob{\Exp{\prf}_F(D)=1 \given b=1} + \Prob{\Exp{\prf}_F(D)=1 \given b=0}
      - 1 \\
   &=& \Prob{\game_0(\advA)=1} - \Prob{\game_1(\advA)=1} \,.
 \end{eqnarray}
@@ -196,8 +192,7 @@ as before. In particular,
 So, substituting this bound back into the earlier advantage inequalities, we find the final bound of
 \begin{equation*}
   \begin{aligned}
-    \Adv{\errep}_{\Pi,\delta,r}(\advA) &\leq \\
-      \Adv{\prf}_F(D) &  +
+    \Adv{\errep}_{\Pi,\delta,r}(\advA) &\leq \Adv{\prf}_F(D) &  +
     \frac{q_R^2}{2^\lambda} +
     \left(\frac{p'q_Rq_T}{r}\right)^re^{r-p'q_Rq_T} \,.
   \end{aligned}

@@ -92,11 +92,10 @@ $O(kr)$ within all of the parameter ranges we tested.
 %
 \newcommand{\mydot}{{\scriptsize\ding{108}}}
 \newcommand{\myex}{{\scriptsize\ding{53}}}
-\begin{SCfigure*}
-\centering
-\includegraphics[page=1,scale=0.675]{fig/bf-correct-attk-sim}
-\caption{
-  %
+\begin{figure}
+  \includegraphics[scale=0.8]{fig/bf-correct-attk-sim}
+  \caption{
+    %
   Success rate and average-case time complexity for the optimized attack on classic
   Bloom filter.
   %
@@ -106,9 +105,9 @@ $O(kr)$ within all of the parameter ranges we tested.
   %
   Default parameters are $k=4$, $m=2^{10}$, $n=100$, $r=1$, and $s=2^{10}$.
   In each plot, one of these parameters is varied.
-}
-\label{fig:bf-correct-attk-sim}
-\end{SCfigure*}
+  }
+  \label{fig:bf-bound}
+\end{figure}
 
 \ignore{
 \heading{Privacy.}

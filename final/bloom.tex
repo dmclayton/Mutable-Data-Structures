@@ -1,5 +1,5 @@
 \begin{figure}
-  \twoColsNoDivide{0.22}
+  \twoColsNoDivide{0.33}
   {
     \underline{$\Rep^R_K(\col)$}\\[2pt]
       $\salt \getsr \bits^\lambda$ \com{Choose a salt $\salt$}\\
@@ -274,8 +274,7 @@ we can prove the following.
   that
   \begin{equation*}
     \begin{aligned}
-            \Adv{\errep}_{\Pi,\delta,r}(t,\,&q_R,q_T,0,q_H) \leq \\
-        & q_R \cdot \left[\frac{q_H}{2^\lambda} +
+            \Adv{\errep}_{\Pi,\delta,r}(t,\,&q_R,q_T,0,q_H) \leq q_R \cdot \left[\frac{q_H}{2^\lambda} +
         \left(\frac{pq}{r}\right)^re^{r-pq}\right] \,,
     \end{aligned}
   \end{equation*}
@@ -334,31 +333,34 @@ offline.
 %
 In the \erreps\ setting, or in the \errep\ setting when we use a PRF instead of a
 hash function, the adversary's attack is largely \emph{online}, rendering
-the~$q$ term quite pessimistic. In these settings, a significantly smaller
-filter will do.
-
-Figure~\ref{fig:bf-bound} shows filters comparable in size to those discussed
-in~\cite{gerbet2015power}, but Bloom filters used in practice are sometimes much
-larger, on the order of $2^{20}$ or $2^{30}$. We also find benefits in these
-settings. For example, we can use a~$32$GB filter to store $2^{30}$ elements,
-each hashed~$16$ times, in
-such a way that an adversary making $2^{64}$ queries has a less than
-$2.2 \times 10^{-3}$ probability of producing~$5$ or more errors, and less than
-an~$8.3 \times 10^{-9}$ probability of producing~$10$ or more errors. Again, in
-the \erreps\ setting or when using a PRF, the number of adversarial queries is
-likely to be much smaller than this, and so the filter itself can also be made
-much smaller.
+the~$q$ term quite conservative. In these settings, a significantly smaller
+filter will do. For example, if we assume that an adversary making an online
+attack will make no more than $q=2^{32}$ online queries, we get the results seen
+in Figure~\ref{fig:bf-bound-online}. Beyond this, if a larger error rate is acceptable, the filters can
+again be made substantially smaller.
 
 \begin{figure}
   \hspace*{-10pt}
-  \includegraphics{fig/bf-bound}
-  \vspace{-24pt}
+  \includegraphics[scale=0.9]{fig/bf-bound}
+  \includegraphics[scale=0.9]{fig/bf-bound-big}
   \caption{
     The value of $\zeta_{k,m,n}(q,r)$ (Equation~(\ref{eq:zeta})) for $q=2^{64}$,
-    $k=16$, $n=100$, varying values of~$r$ (one line per $r$-value) and filter
+    $k=16$, $n=100$ (left) or $n=10^9$ (right), varying values of~$r$ (one line per $r$-value) and filter
     length~$m$ (the x-axis).  Note the log-2 scale on the y-axis.
   }
   \label{fig:bf-bound}
+\end{figure}
+
+\begin{figure}
+  \hspace*{-10pt}
+  \includegraphics[scale=0.9]{fig/bf-bound-online}
+  \includegraphics[scale=0.9]{fig/bf-bound-big-online}
+  \caption{
+    The value of $\zeta_{k,m,n}(q,r)$ (Equation~(\ref{eq:zeta})) for $q=2^{32}$,
+    $k=16$, $n=100$ (left) or $n=10^9$ (right), varying values of~$r$ (one line per $r$-value) and filter
+    length~$m$ (the x-axis).  Note the log-2 scale on the y-axis.
+  }
+  \label{fig:bf-bound-online}
 \end{figure}
 
 \proc{
@@ -367,7 +369,7 @@ much smaller.
 \end{proof}
 }
 \full{
-\begin{proof}[Proof of Theorem~\ref{thm:sbf-errep-immutable-full}]
+\begin{proof}[Proof of Theorem~\ref{thm:sbf-errep-immutable}]
   \input{fullproof/sbf-errep-immutable}
 \end{proof}
 }
@@ -385,8 +387,7 @@ following \erreps\ bound for $\Pi$.
   $r > p'q_T$, then it holds that
   \begin{eqnarray*}
     \begin{aligned}
-      \Adv{\erreps}_{\Pi,\delta,r}(t,\,&q_R, q_T, q_U, q_H, q_V) \leq \\
-          & q_R \cdot \left[
+      \Adv{\erreps}_{\Pi,\delta,r}(t,\,&q_R, q_T, q_U, q_H, q_V) \leq q_R \cdot \left[
       \frac{q_H}{2^\lambda} +
       \left(\frac{p'q_T}{r}\right)^re^{r-p'q_T}\right]\,,
     \end{aligned}
@@ -410,7 +411,7 @@ give, then moving to games where this advantage is taken into account.
 }
 
 \full{
-  \begin{proof}[Proof Sketch of Theorem~\ref{thm:sbf-erreps}]
+  \begin{proof}[Proof of Theorem~\ref{thm:sbf-erreps}]
   \input{fullproof/sbf-erreps}
 \end{proof}
 }
@@ -464,7 +465,7 @@ the adversary being able to guess the salt.
 }
 
 \full{
-  \begin{proof}[Proof Sketch of Theorem~\ref{thm:kbf-errep}]
+  \begin{proof}[Proof of Theorem~\ref{thm:kbf-errep}]
   \input{fullproof/kbf-errep}
 \end{proof}
 }
@@ -493,7 +494,7 @@ respect to keyed structures.
 \subsection{$\ell$-thresholded BFs}\label{sec:bf-thresh}
 
 \begin{figure}
-  \twoColsNoDivide{0.22}
+  \twoColsNoDivide{0.33}
   {
     \underline{$\Rep^R_K(\col)$}\\[2pt]
       $\salt \getsr \bits^\lambda$ \com{Choose a salt $\salt$}\\
@@ -546,12 +547,11 @@ of providing strong security guarantees for even smaller filter sizes.
 \begin{theorem}[\erreps\ security of thresholded BFs]
 \label{thm:bf-thr-bound}
 \label{thm:sbf-erreps-th}
-Let $p_\ell = ((\ell+k)/m)^k$. For integers $q_R, q_T, q_U, q_H, q_V, r, t \geq 0$ such
+Let $p_\ell = ((\ell+k)/m)^k$. For integers $q_R, q_T, q_U, q_H, q_V, r$, $t \geq 0$ such
 that $r > p_\ell q_T$, it holds that
   \begin{equation*}
     \begin{aligned}
-      \Adv{\erreps}_{\Pi,\delta,r}(t,\,&,q_R,q_T,q_U,q_H,q_V) \leq \\
-        & \frac{q_R(q_H+q_R)}{2^\lambda} + e^{r-p_\ell q_T}\left(\frac{p_\ell q_T}{r}\right)^r
+      \Adv{\erreps}_{\Pi,\delta,r}(t,\,&,q_R,q_T,q_U,q_H,q_V) \leq \frac{q_R(q_H+q_R)}{2^\lambda} + e^{r-p_\ell q_T}\left(\frac{p_\ell q_T}{r}\right)^r
         \,,
     \end{aligned}
   \end{equation*}
@@ -572,7 +572,7 @@ limit on the adversarial advantage even in this worst-case scenario.
 }
 
 \full{
-  \begin{proof}[Proof Sketch of Theorem~\ref{thm:sbf-erreps-th}]
+  \begin{proof}[Proof of Theorem~\ref{thm:sbf-erreps-th}]
   \input{fullproof/sbf-erreps-th}
 \end{proof}
 }
@@ -618,9 +618,10 @@ adversary is allowed a non-negligible number of calls to $q_R$.
 
 
 \begin{figure}
+  \begin{center}
   \hspace*{-10pt}
-  \includegraphics{fig/bf-th}
-  \vspace{-24pt}
+  \includegraphics[scale=1.2]{fig/bf-th}
+  \end{center}
   \caption{
     Performance of $n$-capped versus $\ell$-thresholded Bloom
     filters. The solid orange line shows the value of $\zeta_{k,m,n}(q,r)$ for

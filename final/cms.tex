@@ -1,6 +1,6 @@
 \label{sec:sketch}
 \begin{figure}
-  \twoColsNoDivide{0.22}
+  \twoColsNoDivide{0.33}
   {
     \underline{$\Rep^R_K(\col)$}\\[2pt]
       $\salt \getsr \bits^\lambda$ \com{Choose a salt $\salt$}\\
@@ -167,8 +167,7 @@ Let $p_\ell = ((\ell+1)/m)^k$. For all $q_R, q_T, q_U, q_H, q_V, r, t \geq 0$
 it holds that
   \begin{equation*}
   \begin{aligned}
-    \Adv{\erreps}_{\Pi,\delta,r}(O(t),\,&q_R,q_T,q_U,q_H,q_V) \leq \\
-     & q_R \cdot \left[\frac{q_H}{2^\lambda} + e^{r'-p_\ell q_T}\left(\frac{p_\ell q_T}{r'}\right)^r\right],
+    \Adv{\erreps}_{\Pi,\delta,r}(O(t),\,&q_R,q_T,q_U,q_H,q_V) \leq q_R \cdot \left[\frac{q_H}{2^\lambda} + e^{r'-p_\ell q_T}\left(\frac{p_\ell q_T}{r'}\right)^r\right],
   \end{aligned}
 \end{equation*}
 where $H$ is modeled as a random oracle, $r' = \lfloor r/(k+1) \rfloor$, and $r'

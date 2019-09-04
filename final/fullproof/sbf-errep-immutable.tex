@@ -1,31 +1,32 @@
 \begin{figure*}
-\threeColsOneDivideUnbalanced{0.40}{0.27}{0.27}
+\threeColsOneDivideUnbalanced{0.34}{0.33}{0.27}
 {
   \vspace{-7pt}
   \experimentv{$\game_{0}(\advB)$}
       \hfill \diffplus{$\game_1$}\\[2pt]
     $M^* \gets \bot$;
     $\salt^* \getsr \bits^\lambda$\\
-    $\advB^{\REPO,\QRYO,\HASHO_1}$;
+    $\advB^{\REPO,\QRYO,\HASHO_1}$\\
     return $\big[\sum_x \err[x] \geq r\big]$
   \\[6pt]
   \oraclev{$\REPO(\col)$}\\[2pt]
-    $M^* \gets \bigvee_{x \in \col} \bmap_m(\HASHO_2(\salt^* \cat x))$;
-    $\setS^* \gets \col$;
+    $M^* \gets \bigvee_{x \in \col} \bmap_m(\HASHO_2(\salt^* \cat x))$\\
+    $\setS^* \gets \col$\\
     return $\langle M^*, Z^* \rangle$
   \\[6pt]
   \oraclev{$\QRYO(\qry_x)$}\\[2pt]
-    $X \gets \bmap_m(\HASHO_3(\salt^* \cat x))$;
+    $X \gets \bmap_m(\HASHO_3(\salt^* \cat x))$\\
     $a \gets X = M^* \AND X$\\
-    if $\err[x] < \delta(a,\qry_x(\col^*))$ then
+    if $\err[x] < \delta(a,\qry_x(\col^*))$ then\\
           $\err[x] \gets \delta(a,\qry_x(\col^*))$\\
     return $a$
   \\[6pt]
   \oraclev{$\HASHO_c(\salt \cat x)$}\\[2pt]
     $\vv \getsr [m]^k$\\
-    if $M^*=\bot$ and $\salt=\salt^*$ and $c=1$ then \com{Caller is~$\advB$}\\
-    \tab $\bad_1 \gets 1$; \diffplus{return $\vv$}\\
-    if $T[Z,x] = \bot$ then $\vv \gets T[Z,x]$\\
+    if $M^*=\bot$ and $\salt=\salt^*$ and $c=1$ then\\
+    \tab $\bad_1 \gets 1$; \diffplus{return $\vv$} \com{Caller is~$\advB$}\\
+    if $T[Z,x] = \bot$ then\\
+    \tab $\vv \gets T[Z,x]$\\
     $T[Z,x] \gets \vv$; return $\vv$
 }
 {
@@ -34,15 +35,18 @@
     $\vv \getsr [m]^k$\\
     if $M^*=\bot$ and $\salt=\salt^*$ and $c=1$ then\\
     \tab $\bad_1 \gets 1$; return $\vv$\\
-    if $T[Z,x] = \bot$ then $\vv \gets T[Z,z]$\\
+    if $T[Z,x] = \bot$ then\\
+    \tab $\vv \gets T[Z,z]$\\
     $T[Z,x] \gets \vv$\\[2pt]
     \diffplusbox{
     \com{Caller is~$\advB$ or $\QRYO$}\\
     if $c=1$ or $c=3$ then\\
-    \tab if $\salt \ne \salt^*$  then return $\vv$\\
+    \tab if $\salt \ne \salt^*$  then\\
+    \tab return $\vv$\\
     \tab $\Ans[x] \gets \bmap_m(\vv) = M^* \AND \bmap_m(\vv)$\\
-    \tab if $\err[x] < \delta(\Ans[x],\qry_x(\col^*))$ then
-    \tab\tab $\err[x] \gets \delta(\Ans[x],\qry_x(\col^*))$
+    \tab $\epsilon \gets \delta(\Ans[x],\qry_x(\col^*))$\\
+    \tab if $\err[x] < \epsilon$ then\\
+    \tab\tab $\err[x] \gets \epsilon$
     }
     return $\vv$
 }
@@ -66,16 +70,14 @@
 \label{fig:sbf-errep-immutable/games}
 \end{figure*}
 
-We will use the following lemma for keyless structures, which is proved in
-Appendix~\ref{sec:keyless-proof}.
+We will use the following lemma for keyless structures.
 
 \begin{lemma}\label{thm:lemma1}
   For every $q_R, q_T, q_U, q_H, r, t \geq 0$ and keyless structure~$\Gamma$ it
   holds that
   \begin{eqnarray*}
     \begin{aligned}
-      \Adv{\errep}_{\Gamma,\delta,r}(t,\,&q_R, q_T, q_U, q_H) \leq \\
-      & q_R \cdot \Adv{\errep1}_{\Gamma,\delta,r}(O(t), q_T, q_U, q_H) \,,
+      \Adv{\errep}_{\Gamma,\delta,r}(t,\,&q_R, q_T, q_U, q_H) \leq q_R \cdot \Adv{\errep1}_{\Gamma,\delta,r}(O(t), q_T, q_U, q_H) \,,
     \end{aligned}
   \end{eqnarray*}
 \end{lemma}

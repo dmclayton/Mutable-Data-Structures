@@ -22,8 +22,8 @@
     $\setS \gets \setS \cup \{x\}$\\
     for $i$ in $[1..k]$ do\\
       $\tab a \gets \min(a, \v.M[i][\v.X[i]])$\\
-    if $\err[x] < \delta(a,\qry_x(\col^*))$ then
-          $\err[x] \gets \delta(a,\qry_x(\col^*))\diffplus{$+k$}$\\
+    if $\err[x] < \delta(a,\qry_x(\col^*))$ then\\
+      \tab$\err[x] \gets \delta(a,\qry_x(\col^*))\diffplus{$+k$}$\\
     return $a$
   \\[6pt]
   \oraclev{$\REPO(\col)$}\\[2pt]
@@ -36,7 +36,7 @@
 }
 {
   \vspace{-7pt}
-  \com{Games $\game_0$, $\game_1$, and $\game_2$ continued from the previous
+  \com{Games $\game_0$, $\game_1$, $\game_2$ continued from previous
   box.}
   \oraclev{$\UPO(\up_{x,b})$}\\[2pt]
     if $w'(\v.M^*) > \ell$ then return $\top$\\

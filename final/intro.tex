@@ -190,19 +190,19 @@ of the structure/attack-model landscape.
 \begin{figure}[tp]
 \begin{center}
 \small
-  \begin{tabular}{ |p{2.5cm} | p{5cm}|}
+  \begin{tabular}{ |p{5cm} | p{10cm}|}
     \hline
     {\bf Structure} & {\bf Results}\\ \hline
-    \parbox[c][2.4cm]{2.5cm}{Bloom\;filter\\(Fig.~\ref{fig:bf-def}, Fig.~\ref{fig:bft-def})}
-          & \parbox[c][2cm]{5cm}{Traditional implementation
+    \parbox[c][2.4cm]{5cm}{Bloom\;filter\\(Fig.~\ref{fig:bf-def}, Fig.~\ref{fig:bft-def})}
+          & \parbox[c][2cm]{10cm}{Traditional implementation
             insecure.\\\emph{Immutable case:} structure can be secured
     with per-representation salt. \emph{Mutable case:} structure additionally require a secret key or\\keeping representations private, and benefit from thresholding.}
           \\ \hline
-    \parbox[c]{2.5cm}{Counting filter (Fig.~\ref{fig:cbf-def})}
-          & \parbox[c][1.6cm]{5cm}{Traditional implementation insecure.\\Security can be achieved by combining a per-representation salt, thresholding, and private representations.}
+    \parbox[c]{5cm}{Counting filter (Fig.~\ref{fig:cbf-def})}
+          & \parbox[c][1.6cm]{10cm}{Traditional implementation insecure.\\Security can be achieved by combining a per-representation salt, thresholding, and private representations.}
          \\ \hline
-     \parbox[c]{2.5cm}{Count-min\;sketch\\(Fig.~\ref{fig:cms-def})}
-          & \parbox[c][1.6cm]{5cm}{Traditional implementation insecure.\\Security can be achieved by combining a per-representation salt, thresholding, and private representations.}
+     \parbox[c]{5cm}{Count-min\;sketch\\(Fig.~\ref{fig:cms-def})}
+          & \parbox[c][1.6cm]{10cm}{Traditional implementation insecure.\\Security can be achieved by combining a per-representation salt, thresholding, and private representations.}
           \\ \hline
   \end{tabular}
 \caption{A high-level, informal summary of our results.}
