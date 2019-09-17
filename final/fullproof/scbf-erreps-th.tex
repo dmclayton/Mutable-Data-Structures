@@ -119,8 +119,7 @@ is set, with a bound of
     q_H/2^\lambda + \Prob{\game_1(\advA)=1} \,.
 \end{equation}
 
-Unlike in the case of a count min-sketch, it is entirely possible for deletions
-to benefit the adversary in this game. In particular, if $x$ is found to be a
+Note that if $x$ is found to be a
 false positive, deleting $x$ may cause up to $k$ elements of $\col$ to become
 false negatives. We therefore move to a game~$\game_2$ where the adversary gets
 credit for either a single false positive or for $k$ false negatives whenever it
@@ -139,7 +138,7 @@ $\advB$ succeeds whenever $\advA$ does, i.e.
 $\Prob{\game_1(\advA)=1} \le \Prob{\game_2(\advB) = 1}$.
 
 Since the remaining deletions do not cause errors, we can use the same argument
-as in the proof of Theorem~\ref{thm:scms-erreps-th} to reduce from $\advB$ to an
+as in the later proof of Theorem~\ref{thm:scms-erreps-th} to reduce from $\advB$ to an
 adversary $\advC$ which does not make deletions at all. In~$\game_3$, we further
 reduce from a counting filter to a normal Bloom filter by capping each of the
 counters in the filter at 1. Since no deletions are performed, a counter

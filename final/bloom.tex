@@ -135,8 +135,8 @@ Throughout this section we will use the error function~$\delta$ defined as
 This simply indicates whether the query result matched the correct response.
 
 \subsection{Insecurity of unsalted BFs}\label{sec:bad-bfs}
-The performance of basic Bloom filters is well-understood assuming the choice of
-set~$\S$ being represented is independent of the choice of hash function. When
+The performance of basic Bloom filters is well-understood, assuming the choice of
+set~$\setS$ being represented is independent of the choice of hash function. When
 this assumption is violated, however, their performance can be substantially
 degraded~\cite{gerbet2015power}.
 %
@@ -225,10 +225,12 @@ be found.  If $|\setT| \leq |\setR|$, then such a set exists; but finding it may
 computationally infeasible, depending on the size of the cover set, the size of
 the target set, and the parameters of the Bloom filter.
 %
+\ignore{
 In Appendix~\ref{app:unsalted-attack} we demonstrate that target-set coverage
 attacks are feasible for practical BF parameters. We do so by simulating the
 attack when~$H$ is a random function (i.e., for each distinct input we choose
-$k$ integers from $[m]$ at random) for typical choices of $k$, $m$, and~$n$.
+$k$ integers from $[m]$ at random) for typical choices of $k$, $m$, and~$n$.}
+\input{attack/bf}
 
 \ignore{
 The key to pollution attacks and target-set coverage attacks is that the
@@ -616,21 +618,34 @@ When we take into account the factor of~$q_R$ present in the $n$-capped security
 bound, we conclude that thresholding provides significantly more security if the
 adversary is allowed a non-negligible number of calls to $q_R$.
 
-
 \begin{figure}
   \begin{center}
   \hspace*{-10pt}
-  \includegraphics[scale=1.2]{fig/bf-th}
+  \includegraphics[scale=0.9]{fig/bf-th-online}
+  \includegraphics[scale=0.9]{fig/bf-th-big-online}
   \end{center}
   \caption{
     Performance of $n$-capped versus $\ell$-thresholded Bloom
     filters. The solid orange line shows the value of $\zeta_{k,m,n}(q,r)$ for
-    $k=16$, $n=100$, $q=2^{16}$, $r=1$, and varying $m$ (on the x-axis).
+    $k=16$, $n=100$ (left) or $n=10^9$ (right), $q=2^{32}$, $r=5$, and varying $m$ (on the x-axis).
     %
-    The dotted blue line shows the dominate term in the bound of
+    The dotted blue line shows the dominant term in the bound of
     Theorem~\ref{thm:sbf-erreps-th} for $\ell=nk$. The bounds are comparable,
     but thresholding would perform much better than capping for even
     modest~$q_R$.
   }
   \label{fig:bf-th}
+\end{figure}
+
+\begin{figure}
+  \begin{center}
+  \hspace*{-10pt}
+  \includegraphics[scale=0.9]{fig/bf-th-small}
+  \includegraphics[scale=0.9]{fig/bf-th}
+  \end{center}
+  \caption{
+    Performance of $n$-capped versus $\ell$-thresholded Bloom
+    filters. The parameters are the same as above, except that $r = 1$.
+  }
+  \label{fig:bf-th-2}
 \end{figure}

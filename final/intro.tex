@@ -382,6 +382,11 @@ implementations prevent updates that would cause $\col(x)-1 < 0$.}
 \end{center}
 \end{figure*}
 
+\heading{Recommendations}
+%
+We find that the keeping the data structure private is often essential to guaranteeing security. In many settings this is not an issue, for example if the structure is only directly accessed by some specific trusted source. For counting filters and count min-sketches, the presence of both insertion and deletion operations gives an adaptive adversary enough power that security is difficult to provide. However, \textbf{with per-representation salts and the thresholding procedure we describe, security can be guaranteed in the private setting}.
+
+For Bloom filters, the situation is somewhat better. Even in the public setting, \textbf{a salt alone can suffice to provide security for Bloom filters}, though this may also require a substantial increase in the size of the filter. For security purposes, a private key is also useful, forcing the adversary's attacks to be `online' rather than relying on offline hash computations. However, using a private key may not be possible in all applications, since anyone making a query to the filter must have access to the key.
 
 \heading{Future work}
 %

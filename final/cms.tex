@@ -43,31 +43,16 @@
 
 The count min-sketch (CMS) data structure is designed to concisely estimate the
 number of times a datum has occurred in a data stream. In other words, it is
-designed to estimate the frequency of each element of a multiset.  The data
+designed to estimate the frequency of each element of a multiset. The data
 structure is similar to a Bloom filter, but instead of a length-$m$ array of
 bits it uses a $k$-by-$m$ array of counters. It is designed to deal with streams
 of data in the non-negative turnstile model~\cite{cormode2005improved}, which
 means the sketch accommodates both insertions and deletions but does not allow
-any entries to have a negative frequency. Our construction
-$\sketch[R,\ell,\lambda]$ defined in Figure~\ref{fig:cms-def} involves an
-$\ell$-thresholded variation of this structure. The traditional description of
-a count min-sketch involves a parameter $n$ describing the size of the input
-stream, whereas our $\ell$ describes the maximum number of nonzero counters. As
-in the case of Bloom filters, this does not significantly change the operation
-of the sketch in a non-adversarial setting, since for random input streams the
-number of nonzero counters is closely related to the number of elements in the
-stream.
-%
-In the presence of an adversary, however, we expect $\ell$-thresholding to
-provide better security bounds than the traditional definition would provide by
-handicapping pollution attacks and similar adversarial strategies.
-
-We will show that, in the \errep\ setting, the count min-sketch structure is
-insecure regardless of whether $\ell$-thresholding is used or not, and
-regardless of the details of the behavior of the function $R$. On the other
-hand, we show that \erreps\ security is achievable even under the assumption
-that a salted but unkeyed hash function is used, i.e. $\lambda > 0$ but $\keys =
-\{\emptyset\}$.
+any entries to have a negative frequency.
+Despite this, we will see that the two structures are closely related in
+terms of security properties. We show that \errep\ security is similarly
+impossible, but employing $\ell$-thresholding allows for \erreps\ security with a
+bound that is close to count min-sketch. 
 
 \heading{Non-adaptive error bound}
 %
@@ -81,7 +66,7 @@ our syntax, and $x \in \bits^*$ is any string, possibly but not necessarily a
 member of $\col$, we define the error probability as
 \begin{equation}\label{eq:bf-fp}
   \begin{aligned}
-    P_{k,m}(n) =
+    P'_{k,m}(n) =
       \Pr\big[&\rho \getsr \Func(\bits^*,[m]^k);
               \pub \getsr \Rep^\rho(\setS): \\
               &\Qry^\rho(\pub, \qry_x) > \qry_x(\setS)+\frac{en}{m} \given \pub \ne \bot
@@ -91,7 +76,7 @@ member of $\col$, we define the error probability as
 %
 (Here as above, $e$ denotes the base of the natural logarithm.)
 %
-Informally, $P_{k,m}(n)$ is the probability that some~$x$ is overestimated by a
+Informally, $P'_{k,m}(n)$ is the probability that some~$x$ is overestimated by a
 non-negligible amount in the representation of some $\setS$ containing a total
 of $n$ elements, when a random function is used for hashing. Cormode and
 Muthukrishnan~\cite{cormode2005improved} show that this probability is bounded
@@ -117,36 +102,24 @@ as
   \end{cases}
 \end{equation}
 
-\subsection{Insecurity of public sketches}\label{sec:pub-sketch-bad}
+Note that other $\delta(x,y)$ may be preferable in some applications. For
+example, if the degree of error is significant, it may be desirable to use a $\delta$
+which only counts as an error if $x$ and $y$ differ by more than some threshold value,
+or to use a function such as $\delta(x,y) = |x-y|$. In this paper we use this
+error bound because it is in some sense the most conservative, counting any
+overestimate as an error.
 
-Unlike in the Bloom filter case, good security bounds cannot be achieved for a
-count-min sketch in the \errep\ setting even if salts and/or private keys are
-used. The insecurity is due to the relative power of the $\UPO$ oracle compared
-to the Bloom filter. Not only does it allow for deletion as well as
-insertion, but since updates are \emph{added} to the representation rather than
-being combined with bitwise-OR, the adversary gains more information from
-seeing updates occur. Because of these differences, the adversary can mount
-an attack similar to the target-set coverage attack for a Bloom filter even if a
-PRF is used for
-hashing. First, the adversary calls $\REPO(\emptyset)$ to get an empty
-representation. The adversary can then call $\UPO$ to insert an element into the
-set, see exactly what the outputs of each of the hash functions are, and then
-call $\UPO$ again to delete the element. By doing this repeatedly, an adversary
-can determine the outputs of the PRF for $u$ different inputs using $2u$ calls
-to $\UPO$. Once a sufficiently large number of PRF outputs has been determined,
-the adversary can construct the test and target set used for the target-set
-coverage attack (Section~\ref{sec:bad-bfs}). The adversary then calls $\UPO$ several more times to insert
-each element of the test set into the sketch, and then
-each element of the target set will be overestimated.
+\subsection{Insecurity of public sketches}
 
-In actual use, this specific attack may not be feasible for the adversary.
-However, as long as the sketch is public, the adversary can easily determine the
-exact results of inserting or deleting any element just by seeing which counters
-are incremented or decremented. For this reason it is not enough that the
-function used to perform queries and updates is impossible for the adversary to
-simulate, since the adversary can build a lookup table just by watching the
-sketch as it is updated. Instead, we must require that the sketch itself be kept
-secret from the adversary.
+The count min-sketch structure necessarily fails to satisfy \errep\
+correctness for the same reasons as in the case of a counting filter. In
+particular, the adversary can call $\REPO(\emptyset)$ to receive an empty
+representation, insert an element $x$, observe which counters are incremented by
+this insertion, and then delete $x$. (Again, this is possible only because the
+sketch is public). By doing this repeatedly, the adversary can
+gain information about which elements overlap with which combinations of other
+elements, and can therefore mount the same attack described in
+Section~\ref{sec:pub-count-bad}.
 
 \subsection{Private, $\ell$-thresholded sketches}
 
@@ -196,18 +169,31 @@ seeks to find $r'$ overestimates by making arbitrary queries.
 \end{proof}
 }
 
-\subsection{Discussion}
+\proc{
+  \begin{proof}[Proof Sketch of Theorem~\ref{thm:counting-erreps}]
+  \input{proof/scbf-erreps-th}
+\end{proof}
+}
 
-Unlike Bloom filters, there is no simple tweak that can be performed
-to a count min-sketch to provide good \errep\ security bounds. In particular, it
-does not achieve security even in the immutable setting, and adding a secret key
-does not help.
-%
-However, the bound above shows that in settings where sketches can be assumed
-secret it is possible to prove an upper bound on the number of overestimates an
-adversary can cause. In particular, we recommend the combination of random
-per-representation salts and $\ell$-thresholding in order to mitigate possible
-attacks in the \erreps\ setting.
+\full{
+  \begin{proof}[Proof Sketch of Theorem~\ref{thm:counting-erreps}]
+  \input{fullproof/scbf-erreps-th}
+\end{proof}
+}
+
+\subsection{Discussion}
+The results for count min-sketches are similar to the results for counting
+filters, as might be expected given the similarities in terms of both the
+supported updates and the structure of the representations themselves (any
+count min-sketch can be transformed into a counting filter by adding all the
+rows together element-wise.) In particular, we see that count min-sketches
+which are publicly visible cannot provide good security guarantees. This means
+that sketches intended for a security-sensitive setting should be kept
+hidden from potential adversaries. Furthermore, our bound relies on
+per-representation random salts and $\ell$-thresholding, so these changes should
+also be taken into account when constructing secure count min-sketches. The size
+increase of the sketches is comparable to the size increase of counting filters,
+but does not need to take into account multiple types of errors
 
 The bound we achieve is based on the same binomial bound as in the case of Bloom
 filters, but has a notable difference in the form of $r'$ replacing $r$. This
@@ -218,4 +204,4 @@ parameter choices. We also note that it is possible this bound can be improved
 to reduce the impact on sketch size, since the initial factor of $q_R$ does not
 have an obvious attack associated with it which would make this bound tight.
 %
-(The same is true, of course, of Bloom filters.)
+(The same is true, of course, of Bloom and counting filters.)

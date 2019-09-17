@@ -13,6 +13,8 @@ rc('text', usetex=True)
 
 # How many bits in a KB
 kb = 8192.0
+mb = 1024.0*kb
+gb = 1024.0*mb
 
 # Kirsch-Mitzenmacher
 def Mitz(k, n, m):
@@ -37,19 +39,19 @@ def Us(q, r, k, n, m):
 
 
 # Fixed parameters
-qorder = 16
+qorder = 32
 q = 1<<qorder
-n = 100
+n = 10**9
 k = 16
 r = 1
 
 # Range of filter length
-start = 1024
-end   = start + 8192
-M = np.linspace(start, end, (end-start)/10)
+start = 7*gb
+end   = 15*gb
+M = np.linspace(start, end, 10)
 
 # Which parameter do you want to plot on the x-axis?
-N = range(100,1100,100)
+N = range(10**8,10**9+10**8,10**8)
 R = range(1,11,1)
 param = R
 
@@ -59,12 +61,13 @@ yscale('log', basey=2)
 r = 1
 k = 16
 l = (n * k)
-th, = plot(M/kb, map(lambda X:Thresh(q,r,k,l,X), M), ':', lw=0.8)
-bf, = plot(M/kb, map(lambda X:Us(q,r,k,n,X), M), lw=0.8)
+th, = plot(M/gb, map(lambda X:Thresh(q,r,k,l,X), M), ':', lw=0.8)
+bf, = plot(M/gb, map(lambda X:Us(q,r,k,n,X), M), lw=0.8)
+print Thresh(q,r,k,l,start)
 legend([bf, th], ['$n$-capped', '$\ell$-thresholded'])
-xticks(np.arange(0,int(end/kb+1),0.5))
-xlabel('Filter length (KB)')
-xlim(start/kb, end/kb)
+xticks(np.arange(0,int(end/gb+1),1))
+xlabel('Filter length (GB)')
+xlim(start/gb, end/gb)
 ylim(10**-6, 1)
 grid(lw=0.25)
 tight_layout()
