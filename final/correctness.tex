@@ -65,10 +65,10 @@ When a query $\UPO(i,\up)$ is made, the oracle first updates the data
 object~$\col_i$ and its corresponding representation.
 %
 Now, for each defined value~$\err_i[\qry]$, we re-evaluate the error that
-\emph{would} be caused by the previously asked~$\qry$ WRT the newly updated
+\emph{would} be caused by the previously asked~$\qry$, with respect to the newly updated
 $\col_i$ and $\pub_i$. If the existing value of $\err_i[\qry]$ is larger than
-the error that~$\qry$ would cause to WRT the newly updated~$\col_i$ and
-$\pub_i$, then we overwrite $\err_i[\qry]$ with the smaller value.  Doing so
+the error that~$\qry$ would cause (again, w.r.t.\ the newly updated~$\col_i$ and
+$\pub_i$), then we overwrite $\err_i[\qry]$ with the smaller value.  Doing so
 ensures that the array~$\err_i$ does not overcredit the attacker for errors
 against the current data object and representation. For example, if $x$ was
 previously found to be a false positive for a Bloom filter, and the adversary
