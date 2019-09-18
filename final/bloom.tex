@@ -345,24 +345,14 @@ again be made substantially smaller.
   \hspace*{-10pt}
   \includegraphics[scale=0.9]{fig/bf-bound}
   \includegraphics[scale=0.9]{fig/bf-bound-big}
+  \includegraphics[scale=0.9]{fig/bf-bound-online}
+  \includegraphics[scale=0.9]{fig/bf-bound-big-online}
   \caption{
-    The value of $\zeta_{k,m,n}(q,r)$ (Equation~(\ref{eq:zeta})) for $q=2^{64}$,
+    The value of $\zeta_{k,m,n}(q,r)$ (Equation~(\ref{eq:zeta})) for $q=2^{64}$ (top) or $q = 2^{32}$,
     $k=16$, $n=100$ (left) or $n=10^9$ (right), varying values of~$r$ (one line per $r$-value) and filter
     length~$m$ (the x-axis).  Note the log-2 scale on the y-axis.
   }
   \label{fig:bf-bound}
-\end{figure}
-
-\begin{figure}
-  \hspace*{-10pt}
-  \includegraphics[scale=0.9]{fig/bf-bound-online}
-  \includegraphics[scale=0.9]{fig/bf-bound-big-online}
-  \caption{
-    The value of $\zeta_{k,m,n}(q,r)$ (Equation~(\ref{eq:zeta})) for $q=2^{32}$,
-    $k=16$, $n=100$ (left) or $n=10^9$ (right), varying values of~$r$ (one line per $r$-value) and filter
-    length~$m$ (the x-axis).  Note the log-2 scale on the y-axis.
-  }
-  \label{fig:bf-bound-online}
 \end{figure}
 
 \proc{
@@ -621,13 +611,15 @@ adversary is allowed a non-negligible number of calls to $q_R$.
 \begin{figure}
   \begin{center}
   \hspace*{-10pt}
-  \includegraphics[scale=0.9]{fig/bf-th-online}
-  \includegraphics[scale=0.9]{fig/bf-th-big-online}
+  \includegraphics[scale=0.8]{fig/bf-th-small}
+  \includegraphics[scale=0.8]{fig/bf-th}
+  \includegraphics[scale=0.8]{fig/bf-th-online}
+  \includegraphics[scale=0.8]{fig/bf-th-big-online}
   \end{center}
   \caption{
     Performance of $n$-capped versus $\ell$-thresholded Bloom
     filters. The solid orange line shows the value of $\zeta_{k,m,n}(q,r)$ for
-    $k=16$, $n=100$ (left) or $n=10^9$ (right), $q=2^{32}$, $r=5$, and varying $m$ (on the x-axis).
+    $k=16$, $n=100$ (left) or $n=10^9$ (right), $q=2^{32}$, $r=1$ (top) or $r = 5$ (bottom), and varying $m$ (on the x-axis).
     %
     The dotted blue line shows the dominant term in the bound of
     Theorem~\ref{thm:sbf-erreps-th} for $\ell=nk$. The bounds are comparable,
@@ -635,17 +627,4 @@ adversary is allowed a non-negligible number of calls to $q_R$.
     modest~$q_R$.
   }
   \label{fig:bf-th}
-\end{figure}
-
-\begin{figure}
-  \begin{center}
-  \hspace*{-10pt}
-  \includegraphics[scale=0.9]{fig/bf-th-small}
-  \includegraphics[scale=0.9]{fig/bf-th}
-  \end{center}
-  \caption{
-    Performance of $n$-capped versus $\ell$-thresholded Bloom
-    filters. The parameters are the same as above, except that $r = 1$.
-  }
-  \label{fig:bf-th-2}
 \end{figure}
