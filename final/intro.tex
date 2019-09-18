@@ -337,36 +337,38 @@ structures.
 
 \begin{figure*}[tp]
 \begin{center}
-\small
+\scriptsize
   \begin{tabular}{ |p{1.75cm} | p{2.5cm} | p{2.95cm} | p{4cm} | p{3.7cm}|}
     \hline
     {\bf Structure} & {\bf Data Objects} & {\bf Supported Queries} & {\bf Supported Updates} & {\bf Parameters} \\ \hline
-    \parbox[c]{1.5cm}{Bloom\\ filter (Fig.~\ref{fig:bf-def})}
-          & \parbox[c][6ex]{2cm}{Sets\\$\col\subseteq \bits^*$} %, or\\ $\col \in \Func(\bits^*,\{0,1\})$}
+    \parbox[c]{1.75cm}{Bloom filter\\ (Fig.~\ref{fig:bf-def})}
+          & \parbox[c][6ex]{2.5cm}{Sets,\\$\col\subseteq \bits^*$} %, or\\ $\col \in \Func(\bits^*,\{0,1\})$}
           & $\qry_x(\col) = [x \in \col]$
           &  $\up_x(\col) = \col \cup \{x\}$
           & \parbox[c]{4cm}{$n$, max $|\col|$\\$k$, \# hash functions\\$m$, array size (bits)}
           \\\hline
      \parbox[c]{2cm}{$\ell$-thresholded\\ Bloom filter\\ (Fig.~\ref{fig:bft-def})}
-          & \parbox[c]{2.5cm}{Sets\\ $\col \subseteq \bits^*$}
+          & \parbox[c]{2.5cm}{Sets,\\ $\col \subseteq \bits^*$}
           & $\qry_x(\col) = [x \in \col]$
           & \parbox[c][10ex]{4cm}{$\up_x(\col) = \col \cup \{x\}$}
-          & \parbox[c]{3.75cm}{$\ell$, max no. 1s in array\\$k$, \# hash functions\\$m$, array size (bits)}
+          & \parbox[c]{3.75cm}{$\ell$, max \# 1s in array\\$k$, \# hash functions\\$m$, array size (bits)}
           \\ \hline
-     \parbox[c]{2cm}{Count-min\\ sketch (Fig.~\ref{fig:cms-def})}
-          & \parbox[c]{2.5cm}{Multisets\\ $\col \in \Func(\bits^*,\N)$}
+     \parbox[c]{2cm}{count-min sketch\\ (Fig.~\ref{fig:cms-def})}
+          & \parbox[c]{2.5cm}{Multisets,\\ $\col\!\in\! \Func(\bits^*,\N)$}
           & $\qry_x(\col) = \col(x)$
           & \parbox[c][10ex]{4cm}{$\up_{x,0}(\col)(x) = \col(x)+1$ \\ $\up_{x,1}(\col)(x) = \col(x)-1$ \\ $\up_{x,b}(\col)(y) = \col(y)$ for $x \neq y$}
-          & \parbox[c]{3.75cm}{$\ell$, max no. nonzero counters\\$k$, \# hash functions and arrays\\$m$, array size (counters)}
+          & \parbox[c]{3.75cm}{$\ell$, max \# nonzero counters\\$k$,
+          \# hash functions and arrays\\$m$, \# counters per array}
           \\ \hline
-    \parbox[c]{1.5cm}{Counting\\ filter (Fig.~\ref{fig:cbf-def})}
-          & \parbox[c]{2.5cm}{Multisets\\ $\col \in \Func(\bits^*,\N)$}
+    \parbox[c]{1.5cm}{counting\\ filter\\ (Fig.~\ref{fig:cbf-def})}
+          & \parbox[c]{2.5cm}{Multisets,\\ $\col \!\in\! \Func(\bits^*,\N)$}
           & $\qry_x(\col) = [\col(x) > 0]$
           & \parbox[c][10ex]{4cm}{$\up_{x,1}(\col)(x) = \col(x)+1$ \\ $\up_{x,-1}(\col)(x) = \col(x)-1$ \\ $\up_{x,b}(\col)(y) = \col(y)$ for $x \neq y$}
-          & \parbox[c]{3.5cm}{$\ell$, max no. non-zero counters\\$k$, \# hash functions\\$m$, array size (counters)}
+          & \parbox[c]{3.5cm}{$\ell$, max \# non-zero counters\\$k$,
+          \# hash functions\\$m$, \# counters per array}
          \\ \hline
-    \ignore{\parbox[c]{1.5cm}{Cuckoo\\ filter}
-          & \parbox[c]{2.5cm}{Multisets\\ $\col \in \Func(\bits^*,\N)$}
+    \ignore{\parbox[c]{1.5cm}{cuckoo\\ filter}
+          & \parbox[c]{2.5cm}{Multisets,\\ $\col \!\in\! \Func(\bits^*,\N)$}
           & $\qry_x(\col) = [\col(x) > 0]$
           & \parbox[c][10ex]{4cm}{$\up_{x,1}(\col)(x) = \col(x)+1$ \\ $\up_{x,-1}(\col)(x) = \col(x)-1$ \\ $\up_{x,b}(\col)(y) = \col(y)$ for $x \neq y$}
           & \parbox[c]{3.5cm}{$n$, max $|\col|$\\$m$, \# buckets\\$b$, bucket size (entries)\\$f$, fingerprint size (bits)}
@@ -376,7 +378,9 @@ structures.
 space-efficient representation of its input data object and, in the presence of
 non-adaptive attacks, provides approximately correct responses to the supported
 queries.  For counting filters and count-min sketches, typical
-implementations prevent updates that would cause $\col(x)-1 < 0$.}
+implementations prevent updates that would cause $\col(x)-1 <
+0$. Count-min sketch supports additional queries (e.g.\ range queries)
+that we do not consider.}
   \label{fig:structures-summary}
   \label{fig:tab-structures}
 \end{center}
