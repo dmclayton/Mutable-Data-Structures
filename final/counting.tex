@@ -44,7 +44,7 @@ queries.
 %
 Our construction
 $\countbloom[R,\ell,\lambda]$ defined in Figure~\ref{fig:cbf-def} involves an
-$\ell$-thresholdedversion of this structure. The traditional description of
+$\ell$-thresholded version of this structure. The traditional description of
 a counting filter involves a parameter $n$ describing the size of the input
 multiset, whereas our $\ell$ describes the maximum number of nonzero counters. As
 in the case of ordinary Bloom filters, this does not significantly change the operation
@@ -86,7 +86,7 @@ Unlike in the Bloom filter case, good security bounds cannot be achieved for a
 counting filter in the \errep\ setting, even if salts and/or private keys are
 used. The insecurity is due to the relative power of the $\UPO$ oracle compared
 to the Bloom filter, which adds and subtracts numeric values stored in the structure rather
-than seeing only the effects of a bitwise OR.
+than seeing only the effects of a bitwise-OR.
 Because of this, the adversary can mount
 an attack similar to the target-set coverage attack for a Bloom filter even if a
 PRF is used for
@@ -112,7 +112,7 @@ simulate, since the adversary can build a lookup table just by watching the
 filter as it is updated. Instead, we must require that the filter itself be kept
 secret from the adversary.
 
-\subsection{Private Thresholded Counting Filters}
+\subsection{Security of private, $\ell$-thresholded counting filters}
 
 \begin{theorem}\label{thm:counting-erreps}
 Fix integers $q_R,q_T,q_U,q_H,q_V, r, t \geq 0$, let $p_\ell = ((\ell+1)/m)^k$,
@@ -147,7 +147,8 @@ per-representation salts and $\ell$-thresholding in order to mitigate possible
 attacks in the \erreps\ setting.
 
 False negatives impact the bound more
-than false positives due to the scaling factor of $k$ that appears in $r'$,
+than false positives due to the scaling factor of $k$ that appears in $r'$
+{\bf\color{red} OH NO, THIS~$r'$ IS THE FIRST THING ON THIS LINE!!!!},
 which indicates that applications seeking to minimize false negatives will
 require larger filters than those seeking to minimize false positives. This is
 distinctly different than in the non-adaptive setting, where false positives are
