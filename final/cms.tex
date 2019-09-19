@@ -52,7 +52,7 @@ any entries to have a negative frequency.
 Despite this, we will see that the two structures are closely related in
 terms of security properties. We show that \errep\ security is similarly
 impossible, but employing $\ell$-thresholding allows for \erreps\ security with a
-bound that is close to count min-sketch. 
+bound that is close to count min-sketch.
 
 \heading{Non-adaptive error bound}
 %
@@ -147,7 +147,7 @@ where $H$ is modeled as a random oracle, $r' = \lfloor r/(k+1) \rfloor$, and $r'
 > p_\ell q_T$.
 \end{theorem}
 
-The theorem uses several reductions to gradually whittle away at the flexibility
+The proof uses a game-playing argument in which we gradually whittle away at the flexibility
 the adversary has in performing repeated insertions, deletions, and queries to
 the same elements. The $r'$ in place of $r$ in the bound comes from the fact
 that, if the adversary finds that some $x$ is overestimated, it may be able to
