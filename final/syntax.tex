@@ -14,7 +14,7 @@ string.
 %
 Let $X \cat Y$ denote the concatenation of bitstrings~$X$ and~$Y$.
 %
-For all $m\geq0$ define~$\bmap_m$ as the following function.  For all
+For all $m\geq0$ define~$\bmap_m$ as the following function: for all
 $\v.x\in[m]^*$ let $\bmap_m(\v.x) = X_1X_2\cdots X_m\in\bits^m$, where
 $X_v=1$ if and only if $\v.x_i = v$ for some $i\in[|\v.x|]$.
 %
@@ -22,19 +22,18 @@ We call $\bmap_m(\v.x)$ the \emph{bitmap} of~$\v.x$.
 %
 Let~$X$ and~$Y$ be equal-length bitstrings. We write $X \OR Y$ for their
 bitwise-OR, $X \AND Y$ for their bitwise-AND, and $X \XOR Y$ for their
-bitwise-XOR. Let $\NOT X = 1^{|X|} \xor X$, and let $\hw(X)$ denote the Hamming
+bitwise-XOR. Let $\NOT X = 1^{|X|} \xor X$ (bitwise-NOT), and let $\hw(X)$ denote the Hamming
 weight of (i.e., the number of 1s in)~$X$.
 %
-For an array~$\v.M$ of integers, we analogously define $\hw'(\v.m)$ to be the number
-of \emph{nonzero} integers in the array. We also define $\zeroes(m)$ to be a
-function taking a non-negative integer and returning a length-$m$ integer vector
-with all entries set to~$0$.
+For an array~$\v.M$ of integers, we analogously define $\hw'(\v.M)$ to be the number
+of \emph{nonzero} integers in the array. We also let $\zeroes(m)$ denote the
+length~$m$ vector of zeros.
 
 Let $\Func(\setX,\setY)$ denote the set of functions $f:\setX\to\setY$.
 %
 For every function~$f: \setX \to \setY$, define $\id^f: \{\emptystr\} \times \setX \to \setY$ so that
 $\id^f(\emptystr, x) = f(x)$ for all $x$ in the domain
-of~$f$. This allows us to talk about using unkeyed hash functions $H$ in places where,
+of~$f$. This allows us to use unkeyed hash functions $H$ in situations where,
 syntactically, a function is required to take a key along with its input.
 
 \heading{Adversaries}
@@ -52,14 +51,14 @@ function to be a function $F: \setK \times \setX \to \setY$. The intent is for
 the outputs of the function to appear random for a fixed choice of key, which is
 formally captured by the game described in Figure~\ref{fig:prf-def}. We define
 the advantage of an adversary $\advA$ to be
-$\Adv{\prf}_F(\advA) = \Prob{\Exp{\prf}_F(\advA) = 1}$, and the advantage
+$\Adv{\prf}_F(\advA) = \Prob{\Exp{\prf}_F(\advA) = 1}$, and the function
 $\Adv{\prf}_F(t,q)$ to be the maximum advantage of any adversary running for $t$
-steps and making $q$ queries to the PRF oracle.
+steps and making $q$ queries to~$\PRFO$.
 %\cpnote{We could save a few inches here by changing the definition. I personally
 %like a nice, concrete PRF notion like this one, however.}
 
 \begin{figure}
-  \twoColsNoDivide{0.22}
+  \twoColsNoDivide{0.24}
   {
     \experimentv{$\Exp{\prf}_F(\advA)$}\\[2pt]
       $b \getsr \bits$; $\key \getsr \keys$\\
@@ -87,7 +86,7 @@ $\mathcal{U} \subseteq \Func(\mathcal{D},\mathcal{D})$ be a set of allowed
 data-object \emph{updates}.  A {\em data structure} is a tuple $\Pi =
 (\Rep,\Qry,\Up)$, where:
 
-\begin{itemize}[leftmargin=.1in]
+\begin{itemize}[leftmargin=.2in]
   \item $\Rep\colon \keys \times \mathcal{D} \to \{0,1\}^* \cup \{\bot\}$ is a
   randomized {\em representation algorithm}, taking as input a key $\key \in
   \keys$ and data object $\col \in \mathcal{D}$, and outputting the
@@ -108,7 +107,7 @@ data-object \emph{updates}.  A {\em data structure} is a tuple $\Pi =
 
 Allowing each of the algorithms to take a key~$K$ lets us separate (in our
 security notions) any secret randomness used across data structure operations,
-from per-operation randomness (e.g., salts).  Note that our syntax admits the
+from per-operation randomness (e.g., generation of a salt).  Note that our syntax admits the
 common case of \emph{unkeyed} data structures, by setting
 $\keys=\{\emptystring\}$.
 
