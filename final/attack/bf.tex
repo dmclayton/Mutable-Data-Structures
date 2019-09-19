@@ -1,8 +1,8 @@
 \label{app:unsalted-attack}
-Fix integers $\ell, n, \lambda \geq0$, let $H:\bits^*\to[m]^k$ be a function,  and let
-$\Pi = \BF[H,t,\lambda]$ as specified in Figure~\ref{fig:bf-def}.
+Fix integer $n \geq0$, let $H:\bits^*\to[m]^k$ be a function,  and let
+$\Pi = \BF[H,n,0]$ as specified in Figure~\ref{fig:bf-def}.
 %
-The possibility of pre-computing the structure in the \errep1 games yields the
+The possibility of pre-computing the structure in the \erreps1 experiment yields the
 following attack. Given a set $\setT\subseteq\bits^*$ of target queries, the
 adversary searches for a set $\setS\subseteq\bits^*$ such that
 $\Qry^H(\Rep^H(\setS), x) = 1$ for all $x \in \setT$. We call such a set a
@@ -84,7 +84,7 @@ $m=1024$, $n=100$, and $r=1$, a test set of just $512$ elements suffices for a
 success rate of nearly $60\%$ (top-right). It is also worth noting that
 increasing the error parameter only slightly decreases the success rate
 (bottom-left). These results show that even for very pessimistic parameter
-choices, the basic Bloom filter is not secure in the \errep1\ sense.
+choices, the basic Bloom filter is not secure in the \erreps1\ sense.
 %
 Finally, we find that the average number of sets that were tested is about
 $O(kr)$ within all of the parameter ranges we tested.
@@ -93,14 +93,15 @@ $O(kr)$ within all of the parameter ranges we tested.
 %\newcommand{\mydot}{{\scriptsize\ding{108}}}
 %\newcommand{\myex}{{\scriptsize\ding{53}}}
 \begin{figure}
-  \includegraphics[scale=0.8]{fig/bf-correct-attk-sim}
+  \centering
+  \includegraphics[scale=0.7]{fig/bf-correct-attk-sim}
   \caption{
     %
   Success rate and average-case time complexity for the optimized attack on classic
   Bloom filter.
   %
-  Each plot shows the success rate (\scriptsize\ding{108}), as well as the average number
-  of tested sets (\scriptsize\ding{53}), for 1000 executions of
+  Each plot shows the success rate ({\scriptsize\ding{108}}), as well as the average number
+  of tested sets ({\scriptsize\ding{53}}), for 1000 executions of
   the attack on simulated inputs.
   %
   Default parameters are $k=4$, $m=2^{10}$, $n=100$, $r=1$, and $s=2^{10}$.
