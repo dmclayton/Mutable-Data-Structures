@@ -1,15 +1,15 @@
 \paragraph{Comparison with Naor-Yogev}
-As previously noted, Naor and Yogev~\cite{naor2015bloom} were the first to
+As previously noted, NY~\cite{naor2015bloom} were the first to
 formalize adversarial correctness of Bloom filters.  Our work extends theirs
 significantly in several directions. First, we consider abstract data
 structures, rather than only set-membership structures.  Even with respect to
 the specific case of correctness for set-membership structures, our work offers
-several advantages as compared to the Naor-Yogev treatment.
+several advantages as compared to the NY treatment.
 %
 One, our syntax distinguishes between the (secret) key and the public portion of
 a data structure, an important distinction that is missing in their work.
 %
-Two, the Naor-Yogev definition of correctness allows the adversary to make
+Two, the NY definition of correctness allows the adversary to make
 several queries, some of which may produce incorrect results; the attacker then
 succeeds if it outputs a \emph{fresh} query that causes an error. This
 separation seems arbitrary, and we propose instead a parameterized definition in
@@ -106,7 +106,7 @@ variant.}
 }\fi
 
 \if{0}{
-  We recommend reading the Naor-Yogev paper for a survey of related work and a
+  We recommend reading the NY paper for a survey of related work and a
   discussion of related papers. Here we mention a few additional practical
   works, but stress that this only scratches the surface.
   %

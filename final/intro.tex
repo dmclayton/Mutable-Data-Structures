@@ -41,11 +41,11 @@ each other.  Said another way, even if~$\col$ is adversarially chosen,
 this choice cannot depend on particular hash functions that are used
 to produce the Bloom filter and compute the query responses.
 %
-The conceptual innovation of NY was remove this assumption an explore
-the consequences upon the probability of Bloom filter query-response errors.  In
-particular, NY allowed the adversary to specify a (fixed)
-set~$\col$ that may depend on the hash functions, and then attempt to
-induce errors via set-membership queries.
+The conceptual innovation of NY was to remove this assumption an explore the
+consequences upon the probability of Bloom filter query-response errors.  In
+particular, NY allowed the adversary to specify a (fixed) set~$\col$ that may
+depend on the hash functions, and then attempt to induce errors via
+set-membership queries.
 
 We expand upon NY in several ways, providing syntax and security
 notions that allow analysis of a large class of data structures (not
@@ -59,7 +59,7 @@ the data to be represented may change over time, e.g., streaming data applicatio
 Many data structures are designed for such settings ---~the counting filter~\cite{fan2000summary}, count-min
 sketch~\cite{cormode2005improved}, cuckoo filter~\cite{fan2014cuckoo}, and
 stable Bloom filter~\cite{deng2006approximately}, to name a few~--- by providing
-updatable, or\emph{mutable}, representations.  Our syntactic formalization of
+updatable, or \emph{mutable}, representations.  Our syntactic formalization of
 data structures captures this reality. 
 %Attacks that treat representations as immutable (after creation) are captured as a special case.
 
@@ -100,7 +100,7 @@ answers to set-membership queries\footnote{Indeed, they were initially
 introduced to support deletions from a \emph{set}, without having to
 rebuild the representation, as one would for a Bloom filter.}, where a
 query about~$x$ results in a positive response iff all of the
-hash-indicated counters are at least one.%
+hash-indicated counters are at least one.
 %
 %
 %
@@ -123,7 +123,8 @@ Both the Bloom and counting filters have binary query responses,
 making the notion of response error easy to define: the response is
 correct, or it isn't.  But practically important structures, like the count-min sketch, admit
 frequency-of-element queries, which have integer responses.  What
-constitutes an error is less clear, when this is the case.
+constitutes an error is less clear for such queries.
+%
 Even in the traditional analyses (i.e., non-adaptive attacks) one is
 guaranteed only that responses will be ``close'' to correct,
 with probability ``close'' to one. 
@@ -154,7 +155,7 @@ is fixed across all calls; however, per-representation randomness
 update-oracle~$\UPO$ and, at any time, it may query a representation
 via a query-oracle~$\QRYO$. The adversary is given credit (determined
 by~$\delta$) for each $\QRYO$-query that results in an error.
-
+%
 The \erreps\ game is defined in much the same way, except that representations
 are not shown to the adversary unless it explicitly asks for them to be
 revealed.
@@ -180,10 +181,10 @@ We exercise our syntax and notions by analyzing three important, real-world data
 structures: Bloom filters~\cite{bloom1970space} (Section~\ref{sec:bloom}), count
 min-sketches~\cite{cormode2005improved} (Section~\ref{sec:sketch}), and counting
 filters~\cite{fan2000summary} (Appendix~\ref{sec:count}), summarized in
-Figure~\ref{fig:tab-structures}. Our studies examine the basic
-versions of each, as well as variants that may take a key or a
-per-representation random salt, and variants that incorporate measures
-of representation saturation.  Each of the basic structures supports different queries and
+Figure~\ref{fig:tab-structures}. We begin each analysis with the basic
+version of the structure, then consider variants that take a key or a
+per-representation random salt, as well as variants that incorporate measures
+of representation saturation.  Each basic structure supports different queries and
 update operations; taken together, they provide interesting coverage
 of the structure/attack-model landscape.
 
@@ -205,7 +206,7 @@ of the structure/attack-model landscape.
           & \parbox[c][1.6cm]{10cm}{Traditional implementation insecure.\\Security can be achieved by combining a per-representation salt, thresholding, and private representations.}
           \\ \hline
   \end{tabular}
-\caption{A high-level, informal summary of our results.}
+\caption{A high-level summary of our results.}
   \label{fig:results-summary}
 \end{center}
 \end{figure}
@@ -219,10 +220,10 @@ coverage attacks} (described in Section~\ref{sec:bad-bfs}).  These are closely
 related to \emph{pollution attacks} against standard Bloom
 filters~\cite{gerbet2015power}, which we will discuss in some detail.
 
-On the positive side, we show how these structures can be
-modified in order to prove security.  These modification are conceptually
-straightforward and intuitive; we do not, however, study the deployment
-implications of these modifcations.
+On the positive side, we show how these structures can be modified in order to
+prove security.  These modification are conceptually straightforward and
+intuitive; we do not, however, study the deployment implications of these
+modifications.
 
 \paragraph{Bloom filters, our in-depth study}
 Due to their wide-spread and varied use (and following NY), we begin
