@@ -1,9 +1,9 @@
 \label{sec:count}
 \begin{figure}
-  \twoColsNoDivide{0.22}
+  \twoColsNoDivide{0.33}
   {
     \underline{$\Rep^R_K(\col)$}\\[2pt]
-      $\salt \getsr \bits^\lambda$\\
+      $\salt \getsr \bits^\lambda$ \com{Choose a salt $\salt$}\\
       $\pub \gets \langle \zeroes(m), \salt\rangle$\\
       for $x \in \col$ do \\
         $\tab \pub \gets \Up^R_K(\pub, \up_{x,1})$\\
@@ -37,19 +37,36 @@
   \label{fig:cbf-def}
 \end{figure}
 
-Counting filters are a modified version of Bloom filters which are designed to,
-like a count min-sketch, allow for deletion as well as insertion~\cite{fan2000summary}.
-Unlike CMSes,
-however, counting filters are designed to handle set membership queries rather
-than frequency queries. Despite this, the two structures are closely related in
-terms of security properties. We show that \errep\ security is similarly
-impossible, but employing $\ell$-thresholding allows for \erreps\ security with a
-bound that is close to count min-sketch. This $\ell$-thresholded filter is
-formally defined in Figure~\ref{fig:cbf-def}.
+Counting filters are a modified version of Bloom filters. Like ordinary
+Bloom filters, counting filters are only designed to handle set membership
+queries, but counting filters are designed to
+allow for deletion as well as insertion~\cite{fan2000summary}.
+%
+Our construction
+$\countbloom[R,\ell,\lambda]$ defined in Figure~\ref{fig:cbf-def} involves an
+$\ell$-thresholded version of this structure. The traditional description of
+a counting filter involves a parameter $n$ describing the size of the input
+multiset, whereas our $\ell$ describes the maximum number of nonzero counters. As
+in the case of ordinary Bloom filters, this does not significantly change the operation
+of the filter in a non-adversarial setting, since for random input multisets the
+number of nonzero counters is closely related to the number of elements in the
+multiset.
+%
+In the presence of an adversary, however, we expect $\ell$-thresholding to
+provide better security bounds than the traditional definition would provide by
+handicapping pollution attacks and similar adversarial strategies.
+
+We will show that, in the \errep\ setting, the counting filter is
+insecure regardless of whether $\ell$-thresholding is used or not, and
+regardless of the details of the behavior of the hash function or PRF used to
+insert and delete elements. On the other
+hand, we show that \erreps\ security is achievable even under the assumption
+that a salted but unkeyed hash function is used, i.e. $\lambda > 0$ but $\keys =
+\{\emptyset\}$.
 
 \heading{Error function for frequency queries}
 %
-Unlike with a Bloom filter or count min-sketch, counting filters must account
+Unlike with a Bloom filter, counting filters must account
 for two different types of errors: false positives and false negatives. To be as
 general as possible, we define a parametrized error function~$\delta$ for
 positive $\delta^+, \delta^- \in \R$ as
@@ -65,17 +82,38 @@ This means that false positives are given a weight of $\delta^+$ while false
 negatives are given a weight of $\delta^-$, and correct responses are given a
 weight of 0.
 
-\subsection{Insecurity of public counting filters}
-Any counting filter construction necessarily fails to satisfy \errep\
-correctness for the same reasons as in the case of count min-sketch. In
-particular, the adversary can call $\REPO(\emptyset)$ to receive an empty
-representation, insert an element $x$, observe which counters are incremented by
-this insertion, and then delete $x$. By doing this repeatedly, the adversary can
-gain information about which elements overlap with which combinations of other
-elements, and can therefore mount the same attack described in
-Section~\ref{sec:pub-sketch-bad}.
+\subsection{Insecurity of public counting filters}\label{sec:pub-count-bad}
+Unlike in the Bloom filter case, good security bounds cannot be achieved for a
+counting filter in the \errep\ setting, even if salts and/or private keys are
+used. The insecurity is due to the relative power of the $\UPO$ oracle compared
+to the Bloom filter, which adds and subtracts numeric values stored in the structure rather
+than seeing only the effects of a bitwise-OR.
+Because of this, the adversary can mount
+an attack similar to the target-set coverage attack for a Bloom filter even if a
+PRF is used for
+hashing. First, the adversary calls $\REPO(\emptyset)$ to get an empty
+representation. The adversary can then call $\UPO$ to insert an element into the
+set, see exactly what the outputs of each of the hash functions are, and then
+call $\UPO$ again to delete the element. By doing this repeatedly, an adversary
+can determine the outputs of the PRF for $u$ different inputs using $2u$ calls
+to $\UPO$. The combination of public representation with the insertion
+and deletion operations effectively provides an oracle for the secretly-keyed
+PRF. Once a sufficiently large number of PRF outputs has been determined,
+the adversary can construct the test and target set used for the target-set
+coverage attack (Section~\ref{sec:bad-bfs}). The adversary then calls $\UPO$ several more times to insert
+each element of the test set into the filter, and then
+each element of the target set will be overestimated.
 
-\subsection{Private Thresholded Counting Filters}
+In actual use, this specific attack may not be feasible for the adversary.
+However, as long as the filter is public, the adversary can easily determine the
+exact results of inserting or deleting any element just by seeing which counters
+are incremented or decremented. For this reason it is not enough that the
+function used to perform queries and updates is impossible for the adversary to
+simulate, since the adversary can build a lookup table just by watching the
+filter as it is updated. Instead, we must require that the filter itself be kept
+secret from the adversary.
+
+\subsection{Security of private, $\ell$-thresholded counting filters}
 
 \begin{theorem}\label{thm:counting-erreps}
 Fix integers $q_R,q_T,q_U,q_H,q_V, r, t \geq 0$, let $p_\ell = ((\ell+1)/m)^k$,
@@ -84,50 +122,35 @@ $r' = \lfloor r/\max(\delta^+,k\delta^-) \rfloor$. For all such
 $q_R,q_T,$ $q_U,q_H,q_V,r$, and~$t$, if $r' > p_\ell q_T$ then
   \begin{equation*}
   \begin{aligned}
-   \Adv{\erreps}_{\Pi,\delta,r}(O(t),\,&q_R,q_T,q_U,q_H,q_V) \leq\\
-     & q_R \cdot \left[\frac{q_H}{2^\lambda} + e^{r'-p_\ell q_T}\left(\frac{p_\ell q_T}{r'}\right)^{r'}\right],
+   \Adv{\erreps}_{\Pi,\delta,r}(O(t),\,&q_R,q_T,q_U,q_H,q_V) \leq q_R \cdot \left[\frac{q_H}{2^\lambda} + e^{r'-p_\ell q_T}\left(\frac{p_\ell q_T}{r'}\right)^{r'}\right],
   \end{aligned}
 \end{equation*}
 where $H$ is modeled as a random oracle.
 \end{theorem}
-The proof combines details from the proofs of count min-sketch bounds and the
-proofs of Bloom filter bounds. In particular, we begin by following an argument
-as in the count min-sketch case to limit the advantage the adversary can get
-from deleting elements and from re-inserting elements of the original set. There
-is a difference in the counting filter case in that \emph{inserting} a known
-false positive cannot benefit the adversary, while \emph{deleting} it can. This
-is the opposite of the count min-sketch case, but the effect on the bound is
-quite similar. In each case we give the adversary additional credit for finding
-these false positives while constraining them to not modify false positives they
-find. This causes $r'$ to appear in the proof bound rather than $r$ in each
-case, but because of the different error functions the definitions of $r'$ are
-slightly different.
-%
-After this step, we observe that a counting filter without
-deletion behaves the same as an ordinary Bloom filter in terms of how it
-responds to queries. We can therefore borrow the arguments used to establish the
-bounds in Theorem~\ref{thm:sbf-erreps-th} to finish the proof.
-%
-We defer the details of the proof to Appendix~\ref{sec:proof/counting-erreps}.
-%\begin{proof}
-%  \input{proof/scbf-erreps-th}
-%\end{proof}
+The proof is similar to the case of count min-sketch, but has additional
+difficulties because the deletion operation is somewhat more complex to deal
+with in the case of a counting filter. In particular, because the filter contains
+single bits rather than counters, the adversary may be able
+to `delete' an element incorrectly believed to be in the set in order to induce
+false negatives. We therefore delay the proof until after the proof
+of Theorem~\ref{thm:scms-erreps-th} in Section~\ref{sec:sketch-proof} for count min-sketches. The two proofs are
+in fact quite similar due to similarity of the two structures, and in particular
+the fact that the allowed updates are the same.
 
-\subsection{Discussion}
-The results for counting filters are similar to the results for count-min
-sketch, as might be expected given the similarities in terms of both the
-supported updates and the structure of the representations themselves (any
-count-min sketch can be transformed into a counting filter by adding all the
-rows together element-wise.) In particular, we again see that counting filters
-which are publicly visible cannot provide good security guarantees. This means
-that counting filters intended for a security-sensitive setting should be kept
-hidden from potential adversaries. Furthermore, our bound relies on
-per-representation random salts and $\ell$-thresholding, so these changes should
-also be taken into account when constructing secure counting filters. The size
-increase of the filters is comparable to the size increase of count
-min-sketches, but is distinct in that it depends on the relative weight of false
-positives as opposed to false negatives. False negatives impact the bound more
-than false positives due to the scaling factor of $k$ that appears in $r'$,
+So we find that, unlike Bloom filters, there is no simple tweak that can be performed
+to a counting filter to provide good \errep\ security bounds. In particular, it
+does not achieve security even in the immutable setting, and adding a secret key
+does not help.
+%
+However, the bound above shows that in settings where filters can be assumed
+secret it is possible to prove an upper bound on the number of overestimates an
+adversary can cause. In particular, we recommend the combination of random
+per-representation salts and $\ell$-thresholding in order to mitigate possible
+attacks in the \erreps\ setting.
+
+False negatives impact the bound more
+than false positives due to the scaling factor of $k$ that appears in $r'$
+{\bf\color{red} OH NO, THIS~$r'$ IS THE FIRST THING ON THIS LINE!!!!},
 which indicates that applications seeking to minimize false negatives will
 require larger filters than those seeking to minimize false positives. This is
 distinctly different than in the non-adaptive setting, where false positives are

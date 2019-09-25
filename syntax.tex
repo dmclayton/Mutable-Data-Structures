@@ -14,7 +14,7 @@ string.
 %
 Let $X \cat Y$ denote the concatenation of bitstrings~$X$ and~$Y$.
 %
-For all $m\geq0$ define~$\bmap_m$ as the following function.  For all
+For all $m\geq0$ define~$\bmap_m$ as the following function: for all
 $\v.x\in[m]^*$ let $\bmap_m(\v.x) = X_1X_2\cdots X_m\in\bits^m$, where
 $X_v=1$ if and only if $\v.x_i = v$ for some $i\in[|\v.x|]$.
 %
@@ -22,19 +22,18 @@ We call $\bmap_m(\v.x)$ the \emph{bitmap} of~$\v.x$.
 %
 Let~$X$ and~$Y$ be equal-length bitstrings. We write $X \OR Y$ for their
 bitwise-OR, $X \AND Y$ for their bitwise-AND, and $X \XOR Y$ for their
-bitwise-XOR. Let $\NOT X = 1^{|X|} \xor X$, and let $\hw(X)$ denote the Hamming
+bitwise-XOR. Let $\NOT X = 1^{|X|} \xor X$ (bitwise-NOT), and let $\hw(X)$ denote the Hamming
 weight of (i.e., the number of 1s in)~$X$.
 %
-For an array~$\v.M$ of integers, we analogously define $\hw'(\v.m)$ to be the number
-of \emph{nonzero} integers in the array. We also define $\zeroes(m)$ to be a
-function taking a non-negative integer and returning a length-$m$ integer vector
-with all entries set to~$0$.
+For an array~$\v.M$ of integers, we analogously define $\hw'(\v.M)$ to be the number
+of \emph{nonzero} integers in the array. We also let $\zeroes(m)$ denote the
+length~$m$ vector of zeros.
 
 Let $\Func(\setX,\setY)$ denote the set of functions $f:\setX\to\setY$.
 %
 For every function~$f: \setX \to \setY$, define $\id^f: \{\emptystr\} \times \setX \to \setY$ so that
 $\id^f(\emptystr, x) = f(x)$ for all $x$ in the domain
-of~$f$. This allows us to talk about using unkeyed hash functions $H$ in places where,
+of~$f$. This allows us to use unkeyed hash functions $H$ in situations where,
 syntactically, a function is required to take a key along with its input.
 
 \heading{Adversaries}
@@ -52,14 +51,14 @@ function to be a function $F: \setK \times \setX \to \setY$. The intent is for
 the outputs of the function to appear random for a fixed choice of key, which is
 formally captured by the game described in Figure~\ref{fig:prf-def}. We define
 the advantage of an adversary $\advA$ to be
-$\Adv{\prf}_F(\advA) = \Prob{\Exp{\prf}_F(\advA) = 1}$, and the advantage
+$\Adv{\prf}_F(\advA) = \Prob{\Exp{\prf}_F(\advA) = 1}$, and the function
 $\Adv{\prf}_F(t,q)$ to be the maximum advantage of any adversary running for $t$
-steps and making $q$ queries to the PRF oracle.
+steps and making $q$ queries to~$\PRFO$.
 %\cpnote{We could save a few inches here by changing the definition. I personally
 %like a nice, concrete PRF notion like this one, however.}
 
 \begin{figure}
-  \twoColsNoDivide{0.22}
+  \twoColsNoDivide{0.24}
   {
     \experimentv{$\Exp{\prf}_F(\advA)$}\\[2pt]
       $b \getsr \bits$; $\key \getsr \keys$\\
@@ -79,7 +78,7 @@ steps and making $q$ queries to the PRF oracle.
   \vspace{-8pt}
 \end{figure}
 
-\subsection{Data Structures}
+\subsection{Data structures}
 Fix non-empty sets $\mathcal{D}, \mathcal{R}, \keys$ of \emph{data objects},
 \emph{responses} and \emph{keys}, respectively.  Let $\mathcal{Q}\subseteq
 \Func(\mathcal{D},\mathcal{R})$ be a set of allowed \emph{queries}, and let
@@ -87,7 +86,7 @@ $\mathcal{U} \subseteq \Func(\mathcal{D},\mathcal{D})$ be a set of allowed
 data-object \emph{updates}.  A {\em data structure} is a tuple $\Pi =
 (\Rep,\Qry,\Up)$, where:
 
-\begin{itemize}[leftmargin=*]
+\begin{itemize}[leftmargin=.2in]
   \item $\Rep\colon \keys \times \mathcal{D} \to \{0,1\}^* \cup \{\bot\}$ is a
   randomized {\em representation algorithm}, taking as input a key $\key \in
   \keys$ and data object $\col \in \mathcal{D}$, and outputting the
@@ -108,7 +107,7 @@ data-object \emph{updates}.  A {\em data structure} is a tuple $\Pi =
 
 Allowing each of the algorithms to take a key~$K$ lets us separate (in our
 security notions) any secret randomness used across data structure operations,
-from per-operation randomness (e.g., salts).  Note that our syntax admits the
+from per-operation randomness (e.g., generation of a salt).  Note that our syntax admits the
 common case of \emph{unkeyed} data structures, by setting
 $\keys=\{\emptystring\}$.
 
@@ -122,10 +121,24 @@ choices, too.  Many common data structures do not have randomized representation
 updates, but some do, e.g. the Cuckoo filter~\cite{fan2014cuckoo} and the stable
 Bloom filter~\cite{deng2006approximately}.
 
-The query algorithm $\Qry$ is deterministic.  This reflects the overwhelming
-behavior of data structures in practice, in particular those with
-space-efficient representations. It also allows us to focus on correctness
+Note that $\Up$ takes a function operating on data objects as an argument, even
+though $\Up$ itself operates on \emph{representations} of data objects. This is
+intentional, to match the way these data structures generally operate.
+In a data structure representing a set or multiset, we often think of performing
+operations such as `insert $x$' or `delete $y$'. When the set or multiset is not
+being stored, but instead modeled via a representation, the representation must
+transform these operations into operations on the actual data structure it is
+using for storage.
+A Bloom filter, for example, will handle an `insert $x$' query by hashing $x$
+and setting the resulting bits in the filter to 1. In this way, the abstract
+insertion function $\up_x$, operating on sets, is handled by $\Up$ as a concrete
+action of setting certain bits in the filter. Side-effects of $\Up$,
+or cases where the algorithm's behavior does not perfectly match the intended
+update $\up$, are a potential source of errors that an adversary can exploit.
+
+We also note that the query algorithm $\Qry$ is deterministic.  This reflects
+the overwhelming behavior of data structures in practice, in particular those
+with space-efficient representations. It also allows us to focus on correctness
 errors caused by the actions of an adaptive adversary, without attending to
 those caused by randomized query responses.  Randomized query responses may be
 of interest from a data privacy perspective, but our focus is on correctness.
-

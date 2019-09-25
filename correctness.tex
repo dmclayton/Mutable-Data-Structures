@@ -9,13 +9,14 @@
 
 Let $\struct=(\Rep,\Up,\Qry)$ be a data structure with response space~$\results$.
 %
-We define two adversarial notions of correctness given by a pair of related
-experiments for~$\struct$, \emph{error function} $\delta:\results^2 \to \R$,
-and \emph{error capacity}~$r$. The values $\delta(x,y)$ of the error function
-represent the ``badness'' of getting an erroneous result of $x$ from $\Qry$ when
-$y$ should actually have been returned. In general we require
-$\delta(x,y) \geq 0$ and $\delta(x,x) = 0$ for all $x$ and $y$, but otherwise
-place no restrictions on what the error function might look like.
+We define two adversarial notions of correctness involving~$\struct$, an
+\emph{error function} $\delta:\results^2 \to \R$, and an \emph{error capacity}~$r$.
+The values $\delta(x,y)$ of the error function represent the ``badness'' of
+getting an erroneous result of $x$ from $\Qry$ when $y$ should actually have
+been returned. In general we require $\delta(x,y) \geq 0$ and $\delta(x,x) = 0$
+for all $x$ and $y$, but otherwise place no restrictions on what the error
+function might look like. For example, in the case of Bloom filters we use a
+very simply error function: $\delta(x,y) = 1$ for any $x \ne y$.
 
 The two correctness notions are given by the experiments in
 Figure~\ref{fig:security}. One corresponds to cases where the representations of
@@ -29,7 +30,9 @@ representations, we only give the adversary credit for $\QRYO$ calls that
 produce errors in the ``current'' data objects $\col_i$ and their
 representations $\pub_i$. Because we consider mutable data objects and
 representations, the notion of ``current'' is defined by calls to the $\REPO$
-and $\UPO$ oracles.
+and $\UPO$ oracles. In the case of Bloom filters, for example, we want to
+keep track of all the false positives which have been found so far, except for
+those false positives which have since been turned into true positives.
 
 To track errors, both experiments maintain an array $\err_i[]$ for every data
 object~$\col_i$ that has been defined.  Initially, $\err_i[]$ is implicitly
@@ -53,26 +56,24 @@ The first time $(i,\qry)$ is queried to~$\QRYO$ this is guaranteed, since the
 minimum possible value output by~$\delta$ is~$0$. After this, the adversary gets
 credit only for making a worse error than the one already found. This prevents
 the adversary from trivially winning by repeatedly sending the same
-error-producing query to $\QRYO$.
+error-producing query to $\QRYO$. In our Bloom filter example, if $\QRYO$ finds
+that $\qry$ is a new false positive, it will set $\err_i[\qry]$ to 1, showing
+that an additional error has been produced.
 
 When a query $\UPO(i,\up)$ is made, the oracle first updates the data
 object~$\col_i$ and its corresponding representation.
 %
 Now, for each defined value~$\err_i[\qry]$, we re-evaluate the error that
-\emph{would} be caused by the previously asked~$\qry$ WRT the newly updated
+\emph{would} be caused by the previously asked~$\qry$, with respect to the newly updated
 $\col_i$ and $\pub_i$. If the existing value of $\err_i[\qry]$ is larger than
-the error that~$\qry$ would cause to WRT the newly updated~$\col_i$ and
-$\pub_i$, then we overwrite $\err_i[\qry]$ with the smaller value.  Doing so
+the error that~$\qry$ would cause (again, w.r.t.\ the newly updated~$\col_i$ and
+$\pub_i$), then we overwrite $\err_i[\qry]$ with the smaller value.  Doing so
 ensures that the array~$\err_i$ does not overcredit the attacker for errors
-against the current data object and representation.
-
-For a concrete example of why these choices are necessary, consider a
-representation~$\pub$ of the set~$\col = \{1,2,3\}$ in some structure that
-supports set membership queries. Suppose an adversary learns that~$4$ is a
-false-positive value for $\pub$. If the adversary later uses an $\UPO$ query to
-add~$4$ to~$\col$, this should no longer count as a false positive. Our
-definition ensures that these known false positives are checked for and no
-longer counted if added to the set.
+against the current data object and representation. For example, if $x$ was
+previously found to be a false positive for a Bloom filter, and the adversary
+then inserts $x$ into the data structure, we set $\err_i[\qry_x]$ to 0. Since
+$x$ is now a true positive rather than a false positive, it should no longer
+be counted as an error.
 
 \erreps\ differs from \errep\ only in that the $\REPO$ and $\UPO$ oracles do not
 reveal the representation to the adversary. This models the case where the data

@@ -1,0 +1,115 @@
+\documentclass{article}
+\usepackage[margin=1in]{geometry}
+\usepackage[toc,page]{appendix}
+\usepackage[font={small}]{caption}
+\usepackage{amsthm}
+\usepackage{balance}
+\usepackage{xcolor}
+\usepackage{graphicx}
+\input{header}
+%\input{macros}
+%\usepackage{times}
+
+\DeclareMathAlphabet{\mathcal}{OMS}{cmsy}{m}{n}
+
+\newcommand{\proc}[1]{}
+\newcommand{\full}[1]{#1}
+
+\def\dashuline{\bgroup
+  \ifdim\ULdepth=\maxdimen  % Set depth based on font, if not set already
+    \settodepth\ULdepth{(j}\advance\ULdepth.4pt\fi
+  \markoverwith{\kern.15em
+  \vtop{\kern\ULdepth \hrule width .3em}%
+  \kern.15em}\ULon}
+
+%\newcounter{foot}
+%\setcounter{foot}{1}
+
+\newtheorem{theorem}{Theorem}
+\newtheorem{corollary}{Corollary}
+\newtheorem{definition}{Definition}
+
+\newtheorem{lemma}{Lemma}
+
+\theoremstyle{remark}
+%\newtheorem*{remark}{Remark}
+\newtheorem{remark}{Remark}
+
+
+\usepackage{enumitem}
+\setlist{parsep=2pt}
+
+% While in submission
+\usepackage{fancyhdr}
+
+% Editorial
+%\newcommand{\note}[3]{\basenote{#1}{#2}{says}{#3}}
+\renewcommand{\subsubsection}[1]{\medskip\noindent\textbf{#1.}}
+%\newcommand{\heading}[1]{\textit{#1.}}
+\newcommand{\keywords}[1]{\medskip\noindent\textbf{Keywords:}~#1}
+
+%\setlength{\textfloatsep}{10pt}
+%\setlength{\abovecaptionskip}{4pt}
+%\setlength{\parskip}{0pt}
+%\setlength{\parsep}{0pt}
+%\setlength{\headsep}{0pt}
+%\setlength{\topskip}{0pt}
+%\setlength{\topmargin}{0pt}
+%\setlength{\topsep}{0pt}
+%\setlength{\partopsep}{0pt}
+
+% fix-ups
+\newcommand{\noiselowlevelruler}{\vspace{6pt}\hrule}
+\newcommand{\abovegamespacer}{\vspace{-8pt}}
+\newcommand{\boxsep}[1]{\\\hspace*{-4.5pt}\rule{1.038\textwidth}{0.5pt}\vspace{3pt}}
+\newcommand{\noiselcolwidth}{0.48}
+\newcommand{\noisercolwidth}{0.48}
+\newcommand{\prelimboxfix}{0.303}
+\newcommand{\infull}[1]{#1}
+\newcommand{\inproc}[1]{}
+%\newcommand{\missingqed}{}
+\newcommand{\thetheoremoneproof}{Proof of Theorem~\ref{thm:sufficient2}}
+\newcommand{\noiseboxtab}{\tab}
+\newcommand{\compthmspacer}{}
+\newcommand{\belowcap}{\vspace{6pt}\hrule}
+
+%\pagestyle{fancy}
+
+\date{}
+\title{Probabilistic Data Structures in Adversarial Environments}
+\author{David Clayton, Christopher Patton, and Thomas Shrimpton}
+\date{\small Florida Institute for Cybersecurity Research\\
+Computer and Information Science and Engineering \\ University of Florida
+\\[2pt]
+\texttt{\{\texttt{davidclayton},\texttt{cjpatton},\texttt{teshrim}\}@ufl.edu}
+}
+
+\usepackage{fancyhdr}
+\fancyhf{} % sets both header and footer to nothing
+\renewcommand{\headrulewidth}{0pt}
+
+\setcounter{tocdepth}{2}
+
+\begin{document}
+
+\maketitle
+\thispagestyle{fancy}
+\lhead{The proceedings version of this paper appears at CCS~'19. This is the
+full version.}
+
+\begin{abstract}
+  \input{abstract}
+\end{abstract}
+
+\newpage
+
+\tableofcontents
+
+\newpage
+
+%\pagestyle{fancy}
+%\lhead{C. Patton and T. Shrimpton}
+%\rphead{Security in the Presence of Key-Reuse}
+\input{mutable-body}
+
+\end{document}

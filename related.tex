@@ -1,15 +1,15 @@
 \paragraph{Comparison with Naor-Yogev}
-As previously noted, Naor and Yogev~\cite{naor2015bloom} were the first to
+As previously noted, NY~\cite{naor2015bloom} were the first to
 formalize adversarial correctness of Bloom filters.  Our work extends theirs
 significantly in several directions. First, we consider abstract data
 structures, rather than only set-membership structures.  Even with respect to
 the specific case of correctness for set-membership structures, our work offers
-several advantages as compared to the Naor-Yogev treatment.
+several advantages as compared to the NY treatment.
 %
 One, our syntax distinguishes between the (secret) key and the public portion of
 a data structure, an important distinction that is missing in their work.
 %
-Two, the Naor-Yogev definition of correctness allows the adversary to make
+Two, the NY definition of correctness allows the adversary to make
 several queries, some of which may produce incorrect results; the attacker then
 succeeds if it outputs a \emph{fresh} query that causes an error. This
 separation seems arbitrary, and we propose instead a parameterized definition in
@@ -23,24 +23,11 @@ real-world constructions to understand their security.
 \paragraph{Other related works}
 There is a long tradition in computer science of designing structures that
 concisely (but probabilistically) represent data so as to support some set of
-queries, and each of these structures has its own interesting security
-characterisitcs~\cite{chazelle2004bloomier,cormode2005improved,DP08a,DF03,fredman1984storing,mironov2011sketching}.
+queries~\cite{chazelle2004bloomier,cormode2005improved,DP08a,DF03,fredman1984storing,mironov2011sketching}.
+Each of these structures has its own interesting security characterisitcs.
 
-We have already mentioned the ubiquity of Bloom filters in support of efficient
-network communication and computing protocols.  They also find use in
-security-critical environments, including spam filters, (distributed)
-denial-of-service attack detection, and deep packet
-inspection~\cite{tarkoma2012theory}.  Recently, Bloom filters were proposed as a
-means of efficient certificate-revocation list (CRL)
-distribution~\cite{larisch2017crlite}, a crucial component of public-key
-infrastructures.
-
-% Correctness attacks
-Correctness of data structures in adversarial settings is well-motivated in the
-security literature and in practice.
-%
 Perhaps the earliest published attack on the correctness of a data structure was due to
-Lipton and Naughton~\cite{lipton1993clocked} who showed that timing analysis of
+Lipton and Naughton~\cite{lipton1993clocked}, who showed that timing analysis of
 record insertion in a hash table allows an adversary to adaptively choose
 elements so as to increase look-up time, effectively degrading a service's
 performance.
@@ -57,7 +44,9 @@ functions (as do~\cite{crosby2003denial}), their methodology is effective even
 for good choices of hash functions.
 %
 They suggest revised parameter choices for Bloom filters (i.e., filter length and
-number of hashes) in order to cope with their attacks.
+number of hashes) in order to cope with their attacks, as well as the use of
+keyed hash functions. With our more general attack model, however, we will see
+that a secret key alone does not guarantee correctness.
 
 
 \ignore{
@@ -104,7 +93,7 @@ variant.}
 }\fi
 
 \if{0}{
-  We recommend reading the Naor-Yogev paper for a survey of related work and a
+  We recommend reading the NY paper for a survey of related work and a
   discussion of related papers. Here we mention a few additional practical
   works, but stress that this only scratches the surface.
   %

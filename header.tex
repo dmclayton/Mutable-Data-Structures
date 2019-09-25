@@ -26,6 +26,7 @@
 %\usepackage{parskip}
 \usepackage{multirow}
 \usepackage{array}
+\usepackage{enumitem}
 %\usepackage{framed}
 
 \hypersetup{
@@ -155,7 +156,7 @@
 \newcommand{\algorithmv}[1]{\underline{{alg.} #1}:}
 
 % - Inline comment
-\definecolor{CommentColor}{RGB}{125,175,230}
+%\definecolor{CommentColor}{RGB}{125,175,230}
 %\newcommand{\comment}[1]{\textcolor{CommentColor}{\,\textbf{\#}\,#1}}
 \definecolor{theblue}{RGB}{85,135,170}
 \newcommand{\com}[1]{\text{\textcolor{theblue}{\,\text{//}\,{\small #1}}}}
@@ -396,9 +397,9 @@
 \newcommand{\anytodo}[1]{\todo{ANY}{#1}}
 \newcommand{\tsnote}[1]{\note{cyan}{TS}{#1}}
 \newcommand{\jnote}[1]{\note{green}{Jon}{#1}}
-\definecolor{darkgreen}{RGB}{50,127,0}
+%\definecolor{darkgreen}{RGB}{50,127,0}
 \newcommand{\cpnote}[1]{\note{darkgreen}{CP}{#1}}
-\definecolor{orange}{RGB}{255,165,0}
+%\definecolor{orange}{RGB}{255,165,0}
 \newcommand{\dcnote}[1]{\note{orange}{DC}{#1}}
 \newcommand{\dctodo}[1]{\todo{David}{#1}}
 \newcommand{\ignore}[1]{\if{0} #1 \fi}
