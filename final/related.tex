@@ -23,24 +23,11 @@ real-world constructions to understand their security.
 \paragraph{Other related works}
 There is a long tradition in computer science of designing structures that
 concisely (but probabilistically) represent data so as to support some set of
-queries, and each of these structures has its own interesting security
-characterisitcs~\cite{chazelle2004bloomier,cormode2005improved,DP08a,DF03,fredman1984storing,mironov2011sketching}.
+queries~\cite{chazelle2004bloomier,cormode2005improved,DP08a,DF03,fredman1984storing,mironov2011sketching}.
+Each of these structures has its own interesting security characterisitcs.
 
-We have already mentioned the ubiquity of Bloom filters in support of efficient
-network communication and computing protocols.  They also find use in
-security-critical environments, including spam filters, (distributed)
-denial-of-service attack detection, and deep packet
-inspection~\cite{tarkoma2012theory}.  Recently, Bloom filters were proposed as a
-means of efficient certificate-revocation list (CRL)
-distribution~\cite{larisch2017crlite}, a crucial component of public-key
-infrastructures.
-
-% Correctness attacks
-Correctness of data structures in adversarial settings is well-motivated in the
-security literature and in practice.
-%
 Perhaps the earliest published attack on the correctness of a data structure was due to
-Lipton and Naughton~\cite{lipton1993clocked} who showed that timing analysis of
+Lipton and Naughton~\cite{lipton1993clocked}, who showed that timing analysis of
 record insertion in a hash table allows an adversary to adaptively choose
 elements so as to increase look-up time, effectively degrading a service's
 performance.

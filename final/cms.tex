@@ -59,8 +59,8 @@ bound that is close to count min-sketch.
 The CMS is designed to minimize the number of elements whose
 frequencies are overestimated, while still allowing for reasonably low memory
 usage. For a function $\rho$ and integer $\lambda\ge0$, let
-$\sketch[\id^\rho,n,\lambda] = (\Rep^\rho,\Qry^\rho,\Up^\rho)$ as defined
-previously. If $\col$ is a multiset containing a total of $n$ elements
+$\sketch[\id^\rho,n,\lambda] = (\Rep^\rho,\Qry^\rho,\Up^\rho)$ as defined in
+Figure~\ref{fig:cms-def}. If $\col$ is a multiset containing a total of $n$ elements
 (counting duplicates as separate elements), i.e. $\col \in \Func(\bits^*,\N)$ in
 our syntax, and $x \in \bits^*$ is any string, possibly but not necessarily a
 member of $\col$, we define the error probability as
@@ -122,6 +122,7 @@ elements, and can therefore mount the same attack described in
 Section~\ref{sec:pub-count-bad}.
 
 \subsection{Private, $\ell$-thresholded sketches}
+\label{sec:sketch-proof}
 
 Given the success of $\ell$-thresholding in the case of Bloom filters, we
 continue using this tweak in the case of count min-sketches. Between
@@ -164,10 +165,22 @@ seeks to find $r'$ overestimates by making arbitrary queries.
 }
 
 \full{
-  \begin{proof}[Proof Sketch of Theorem~\ref{thm:scms-erreps-th}]
+  \begin{proof}[Proof of Theorem~\ref{thm:scms-erreps-th}]
   \input{fullproof/scms-erreps-th}
 \end{proof}
 }
+
+Now that we have proven Theorem~\ref{thm:scms-erreps-th}, we now return to the case
+of the counting filter for the proof of Theorem~\ref{thm:counting-erreps}. While the two structures
+appear rather different due to the two-dimensional nature of sketches and their
+support for frequency queries rather than simple membership queries, the security
+proofs turn out to be quite similar. In particular, due to our choice of error
+function, the proofs coincide as soon as we have managed to reduce to the case
+where the adversary makes no deletions. In this scenario, false positives arise
+in a counting filter in precisely the same way that overestimates arise in a count
+min-sketch. Once we have reduced to the no-deletion scenario, the proofs become
+almost identical, an interesting result which might extend to other data structures
+as well.
 
 \proc{
   \begin{proof}[Proof Sketch of Theorem~\ref{thm:counting-erreps}]
@@ -176,7 +189,7 @@ seeks to find $r'$ overestimates by making arbitrary queries.
 }
 
 \full{
-  \begin{proof}[Proof Sketch of Theorem~\ref{thm:counting-erreps}]
+  \begin{proof}[Proof of Theorem~\ref{thm:counting-erreps}]
   \input{fullproof/scbf-erreps-th}
 \end{proof}
 }

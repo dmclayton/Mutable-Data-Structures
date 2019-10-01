@@ -71,8 +71,8 @@ At the end of the section, we discuss the second class of filters that we call t
 number of elements are added to the set, a thresholded filter is deemed full
 once at least $\ell\geq0$ bits of the filter are set.
 %
-In the usual, non-adaptive setting, this strategy performs
-similarly to the standard Bloom filter, but we find that a filter threshold
+In the usual, non-adaptive setting, this implementation behaves very
+similarly to the standard `$n$-capped' Bloom filter, but we find that a filter threshold
 allows us to obtain better bounds.
 %
 We will demonstrate this for salted BFs in the \erreps\ setting.
@@ -258,7 +258,7 @@ The works because the adversary can test for errors on its own because it knows
 the salt.  In practice, an adversary may not be able to perform this exact
 attack, since even in the streaming setting it is possible that the salt is not
 immediately revealed to the adversary. However, as soon as the adversary does
-learn the salt, it can immediately launch a pollution attack against the filter,
+learn the salt, it can immediately launch a target-set coverage attack against the filter,
 without having to make any queries directly to the filter.
 %
 \ignore{Just as in the immutable setting the adversary can exploit its knowledge
@@ -297,7 +297,7 @@ of~$q_R$ means that the bound we can prove is weakened somewhat when a number of
 representations are observed by the adversary. (In Section~\ref{sec:bf-thresh},
 we will show that we can do better by thresholding rather than capping.) The $q_H/2^\lambda$ term
 corresponds to the probability of the adversary guessing the salt before the
-representation is constructed, but this will be negligible as long as $\lambda$
+representation is constructed, but this will be very small as long as $\lambda$
 is chosen to be sufficiently large (say, $\lambda=128$). The final, messier term
 comes from applying a Chernoff bound to the non-adaptive adversary's probability
 of succeeding in the experiment given $q = q_H+q_T$ guesses.
@@ -319,7 +319,7 @@ and Mitzenmacher~\cite{kirsch2006less}.
 Figure~\ref{fig:bf-bound} shows values
 of~$\zeta_{k,m,n}(q,r)$ for varying~$m$.
 %
-What this plot shows is that, for a given error capacity~$r$, once a certain lower
+What these plots show is that, for a given error capacity~$r$, once a certain lower
 bound on the filter size is reached, the $\zeta$ term decreases quite quickly.
 Moreover, the rate at which~$\zeta$ decreases scales nicely with the error
 capacity.  For example, if one is willing to tolerate up to~$r=10$ false
@@ -339,7 +339,7 @@ hash function, the adversary's attack is largely \emph{online}, rendering
 the~$q$ term quite conservative. In these settings, a significantly smaller
 filter will do. For example, if we assume that an adversary making an online
 attack will make no more than $q=2^{32}$ online queries, we get the results seen
-in Figure~\ref{fig:bf-bound-online}. Beyond this, if a larger error rate is acceptable, the filters can
+in the lower plots of Figure~\ref{fig:bf-bound}. Beyond this, if a larger error rate is acceptable, the filters can
 again be made substantially smaller.
 
 \begin{figure}
@@ -349,7 +349,7 @@ again be made substantially smaller.
   \includegraphics[scale=0.9]{fig/bf-bound-online}
   \includegraphics[scale=0.9]{fig/bf-bound-big-online}
   \caption{
-    The value of $\zeta_{k,m,n}(q,r)$ (Equation~(\ref{eq:zeta})) for $q=2^{64}$ (top) or $q = 2^{32}$,
+    The value of $\zeta_{k,m,n}(q,r)$ (Equation~(\ref{eq:zeta})) for $q=2^{64}$ (top) or $q = 2^{32}$ (bottom),
     $k=16$, $n=100$ (left) or $n=10^9$ (right), varying values of~$r$ (one line per $r$-value) and filter
     length~$m$ (the x-axis).  Note the log-2 scale on the y-axis.
   }
@@ -534,7 +534,7 @@ The non-adaptive false positive probability is similar is similar to capped
 filters, since the number of~$1$ bits in the filter can be closely predicted
 from the number of elements in a randomly-selected underlying set. Because of
 this, and because we are able to demonstrate better security bounds for an
-$\ell$-thresholded filter than for a capped filter, we suggest this as a way
+$\ell$-thresholded filter than for a capped filter (Theorem~\ref{thm:sbf-erreps}), we suggest this as a way
 of providing strong security guarantees for even smaller filter sizes.
 
 \begin{theorem}[\erreps\ security of thresholded BFs]
@@ -573,16 +573,16 @@ limit on the adversarial advantage even in this worst-case scenario.
 
 \subsection{Discussion}
 
-These results show that the standard Bloom filter construction is weak to
+The target-set coverage attack shows that the standard Bloom filter construction is weak to
 adaptive adversaries. Moving to the salted $\SBF$ construction mitigates this,
-but if filters are public they must be both large and immutable. In the \erreps\
+but if filters are public they must be both large and immutable (Theorem~\ref{thm:sbf-errep-immutable}). In the \erreps\
 setting updates do not break security and the minimum size of the filter to
-guarantee a fixed error rate is considerably reduced. The guarantee (or,
+guarantee a fixed error rate is considerably reduced (Theorem~\ref{thm:sbf-erreps}). The guarantee (or,
 equivalently, filter size) can be further improved, especially if the number of
-representations constructed is large, by using $\ell$-thresholding.
+representations constructed is large, by using $\ell$-thresholding (Theorem~\ref{thm:bf-thr-bound}).
 Additionally, if the filters themselves cannot be kept private but a secret key
 for the hash functions \emph{can} be concealed from adversaries, the $\KBF$
-construction shows how to provide security in the \errep\ setting.
+construction shows how to provide security in the \errep\ setting (Theorem~\ref{thm:bf-key-bound}).
 
 These requirements are more stringent than the mitigations suggested by Gerbet
 \etal~\cite{gerbet2015power} due to our stronger attack model (where multiple
@@ -607,7 +607,7 @@ set of size $n$ can set at most $nk$ bits to 1, and this upper bound only occurs
 in the unlikely circumstance that there are no hash collisions during insertion.
 When we take into account the factor of~$q_R$ present in the $n$-capped security
 bound, we conclude that thresholding provides significantly more security if the
-adversary is allowed a non-negligible number of calls to $q_R$.
+adversary is allowed even a small number of additional calls to $q_R$.
 
 \begin{figure}
   \begin{center}

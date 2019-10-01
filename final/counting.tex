@@ -37,10 +37,10 @@
   \label{fig:cbf-def}
 \end{figure}
 
-Counting filters are a modified version of Bloom filters which are designed to
-allow for deletion as well as insertion~\cite{fan2000summary}. Like ordinary
+Counting filters are a modified version of Bloom filters. Like ordinary
 Bloom filters, counting filters are only designed to handle set membership
-queries.
+queries, but counting filters are designed to
+allow for deletion as well as insertion~\cite{fan2000summary}.
 %
 Our construction
 $\countbloom[R,\ell,\lambda]$ defined in Figure~\ref{fig:cbf-def} involves an
@@ -58,7 +58,8 @@ handicapping pollution attacks and similar adversarial strategies.
 
 We will show that, in the \errep\ setting, the counting filter is
 insecure regardless of whether $\ell$-thresholding is used or not, and
-regardless of the details of the behavior of the function $R$. On the other
+regardless of the details of the behavior of the hash function or PRF used to
+insert and delete elements. On the other
 hand, we show that \erreps\ security is achievable even under the assumption
 that a salted but unkeyed hash function is used, i.e. $\lambda > 0$ but $\keys =
 \{\emptyset\}$.
@@ -132,10 +133,11 @@ with in the case of a counting filter. In particular, because the filter contain
 single bits rather than counters, the adversary may be able
 to `delete' an element incorrectly believed to be in the set in order to induce
 false negatives. We therefore delay the proof until after the proof
-of Theorem~\ref{thm:scms-erreps-th} for count min-sketches.
+of Theorem~\ref{thm:scms-erreps-th} in Section~\ref{sec:sketch-proof} for count min-sketches. The two proofs are
+in fact quite similar due to similarity of the two structures, and in particular
+the fact that the allowed updates are the same.
 
-\subsection{Discussion}
-Unlike Bloom filters, there is no simple tweak that can be performed
+So we find that, unlike Bloom filters, there is no simple tweak that can be performed
 to a counting filter to provide good \errep\ security bounds. In particular, it
 does not achieve security even in the immutable setting, and adding a secret key
 does not help.

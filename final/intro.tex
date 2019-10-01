@@ -121,7 +121,7 @@ negative.
 
 Both the Bloom and counting filters have binary query responses,
 making the notion of response error easy to define: the response is
-correct, or it isn't.  But practically important structures, like the count-min sketch, admit
+either correct or incorrect.  But practically important structures, like the count-min sketch, admit
 frequency-of-element queries, which have integer responses.  What
 constitutes an error is less clear for such queries.
 %
@@ -178,6 +178,14 @@ much stronger notion which we will find is not always achievable.
 
 \paragraph{Case studies and our findings}
 We exercise our syntax and notions by analyzing three important, real-world data
+<<<<<<< HEAD
+structures: Bloom filters~\cite{bloom1970space} (Section~\ref{sec:bloom}), counting
+filters~\cite{fan2000summary} (Section~\ref{sec:count}), and count
+min-sketches~\cite{cormode2005improved} (Section~\ref{sec:sketch}). Our studies examine the basic
+versions of each, as well as variants that may take a key or a
+per-representation random salt, and variants that incorporate measures
+of representation saturation.  Each of the basic structures supports different queries and
+=======
 structures: Bloom filters~\cite{bloom1970space} (Section~\ref{sec:bloom}), count
 min-sketches~\cite{cormode2005improved} (Section~\ref{sec:sketch}), and counting
 filters~\cite{fan2000summary} (Appendix~\ref{sec:count}), summarized in
@@ -185,6 +193,7 @@ Figure~\ref{fig:tab-structures}. We begin each analysis with the basic
 version of the structure, then consider variants that take a key or a
 per-representation random salt, as well as variants that incorporate measures
 of representation saturation.  Each basic structure supports different queries and
+>>>>>>> cba087e913c8fa6a1427901e764cd47ca02309ab
 update operations; taken together, they provide interesting coverage
 of the structure/attack-model landscape.
 
@@ -195,15 +204,15 @@ of the structure/attack-model landscape.
     \hline
     {\bf Structure} & {\bf Results}\\ \hline
     \parbox[c][2.4cm]{5cm}{Bloom\;filter\\(Fig.~\ref{fig:bf-def}, Fig.~\ref{fig:bft-def})}
-          & \parbox[c][2cm]{10cm}{Traditional implementation
+          & \parbox[c][2cm]{10cm}{Basic structure
             insecure.\\\emph{Immutable case:} structure can be secured
-    with per-representation salt. \emph{Mutable case:} structure additionally require a secret key or\\keeping representations private, and benefit from thresholding.}
+    with per-representation salt. \emph{Mutable case:} structure additionally require a secret key or\\keeping representations private, and benefit from thresholding (defining `fullness' by Hamming weight rather than number of elements).}
           \\ \hline
     \parbox[c]{5cm}{Counting filter (Fig.~\ref{fig:cbf-def})}
-          & \parbox[c][1.6cm]{10cm}{Traditional implementation insecure.\\Security can be achieved by combining a per-representation salt, thresholding, and private representations.}
+          & \parbox[c][1.6cm]{10cm}{Basic structure insecure.\\Security can be achieved by combining a per-representation salt, thresholding, and private representations.}
          \\ \hline
      \parbox[c]{5cm}{Count-min\;sketch\\(Fig.~\ref{fig:cms-def})}
-          & \parbox[c][1.6cm]{10cm}{Traditional implementation insecure.\\Security can be achieved by combining a per-representation salt, thresholding, and private representations.}
+          & \parbox[c][1.6cm]{10cm}{Basic structure insecure.\\Security can be achieved by combining a per-representation salt, thresholding, and private representations.}
           \\ \hline
   \end{tabular}
 \caption{A high-level summary of our results.}
@@ -220,10 +229,17 @@ coverage attacks} (described in Section~\ref{sec:bad-bfs}).  These are closely
 related to \emph{pollution attacks} against standard Bloom
 filters~\cite{gerbet2015power}, which we will discuss in some detail.
 
+<<<<<<< HEAD
+On the positive side, we show how these structures can be
+modified in ways that are conceptually
+straightforward and intuitive in order to prove security. Our results are summarized
+in Figure~\ref{fig:results-summary}.
+=======
 On the positive side, we show how these structures can be modified in order to
 prove security.  These modification are conceptually straightforward and
 intuitive; we do not, however, study the deployment implications of these
 modifications.
+>>>>>>> cba087e913c8fa6a1427901e764cd47ca02309ab
 
 \paragraph{Bloom filters, our in-depth study}
 Due to their wide-spread and varied use (and following NY), we begin
@@ -276,43 +292,43 @@ analytical value in adversarial environments.  In
 Theorem~\ref{thm:sbf-erreps-th}, we reconsider the security of salted
 BFs in the mutable, private setting, and exhibit substantially tighter bounds. In
 particular, we find that as long as salts are reasonably large, we can use
-a 1 kilobyte filter to store 100 objects, while incurring less than one in a million
-chance of a \emph{single} false positive.  This holds even if the adversary is allowed
-to completely control the filter's construction and make up to $2^{16}$ queries
-(see Figure~\ref{fig:bf-th}).
+a 900-byte filter to store 100 objects, while incurring a less than 10\%
+chance of a single false positive over the course of $2^{32}$ queries,
+and a less than one-in-a-million chance of 5 or more
+false positives (see Figure~\ref{fig:bf-th}).  This holds even if the adversary is allowed
+to completely control the filter's construction.
 
-
-\paragraph{Count min-sketches}
+\heading{Counting filters}
 Following the deep dive into Bloom filters in Section~\ref{sec:bloom}, we then
-consider count min-sketches (CMS), which provide a compact representation of a
-multiset, allowing additions and deletions, and yielding approximate queries for
-approximate frequency of an element in the multiset. While a count-min sketch
-hashes in much the same way as a Bloom filter, it uses a 2D array of non-negative
-integer counters rather than a linear array of bits, allowing the structure to
-keep track of how many times each counter is incremented.
-%
-We find that, CMSes are not secure in the
-public-representation setting, even if we use a salt or use a PRF in place of
-the hash function. The fact that the adversary can see exactly which filters are
+consider counting filters, which allow for both insertion and deletion operations
+while maintaining a compact representation by using counters in place of single
+bits. Besides this, the construction is identical to that of a standard Bloom filter.
+Despite the similarities, we find that counting filters are not secure in the
+public-representation setting, even if we add a salt or use a PRF in place of the
+hash function. The fact that the adversary can see exactly which filters are
 incremented or decremented with each update, along with the fact that updates can be
 trivially reversed (deletion undoes insertion and vice versa) allows the
 adversary to mount attacks by trial and error even if it lacks the ability to
 predict in advance where an element will be sent by the hash functions.
-%
 However, we are able to derive a good correctness in the mutable/private setting
-(Theorem~\ref{thm:scms-erreps-th}), using a per-representation salt and a
+(Theorem~\ref{thm:scbf-erreps-th}), using a per-representation salt and a
 notion of ``fullness'' similar to threshold Bloom filters.
 
-\heading{Counting filters}
-In Appendix~\ref{sec:count}, we include a discussion of the security
-of counting filters.
+\paragraph{Count min-sketches}
+Finally, we also consider the case of count min-sketches. These structures
+provide a compact representation of a
+multiset rather than a set, allowing queries for
+approximate frequency of an element in the multiset. While a count-min sketch
+hashes in much the same way as a Bloom or counting filter, it uses a 2D array of non-negative
+integer counters rather than a linear array, taking the minimum counter value
+over all arrays to answer queries.
 %
-In a loose sense, these fall somewhere between the CMS and Bloom
-filters: they admit both addition and deletion
-updates to the representation (like CMS), but only support set-membership queries.
+We find that due to their structural similarities and the similar update operations
+allowed for the structures, CMS and counting filters exhibit similar security
+properties. Again we see that these structures are not secure in the public-representation
+case, but find a bound in the private-representation case when salts and thresholds
+are used (Theorem~\ref{thm:counting-erreps}).
 %
-Due to their structural similarities, CMS and counting filters
-exhibit similar security properties (Theorem~\ref{thm:counting-erreps}).
 
 \ignore{
 %
@@ -389,9 +405,9 @@ that we do not consider.}
 
 \heading{Recommendations}
 %
-We find that the keeping the data structure private is often essential to guaranteeing security. In many settings this is not an issue, for example if the structure is only directly accessed by some specific trusted source. For counting filters and count min-sketches, the presence of both insertion and deletion operations gives an adaptive adversary enough power that security is difficult to provide. However, \textbf{with per-representation salts and the thresholding procedure we describe, security can be guaranteed in the private setting}.
+We find that the keeping the data structure private is often essential to guaranteeing security. In many settings this is not an issue, for example if the structure is only directly accessed by some specific trusted source. For counting filters and count min-sketches, the presence of both insertion and deletion operations gives an adaptive adversary enough power that security is difficult to provide. However, \emph{with per-representation salts and the thresholding procedure we describe, security can be guaranteed in the private setting}.
 
-For Bloom filters, the situation is somewhat better. Even in the public setting, \textbf{a salt alone can suffice to provide security for Bloom filters}, though this may also require a substantial increase in the size of the filter. For security purposes, a private key is also useful, forcing the adversary's attacks to be `online' rather than relying on offline hash computations. However, using a private key may not be possible in all applications, since anyone making a query to the filter must have access to the key.
+For Bloom filters, the situation is somewhat better. Even in the public setting, \emph{a salt alone can suffice to provide security for Bloom filters}, though this may also require a substantial increase in the size of the filter. For security purposes, a private key is also useful, forcing the adversary's attacks to be `online' rather than relying on offline hash computations. However, using a private key may not be possible in all applications, since anyone making a query to the filter must have access to the key.
 
 \heading{Future work}
 %
@@ -410,8 +426,12 @@ Bloom filter family alone has a wide range of practical applications, for
 example in large database query processing~\cite{broder2004network}, routing
 algorithms for peer-to-peer networks~\cite{reynolds2003efficient}, protocols for
 establishing linkages between medical-record databases~\cite{schnell2011novel},
-fair routing of TCP packets~\cite{feng2001stochastic}, and Bitcoin wallet
-synchronization~\cite{gervais2014privacy}.
+fair routing of TCP packets~\cite{feng2001stochastic}, Bitcoin wallet
+synchronization~\cite{gervais2014privacy}, and deep packet inspection~\cite{tarkoma2012theory}.
+Recently, Bloom filters were proposed as a
+means of efficient certificate-revocation list (CRL)
+distribution~\cite{larisch2017crlite}, a crucial component of public-key
+infrastructures.
 %
 Analyzing higher-level primitives or protocols will require establishing
 appropriate syntax and security notions for those, too; hence we leave this for
