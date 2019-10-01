@@ -10,11 +10,11 @@
     return $\big[\sum_x \err[x] \geq r\big]$
   \\[6pt]
   \oraclev{$\HASHO_c(\salt \cat x)$}\\[2pt]
-    $\vv \getsr [m]^k$\\
+    $\v.v \getsr [m]^k$\\
     if $\salt=\salt^*$ and $c = 1$ then \com{Caller is~$\advB$}\\
-    \tab $\bad_1 \gets 1$; \diffplus{return $\vv$}\\
-    if $T[Z,x] = \bot$ then $\vv \gets T[Z,x]$\\
-    $T[Z,x] \gets \vv$; return $\vv$
+    \tab $\bad_1 \gets 1$; \diffplus{return $\v.v$}\\
+    if $T[Z,x] = \bot$ then $\v.v \gets T[Z,x]$\\
+    $T[Z,x] \gets \v.v$; return $\v.v$
   \\[6pt]
   \oraclev{$\QRYO(\qry_x)$}\\[2pt]
     $\v.X \gets \HASHO_3(\salt^* \cat x)$;

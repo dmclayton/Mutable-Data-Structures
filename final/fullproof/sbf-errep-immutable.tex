@@ -22,33 +22,33 @@
     return $a$
   \\[6pt]
   \oraclev{$\HASHO_c(\salt \cat x)$}\\[2pt]
-    $\vv \getsr [m]^k$\\
+    $\v.v \getsr [m]^k$\\
     if $M^*=\bot$ and $\salt=\salt^*$ and $c=1$ then\\
-    \tab $\bad_1 \gets 1$; \diffplus{return $\vv$} \com{Caller is~$\advB$}\\
+    \tab $\bad_1 \gets 1$; \diffplus{return $\v.v$} \com{Caller is~$\advB$}\\
     if $T[Z,x] = \bot$ then\\
-    \tab $\vv \gets T[Z,x]$\\
-    $T[Z,x] \gets \vv$; return $\vv$
+    \tab $\v.v \gets T[Z,x]$\\
+    $T[Z,x] \gets \v.v$; return $\v.v$
 }
 {
   \vspace{-2pt}
   \oraclev{$\HASHO_c(\salt \cat x)$}\\[2pt]
-    $\vv \getsr [m]^k$\\
+    $\v.v \getsr [m]^k$\\
     if $M^*=\bot$ and $\salt=\salt^*$ and $c=1$ then\\
-    \tab $\bad_1 \gets 1$; return $\vv$\\
+    \tab $\bad_1 \gets 1$; return $\v.v$\\
     if $T[Z,x] = \bot$ then\\
-    \tab $\vv \gets T[Z,z]$\\
-    $T[Z,x] \gets \vv$\\[2pt]
+    \tab $\v.v \gets T[Z,z]$\\
+    $T[Z,x] \gets \v.v$\\[2pt]
     \diffplusbox{
     \com{Caller is~$\advB$ or $\QRYO$}\\
     if $c=1$ or $c=3$ then\\
     \tab if $\salt \ne \salt^*$  then\\
-    \tab return $\vv$\\
-    \tab $\Ans[x] \gets \bmap_m(\vv) = M^* \AND \bmap_m(\vv)$\\
+    \tab return $\v.v$\\
+    \tab $\Ans[x] \gets \bmap_m(\v.v) = M^* \AND \bmap_m(\v.v)$\\
     \tab $\epsilon \gets \delta(\Ans[x],\qry_x(\col^*))$\\
     \tab if $\err[x] < \epsilon$ then\\
     \tab\tab $\err[x] \gets \epsilon$
     }
-    return $\vv$
+    return $\v.v$
 }
 {
   \vspace{-7pt}
@@ -82,12 +82,24 @@ We will use the following lemma for keyless structures.
   \end{eqnarray*}
 \end{lemma}
 %
-\noindent
-The proof is by a fairly straightforward hybrid argument. Because~$\Gamma$ is
-keyless, in the reduction we simulate $q_R-1$ of the calls to $\REPO$ experiment
-and use our own oracles for the remaining query. The best we can do with this
-strategy is to guess the representation the \errep\ adversary will use in
-its attack, which results in the~$q_R$ factor in the bound.
+
+\begin{proof}
+The proof is by a fairly straightforward hybrid argument. Let $\advB$ be an adversary
+for the \errep\ case. Because~$\Gamma$ is keyless, note that an \errep1 adversary
+$\advA$ can perfectly simulate the behavior of the oracles in the experiment. This
+allows $\advA$ to simulate $\advB$ as follows. At the start of the game, $\advA$ picks
+$i$ from $[q_R]$ uniformly at random. Then $\advA$ simulates $\advB$ while also
+simulating all oracle queries except those related to the $i$th representation.
+When the $i$th call to $\REPO$ is made, $\advA$ makes its single $\REPO$ call.
+Any $\UPO$ and $\QRYO$ calls $\advB$ makes for the $i$th representation are forwarded
+by $\advA$ to its own oracles, whereas all other oracle calls are simulated.
+Once $\advB$ halts, $\advA$ also halts and returns 1. Since the simulation is
+perfect, $\advA$ is guaranteed to win as long as two conditions occur: $\advA$'s
+choice of $i$ matches the output of $\advB$, and $\advB$ itself would win the experiment.
+Since $\advA$ has a $1/q_R$ chance of randomly picking the correct value for $i$,
+we have the result that
+$\Adv{\errep}_{\Gamma,\delta,r}(\advB) \leq q_R \cdot \Adv{\errep1}_{\Gamma,\delta,r}(\advA)$.
+\end{proof}
 
 Let $\advA$ be an \errep\ adversary making~$1$ query to~$\REPO$, $q_T$ queries
 to $\QRYO$, $0$ queries to $\UPO$, and $q_H$ queries to the random
