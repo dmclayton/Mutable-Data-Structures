@@ -178,22 +178,12 @@ much stronger notion which we will find is not always achievable.
 
 \paragraph{Case studies and our findings}
 We exercise our syntax and notions by analyzing three important, real-world data
-<<<<<<< HEAD
 structures: Bloom filters~\cite{bloom1970space} (Section~\ref{sec:bloom}), counting
 filters~\cite{fan2000summary} (Section~\ref{sec:count}), and count
 min-sketches~\cite{cormode2005improved} (Section~\ref{sec:sketch}). Our studies examine the basic
 versions of each, as well as variants that may take a key or a
 per-representation random salt, and variants that incorporate measures
 of representation saturation.  Each of the basic structures supports different queries and
-=======
-structures: Bloom filters~\cite{bloom1970space} (Section~\ref{sec:bloom}), count
-min-sketches~\cite{cormode2005improved} (Section~\ref{sec:sketch}), and counting
-filters~\cite{fan2000summary} (Appendix~\ref{sec:count}), summarized in
-Figure~\ref{fig:tab-structures}. We begin each analysis with the basic
-version of the structure, then consider variants that take a key or a
-per-representation random salt, as well as variants that incorporate measures
-of representation saturation.  Each basic structure supports different queries and
->>>>>>> cba087e913c8fa6a1427901e764cd47ca02309ab
 update operations; taken together, they provide interesting coverage
 of the structure/attack-model landscape.
 
@@ -229,17 +219,10 @@ coverage attacks} (described in Section~\ref{sec:bad-bfs}).  These are closely
 related to \emph{pollution attacks} against standard Bloom
 filters~\cite{gerbet2015power}, which we will discuss in some detail.
 
-<<<<<<< HEAD
 On the positive side, we show how these structures can be
 modified in ways that are conceptually
 straightforward and intuitive in order to prove security. Our results are summarized
 in Figure~\ref{fig:results-summary}.
-=======
-On the positive side, we show how these structures can be modified in order to
-prove security.  These modification are conceptually straightforward and
-intuitive; we do not, however, study the deployment implications of these
-modifications.
->>>>>>> cba087e913c8fa6a1427901e764cd47ca02309ab
 
 \paragraph{Bloom filters, our in-depth study}
 Due to their wide-spread and varied use (and following NY), we begin
