@@ -52,7 +52,7 @@ function. The \emph{keyed} Bloom filter $\KBF[F,n,\lambda]$ is the
 structure $\bloom[F,n,\lambda]$, where $F:\keys\by\bits^*\to[m]^k$ is a
 PRF.
 %
-Note that the basic and salted BFs have key spaces $\{\emptystr\}$ and the keyed
+Note that the basic and salted BFs have key space $\{\emptystr\}$ and the keyed
 BF has key space~$\keys$.
 
 In this section, we will show that the basic Bloom filter construction
@@ -336,7 +336,7 @@ offline.
 %
 In the \erreps\ setting, or in the \errep\ setting when we use a PRF instead of a
 hash function, the adversary's attack is largely \emph{online}, rendering
-the~$q$ term quite conservative. In these settings, a significantly smaller
+the~$q$ term overly conservative. In these settings, a significantly smaller
 filter will do. For example, if we assume that an adversary making an online
 attack will make no more than $q=2^{32}$ online queries, we get the results seen
 in the lower plots of Figure~\ref{fig:bf-bound}. Beyond this, if a larger error rate is acceptable, the filters can
@@ -349,9 +349,10 @@ again be made substantially smaller.
   \includegraphics[scale=0.9]{fig/bf-bound-online}
   \includegraphics[scale=0.9]{fig/bf-bound-big-online}
   \caption{
-    The value of $\zeta_{k,m,n}(q,r)$ (Equation~(\ref{eq:zeta})) for $q=2^{64}$ (top) or $q = 2^{32}$ (bottom),
-    $k=16$, $n=100$ (left) or $n=10^9$ (right), varying values of~$r$ (one line per $r$-value) and filter
-    length~$m$ (the x-axis).  Note the log-2 scale on the y-axis.
+    The value of $\zeta_{k,m,n}(q,r)$ (Equation~(\ref{eq:zeta})) for: $k=16$;
+    $q=2^{64}$ (top) or $2^{32}$ (bottom); $n=100$ (left) or~$10^9$ (right);
+    varying values of~$r$ (one line per $r$-value); and varying values of the
+    filter length~$m$ (the x-axis).  Note the log-2 scale on the y-axis.
   }
   \label{fig:bf-bound}
 \end{figure}
@@ -619,8 +620,9 @@ adversary is allowed even a small number of additional calls to $q_R$.
   \end{center}
   \caption{
     Performance of $n$-capped versus $\ell$-thresholded Bloom
-    filters. The solid orange line shows the value of $\zeta_{k,m,n}(q,r)$ for
-    $k=16$, $n=100$ (left) or $n=10^9$ (right), $q=2^{32}$, $r=1$ (top) or $r = 5$ (bottom), and varying $m$ (on the x-axis).
+    filters. The solid orange line shows the value of $\zeta_{k,m,n}(q,r)$ for:
+    $k=16$; $q=2^{32}$; $n=100$ (left) or~$10^9$ (right); $r=1$ (top) or~$5$
+    (bottom); and varying $m$ (on the x-axis).
     %
     The dotted blue line shows the dominant term in the bound of
     Theorem~\ref{thm:sbf-erreps-th} for $\ell=nk$. The bounds are comparable,

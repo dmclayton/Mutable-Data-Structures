@@ -68,7 +68,7 @@ data structures captures this reality.
 %but a small amount of error is permitted.
 %
 Next, while the Bloom filter was designed to represent data collections~$\col$
-that are sets, streaming data (for example) is more accurately 
+that are sets, a data stream (for example) is more accurately 
 modeled as a multiset.  Here one is often interested in information
 about frequency, e.g., ``how many times does~$x$ appear
 in~$\col$?''
@@ -86,8 +86,9 @@ three algorithms take a key~$\ky$ as input, and both~$\Rep$ and~$\Up$ may be
 randomized.
 
 The combination of mutability and rich query spaces has significant implications
-for security. Consider the counting filter
-structure~\cite{fan2000summary}.  It is similar to a Bloom filter, but 
+for security. Consider the counting Bloom filter
+structure~\cite{fan2000summary} (we refer to this simply as a ``counting
+filter'' in the remainder).  It is similar to a Bloom filter, but 
 instead of a bit array, a counting filter represents an updatable
 multiset~$\col$ as an array of~$m$ integers; these serve as counters.
 To add~$x$ to~$\col$, hash values $h_1(x), \ldots,
@@ -132,7 +133,7 @@ with probability ``close'' to one.
 We therefore parameterize our security experiments with a specifiable
 \emph{error function}~$\delta$.  If the correct response to an adversarial
 query is~$a$ and the data structure responds with~$a'$, the
-experiments award the adversary with an error weight $\delta(a,a') \geq 0$.
+experiments award the adversary with error weight $\delta(a,a') \geq 0$.
 %
 Our experiments are additionally parameterized by an \emph{error capacity}
 $r\geq0$, and the adversary is considered to ``win'' if the total cost of the
@@ -150,7 +151,7 @@ representation-oracle~$\REPO$ that, on input a collection~$\col$,
 returns the resulting representation $\Rep_K(\col)$. Note that the
 key~$K$ (which may be the empty string, to capture unkeyed structures)
 is fixed across all calls; however, per-representation randomness
-(e.g. salts) may be present.  The adversary is permitted to
+(e.g. salts) may be encoded by the representation.  The adversary is permitted to
 (adaptively) update any established representation via an
 update-oracle~$\UPO$ and, at any time, it may query a representation
 via a query-oracle~$\QRYO$. The adversary is given credit (determined

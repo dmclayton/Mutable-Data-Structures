@@ -14,7 +14,7 @@ by $\QRYO(x)$ for each $x\in\setT$.
 Assuming $|\setT| \geq r$, where~$r$ is the error capacity, the attack succeeds
 with probability~$1$.
 %
-In this section we describe a strategy for finding a covering set and evaluate
+Next we describe a heuristic strategy for finding a covering set and evaluate
 its performance in terms of success rate and computational cost. We will
 (conservatively) model~$H$ as a random oracle.
 
@@ -31,7 +31,7 @@ to~$\REPO$, and~$r$ queries to~$\QRYO$. However, checking $\binom{s}{n}$ sets
 would be infeasible, even for modest choices of $k$, $m$, and $n$. Observe,
 however, that there is a lot of sub-structure to exploit in the search.
 %
-In the remainder, we describe a \emph{heuristic} strategy for finding a
+In particular, there is a simple heuristic strategy for finding a
 satisfying set (if it exists) in which we need only check about $O(kr)$ sets on
 average.
 
@@ -76,7 +76,8 @@ optimal solution.
 
 We implemented this attack and evaluated its performance.
 Figure~\ref{fig:bf-correct-attk-sim} shows the success rate and average number
-of sets checked for a number of simulations and various parameters.
+of sets checked for a number of simulations and various parameters. (For each
+simulation we start with a ``fresh'' choice of random oracle.)
 %
 Unsurprisingly, the success rate decreases as we increase the number of filter
 bits (top-left of Figure~\ref{fig:bf-correct-attk-sim}); however, with $k=4$,
@@ -87,7 +88,7 @@ increasing the error parameter only slightly decreases the success rate
 choices, the basic Bloom filter is not secure in the \erreps1\ sense.
 %
 Finally, we find that the average number of sets that were tested is about
-$O(kr)$ within all of the parameter ranges we tested.
+$O(kr)$ within all of the parameter regimes we studied.
 
 %
 %\newcommand{\mydot}{{\scriptsize\ding{108}}}

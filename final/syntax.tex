@@ -34,7 +34,7 @@ Let $\Func(\setX,\setY)$ denote the set of functions $f:\setX\to\setY$.
 For every function~$f: \setX \to \setY$, define $\id^f: \{\emptystr\} \times \setX \to \setY$ so that
 $\id^f(\emptystr, x) = f(x)$ for all $x$ in the domain
 of~$f$. This allows us to use unkeyed hash functions $H$ in situations where,
-syntactically, a function is required to take a key along with its input.
+syntactically, a keyed function (e.g., a pseudorandom function) is called for.
 
 \heading{Adversaries}
 Adversaries are randomized algorithms that expect access to one or more oracles
@@ -52,8 +52,8 @@ the outputs of the function to appear random for a fixed choice of key, which is
 formally captured by the game described in Figure~\ref{fig:prf-def}. We define
 the advantage of an adversary $\advA$ to be
 $\Adv{\prf}_F(\advA) = \Prob{\Exp{\prf}_F(\advA) = 1}$, and the function
-$\Adv{\prf}_F(t,q)$ to be the maximum advantage of any adversary running for $t$
-steps and making $q$ queries to~$\PRFO$.
+$\Adv{\prf}_F(t,q)$ to be the maximum advantage of any $t$-time adversary
+making $q$ queries to~$\PRFO$.
 %\cpnote{We could save a few inches here by changing the definition. I personally
 %like a nice, concrete PRF notion like this one, however.}
 
