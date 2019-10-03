@@ -75,7 +75,7 @@ in~$\col$?''
 %As with Bloom filters, the challenge is to answer this question with
 %as little space consumption as possible, at the cost of admitting a reasonable
 %amount of error.
-Thus, in addition to admiting mutable respresentation, our
+Thus, in addition to admiting mutable representations, our
 formalization of data structures allows for rich
 query spaces.  Specifically, we define a data structure to be a triple of algorithms $(\Rep,
 \Qry, \Up)$ denoting the \emph{representation}, \emph{query-evaluation}, and
@@ -97,9 +97,9 @@ incremented.  Decrementing the counters implements \emph{deletion} of
 an occurrence of~$x$ from~$\col$. %(Counters are typically floored at 0.)
 %
 Like a Bloom filter, a counting filter provide approximately correct
-answers to set-membership queries\footnote{Indeed, they were initially
+answers to set-membership queries,\footnote{Indeed, they were initially
 introduced to support deletions from a \emph{set}, without having to
-rebuild the representation, as one would for a Bloom filter.}, where a
+rebuild the representation, as one would for a Bloom filter.} where a
 query about~$x$ results in a positive response iff all of the
 hash-indicated counters are at least one.
 %
@@ -183,11 +183,12 @@ structures: Bloom filters~\cite{bloom1970space} (Section~\ref{sec:bloom}), count
 filters~\cite{fan2000summary} (Section~\ref{sec:count}), and count
 min-sketches~\cite{cormode2005improved} (Section~\ref{sec:sketch}). Our studies examine the basic
 versions of each, as well as variants that may take a key or a
-per-representation random salt, and variants that incorporate measures
-of representation saturation.  Each of the basic structures supports different queries and
+per-representation random salt, and variants that incorporate alternate measures of
+when the structure is full.  Each of the basic structures supports different queries and
 update operations; taken together, they provide interesting coverage
 of the structure/attack-model landscape.
 
+\setlength{\belowcaptionskip}{-10pt}
 \begin{figure}[tp]
 \begin{center}
 \small
@@ -210,6 +211,7 @@ of the structure/attack-model landscape.
   \label{fig:results-summary}
 \end{center}
 \end{figure}
+\setlength{\belowcaptionskip}{0pt}
 
 We find
 that \emph{none of the (basic) structures meets either of our security
@@ -295,11 +297,11 @@ trivially reversed (deletion undoes insertion and vice versa) allows the
 adversary to mount attacks by trial and error even if it lacks the ability to
 predict in advance where an element will be sent by the hash functions.
 However, we are able to derive a good correctness in the mutable/private setting
-(Theorem~\ref{thm:scbf-erreps-th}), using a per-representation salt and a
+(Theorem~\ref{thm:counting-erreps}), using a per-representation salt and a
 notion of ``fullness'' similar to threshold Bloom filters.
 
 \paragraph{Count min-sketches}
-Finally, we also consider the case of count min-sketches. These structures
+Finally, we also consider the case of the count min-sketch (CMS). These structures
 provide a compact representation of a
 multiset rather than a set, allowing queries for
 approximate frequency of an element in the multiset. While a count-min sketch
@@ -311,7 +313,7 @@ We find that due to their structural similarities and the similar update operati
 allowed for the structures, CMS and counting filters exhibit similar security
 properties. Again we see that these structures are not secure in the public-representation
 case, but find a bound in the private-representation case when salts and thresholds
-are used (Theorem~\ref{thm:counting-erreps}).
+are used (Theorem~\ref{thm:scms-erreps-th}).
 %
 
 \ignore{
@@ -397,8 +399,9 @@ For Bloom filters, the situation is somewhat better. Even in the public setting,
 %
 The focus of this work is the data structures themselves.  Even so, we
 were only able to consider a handful of (important, real-world)
-examples.  We hope that future work will apply our formalisms to the
-many probabilistic data structures that exist.
+examples.  We hope that future work will apply our formalisms to
+other probabilistic data structures, such as the previously-mentioned
+cuckoo filter and stable Bloom filter.
 
 Going into a different direction, future work should
 also address how adversarial correctness impacts high-level protocols that use
@@ -420,12 +423,12 @@ infrastructures.
 Analyzing higher-level primitives or protocols will require establishing
 appropriate syntax and security notions for those, too; hence we leave this for
 future work.
-%
+
 Another interesting direction is to consider what information data structures
 leak via their public representations. A large variety of data structures with
 interesting privacy properties have been proposed. For example, variants of
 Bloom filters that ensure privacy of the \emph{query} have been
-studied~\cite{bellovin2004privacy,nojima2009cryptographically}. These prior work
+studied~\cite{bellovin2004privacy,nojima2009cryptographically}. These prior works
 leave open the security of more conventional data structures, like those studied
 in this paper.
 

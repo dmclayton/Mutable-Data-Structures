@@ -132,10 +132,10 @@ section), but has additional
 difficulties because the deletion operation is somewhat more complex to deal
 with in the case of a counting filter. In particular, because the filter contains
 single bits rather than counters, the adversary may be able
-to `delete' an element incorrectly believed to be in the set in order to induce
-false negatives. We therefore delay the proof until after the proof
-of Theorem~\ref{thm:scms-erreps-th} in Section~\ref{sec:sketch-proof} for count min-sketches. The two proofs are
-in fact quite similar due to similarity of the two structures, and in particular
+to ``delete'' an element incorrectly believed to be in the set in order to induce
+false negatives. We therefore delay the proof until Appendix~\ref{app:delayed-proof}.
+The proof is in fact quite similar to that of Theorem~\ref{thm:scms-erreps-th}
+due to similarity of the two structures, and in particular
 the fact that the allowed updates are the same.
 
 So we find that, unlike Bloom filters, there is no simple tweak that can be performed

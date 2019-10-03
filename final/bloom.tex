@@ -67,12 +67,12 @@ that $\SBF$ is only secure in the \erreps\ setting. To provide \errep\ security
 when updates are needed, $\KBF$ must be used instead.
 
 At the end of the section, we discuss the second class of filters that we call the
-\emph{$\ell$-thresholded}. Instead of rejecting updates after a pre-determined
+\emph{$\ell$-thresholded} filters. Instead of rejecting updates after a pre-determined
 number of elements are added to the set, a thresholded filter is deemed full
 once at least $\ell\geq0$ bits of the filter are set.
 %
 In the usual, non-adaptive setting, this implementation behaves very
-similarly to the standard `$n$-capped' Bloom filter, but we find that a filter threshold
+similarly to the standard ``$n$-capped'' Bloom filter, but we find that a filter threshold
 allows us to obtain better bounds.
 %
 We will demonstrate this for salted BFs in the \erreps\ setting.
@@ -164,8 +164,8 @@ analyze websites. In order to keep track of the set of webpages which have
 already been visited during a crawl, some crawlers use a Bloom filter which is
 updated to include each new page the crawler visits.
 Suppose the adversary controls at least one such webpage along the crawl's path
-and wishes to deny the spider access to a different webpage, the `target
-webpage'. The adversary can choose the links present on its own webpage, which
+and wishes to deny the spider access to a different webpage, the ``target
+webpage''. The adversary can choose the links present on its own webpage, which
 will cause the spider to visit the chosen webpages and set the corresponding
 bits of its Bloom filter to~$1$. If those links are chosen in such a way that they
 produce a false positive for the target webpage, the spider will then
@@ -178,7 +178,7 @@ inputs that maximizes the number of 1s in the filter. This strategy is especiall
 effective when the structure of the hash function is known to the adversary. In
 particular, as long as the choice of hash function and any associated parameters
 are public, the adversary can compute the hash function on its own in order to
-determine which choices will set the maximum number of bits to 1, or which
+determine which choices maximize the number of bits set to 1, or which
 choices will set certain target bits to 1 in order to cause specific false
 positives. They show that with $m = 3200$ and $k = 4$, the adversary can double
 the false positive rate if they control 200 out of a total of $n = 600$
@@ -368,6 +368,7 @@ again be made substantially smaller.
 \end{proof}
 }
 
+\heading{Security in the mutable setting}
 Recall that the \errep1 attack against mutable salted filters exploited the fact that
 the adversary learned the salt as soon as the filter was created, and that from
 this it could compute the hash function on its own. Even if the filter is
@@ -435,14 +436,12 @@ integers~$n,\lambda\geq0$, and let $\Pi = \KBF[F,n,\lambda]$.
 \label{thm:kbf-errep}
   Let $p' = P_{k,m}(n+r)$.  For integers $q_R, q_T, q_U, q_H, r, t \geq 0$ such that
   $r > p'q_T$, it holds that
-  \begin{equation*}
-    \begin{aligned}
-      \Adv{\errep}_{\Pi,\delta,r}(t,\,&q_R,q_T,q_U,q_H) \leq \\
-        \Adv{\prf}_F(O(t),nq_R+q_T+q_U) & +
+  \begin{equation}
+      \Adv{\errep}_{\Pi,\delta,r}(t,q_R,q_T,q_U,q_H) \leq 
+        \Adv{\prf}_F(O(t),nq_R+q_T+q_U) +
       \frac{q_R^2}{2^\lambda} +
       \left(\frac{p'q_Rq_T}{r}\right)^re^{r-p'q_Rq_T} \,.
-    \end{aligned}
-  \end{equation*}
+  \end{equation}
 \end{theorem}
 
 As usual, our strategy will be to move to the non-adaptive setting via a
@@ -579,7 +578,7 @@ adaptive adversaries. Moving to the salted $\SBF$ construction mitigates this,
 but if filters are public they must be both large and immutable (Theorem~\ref{thm:sbf-errep-immutable}). In the \erreps\
 setting updates do not break security and the minimum size of the filter to
 guarantee a fixed error rate is considerably reduced (Theorem~\ref{thm:sbf-erreps}). The guarantee (or,
-equivalently, filter size) can be further improved, especially if the number of
+alternatively, filter size) can be further improved, especially if the number of
 representations constructed is large, by using $\ell$-thresholding (Theorem~\ref{thm:bf-thr-bound}).
 Additionally, if the filters themselves cannot be kept private but a secret key
 for the hash functions \emph{can} be concealed from adversaries, the $\KBF$

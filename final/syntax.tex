@@ -48,7 +48,7 @@ the time required to evaluate its oracle queries.
 %
 For sets $\setX$ and $\setY$ and a keyspace $\setK$, we define a pseudorandom
 function to be a function $F: \setK \times \setX \to \setY$. The intent is for
-the outputs of the function to appear random for a fixed choice of key, which is
+the outputs of the function to appear random for a uniformly randomly chosen key, which is
 formally captured by the game described in Figure~\ref{fig:prf-def}. We define
 the advantage of an adversary $\advA$ to be
 $\Adv{\prf}_F(\advA) = \Prob{\Exp{\prf}_F(\advA) = 1}$, and the function

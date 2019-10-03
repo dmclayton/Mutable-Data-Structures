@@ -82,16 +82,16 @@ We will use the following lemma for keyless structures.
   \end{eqnarray*}
 \end{lemma}
 %
-
+\renewcommand{\qed}{\hfill\ensuremath{\blacksquare}}
 \begin{proof}
 The proof is by a fairly straightforward hybrid argument. Let $\advB$ be an adversary
 for the \errep\ case. Because~$\Gamma$ is keyless, note that an \errep1 adversary
 $\advA$ can perfectly simulate the behavior of the oracles in the experiment. This
 allows $\advA$ to simulate $\advB$ as follows. At the start of the game, $\advA$ picks
 $i$ from $[q_R]$ uniformly at random. Then $\advA$ simulates $\advB$ while also
-simulating all oracle queries except those related to the $i$th representation.
-When the $i$th call to $\REPO$ is made, $\advA$ makes its single $\REPO$ call.
-Any $\UPO$ and $\QRYO$ calls $\advB$ makes for the $i$th representation are forwarded
+simulating all oracle queries except those related to the $i$-th representation.
+When the $i$-th call to $\REPO$ is made, $\advA$ makes its single $\REPO$ call.
+Any $\UPO$ and $\QRYO$ calls $\advB$ makes for the $i$-th representation are forwarded
 by $\advA$ to its own oracles, whereas all other oracle calls are simulated.
 Once $\advB$ halts, $\advA$ also halts and returns 1. Since the simulation is
 perfect, $\advA$ is guaranteed to win as long as two conditions occur: $\advA$'s
@@ -100,6 +100,7 @@ Since $\advA$ has a $1/q_R$ chance of randomly picking the correct value for $i$
 we have the result that
 $\Adv{\errep}_{\Gamma,\delta,r}(\advB) \leq q_R \cdot \Adv{\errep1}_{\Gamma,\delta,r}(\advA)$.
 \end{proof}
+\renewcommand{\qed}{\hfill\ensuremath{\square}}
 
 Let $\advA$ be an \errep\ adversary making~$1$ query to~$\REPO$, $q_T$ queries
 to $\QRYO$, $0$ queries to $\UPO$, and $q_H$ queries to the random
